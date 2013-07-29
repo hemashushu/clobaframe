@@ -1,0 +1,7 @@
+#!/bin/bash
+# build the library, source and javadoc packages
+# for details see
+#	http://maven.apache.org/plugins/maven-install-plugin/
+#	http://maven.apache.org/plugins/maven-javadoc-plugin/
+#	http://maven.apache.org/plugins/maven-source-plugin/
+mvn clean javadoc:jar source:jar package -DskipTests=true

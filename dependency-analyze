@@ -1,0 +1,3 @@
+#!/bin/bash
+# for details see http://maven.apache.org/plugins/maven-dependency-plugin/
+mvn dependency:analyze

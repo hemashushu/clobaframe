@@ -1,0 +1,3 @@
+#!/bin/bash
+# details see http://maven.apache.org/plugins/maven-surefire-plugin/
+mvn clean test

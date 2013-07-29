@@ -1,0 +1,10 @@
+How to run the unit test:
+-------------------------
+
+1. Check out source code to any folder.
+
+2. Make the following folder and change the folder owner to the current user:
+    /var/lib/clobaframe
+
+3. Run the unit test with Apache Maven:
+    $ mvn clean test

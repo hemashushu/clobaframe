@@ -1,0 +1,5 @@
+#!/bin/bash
+# for details see http://maven.apache.org/plugins/maven-dependency-plugin/
+mvn clean dependency:resolve
+mvn clean dependency:resolve -Dclassifier=javadoc
+mvn clean dependency:resolve -Dclassifier=sources

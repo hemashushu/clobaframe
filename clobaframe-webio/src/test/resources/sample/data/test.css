@@ -1,0 +1,565 @@
+/*
+* common.css
+*/
+
+/*
+* color:
+*
+*	Background: #ffffff (Black)
+*	Text: #000000 (White)
+*	Link: #0a9ccc, hsv(195.95.80) (Pacific blue) from #0099cc, hsv(195,100,80)
+*	Link active: #f2870c, hsv(32,95,95) (Orange) from #ff8800, hsv(32,100,100)
+*	Menu link active: #93b236, hsv(75,70,70) (Yellow green) from #99cc00, hsv(75,100,80)
+*
+*	Yellow green linear: #99cc00(0,brightness) -> #86b200(2) -> #739900(4) hsv(75,100,60) rgb(115,153,0) ->
+*				#607f00(6) hsv(75,100,50) rgb(96,127,0) -> #4c6600(8) ->
+*				#394c00(10)
+*
+*	Yellow green link: #4c6600
+*	Yellow green block: #f0f8db
+*
+*	Blue linear: #00ace5(-2) -> #0099cc(0,brightness) -> #0086b2(2) -> #007399(4) hsv(195,100,60) rgb(0,115,153) ->
+*				#00607f(6) hsv(195,100,50) rgb(0,96,127) -> #004c66(8) ->
+*				#00394c(10)
+*
+*	Tab underline and selected: #b2cc66 hsv(75,50,80) #86b200 hsv(75,100,70)
+*	Orange block: #ffb442
+*	Flat button: #6b888c, hsv(187,24,55) from #0099cc, hsv(195,100,80)
+*	Flash message panel: #6a7273, hsv(187,8,45) from #0099cc, hsv(195,100,80)
+*	Popup box/highlight box: #ff8800, hsv(32,100,100), background #fff6df hsv(43,13,100)
+*	Input box focus border: #2eb8e5 hsv(195,80,90) from #0099cc, hsv(195,100,80)
+*
+*/
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: "DejaVu Sans", Arial, Helvetica, sans-serif;
+	font-size: 0.8em;
+}
+
+input[type="text"],
+input[type="password"],
+select,
+textarea {
+	/* font-size: 1em; */
+}
+
+input.light,
+select.light,
+textarea.light {
+	width: 220px;
+	height: 16px;
+	padding: 10px 16px;
+	border: 1px solid #cccccc;
+	border-radius: 4px;
+	box-shadow: 0 2px 4px -3px rgba(0, 0, 0, 0.25) inset, 0 1px 0 rgba(252,252,252,0.5);
+}
+
+input.light:focus,
+select.light:focus,
+textarea.light:focus {
+	border: 1px solid #2eb8e5;
+	box-shadow: 0 0 8px rgba(82, 168, 236, .6); /* optional */
+	outline: none;
+}
+
+a:link, a:visited {
+	color: #0a9ccc;
+	font-weight: normal;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #f2870c;
+	text-decoration: underline;
+}
+
+ul {
+	list-style: none outside none;
+}
+
+h1 {
+	font-size: 1.8em;
+	margin-bottom: 16px;
+}
+
+a.button {
+	background: #dcdcdc;
+	background: -webkit-gradient(linear, left top, left bottom, from(#fcfcfc), to(#dcdcdc));
+	background: -moz-linear-gradient(top, #fcfcfc, #dcdcdc);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#fcfcfc', EndColorStr='#dcdcdc'); /* ie-fix (6,7,8,9 gradient) */
+
+	border-radius: 3px;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #bbbbbb #bbbbbb #999999;
+
+	cursor: pointer;
+	display: inline-block;
+	white-space: nowrap;
+	text-align: center;
+	/* vertical-align: bottom; */
+	text-decoration: none;
+
+	padding: 10px 16px;
+	height: 16px;
+	line-height: 16px;
+
+	color: #000000;
+	text-shadow: 0 1px 0 #ffffff;
+}
+
+a.button:hover {
+	border-color: #666666 #666666 #444444;
+	box-shadow: 0 0 2px rgba(0,0,0,.3);
+}
+
+a.button:active {
+	background: #cccccc;
+	background: -webkit-gradient(linear, left top, left bottom, from(#e0e0e0), to(#fcfcfc));
+	background: -moz-linear-gradient(top, #e0e0e0, #fcfcfc);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#e0e0e0', EndColorStr='#fcfcfc'); /* ie-fix (6,7,8,9 gradient) */
+}
+
+a.button:focus {
+	outline: none;
+}
+
+a.defaultButton {
+	background: #739900;
+	background: -webkit-gradient(linear, left top, left bottom, from(#99cc00), to(#739900));
+	background: -moz-linear-gradient(top, #99cc00, #739900);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#99cc00', EndColorStr='#739900');	/* ie-fix (6,7,8,9 gradient) */
+
+	color: #ffffff;
+	text-shadow: none;
+	border-color: #607f00 #607f00 #4c6600;
+}
+
+a.defaultButton:hover {
+	border-color: #4c6600 #4c6600 #394c00;
+	box-shadow: 0 0 3px rgba(96, 127, 0, .6);
+}
+
+a.defaultButton:active {
+	background: #99cc00;
+	background: -webkit-gradient(linear, left top, left bottom, from(#607f00), to(#99cc00));
+	background: -moz-linear-gradient(top, #607f00, #99cc00);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#607f00', EndColorStr='#99cc00');	/* ie-fix (6,7,8,9 gradient) */
+}
+
+a.blue {
+	background: #739900;
+	background: -webkit-gradient(linear, left top, left bottom, from(#00ace5), to(#007399));
+	background: -moz-linear-gradient(top, #00ace5, #007399);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#00ace5', EndColorStr='#007399');	/* ie-fix (6,7,8,9 gradient) */
+
+	color: #ffffff;
+	text-shadow: none;
+	border-color: #00607f #00607f #004c66;
+
+}
+
+a.blue:hover {
+	border-color: #004c66 #004c66 #00394c;
+	box-shadow: 0 0 3px rgba(0, 96, 127, .6);
+}
+
+a.blue:active {
+	background: #00ace5;
+	background: -webkit-gradient(linear, left top, left bottom, from(#007399), to(#00ace5));
+	background: -moz-linear-gradient(top, #007399, #00ace5);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#007399', EndColorStr='#00ace5');	/* ie-fix (6,7,8,9 gradient) */
+}
+
+a.disableButton,
+a.disableButton:hover,
+a.disableButton:active {
+	background: #ececec;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#dddddd', EndColorStr='#dddddd'); /* ie-fix (6,7,8,9 gradient) */
+    border-color: #cccccc;
+    color: #999999;
+    text-shadow: 0 1px 0 #fcfcfc;
+	box-shadow: none;
+	cursor: default;
+}
+
+.grayBlock {
+	background: #ececec;
+    border: 1px solid #cccccc;
+	border-radius: 3px;
+
+	display: inline-block;
+    color: #999999;
+    text-shadow: 0 1px 0 #fcfcfc;
+
+	text-align: center;
+
+	padding: 4px 10px;
+	line-height: 18px;
+}
+
+a.flat {
+	background: #6b888c;
+	border-radius: 4px;
+	color: #ffffff;
+	display: inline-block;
+	height: 20px;
+	line-height: 20px;
+	padding: 0 12px;
+	text-align: center;
+}
+
+a.flat:focus {
+	outline: none;
+}
+
+a.done {
+	font-weight: bold;
+}
+
+a.hidden {
+	display: none;
+}
+
+.clear{
+	clear: both;
+}
+
+.hidden {
+	display: none;
+}
+
+.invisible {
+	visibility: hidden;
+}
+
+.highlight {
+	background: #fff6df !important;
+	border: 1px solid #ff8800 !important;
+}
+
+.hints {
+	color: #999999;
+}
+
+.hints ul li {
+	margin-bottom: 4px;
+}
+
+img {
+	border: none; /* ie-fix */
+}
+
+/*
+* Flash message panel
+*/
+.flashMessagePanel {
+	position: absolute;
+	z-index: 300;
+	/* width: 480px; */
+	display: none;
+}
+
+.flashMessagePanelTopMost {
+	position: fixed;
+	margin-left: -100px;
+	left: 50%;
+	top: 5px;
+}
+
+.flashMessagePanel .content {
+	position: relative;
+	background: #6a7273;
+	border-radius: 5px;
+	text-align: center;
+	padding: 6px 26px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, .3);
+	min-width: 200px;
+	max-width: 360px;
+}
+
+.flashMessagePanelBottom .content {
+	max-width: 260px;
+}
+
+.flashMessagePanel .content .text {
+	color: #ffffff;
+	/* line-height: 26px; */
+	margin-right: 12px;
+}
+
+.flashMessagePanel .content .action a {
+	color: #ffffff;
+	/* line-height: 26px; */
+	margin-right: 10px;
+	text-decoration: underline;
+}
+
+.flashMessagePanel .content .close{
+	position: absolute;
+	top: 0;
+	right: 0;
+
+	display: block;
+	color: rgba(255,255,255,.4);
+	padding: 5px;
+	width: 16px;
+	height: 16px;
+}
+
+/*
+* The loading icon
+*/
+.loadingIcon {
+	background: url("[[image/loading-16x16.gif]]") no-repeat 0 0;
+	display: block;
+	width: 16px;
+	height: 16px;
+}
+
+a.loadingAnimation {
+	position: relative;
+	padding-right: 32px;
+}
+
+a.loadingAnimation .loadingIcon {
+	position: absolute;
+	top: 0px;
+	right: 8px;
+}
+
+a.flat .loadingIcon {
+	top: 2px;
+}
+
+a.button .loadingIcon {
+	top: 5px;
+}
+
+a.loadingAnimation .withText {
+	position: static;
+	display: inline-block;
+    margin: 0 8px;
+    padding-left: 24px;
+	color: #666666;
+	width: auto;
+	right: auto;
+}
+
+/*
+* Dropdown button
+*/
+a.dropDownButton {
+	position: relative;
+	padding-right: 28px;
+}
+
+a.dropDownButton .icon{
+	position: absolute;
+	right: 6px;
+	top: 6px;
+	display: block;
+	width: 16px;
+	height: 16px;
+	background: url("[[image/dropdown-16.png]]") no-repeat 0 0;
+	opacity: .85;
+}
+
+a.dropDownButton:hover .icon{
+	opacity: 1.0;
+}
+
+/*
+* Arrow box
+*/
+.arrowBox {
+	position: absolute;
+	top: 40px;
+	left: 0;
+	width: 200px;
+	border-radius: 5px;
+	background: #ffffff;
+	border: 1px solid #999999;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, .2);
+	z-index: 30;
+}
+
+.arrowBox .arrow {
+	position: absolute;
+	left: 32px;
+	top: -18px;
+	display: block;
+	height: 0;
+	width: 0;
+	border-color: transparent transparent #999999;
+	border-style: solid;
+	border-width: 9px;
+}
+
+.arrowBox .arrowBottom {
+	left: 32px;
+	top: auto;
+	bottom: -18px;
+	border-color: #999999 transparent transparent;
+}
+
+.arrowBox .arrowLeft {
+	left: -18px;
+	top: 6px;
+	border-color: transparent #999999 transparent transparent;
+}
+
+.arrowBox .arrowRight {
+	left: auto;
+	top: 6px;
+	right: -18px;
+	border-color: transparent transparent transparent #999999;
+}
+
+/*
+* Drop down menu
+*/
+.dropDownMenu {
+
+}
+
+.dropDownMenu ul {
+	padding: 5px 0;
+}
+
+.dropDownMenu ul li a {
+	display: block;
+	height: 28px;
+	line-height: 28px;
+	text-decoration: none;
+	padding-left: 16px;
+	color: #000000;
+}
+
+.dropDownMenu ul li a.disable {
+	color: #aaaaaa;
+}
+
+.dropDownMenu ul li a:hover{
+	background: #93b236;
+	color: #ffffff;
+}
+
+.dropDownMenu ul li a.disable:hover {
+	color: #cccccc;
+}
+
+.dropDownMenu ul li .split{
+	border-bottom: 1px solid #cccccc;
+	display: block;
+	height: 4px;
+	margin: 0 10px 4px;
+}
+
+/*
+* Popup box, with different border color and shadow color from drop down box.
+*/
+.popupBox {
+	width: 220px;
+	border: 1px solid #ff8800;
+	box-shadow: 0 2px 10px rgba(255, 136, 0, .3);
+	background: #fff6df;
+}
+
+.popupBox .arrow {
+	border-color: transparent transparent #ff8800;
+}
+
+.popupBox .arrowBottom {
+	border-color: #ff8800 transparent transparent;
+}
+
+.popupBox .arrowLeft {
+	border-color: transparent #ff8800 transparent transparent;
+}
+
+.popupBox .arrowRight {
+	border-color: transparent transparent transparent #ff8800;
+}
+
+.popupBox .content {
+	padding: 12px;
+}
+
+.popupBox .content .text {
+	margin-bottom: 4px;
+}
+
+.popupBox .content .action a {
+	margin-right: 12px;
+	text-decoration: underline;
+}
+
+/*
+* Popup dialog, a mini inline dialog.
+*/
+.popupDialog {
+	width: 240px;
+}
+
+.popupDialog .content {
+	padding: 12px;
+}
+
+.popupDialog .content .text {
+	margin-bottom: 12px;
+}
+
+.popupDialog .content .action {
+	text-align: right;
+}
+
+.popupDialog .content .action a {
+	padding: 4px;
+	margin-right: 12px;
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+/*
+* Checkable form
+*/
+
+.checkableForm .statusBox {
+	position: absolute;
+	left: 330px;
+	top: 4px;
+	display: block;
+	width: 16px;
+	height: 16px;
+}
+
+.checkableForm .checking {
+	background: url("[[image/loading-16x16.gif]]") no-repeat 0 0;
+}
+
+.checkableForm .pass {
+	background: url("[[image/success-16.png]]") no-repeat 0 0;
+}
+
+.checkableForm .failed {
+	background: url("[[image/warn-16.png]]") no-repeat 0 0;
+}
+
+/*
+* link list
+*/
+
+.linkList a {
+	background: url("[[image/list-style-right-24.png]]") no-repeat 0 0;
+	padding-left: 28px;
+	display: block;
+	height: 24px;
+	line-height: 24px;
+	margin-bottom: 4px;
+}
