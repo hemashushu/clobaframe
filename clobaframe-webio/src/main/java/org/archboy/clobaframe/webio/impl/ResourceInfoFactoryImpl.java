@@ -1,6 +1,7 @@
 package org.archboy.clobaframe.webio.impl;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,5 +27,10 @@ public class ResourceInfoFactoryImpl implements ResourceInfoFactory {
 	@Override
 	public ResourceInfo make(byte[] content, String contentType, Date lastModified) {
 		return new ByteArrayResourceInfo(content, contentType, lastModified);
+	}
+
+	@Override
+	public ResourceInfo make(InputStream inputStream, long contentLength, String contentType, Date lastModified) {
+		return new InputStreamResourceInfo(inputStream, contentLength, contentType, lastModified);
 	}
 }

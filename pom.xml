@@ -34,7 +34,7 @@
 		<module>clobaframe-query</module>
 		<module>clobaframe-cache</module>
 		<module>clobaframe-webio</module>
-		<module>clobaframe-imaging</module>
+		<module>clobaframe-media</module>
 		<module>clobaframe-webresource</module>
 		<module>clobaframe-blobstore</module>
 		<module>clobaframe-webresource-blobstore</module>

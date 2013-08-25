@@ -15,7 +15,7 @@ public interface ContentTypeAnalyzer {
 	 * This function will check both the extension name and file stream.
 	 * 
 	 * @param file
-	 * @return 
+	 * @return CONTENT_TYPE_UNKNOWN if can not detect.
 	 */
 	String getByFile(File file);
 	
