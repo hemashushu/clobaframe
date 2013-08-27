@@ -34,10 +34,6 @@ public class ExifMetaDataTest {
 
 	@Autowired
 	private MediaFactory mediaFactory;
-
-	@Autowired
-	private ResourceInfoFactory resourceInfoFactory;
-	
 	
 	@Before
 	public void setUp() throws Exception {
@@ -69,8 +65,8 @@ public class ExifMetaDataTest {
 		assertEquals("Apple", metadata1.get(Image.MetaName.Make));
 		assertEquals("iPhone 4", metadata1.get(Image.MetaName.Model));
 		assertEquals(Image.Orientation.Normal, metadata1.get(Image.MetaName.Orientation));
-		assertTrue(Math.abs((Float)metadata1.get(Image.MetaName.GpsLatitude) - 22.5633F) < 0.01);
-		assertTrue(Math.abs((Float)metadata1.get(Image.MetaName.GpsLongitude) - 113.8795F) < 0.01) ;
+		assertTrue(Math.abs((Double)metadata1.get(Image.MetaName.GpsLatitude) - 22.5633F) < 0.01);
+		assertTrue(Math.abs((Double)metadata1.get(Image.MetaName.GpsLongitude) - 113.8795F) < 0.01) ;
 
 		Image image2 = (Image)mediaFactory.make(getFileByName("2.jpg"));
 		MetaData metadata2 = image2.getMetaData();

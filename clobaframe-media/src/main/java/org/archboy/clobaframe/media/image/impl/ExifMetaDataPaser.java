@@ -2,18 +2,23 @@ package org.archboy.clobaframe.media.image.impl;
 
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
+import com.drew.lang.GeoLocation;
 import com.drew.lang.Rational;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
-import com.drew.metadata.exif.ExifDirectory;
+import com.drew.metadata.Tag;
+import com.drew.metadata.exif.ExifIFD0Directory;
+import com.drew.metadata.exif.ExifSubIFDDirectory;
 import com.drew.metadata.exif.GpsDirectory;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.media.Media;
 import org.archboy.clobaframe.media.MetaData;
@@ -36,8 +41,9 @@ public class ExifMetaDataPaser implements MetaDataParser {
 	private final static String CONTENT_TYPE_IMAGE_JPEG = "image/jpeg";
 	private final static String CONTENT_TYPE_IMAGE_TIFF = "image/tiff";
 	
-	private static final DecimalFormat decimalPoint2formatter = new DecimalFormat("0.0##");
-	private static final DecimalFormat decimalPoint1formatter = new DecimalFormat("0.#");
+	private static final DecimalFormat decimalPoint2Formatter = new DecimalFormat("0.0##");
+	private static final DecimalFormat decimalPoint1Formatter = new DecimalFormat("0.#");
+	private static final SimpleDateFormat noTimezoneFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 	
 	@Override
 	public boolean support(String contentType) {
@@ -55,19 +61,31 @@ public class ExifMetaDataPaser implements MetaDataParser {
 			resourceContent = resourceInfo.getContentSnapshot();
 			InputStream in = resourceContent.getInputStream();
 			BufferedInputStream bin = new BufferedInputStream(in);
-			Metadata metadata = ImageMetadataReader.readMetadata(bin);
+			Metadata metadata = ImageMetadataReader.readMetadata(bin, false);
 
-			Class<?> exifClass = ExifDirectory.class;
-			Class<?> gpsClass = GpsDirectory.class;
-			if (metadata.containsDirectory(exifClass)){
-				Directory exifDirectory = metadata.getDirectory(exifClass);
-				Directory gpsDirectory = null;
-				if (metadata.containsDirectory(gpsClass)) {
-					gpsDirectory = metadata.getDirectory(gpsClass);
-				}
+			MetaData metaData = new MetaData();
+			
+			Iterator<Directory> iterator = metadata.getDirectories().iterator();
+			while(iterator.hasNext()){
+				Directory directory = iterator.next();
 				
-				return makeFromDirectory(exifDirectory, gpsDirectory);
+				if (directory instanceof ExifIFD0Directory){
+					handleExifIFD0Directory(metaData, directory);
+				}else if (directory instanceof ExifSubIFDDirectory) {
+					handleExifSubIfDirectory(metaData, directory);
+				}else if (directory instanceof GpsDirectory) {
+					handleGpsDirectory(metaData, directory);
+				}
 			}
+			
+//			if (exifDirectory == null) {
+//				return null;
+//			}else{
+//				return makeFromDirectory(exifDirectory, gpsDirectory);
+//			}
+			
+			return metaData;
+			
 		} catch (ImageProcessingException ex) {
 			//
 		} catch (IOException ex){
@@ -81,72 +99,95 @@ public class ExifMetaDataPaser implements MetaDataParser {
 		return null;
 	}
 	
-	private MetaData makeFromDirectory(Directory exifDirectory, Directory gpsDirectory) throws MetadataException{
+	private void handleGpsDirectory(MetaData metaData, Directory directory) throws MetadataException{
+			
+			GpsDirectory gd = (GpsDirectory)directory;
+			GeoLocation geoLocation = gd.getGeoLocation();
+			
+			if (geoLocation != null){
+				metaData.put(Image.MetaName.GpsLongitude, geoLocation.getLongitude());
+				metaData.put(Image.MetaName.GpsLatitude, geoLocation.getLatitude());
+			}
+			
+//			if (gpsDirectory.containsTag(GpsDirectory.TAG_GPS_LONGITUDE)){
+//				float value = getDegree(gpsDirectory, GpsDirectory.TAG_GPS_LONGITUDE);
+//				if ("E".equals(gpsDirectory.getString(GpsDirectory.TAG_GPS_LONGITUDE_REF))){
+//					metaData.put(Image.MetaName.GpsLongitude, value);
+//				}else{
+//					metaData.put(Image.MetaName.GpsLongitude, -value);
+//				}
+//			}
+//			
+//			if (gpsDirectory.containsTag(GpsDirectory.TAG_GPS_LATITUDE)) {
+//				float value = getDegree(gpsDirectory, GpsDirectory.TAG_GPS_LATITUDE);
+//				if ("N".equals(gpsDirectory.getString(GpsDirectory.TAG_GPS_LATITUDE_REF))){
+//					metaData.put(Image.MetaName.GpsLatitude, value);
+//				}else{
+//					metaData.put(Image.MetaName.GpsLatitude, -value);
+//				}
+//			}
+//			
+//			if (gpsDirectory.containsTag(GpsDirectory.TAG_GPS_ALTITUDE)) {
+//				float value = gpsDirectory.getRational(GpsDirectory.TAG_GPS_ALTITUDE).floatValue();
+//				if (gpsDirectory.getInt(GpsDirectory.TAG_GPS_ALTITUDE_REF) == 0){
+//					metaData.put(Image.MetaName.GpsAltitude, value);
+//				}else{
+//					metaData.put(Image.MetaName.GpsAltitude, -value);
+//				}
+//			}
+	}
+	
+	private void handleExifSubIfDirectory(MetaData metaData, Directory directory) throws MetadataException{
 		
-		MetaData metaData = new MetaData();
-		
-		metaData.put(Image.MetaName.ExposureTime, getStringValue(exifDirectory, ExifDirectory.TAG_EXPOSURE_TIME));
-		metaData.put(Image.MetaName.Make, getStringValue(exifDirectory, ExifDirectory.TAG_MAKE));
-		metaData.put(Image.MetaName.Model, getStringValue(exifDirectory, ExifDirectory.TAG_MODEL));
-		metaData.put(Image.MetaName.Software, getStringValue(exifDirectory, ExifDirectory.TAG_SOFTWARE));
-		metaData.put(Image.MetaName.DateTimeOriginal, getDateValue(exifDirectory, ExifDirectory.TAG_DATETIME_ORIGINAL));
-		
-		if (exifDirectory.containsTag(ExifDirectory.TAG_FOCAL_LENGTH)) {
-			Rational rational = exifDirectory.getRational(ExifDirectory.TAG_FOCAL_LENGTH);
-			metaData.put(Image.MetaName.FocalLength, decimalPoint2formatter.format(rational.doubleValue()));
+		if (directory.containsTag(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL)) {
+			metaData.put(Image.MetaName.DateTimeOriginal, getDateValue(directory, ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL));
 		}
 		
-		if (exifDirectory.containsTag(ExifDirectory.TAG_FNUMBER)) {
-			Rational rational = exifDirectory.getRational(ExifDirectory.TAG_FNUMBER);
-			metaData.put(Image.MetaName.fNumber, decimalPoint1formatter.format(rational.doubleValue()));
+		metaData.put(Image.MetaName.ExposureTime, getStringValue(directory, ExifSubIFDDirectory.TAG_EXPOSURE_TIME));
+		
+		if (directory.containsTag(ExifSubIFDDirectory.TAG_FOCAL_LENGTH)) {
+			Rational rational = directory.getRational(ExifSubIFDDirectory.TAG_FOCAL_LENGTH);
+			if (rational != null){
+				metaData.put(Image.MetaName.FocalLength, decimalPoint2Formatter.format(rational.doubleValue()));
+			}
 		}
 		
-		if (exifDirectory.containsTag(ExifDirectory.TAG_FLASH)){
-			Integer val = getIntValue(exifDirectory, ExifDirectory.TAG_FLASH);
+		if (directory.containsTag(ExifSubIFDDirectory.TAG_FNUMBER)) {
+			Rational rational = directory.getRational(ExifSubIFDDirectory.TAG_FNUMBER);
+			if (rational != null){
+				metaData.put(Image.MetaName.fNumber, decimalPoint1Formatter.format(rational.doubleValue()));
+			}
+		}
+		
+		if (directory.containsTag(ExifSubIFDDirectory.TAG_FLASH)){
+			Integer val = getIntValue(directory, ExifSubIFDDirectory.TAG_FLASH);
 			metaData.put(Image.MetaName.Flash, translateFlash(val));
 		}
 		
-		if (exifDirectory.containsTag(ExifDirectory.TAG_ISO_EQUIVALENT)){
-			Integer val = getIntValue(exifDirectory, ExifDirectory.TAG_ISO_EQUIVALENT);
+		if (directory.containsTag(ExifSubIFDDirectory.TAG_ISO_EQUIVALENT)){
+			Integer val = getIntValue(directory, ExifSubIFDDirectory.TAG_ISO_EQUIVALENT);
 			metaData.put(Image.MetaName.ISOSpeedRatings, translateISOSpeedRatings(val));
 		}
+	}
+	
+	private void handleExifIFD0Directory(MetaData metaData, Directory directory) throws MetadataException{
 		
-		if (exifDirectory.containsTag(ExifDirectory.TAG_ORIENTATION)){
-			Integer val = getIntValue(exifDirectory, ExifDirectory.TAG_ORIENTATION);
+		metaData.put(Image.MetaName.Make, getStringValue(directory, ExifIFD0Directory.TAG_MAKE));
+		metaData.put(Image.MetaName.Model, getStringValue(directory, ExifIFD0Directory.TAG_MODEL));
+		metaData.put(Image.MetaName.Software, getStringValue(directory, ExifIFD0Directory.TAG_SOFTWARE));
+
+		// Date/Time Original overrides value from ExifDirectory.TAG_DATETIME
+		// Unless we have GPS time we don't know the time zone so date must be set
+		// as ISO 8601 datetime without timezone suffix (no Z or +/-)
+		if (directory.containsTag(ExifIFD0Directory.TAG_DATETIME)) {
+			metaData.put(Image.MetaName.DateTimeOriginal, getDateValue(directory, ExifIFD0Directory.TAG_DATETIME));
+		}		
+
+		if (directory.containsTag(ExifIFD0Directory.TAG_ORIENTATION)){
+			Integer val = getIntValue(directory, ExifIFD0Directory.TAG_ORIENTATION);
 			metaData.put(Image.MetaName.Orientation, translateOrientation(val));
 		}
-		
-		if (gpsDirectory != null){
-			
-			if (gpsDirectory.containsTag(GpsDirectory.TAG_GPS_LONGITUDE)){
-				float value = getDegree(gpsDirectory, GpsDirectory.TAG_GPS_LONGITUDE);
-				if ("E".equals(gpsDirectory.getString(GpsDirectory.TAG_GPS_LONGITUDE_REF))){
-					metaData.put(Image.MetaName.GpsLongitude, value);
-				}else{
-					metaData.put(Image.MetaName.GpsLongitude, -value);
-				}
-			}
-			
-			if (gpsDirectory.containsTag(GpsDirectory.TAG_GPS_LATITUDE)) {
-				float value = getDegree(gpsDirectory, GpsDirectory.TAG_GPS_LATITUDE);
-				if ("N".equals(gpsDirectory.getString(GpsDirectory.TAG_GPS_LATITUDE_REF))){
-					metaData.put(Image.MetaName.GpsLatitude, value);
-				}else{
-					metaData.put(Image.MetaName.GpsLatitude, -value);
-				}
-			}
-			
-			if (gpsDirectory.containsTag(GpsDirectory.TAG_GPS_ALTITUDE)) {
-				float value = gpsDirectory.getRational(GpsDirectory.TAG_GPS_ALTITUDE).floatValue();
-				if (gpsDirectory.getInt(GpsDirectory.TAG_GPS_ALTITUDE_REF) == 0){
-					metaData.put(Image.MetaName.GpsAltitude, value);
-				}else{
-					metaData.put(Image.MetaName.GpsAltitude, -value);
-				}
-			}
-		} // end gps
-		
-		return metaData;
+	
 	}
 	
 	
@@ -194,7 +235,11 @@ public class ExifMetaDataPaser implements MetaDataParser {
 	}
 	
 	private static String getStringValue(Directory exifDirectory, int tagType) {
-		return exifDirectory.getString(tagType);
+		if (exifDirectory.containsTag(tagType)) {
+			return exifDirectory.getString(tagType);
+		}else{
+			return null;
+		}
 	}
 
 	private static Date getDateValue(Directory exifDirectory, int tagType) throws MetadataException {
