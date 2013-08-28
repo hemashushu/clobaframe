@@ -5,9 +5,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.media.MediaFactory;
-import org.archboy.clobaframe.io.ResourceContent;
 import org.archboy.clobaframe.io.ResourceInfo;
 import static org.junit.Assert.*;
 import org.archboy.clobaframe.io.ResourceInfoFactory;
@@ -77,11 +77,14 @@ public class ImageGeneratorTest {
 		
 		
 		ResourceInfo resourceInfo = image.getResourceInfo();
-		ResourceContent resourceContent = resourceInfo.getContentSnapshot();
-		
+		//ResourceContent resourceContent = resourceInfo.getContentSnapshot();
+		InputStream in = resourceInfo.getInputStream();
 		FileOutputStream out = new FileOutputStream(file);
-		IOUtils.copy(resourceContent.getInputStream(), out);
-		out.close();
-		resourceContent.close();
+		IOUtils.copy(in, out);
+		
+		IOUtils.closeQuietly(out);
+		IOUtils.closeQuietly(in);
+//		out.close();
+//		in.close();
 	}
 }

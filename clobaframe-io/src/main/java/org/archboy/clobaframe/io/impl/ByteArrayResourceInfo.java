@@ -2,10 +2,10 @@ package org.archboy.clobaframe.io.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Date;
 import org.springframework.util.Assert;
-import org.archboy.clobaframe.io.ResourceContent;
 import org.archboy.clobaframe.io.ResourceInfo;
 
 /**
@@ -39,25 +39,18 @@ public class ByteArrayResourceInfo implements ResourceInfo {
 	}
 
 	@Override
-	public ResourceContent getContentSnapshot() throws IOException {
-		return new DefaultResourceContent(content);
+	public InputStream getInputStream() throws IOException {
+		return new ByteArrayInputStream(content);
 	}
 
 	@Override
-	public ResourceContent getContentSnapshot(long start, long length) throws IOException {
-//		Assert.isTrue(start>=0);
-//		Assert.isTrue(length>0);
-//		Assert.isTrue(start + length <= contentLength);
-//		byte[] partialData = Arrays.copyOfRange(data, (int)start, (int)(start + length));
-//		return new DefaultResourceContent(partialData);
-
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(
+	public InputStream getInputStream(long start, long length) throws IOException {
+		return new ByteArrayInputStream(
 				content, (int)start, (int)length);
-		return new DefaultResourceContent(inputStream, length);
 	}
 
 	@Override
-	public boolean isContentSeekable() {
+	public boolean isSeekable() {
 		return true;
 	}
 

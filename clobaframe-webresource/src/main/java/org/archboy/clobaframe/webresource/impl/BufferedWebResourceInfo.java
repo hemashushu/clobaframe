@@ -23,8 +23,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.archboy.clobaframe.io.ResourceContent;
-import org.archboy.clobaframe.io.impl.DefaultResourceContent;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 
 public class BufferedWebResourceInfo implements WebResourceInfo {
@@ -46,27 +44,24 @@ public class BufferedWebResourceInfo implements WebResourceInfo {
 	public BufferedWebResourceInfo(WebResourceInfo webResourceInfo, int cacheSeconds) {
 		this.webResourceInfo = webResourceInfo;
 		this.cacheMilliSeconds = cacheSeconds * 1000;
-		buildSnapshot();
+		rebuildSnapshot();
 	}
 
 	@Override
-	public ResourceContent getContentSnapshot() throws IOException{
+	public InputStream getInputStream() throws IOException{
 		refresh();
-		return new DefaultResourceContent(content);
+		return new ByteArrayInputStream(content);
 	}
 
 	@Override
-	public ResourceContent getContentSnapshot(long start, long length) throws IOException {
+	public InputStream getInputStream(long start, long length) throws IOException {
 		refresh();
-//		byte[] partialData = Arrays.copyOfRange(content, (int)start, (int)(start + length));
-//		return new DefaultResourceContent(partialData);
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(
+		return new ByteArrayInputStream(
 				content, (int)start, (int)length);
-		return new DefaultResourceContent(inputStream, length);
 	}
 
 	@Override
-	public boolean isContentSeekable() {
+	public boolean isSeekable() {
 		return true;
 	}
 
@@ -113,11 +108,11 @@ public class BufferedWebResourceInfo implements WebResourceInfo {
 		long span = now - lastCheckTime;
 		if (span > cacheMilliSeconds){
 			lastCheckTime = now;
-			buildSnapshot();
+			rebuildSnapshot();
 		}
 	}
 
-	private void buildSnapshot() {
+	private void rebuildSnapshot() {
 
 		if (lastModified != null &&
 				webResourceInfo.getLastModified().getTime() - lastModified.getTime() <= 0){
@@ -127,17 +122,19 @@ public class BufferedWebResourceInfo implements WebResourceInfo {
 
 		this.lastModified = webResourceInfo.getLastModified();
 
-		ResourceContent resourceContent = null;
-
+		//ResourceContent resourceContent = null;
+		InputStream in = null;
 		try {
-			resourceContent = webResourceInfo.getContentSnapshot();
-			InputStream in = resourceContent.getInputStream();
+//			resourceContent = webResourceInfo.getContentSnapshot();
+//			InputStream in = resourceContent.getInputStream();
+			in = webResourceInfo.getInputStream();
+			
 			this.content = IOUtils.toByteArray(in);
 			this.hash = DigestUtils.sha256Hex(this.content);
 		} catch (IOException e) {
 			logger.warn("Read the web resource [{}] content fail.", webResourceInfo.getName());
 		} finally {
-			IOUtils.closeQuietly(resourceContent);
+			IOUtils.closeQuietly(in);
 		}
 	}
 }

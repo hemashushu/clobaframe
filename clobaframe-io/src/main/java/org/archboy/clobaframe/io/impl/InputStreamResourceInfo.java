@@ -3,7 +3,6 @@ package org.archboy.clobaframe.io.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
-import org.archboy.clobaframe.io.ResourceContent;
 import org.archboy.clobaframe.io.ResourceInfo;
 
 /**
@@ -17,7 +16,7 @@ public class InputStreamResourceInfo implements ResourceInfo {
 	private Date lastModified;
 	private InputStream inputStream;
 	
-	private boolean contentSnapshotCreated;
+	private boolean consumed;
 
 	public InputStreamResourceInfo(InputStream inputStream, long contentLength, String contentType, Date lastModified) {
 		this.contentLength = contentLength;
@@ -25,7 +24,7 @@ public class InputStreamResourceInfo implements ResourceInfo {
 		this.lastModified = lastModified;
 		this.inputStream = inputStream;
 		
-		this.contentSnapshotCreated = false;
+		this.consumed = false;
 	}
 	
 	@Override
@@ -39,23 +38,22 @@ public class InputStreamResourceInfo implements ResourceInfo {
 	}
 
 	@Override
-	public ResourceContent getContentSnapshot() throws IOException {
-		if (contentSnapshotCreated){
-			// this BlobInfo implementation only can be got content snapshot once
-			throw new IOException("The content snapshot has already created.");
+	public InputStream getInputStream() throws IOException {
+		if (consumed){
+			throw new IOException("The content has already consumed.");
 		}
 
-		contentSnapshotCreated = true;
-		return new DefaultResourceContent(inputStream, contentLength);
+		consumed = true;
+		return inputStream;
 	}
 
 	@Override
-	public ResourceContent getContentSnapshot(long start, long length) throws IOException {
-		throw new UnsupportedOperationException("Not supported yet.");
+	public InputStream getInputStream(long start, long length) throws IOException {
+		throw new UnsupportedOperationException("Does not supported.");
 	}
 
 	@Override
-	public boolean isContentSeekable() {
+	public boolean isSeekable() {
 		return false;
 	}
 

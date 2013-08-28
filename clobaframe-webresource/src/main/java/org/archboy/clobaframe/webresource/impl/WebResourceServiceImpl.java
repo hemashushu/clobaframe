@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
+import org.archboy.clobaframe.webresource.LocationGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -29,6 +30,7 @@ import org.archboy.clobaframe.webresource.ResourceStrategy;
 import org.archboy.clobaframe.webresource.ResourceStrategyFactory;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceService;
+import org.archboy.clobaframe.webresource.local.LocalLocationGenerator;
 
 /**
  *
@@ -39,18 +41,21 @@ import org.archboy.clobaframe.webresource.WebResourceService;
 public class WebResourceServiceImpl implements WebResourceService {
 
 	private Map<String, WebResourceInfo> webResources = new HashMap<String, WebResourceInfo>();
-	private Map<String, WebResourceInfo> uniqueNameWebResources = new HashMap<String, WebResourceInfo>();
+	//private Map<String, WebResourceInfo> uniqueNameWebResources = new HashMap<String, WebResourceInfo>();
+	private Map<String, String> uniqueNames = new HashMap<String, String>(); // the unique name to resource mapper.
 
 	@Autowired
 	private ResourceStrategyFactory resourceStrategyFactory;
 
-	private ResourceStrategy resourceStrategy;
+	//private ResourceStrategy resourceStrategy;
+	private LocationGenerator locationGenerator;
 
 	@PostConstruct
 	public void init() {
 
-		resourceStrategy = resourceStrategyFactory.getResourceStrategy();
+		ResourceStrategy resourceStrategy = resourceStrategyFactory.getResourceStrategy();
 		ResourceRepository resourceRepository = resourceStrategy.getResourceRepository();
+		this.locationGenerator = resourceStrategy.getLocationGenerator();
 
 		List<WebResourceInfo> webResourceInfos = resourceRepository.findAll();
 
@@ -66,10 +71,11 @@ public class WebResourceServiceImpl implements WebResourceService {
 
 		// get all resource name and unique names
 		for (WebResourceInfo webResourceInfo : webResourceInfos) {
-			webResources.put(webResourceInfo.getName(),
-					webResourceInfo);
-			uniqueNameWebResources.put(webResourceInfo.getUniqueName(),
-					webResourceInfo);
+			webResources.put(webResourceInfo.getName(), webResourceInfo);
+			uniqueNames.put(webResourceInfo.getUniqueName(), webResourceInfo.getName());
+			
+//			uniqueNameWebResources.put(webResourceInfo.getUniqueName(),
+//					webResourceInfo);
 		}
 	}
 
@@ -82,7 +88,7 @@ public class WebResourceServiceImpl implements WebResourceService {
 	@Override
 	public String getLocation(WebResourceInfo webResourceInfo) {
 		Assert.notNull(webResourceInfo);
-		return resourceStrategy.getLocationGenerator().getLocation(webResourceInfo);
+		return locationGenerator.getLocation(webResourceInfo);
 	}
 
 	@Override
@@ -95,12 +101,12 @@ public class WebResourceServiceImpl implements WebResourceService {
 	}
 
 	@Override
-	public WebResourceInfo getResourceByUniqueName(String name) throws FileNotFoundException {
-		WebResourceInfo info = uniqueNameWebResources.get(name);
-		if (info == null) {
+	public WebResourceInfo getResourceByUniqueName(String uniqueName) throws FileNotFoundException {
+		String name = uniqueNames.get(uniqueName);
+		if (name == null) {
 			throw new FileNotFoundException(name);
 		}
-		return info;
+		return getResource(name);
 	}
 
 	@Override

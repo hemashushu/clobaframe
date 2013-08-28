@@ -24,6 +24,7 @@ import org.archboy.clobaframe.io.ResourceInfo;
 /**
  * Check the 'If-Modified-Since' and 'Range' HTTP headers of request
  * before sending resource.
+ * 
  * The 'Last-Modified' HTTP header will be sent.
  *
  * @author young
@@ -39,6 +40,7 @@ public abstract class AbstractDataSenderWithLastModifiedAndRangeCheck extends
 
 		long lastModifiedTime = 0;
 
+		// send last-modified header.
 		if (resourceInfo.getLastModified() != null){
 			lastModifiedTime = resourceInfo.getLastModified().getTime();
 			response.setDateHeader("Last-Modified", lastModifiedTime);
@@ -53,19 +55,11 @@ public abstract class AbstractDataSenderWithLastModifiedAndRangeCheck extends
 		}
 
 		// check 'range' request
-		//ResourceContent resourceContent = resourceInfo.getContentSnapshot();
-
 		if (StringUtils.isNotEmpty(range) &&
-				resourceInfo.isContentSeekable()) {
-				//&& (resourceContent.getInputStream() instanceof SeekableInputStream)) {
+			resourceInfo.isSeekable()) {
 
 			RequestRange requestRange = new RequestRange(range,
 					resourceInfo.getContentLength());
-
-//			ContentReuseResourceInfo reuseResourceInfo = new ContentReuseResourceInfo(
-//					resourceInfo.getContentLength(),
-//					resourceInfo.getContentType(),
-//					resourceContent);
 
 			sendPartialData(response, resourceInfo,
 					extraHeaders,
@@ -73,75 +67,8 @@ public abstract class AbstractDataSenderWithLastModifiedAndRangeCheck extends
 					requestRange.getLength());
 		} else {
 
-//			ContentReuseResourceInfo reuseResourceInfo = new ContentReuseResourceInfo(
-//					resourceInfo.getContentLength(),
-//					resourceInfo.getContentType(),
-//					resourceContent);
-
 			sendData(response, resourceInfo, extraHeaders);
 		}
-
-		// close resource content
-		//IOUtils.closeQuietly(resourceContent);
 	}
 
-	/**
-	 * Deprecated!!
-	 *
-	 * Re-package the resource info object, so that to re-use the
-	 * resource content object that already fetch.
-	 *
-	 * Because the #sendDataWithLastModifiedAndRangeCheck method fetch the
-	 * resource content snapshot to check the stream type.
-	 */
-//	public class ContentReuseResourceInfo implements ResourceInfo {
-//
-//		private long contentLength;
-//		private String contentType;
-//		private ResourceContent resourceContent;
-//
-//		private boolean contentSnapshotCreated;
-//
-//		public ContentReuseResourceInfo(long contentLength, String contentType,
-//				ResourceContent resourceContent) {
-//
-//			this.contentLength = contentLength;
-//			this.contentType = contentType;
-//			this.resourceContent = resourceContent;
-//		}
-//
-//		@Override
-//		public long getContentLength() {
-//			return contentLength;
-//		}
-//
-//		@Override
-//		public String getContentType() {
-//			return contentType;
-//		}
-//
-//		@Override
-//		public ResourceContent getContentSnapshot() throws IOException {
-//			if (contentSnapshotCreated){
-//				// this ResourceInfo implementation only can be got content snapshot once
-//				throw new IOException("The content snapshot is gone.");
-//			}
-//
-//			contentSnapshotCreated = true;
-//			return resourceContent;
-//		}
-//
-//		@Override
-//		public String getName() {
-//			// just drop this property's value
-//			return null;
-//		}
-//
-//		@Override
-//		public Date getLastModified() {
-//			// just drop this property's value
-//			return null;
-//		}
-//
-//	}
 }

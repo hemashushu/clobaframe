@@ -39,7 +39,8 @@ public interface WebResourceSender {
 	 * @param response
 	 * @throws IOException The exception occurs while the specify resource not found.
 	 */
-	void send(String resourceName, HttpServletRequest request,
+	void send(String resourceName, 
+			HttpServletRequest request,
 			HttpServletResponse response) throws IOException;
 
 	/**

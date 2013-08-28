@@ -63,18 +63,18 @@ public interface Blobstore {
 	 * Store the blob object into repository.
 	 *<p>
 	 *     Object will be overwrite if the key duplicate,
-	 *     and the {@link InputStream} of {@link BlobInfo} will be close
+	 *     and the {@link InputStream} of {@link BlobResourceInfo} will be close
 	 *     automatically.
 	 *</p>
 	 *
-	 * @param blobInfo
+	 * @param blobResourceInfo
 	 */
-	void put(BlobInfo blobInfo) throws IOException;
+	void put(BlobResourceInfo blobResourceInfo) throws IOException;
 
 	/**
 	 * Store the blob object into repository.
 	 *
-	 * @param blobInfo
+	 * @param blobResourceInfo
 	 * @param publicReadable This blob object can be public read.
 	 * @param minor
 	 * <p>
@@ -83,7 +83,8 @@ public interface Blobstore {
 	 *     reduced redundancy storing.
 	 * </p>
 	 */
-	void put(BlobInfo blobInfo, boolean publicReadable,
+	void put(BlobResourceInfo blobResourceInfo, 
+			boolean publicReadable,
 			boolean minor) throws IOException;
 
 	/**
@@ -93,7 +94,7 @@ public interface Blobstore {
 	 * @return
 	 * @throws IOException If the specify key does not exists.
 	 */
-	BlobInfo get(BlobKey blobKey) throws IOException;
+	BlobResourceInfo get(BlobKey blobKey) throws IOException;
 
 	/**
 	 * Remove object by key.
@@ -117,7 +118,7 @@ public interface Blobstore {
 	 * </p>
 	 * @return
 	 */
-	BlobInfoPartialCollection list(BlobKey prefix);
+	BlobResourceInfoPartialCollection list(BlobKey prefix);
 
 	/**
 	 * List the remain objects by the previous result.
@@ -125,5 +126,5 @@ public interface Blobstore {
 	 * @param collection
 	 * @return
 	 */
-	BlobInfoPartialCollection listNext(BlobInfoPartialCollection collection);
+	BlobResourceInfoPartialCollection listNext(BlobResourceInfoPartialCollection collection);
 }

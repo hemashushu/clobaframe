@@ -16,39 +16,35 @@
 
 package org.archboy.clobaframe.blobstore.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import org.archboy.clobaframe.blobstore.BlobInfo;
+import org.archboy.clobaframe.blobstore.BlobResourceInfo;
 import org.archboy.clobaframe.blobstore.BlobKey;
-import org.archboy.clobaframe.io.ResourceContent;
-import org.archboy.clobaframe.io.impl.DefaultResourceContent;
 
 /**
  *
  * @author young
- *
  */
-public class BlobInfoFromInputStream implements BlobInfo{
+public class BlobResourceInfoFromByteArray implements BlobResourceInfo{
 
 	private BlobKey blobKey;
-	private long contentLength;
+
 	private String contentType;
 	private Date lastModified;
-	private InputStream inputStream;
+	private byte[] content;
+
 	private Map<String, String> metadata;
 
-	private boolean contentSnapshotCreated;
-
-	public BlobInfoFromInputStream(BlobKey blobKey, long contentLength,
-			String contentType, Date lastModified, InputStream inputStream) {
+	public BlobResourceInfoFromByteArray(BlobKey blobKey, String contentType,
+			Date lastModified, byte[] content) {
 		this.blobKey = blobKey;
-		this.contentLength = contentLength;
 		this.contentType = contentType;
 		this.lastModified = lastModified;
-		this.inputStream = inputStream;
+		this.content = content;
 		this.metadata = new HashMap<String, String>();
 	}
 
@@ -59,7 +55,7 @@ public class BlobInfoFromInputStream implements BlobInfo{
 
 	@Override
 	public long getContentLength() {
-		return contentLength;
+		return content.length;
 	}
 
 	@Override
@@ -73,24 +69,19 @@ public class BlobInfoFromInputStream implements BlobInfo{
 	}
 
 	@Override
-	public ResourceContent getContentSnapshot() throws IOException {
-		if (contentSnapshotCreated){
-			// this BlobInfo implementation only can be got content snapshot once
-			throw new IOException("The content snapshot has already created.");
-		}
-
-		contentSnapshotCreated = true;
-		return new DefaultResourceContent(inputStream, contentLength);
+	public InputStream getInputStream() throws IOException{
+		return new ByteArrayInputStream(content);
 	}
 
 	@Override
-	public ResourceContent getContentSnapshot(long start, long length) throws IOException{
-		throw new UnsupportedOperationException("Not supported yet.");
+	public InputStream getInputStream(long start, long length) throws IOException {
+		return new ByteArrayInputStream(
+				content, (int)start, (int)length);
 	}
 
 	@Override
-	public boolean isContentSeekable() {
-		return false;
+	public boolean isSeekable() {
+		return true;
 	}
 
 	@Override
@@ -102,4 +93,5 @@ public class BlobInfoFromInputStream implements BlobInfo{
 	public void addMetadata(String key, String value) {
 		metadata.put(key, value);
 	}
+
 }

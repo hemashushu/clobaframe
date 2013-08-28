@@ -18,6 +18,7 @@ package org.archboy.clobaframe.blobstore.local;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
@@ -29,12 +30,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.archboy.clobaframe.blobstore.BlobInfo;
-import org.archboy.clobaframe.blobstore.BlobInfoFactory;
-import org.archboy.clobaframe.blobstore.BlobInfoPartialCollection;
+import org.archboy.clobaframe.blobstore.BlobResourceInfo;
+import org.archboy.clobaframe.blobstore.BlobResourceInfoFactory;
+import org.archboy.clobaframe.blobstore.BlobResourceInfoPartialCollection;
 import org.archboy.clobaframe.blobstore.BlobKey;
 import org.archboy.clobaframe.blobstore.Blobstore;
-import org.archboy.clobaframe.io.ResourceContent;
 import static org.junit.Assert.*;
 
 
@@ -49,7 +49,7 @@ public class LocalBlobstoreTest {
 //	private BlobstoreBucket blobstoreBucket;
 
 	@Autowired
-	private BlobInfoFactory blobInfoFactory;
+	private BlobResourceInfoFactory blobInfoFactory;
 
 	private static final String DEFAULT_BUCKET_NAME = "test-clobaframe-bucket";
 
@@ -76,8 +76,8 @@ public class LocalBlobstoreTest {
 		if (blobstore.existBucket(bucketName)){
 
 			// clean all blobs.
-			BlobInfoPartialCollection collection = blobstore.list(new BlobKey(bucketName, null));
-			for (BlobInfo info : collection) {
+			BlobResourceInfoPartialCollection collection = blobstore.list(new BlobKey(bucketName, null));
+			for (BlobResourceInfo info : collection) {
 				blobstore.delete(info.getBlobKey());
 			}
 
@@ -87,7 +87,7 @@ public class LocalBlobstoreTest {
 			return;
 		}
 
-		// test create
+		// test make
 		blobstore.createBucket(bucketName);
 
 		// test exist
@@ -96,7 +96,7 @@ public class LocalBlobstoreTest {
 		// test exist
 		assertFalse(blobstore.existBucket("noneExists"));
 
-		// test create duplicate name bucket
+		// test make duplicate name bucket
 		blobstore.createBucket(bucketName);
 
 		// test delete
@@ -141,7 +141,7 @@ public class LocalBlobstoreTest {
 		writeContent(blobstore, blobKey1, "hello");
 
 		// test get blob by key
-		BlobInfo blobInfoByKey1 = blobstore.get(blobKey1);
+		BlobResourceInfo blobInfoByKey1 = blobstore.get(blobKey1);
 		assertEquals(blobKey1, blobInfoByKey1.getBlobKey());
 
 		// NOTE:: local implements does not support the specify content type.
@@ -160,7 +160,7 @@ public class LocalBlobstoreTest {
 
 		// test overwrite blob content
 		writeContent(blobstore, blobKey1, "woo");
-		BlobInfo blobByKey2 = blobstore.get(blobKey1);
+		BlobResourceInfo blobByKey2 = blobstore.get(blobKey1);
 		assertEquals("woo", readContent(blobByKey2));
 
 		// test get none-exists blob
@@ -191,18 +191,18 @@ public class LocalBlobstoreTest {
 //		byte[] data1 = "bar".getBytes();
 //
 //		BlobKey blobKey2 = new BlobKey(bucketName, key2);
-//		BlobInfo blobInfoByFactory1 = blobInfoFactory.createBlobInfo(blobKey2, 3, "text/plain", in1);
+//		BlobResourceInfo blobInfoByFactory1 = blobInfoFactory.make(blobKey2, 3, "text/plain", in1);
 //
 //		BlobKey blobKey3 = new BlobKey(bucketName, key3);
-//		BlobInfo blobInfoByFactory2 = blobInfoFactory.createBlobInfo(blobKey3, "text/plain", data1);
+//		BlobResourceInfo blobInfoByFactory2 = blobInfoFactory.make(blobKey3, "text/plain", data1);
 //
 //		blobstore.put(blobInfoByFactory1, true, false);
 //		blobstore.put(blobInfoByFactory2, false, true);
 //
 //		in1.close();
 //
-//		BlobInfo blobInfoByKey2 = blobstore.get(blobKey2);
-//		BlobInfo blobInfoByKey3 = blobstore.get(blobKey3);
+//		BlobResourceInfo blobInfoByKey2 = blobstore.get(blobKey2);
+//		BlobResourceInfo blobInfoByKey3 = blobstore.get(blobKey3);
 //
 //		assertEquals("foo", readContent(blobInfoByKey2));
 //		assertEquals("bar", readContent(blobInfoByKey3));
@@ -234,9 +234,9 @@ public class LocalBlobstoreTest {
 		BlobKey prefixAll = new BlobKey(bucketName, null);
 
 		// delete exist blobs
-		BlobInfoPartialCollection blobs = blobstore.list(prefixAll);
+		BlobResourceInfoPartialCollection blobs = blobstore.list(prefixAll);
 		if (blobs.size() > 0){
-			for(BlobInfo blob : blobs){
+			for(BlobResourceInfo blob : blobs){
 				blobstore.delete(blob.getBlobKey());
 			}
 		}
@@ -249,7 +249,7 @@ public class LocalBlobstoreTest {
 		writeContent(blobstore, new BlobKey(bucketName, "r"), "r");
 
 		// test list
-		BlobInfoPartialCollection blobsByNoPrefix1 = blobstore.list(prefixAll);
+		BlobResourceInfoPartialCollection blobsByNoPrefix1 = blobstore.list(prefixAll);
 		assertEquals(5, blobsByNoPrefix1.size());
 		assertFalse(blobsByNoPrefix1.hasMore());
 
@@ -259,23 +259,23 @@ public class LocalBlobstoreTest {
 		assertContainsKey(blobsByNoPrefix1, "r-c-c001");
 		assertContainsKey(blobsByNoPrefix1, "r");
 
-		BlobInfoPartialCollection blobsByPrefix1 = blobstore.list(new BlobKey(bucketName, "r-"));
+		BlobResourceInfoPartialCollection blobsByPrefix1 = blobstore.list(new BlobKey(bucketName, "r-"));
 		assertEquals(3, blobsByPrefix1.size());
 		assertContainsKey(blobsByPrefix1, "r-c-c001");
 		assertContainsKey(blobsByPrefix1, "r-j001");
 		assertContainsKey(blobsByPrefix1, "r-j002");
 
-		BlobInfoPartialCollection blobsByPrefix2 = blobstore.list(new BlobKey(bucketName, "r-c-"));
+		BlobResourceInfoPartialCollection blobsByPrefix2 = blobstore.list(new BlobKey(bucketName, "r-c-"));
 		assertEquals(1, blobsByPrefix2.size());
 		assertContainsKey(blobsByPrefix2, "r-c-c001");
 
 		// delete all blobs
-		BlobInfoPartialCollection blobsByNoPrefix2 = blobstore.list(prefixAll);
-		for(BlobInfo blob : blobsByNoPrefix2){
+		BlobResourceInfoPartialCollection blobsByNoPrefix2 = blobstore.list(prefixAll);
+		for(BlobResourceInfo blob : blobsByNoPrefix2){
 			blobstore.delete(blob.getBlobKey());
 		}
 
-		BlobInfoPartialCollection blobsByRemove1 = blobstore.list(prefixAll);
+		BlobResourceInfoPartialCollection blobsByRemove1 = blobstore.list(prefixAll);
 		assertEquals(0, blobsByRemove1.size());
 	}
 
@@ -297,7 +297,7 @@ public class LocalBlobstoreTest {
 			Map<String, String> metadata) throws IOException{
 		byte[] data = content.getBytes();
 		ByteArrayInputStream in = new ByteArrayInputStream(data);
-		BlobInfo blobInfo = blobInfoFactory.createBlobInfo(blobKey, data.length, "text/plain", in);
+		BlobResourceInfo blobInfo = blobInfoFactory.make(blobKey, "text/plain", in, data.length);
 
 		if (metadata != null){
 			for(String key : metadata.keySet()){
@@ -309,24 +309,26 @@ public class LocalBlobstoreTest {
 	}
 
 	private String readContent(
-			BlobInfo blob) throws IOException{
-		ResourceContent resourceContent = blob.getContentSnapshot();
+			BlobResourceInfo blob) throws IOException{
+		//ResourceContent resourceContent = blob.getContentSnapshot();
+		InputStream in = blob.getInputStream();
 		BufferedReader reader = new BufferedReader(
-				new InputStreamReader(resourceContent.getInputStream()));
+				new InputStreamReader(in));
 		String content = reader.readLine();
-		reader.close();
-		resourceContent.close();
+		IOUtils.closeQuietly(reader);
+		IOUtils.closeQuietly(in);
 		return content;
 	}
 
 	private String readContent(
-			BlobInfo blob, long start, long length) throws IOException{
-		ResourceContent resourceContent = blob.getContentSnapshot(start, length);
+			BlobResourceInfo blob, long start, long length) throws IOException{
+		//ResourceContent resourceContent = blob.getContentSnapshot(start, length);
+		InputStream in = blob.getInputStream(start, length);
 		BufferedReader reader = new BufferedReader(
-				new InputStreamReader(resourceContent.getInputStream()));
+				new InputStreamReader(in));
 		String content = reader.readLine();
-		reader.close();
-		resourceContent.close();
+		IOUtils.closeQuietly(reader);
+		IOUtils.closeQuietly(in);
 		return content;
 	}
 
@@ -340,9 +342,9 @@ public class LocalBlobstoreTest {
 		}
 	}
 
-	private void assertContainsKey(BlobInfoPartialCollection collection, String key) {
+	private void assertContainsKey(BlobResourceInfoPartialCollection collection, String key) {
 		boolean found = false;
-		for (BlobInfo info : collection) {
+		for (BlobResourceInfo info : collection) {
 			if (info.getBlobKey().getKey().equals(key)){
 				found = true;
 				break;

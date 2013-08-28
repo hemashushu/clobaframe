@@ -20,8 +20,8 @@ import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
 import org.springframework.stereotype.Component;
-import org.archboy.clobaframe.blobstore.BlobInfo;
-import org.archboy.clobaframe.blobstore.BlobInfoFactory;
+import org.archboy.clobaframe.blobstore.BlobResourceInfo;
+import org.archboy.clobaframe.blobstore.BlobResourceInfoFactory;
 import org.archboy.clobaframe.blobstore.BlobKey;
 
 /**
@@ -30,22 +30,20 @@ import org.archboy.clobaframe.blobstore.BlobKey;
  *
  */
 @Component
-public class BlobInfoFactoryImpl implements BlobInfoFactory {
+public class BlobResourceInfoFactoryImpl implements BlobResourceInfoFactory {
 
 	@Override
-	public BlobInfo createBlobInfo(BlobKey blobKey, long size,
-			String contentType, InputStream content) {
-		//Calendar calendar = Calendar.getInstance();
-		Date lastModified = new Date(); // calendar.getTime();
-		return new BlobInfoFromInputStream(blobKey, size, contentType,
+	public BlobResourceInfo make(BlobKey blobKey,
+			String contentType, InputStream content, long size) {
+		Date lastModified = new Date();
+		return new BlobResourceInfoFromInputStream(blobKey, size, contentType,
 				lastModified, content);
 	}
 
 	@Override
-	public BlobInfo createBlobInfo(BlobKey blobKey, String contentType, byte[] content) {
-		//Calendar calendar = Calendar.getInstance();
-		Date lastModified = new Date(); // calendar.getTime();
-		return new BlobInfoFromByteArray(blobKey, contentType, lastModified, content);
+	public BlobResourceInfo make(BlobKey blobKey, String contentType, byte[] content) {
+		Date lastModified = new Date();
+		return new BlobResourceInfoFromByteArray(blobKey, contentType, lastModified, content);
 	}
 
 }

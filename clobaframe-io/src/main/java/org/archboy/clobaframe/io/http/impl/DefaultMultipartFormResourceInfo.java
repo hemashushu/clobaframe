@@ -16,11 +16,10 @@
 package org.archboy.clobaframe.io.http.impl;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import org.apache.commons.fileupload.FileItem;
-import org.archboy.clobaframe.io.ResourceContent;
 import org.archboy.clobaframe.io.http.MultipartFormResourceInfo;
-import org.archboy.clobaframe.io.impl.DefaultResourceContent;
 
 /**
  *
@@ -46,8 +45,8 @@ public class DefaultMultipartFormResourceInfo implements MultipartFormResourceIn
 	}
 
 	@Override
-	public boolean isFile() {
-		return !fileItem.isFormField();
+	public boolean isFormField() {
+		return fileItem.isFormField();
 	}
 
 	@Override
@@ -71,24 +70,22 @@ public class DefaultMultipartFormResourceInfo implements MultipartFormResourceIn
 	}
 
 	@Override
-	public ResourceContent getContentSnapshot() throws IOException {
-		return new DefaultResourceContent(
-				fileItem.getInputStream(),
-				fileItem.getSize());
+	public InputStream getInputStream() throws IOException {
+		return fileItem.getInputStream();
 	}
 
 	@Override
-	public ResourceContent getContentSnapshot(long start, long length) throws IOException {
-		throw new UnsupportedOperationException("Not supported yet.");
+	public InputStream getInputStream(long start, long length) throws IOException {
+		throw new UnsupportedOperationException("Does not supported.");
 	}
 
 	@Override
-	public boolean isContentSeekable() {
+	public boolean isSeekable() {
 		return false;
 	}
 
 	@Override
-	public String getName() {
+	public String getFieldName() {
 		return fileItem.getFieldName();
 	}
 

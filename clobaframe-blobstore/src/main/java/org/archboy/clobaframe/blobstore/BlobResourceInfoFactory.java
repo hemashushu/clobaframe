@@ -18,11 +18,11 @@ package org.archboy.clobaframe.blobstore;
 import java.io.InputStream;
 
 /**
- * Generates the {@link BlobInfo} object by {@link InputStream} or byte array.
+ * Generates the {@link BlobResourceInfo} object by {@link InputStream} or byte array.
  *
  * @author young
  */
-public interface BlobInfoFactory {
+public interface BlobResourceInfoFactory {
 
 	/**
 	 * Create the blob object by InputStream.
@@ -33,10 +33,10 @@ public interface BlobInfoFactory {
 	 * @param content
 	 * @return
 	 */
-	BlobInfo createBlobInfo(
+	BlobResourceInfo make(
 			BlobKey blobKey,
-			long size, String contentType,
-			InputStream content);
+			String contentType,
+			InputStream content, long size);
 
 	/**
 	 * Create the blob object by byte array.
@@ -46,7 +46,7 @@ public interface BlobInfoFactory {
 	 * @param content
 	 * @return
 	 */
-	BlobInfo createBlobInfo(
+	BlobResourceInfo make(
 			BlobKey blobKey,
 			String contentType,
 			byte[] content);

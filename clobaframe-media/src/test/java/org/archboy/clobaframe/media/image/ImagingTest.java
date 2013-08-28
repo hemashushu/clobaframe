@@ -22,13 +22,13 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.media.MediaFactory;
 import org.archboy.clobaframe.media.image.impl.DefaultImage;
 import org.archboy.clobaframe.media.image.impl.ImageLoaderImpl;
-import org.archboy.clobaframe.io.ResourceContent;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.junit.After;
 import org.junit.Before;
@@ -290,12 +290,14 @@ public class ImagingTest {
 		File file = new File(tempDir, filename + "." + formatName);
 		
 		ResourceInfo resourceInfo = image.getResourceInfo();
-		ResourceContent resourceContent = resourceInfo.getContentSnapshot();
+		//ResourceContent resourceContent = resourceInfo.getContentSnapshot();
+		InputStream in = resourceInfo.getInputStream();
 		
 		FileOutputStream out = new FileOutputStream(file);
-		IOUtils.copy(resourceContent.getInputStream(), out);
-		out.close();
-		resourceContent.close();
+		IOUtils.copy(in, out);
+		
+		IOUtils.closeQuietly(out);
+		IOUtils.closeQuietly(in);
 	}
 
 	private Image makeSampleImage(){

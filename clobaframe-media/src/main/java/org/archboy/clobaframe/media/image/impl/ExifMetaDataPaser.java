@@ -24,7 +24,6 @@ import org.archboy.clobaframe.media.Media;
 import org.archboy.clobaframe.media.MetaData;
 import org.archboy.clobaframe.media.MetaDataParser;
 import org.archboy.clobaframe.media.image.Image;
-import org.archboy.clobaframe.io.ResourceContent;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.springframework.stereotype.Component;
 
@@ -55,11 +54,13 @@ public class ExifMetaDataPaser implements MetaDataParser {
 	public MetaData parse(Media media) {
 		Image image = (Image)media;
 		ResourceInfo resourceInfo = image.getResourceInfo();
-		ResourceContent resourceContent = null;
+		InputStream in = null;
+		//ResourceContent resourceContent = null;
 		
 		try {
-			resourceContent = resourceInfo.getContentSnapshot();
-			InputStream in = resourceContent.getInputStream();
+			//resourceContent = resourceInfo.getContentSnapshot();
+			//InputStream in = resourceContent.getInputStream();
+			in = resourceInfo.getInputStream();
 			BufferedInputStream bin = new BufferedInputStream(in);
 			Metadata metadata = ImageMetadataReader.readMetadata(bin, false);
 
@@ -93,7 +94,7 @@ public class ExifMetaDataPaser implements MetaDataParser {
 		} catch (MetadataException ex){
 			//
 		} finally {
-			IOUtils.closeQuietly(resourceContent);
+			IOUtils.closeQuietly(in);
 		}
 		
 		return null;

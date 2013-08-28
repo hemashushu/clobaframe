@@ -16,6 +16,7 @@
 package org.archboy.clobaframe.io;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 
 /**
@@ -47,41 +48,38 @@ public interface ResourceInfo {
 
 	/**
 	 * Get the content snapshot.
-	 * <p>
-	 *     The caller <strong>MUST</strong> close the {@link ResourceContent}
-	 *     object after used as soon as possible.
-	 * </p>
+	 * New instance will be created while each invoked.
 	 *
 	 * @return
 	 * @throws IOException
 	 */
-	ResourceContent getContentSnapshot() throws IOException;
+	InputStream getInputStream() throws IOException;
 
 	/**
 	 * Get the content snapshot with the specify range.
-	 * <p>
-	 *     The caller <strong>MUST</strong> close the {@link ResourceContent}
-	 *     object after used as soon as possible.
-	 * </p>
+	 * New instance will be created while each invoked.
 	 *
 	 * @param start
 	 * @param length
 	 * @return
-	 * @throws IOException
+	 * @throws IOException If the resource content is not seekable.
 	 */
-	ResourceContent getContentSnapshot(long start, long length) throws IOException;
+	InputStream getInputStream(long start, long length) throws IOException;
 
 
 	/**
-	 * Optional
+	 * Optional property.
+	 * 
+	 * Indicates the method {@link ResourceInfo#getInputStream(long, long) } can be invoked.
+	 * 
 	 * @return
 	 */
-	boolean isContentSeekable();
+	boolean isSeekable();
 
 	/**
-	 * This is optional property.
+	 * Optional property.
 	 *
-	 * @return
+	 * @return NULL if no date specified.
 	 */
 	Date getLastModified();
 

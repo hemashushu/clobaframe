@@ -26,19 +26,20 @@ import org.archboy.clobaframe.io.ResourceInfo;
 public interface MultipartFormResourceInfo extends ResourceInfo{
 
 	/**
-	 * Indicates the current resource is a file or a form field.
-	 *
-	 * @return
-	 */
-	boolean isFile();
-
-	/**
 	 * The field name.
 	 *
 	 * @return
 	 */
-	String getName();
+	String getFieldName();
 
+	/**
+	 * Indicates the current resource is a file or a form field.
+	 *
+	 * @return
+	 */
+	boolean isFormField();
+
+	
 	/**
 	 * Get the file name.
 	 * <p>

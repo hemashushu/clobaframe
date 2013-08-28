@@ -47,7 +47,7 @@ public class MultipartFormResourceReceiverImpl implements MultipartFormResourceR
 	@Autowired
 	private UploadedTemporaryFileCleanner fileCleanner;
 
-	@Value("${webio.maxUploadSize}")
+	@Value("${io.maxUploadSize}")
 	public void setMaxUploadSizeKB(int maxUploadSizeKB) {
 		this.maxUploadSize = maxUploadSizeKB * 1024L;
 	}
@@ -69,6 +69,7 @@ public class MultipartFormResourceReceiverImpl implements MultipartFormResourceR
 		// Create a factory for disk-based file items
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		factory.setFileCleaningTracker(fileCleanner.getFileCleaningTracker());
+		
 		ServletFileUpload upload = new ServletFileUpload(factory);
 		upload.setSizeMax(maxUploadSize);
 

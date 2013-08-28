@@ -28,8 +28,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.archboy.clobaframe.io.ResourceContent;
-import org.archboy.clobaframe.io.impl.DefaultResourceContent;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 
 /**
@@ -94,23 +92,20 @@ public class LocationReplacingWebResourceInfo implements WebResourceInfo{
 	}
 
 	@Override
-	public ResourceContent getContentSnapshot() throws IOException {
+	public InputStream getInputStream() throws IOException {
 		refresh();
-		return new DefaultResourceContent(content);
+		return new ByteArrayInputStream(content);
 	}
 
 	@Override
-	public ResourceContent getContentSnapshot(long start, long length) throws IOException {
+	public InputStream getInputStream(long start, long length) throws IOException {
 		refresh();
-//		byte[] partialData = Arrays.copyOfRange(content, (int)start, (int)(start + length));
-//		return new DefaultResourceContent(partialData);
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(
+		return new ByteArrayInputStream(
 				content, (int)start, (int)length);
-		return new DefaultResourceContent(inputStream, length);
 	}
 
 	@Override
-	public boolean isContentSeekable() {
+	public boolean isSeekable() {
 		return true;
 	}
 
@@ -129,17 +124,20 @@ public class LocationReplacingWebResourceInfo implements WebResourceInfo{
 		this.lastModified = webResourceInfo.getLastModified();
 
 		String text = null;
-		ResourceContent resourceContent = null;
+		//ResourceContent resourceContent = null;
+		InputStream in = null;
 
 		try{
-			resourceContent = webResourceInfo.getContentSnapshot();
-			InputStream in = resourceContent.getInputStream();
+//			resourceContent = webResourceInfo.getContentSnapshot();
+//			InputStream in = resourceContent.getInputStream();
+			in = webResourceInfo.getInputStream();
+			
 			InputStreamReader reader = new InputStreamReader(in, "utf-8");
 			text = IOUtils.toString(reader);
 		} catch (IOException e) {
 			logger.warn("Fail to load web resource [{}].", webResourceInfo.getName());
 		} finally{
-			IOUtils.closeQuietly(resourceContent);
+			IOUtils.closeQuietly(in);
 		}
 
 		// convert replacing locations
@@ -159,8 +157,8 @@ public class LocationReplacingWebResourceInfo implements WebResourceInfo{
 		String replacedText = builder.toString();
 
 		// convert text into input stream
-		content = replacedText.getBytes(Charset.forName("utf-8"));
-		hash = DigestUtils.sha256Hex(content);
+		this.content = replacedText.getBytes(Charset.forName("utf-8"));
+		this.hash = DigestUtils.sha256Hex(content);
 	}
 
 }

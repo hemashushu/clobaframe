@@ -13,11 +13,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
-import org.archboy.clobaframe.blobstore.BlobInfo;
-import org.archboy.clobaframe.blobstore.BlobInfoPartialCollection;
+import org.archboy.clobaframe.blobstore.BlobResourceInfo;
+import org.archboy.clobaframe.blobstore.BlobResourceInfoPartialCollection;
 import org.archboy.clobaframe.blobstore.BlobKey;
 import org.archboy.clobaframe.blobstore.StoreAgent;
-import org.archboy.clobaframe.io.ResourceContent;
 
 /**
  *
@@ -87,22 +86,22 @@ public class LocalStoreAgentImpl implements StoreAgent {
 	}
 
 	@Override
-	public void put(BlobInfo blobInfo, boolean publicReadable, boolean minor) throws IOException {
+	public void put(BlobResourceInfo blobInfo, boolean publicReadable, boolean minor) throws IOException {
 		BlobKey blobKey = blobInfo.getBlobKey();
 		File bucket = new File(localDir, blobKey.getBucketName());
 		File file = new File(bucket, blobKey.getKey());
 
-		ResourceContent content = blobInfo.getContentSnapshot();
-		InputStream in = content.getInputStream();
+		//ResourceContent content = blobInfo.getContentSnapshot();
+		InputStream in = blobInfo.getInputStream(); // content.getInputStream();
 		FileOutputStream out = new FileOutputStream(file);
 		IOUtils.copy(in, out);
 
-		IOUtils.closeQuietly(content);
 		IOUtils.closeQuietly(out);
+		IOUtils.closeQuietly(in);
 	}
 
 	@Override
-	public BlobInfo get(BlobKey blobKey) throws IOException {
+	public BlobResourceInfo get(BlobKey blobKey) throws IOException {
 		File bucket = new File(localDir, blobKey.getBucketName());
 		File file = new File(bucket, blobKey.getKey());
 		if (!file.exists() || file.isDirectory()) {
@@ -112,7 +111,7 @@ public class LocalStoreAgentImpl implements StoreAgent {
 		}
 
 		String contentType = getContentType(file);
-		return new LocalBlobInfo(blobKey, file, contentType);
+		return new LocalBlobResourceInfo(blobKey, file, contentType);
 	}
 
 	@Override
@@ -131,7 +130,7 @@ public class LocalStoreAgentImpl implements StoreAgent {
 	}
 
 	@Override
-	public BlobInfoPartialCollection list(BlobKey prefix) {
+	public BlobResourceInfoPartialCollection list(BlobKey prefix) {
 		String bucketName = prefix.getBucketName();
 		File bucket = new File(localDir, bucketName);
 		final String startName = prefix.getKey();
@@ -143,18 +142,18 @@ public class LocalStoreAgentImpl implements StoreAgent {
 			}
 		});
 
-		LocalBlobInfoPartialCollection collection = new LocalBlobInfoPartialCollection();
+		LocalBlobResourceInfoPartialCollection collection = new LocalBlobResourceInfoPartialCollection();
 		for (File file : files) {
 			BlobKey blobKey = new BlobKey(bucketName, file.getName());
 			String contentType = getContentType(file);
-			collection.add(new LocalBlobInfo(blobKey, file, contentType));
+			collection.add(new LocalBlobResourceInfo(blobKey, file, contentType));
 		}
 
 		return collection;
 	}
 
 	@Override
-	public BlobInfoPartialCollection listNext(BlobInfoPartialCollection collection) {
+	public BlobResourceInfoPartialCollection listNext(BlobResourceInfoPartialCollection collection) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 

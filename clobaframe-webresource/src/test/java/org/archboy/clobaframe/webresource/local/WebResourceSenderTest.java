@@ -39,7 +39,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.archboy.clobaframe.io.ResourceContent;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceSender;
 import org.archboy.clobaframe.webresource.WebResourceService;
@@ -132,10 +131,10 @@ public class WebResourceSenderTest {
 	}
 
 	private void checkResponseContent(HttpClient client, HttpGet method, WebResourceInfo resourceInfo) throws IOException {
-		ResourceContent resourceContent = resourceInfo.getContentSnapshot();
-		InputStream in = resourceContent.getInputStream();
+		//ResourceContent resourceContent = resourceInfo.getContentSnapshot();
+		InputStream in = resourceInfo.getInputStream(); // resourceContent.getInputStream();
 		byte[] content = IOUtils.toByteArray(in);
-		IOUtils.closeQuietly(resourceContent);
+		IOUtils.closeQuietly(in);
 
 		checkResponseContent(client, method, content);
 	}

@@ -22,7 +22,7 @@ import org.archboy.clobaframe.io.ResourceInfo;
  *
  * @author young
  */
-public interface BlobInfo extends ResourceInfo {
+public interface BlobResourceInfo extends ResourceInfo {
 
 	/**
 	 * The blob object key.

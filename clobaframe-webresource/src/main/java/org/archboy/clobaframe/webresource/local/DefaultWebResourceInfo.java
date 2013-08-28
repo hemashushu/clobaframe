@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.archboy.clobaframe.webresource.impl;
+package org.archboy.clobaframe.webresource.local;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,12 +22,11 @@ import java.io.InputStream;
 import java.util.Date;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
-import org.archboy.clobaframe.io.ResourceContent;
-import org.archboy.clobaframe.io.impl.DefaultResourceContent;
+import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
 import org.archboy.clobaframe.io.file.impl.PartialFileInputStream;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 
-public class DefaultWebResourceInfo implements WebResourceInfo {
+public class DefaultWebResourceInfo implements WebResourceInfo, FileBaseResourceInfo {
 
 	private File file;
 
@@ -35,8 +34,8 @@ public class DefaultWebResourceInfo implements WebResourceInfo {
 	private String uniqueName;
 	private String contentType;
 
-	public DefaultWebResourceInfo(File file, String name, String uniqueName,
-			String contentType) {
+	public DefaultWebResourceInfo(
+			File file, String name, String uniqueName, String contentType) {
 		this.file = file;
 		this.name = name;
 		this.uniqueName = uniqueName;
@@ -75,19 +74,17 @@ public class DefaultWebResourceInfo implements WebResourceInfo {
 	}
 
 	@Override
-	public ResourceContent getContentSnapshot() throws IOException {
-		InputStream in = new FileInputStream(file);
-		return new DefaultResourceContent(in, file.length());
+	public InputStream getInputStream() throws IOException {
+		return new FileInputStream(file);
 	}
 
 	@Override
-	public ResourceContent getContentSnapshot(long start, long length) throws IOException {
-		InputStream in = new PartialFileInputStream(file, start, length);
-		return new DefaultResourceContent(in, length);
+	public InputStream getInputStream(long start, long length) throws IOException {
+		return new PartialFileInputStream(file, start, length);
 	}
 
 	@Override
-	public boolean isContentSeekable() {
+	public boolean isSeekable() {
 		return true;
 	}
 
@@ -101,4 +98,10 @@ public class DefaultWebResourceInfo implements WebResourceInfo {
 		// get the last modified time just in time.
 		return new Date(file.lastModified());
 	}
+
+	@Override
+	public File getFile() {
+		return file;
+	}
+	
 }

@@ -71,10 +71,10 @@ public interface WebResourceService {
 
 	/**
 	 *
-	 * @param name
+	 * @param uniqueName
 	 * @return
 	 */
-	WebResourceInfo getResourceByUniqueName(String name) throws FileNotFoundException;
+	WebResourceInfo getResourceByUniqueName(String uniqueName) throws FileNotFoundException;
 
 	/**
 	 * Get the location (URL) of the specify resource.

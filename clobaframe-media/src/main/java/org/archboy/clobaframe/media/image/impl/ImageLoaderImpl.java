@@ -43,7 +43,6 @@ import org.archboy.clobaframe.media.MediaDataSizeLimitExceededException;
 import org.archboy.clobaframe.media.Media;
 import org.archboy.clobaframe.media.MediaLoader;
 import org.archboy.clobaframe.media.image.Image;
-import org.archboy.clobaframe.io.ResourceContent;
 import org.archboy.clobaframe.io.ResourceInfo;
 
 /**
@@ -81,15 +80,16 @@ public class ImageLoaderImpl implements MediaLoader {
 
 		// OpenJDK current support bmp, jpg, wbmp, jpeg, png, gif
 		
-		ResourceContent resourceContent = null;
+		//ResourceContent resourceContent = null;
 		InputStream in = null;
 		ImageInputStream stream = null;
 		ImageReader reader = null;
 		Image image = null;
 
 		try {
-			resourceContent = resourceInfo.getContentSnapshot();
-			in = resourceContent.getInputStream();
+			//resourceContent = resourceInfo.getContentSnapshot();
+			//in = resourceContent.getInputStream();
+			in = resourceInfo.getInputStream();
 			stream = ImageIO.createImageInputStream(in);
 
 			Iterator<ImageReader> readers = ImageIO.getImageReaders(stream);
@@ -114,7 +114,7 @@ public class ImageLoaderImpl implements MediaLoader {
 			//IOUtils.closeQuietly(stream); // for java 7
 			closeQuietly(stream);
 			IOUtils.closeQuietly(in);
-			IOUtils.closeQuietly(resourceContent);
+			//IOUtils.closeQuietly(resourceContent);
 		}
 
 		return image;

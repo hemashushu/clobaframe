@@ -24,7 +24,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.springframework.util.Assert;
-import org.archboy.clobaframe.io.ResourceContent;
 import org.archboy.clobaframe.io.ResourceInfo;
 
 /**
@@ -52,7 +51,7 @@ public abstract class AbstractDataSender {
 				new Long(resourceInfo.getContentLength()).toString());
 		response.setDateHeader("Date", new Date().getTime());// Calendar.getInstance().getTimeInMillis());
 
-		if (resourceInfo.isContentSeekable()) { // instanceof SeekableInputStream) {
+		if (resourceInfo.isSeekable()) { // instanceof SeekableInputStream) {
 			response.addHeader("Accept-Ranges", "bytes");
 		} else {
 			response.addHeader("Accept-Ranges", "none");
@@ -61,8 +60,8 @@ public abstract class AbstractDataSender {
 		// add other headers
 		addHeaders(response, extraHeaders);
 
-		ResourceContent resourceContent = resourceInfo.getContentSnapshot();
-		InputStream in = resourceContent.getInputStream();
+		//ResourceContent resourceContent = resourceInfo.getContentSnapshot();
+		InputStream in = resourceInfo.getInputStream();
 
 		OutputStream out = null;
 		try {
@@ -70,7 +69,7 @@ public abstract class AbstractDataSender {
 			send(in, out, resourceInfo.getContentLength());
 		} finally {
 			IOUtils.closeQuietly(out);
-			IOUtils.closeQuietly(resourceContent);
+			IOUtils.closeQuietly(in);
 		}
 	}
 
@@ -79,7 +78,7 @@ public abstract class AbstractDataSender {
 			long startPosition, long length) throws IOException {
 
 		Assert.hasText(resourceInfo.getContentType());
-		Assert.isTrue(resourceInfo.isContentSeekable());
+		Assert.isTrue(resourceInfo.isSeekable());
 
 //		if (!(in instanceof SeekableInputStream)){
 //			// close resource content
@@ -118,8 +117,8 @@ public abstract class AbstractDataSender {
 		// add other headers
 		addHeaders(response, extraHeaders);
 
-		ResourceContent resourceContent = resourceInfo.getContentSnapshot(startPosition, length);
-		InputStream in = resourceContent.getInputStream();
+		//ResourceContent resourceContent = resourceInfo.getContentSnapshot(startPosition, length);
+		InputStream in = resourceInfo.getInputStream(startPosition, length);
 
 		OutputStream out = null;
 		try {
@@ -131,7 +130,7 @@ public abstract class AbstractDataSender {
 			send(in, out, lengthToBeSent);
 		} finally {
 			IOUtils.closeQuietly(out);
-			IOUtils.closeQuietly(resourceContent);
+			IOUtils.closeQuietly(in);
 		}
 	}
 

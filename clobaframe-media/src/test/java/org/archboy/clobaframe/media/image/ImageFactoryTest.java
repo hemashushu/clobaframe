@@ -38,8 +38,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.archboy.clobaframe.webio.ContentTypeDetector;
-import org.archboy.clobaframe.io.ResourceContent;
+import org.archboy.clobaframe.io.ContentTypeDetector;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.file.impl.FileResourceInfo;
 import static org.junit.Assert.*;
@@ -47,7 +46,7 @@ import org.archboy.clobaframe.io.ResourceInfoFactory;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/applicationContext.xml" })
-public class MediaFactoryTest {
+public class ImageFactoryTest {
 
 	private static final String DEFAULT_SAMPLE_IMAGE_FOLDER = "sample/image/";
 	private String sampleImageFolder = DEFAULT_SAMPLE_IMAGE_FOLDER;
@@ -110,9 +109,10 @@ public class MediaFactoryTest {
 		assertEquals("image/jpeg", info1.getContentType());
 		assertEquals(file1.lastModified(), info1.getLastModified().getTime());
 
-		ResourceContent content1 = info1.getContentSnapshot();
-		byte[] contentData1 = IOUtils.toByteArray(content1.getInputStream());
-		content1.close();
+		//ResourceContent content1 = info1.getContentSnapshot();
+		InputStream in = info1.getInputStream();
+		byte[] contentData1 = IOUtils.toByteArray(in);
+		in.close();
 
 		InputStream in1 = new FileInputStream(file1);
 		byte[] data1 = IOUtils.toByteArray(in1);
@@ -212,11 +212,13 @@ public class MediaFactoryTest {
 		
 		
 		ResourceInfo resourceInfo = image.getResourceInfo();
-		ResourceContent resourceContent = resourceInfo.getContentSnapshot();
+		//ResourceContent resourceContent = resourceInfo.getContentSnapshot();
+		InputStream in = resourceInfo.getInputStream();
 		
 		FileOutputStream out = new FileOutputStream(file);
-		IOUtils.copy(resourceContent.getInputStream(), out);
-		out.close();
-		resourceContent.close();
+		IOUtils.copy(in, out);
+		
+		IOUtils.closeQuietly(out);
+		IOUtils.closeQuietly(in);
 	}
 }

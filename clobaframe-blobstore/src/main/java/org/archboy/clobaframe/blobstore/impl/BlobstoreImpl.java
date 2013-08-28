@@ -4,8 +4,8 @@ import java.io.IOException;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.archboy.clobaframe.blobstore.BlobInfo;
-import org.archboy.clobaframe.blobstore.BlobInfoPartialCollection;
+import org.archboy.clobaframe.blobstore.BlobResourceInfo;
+import org.archboy.clobaframe.blobstore.BlobResourceInfoPartialCollection;
 import org.archboy.clobaframe.blobstore.BlobKey;
 import org.archboy.clobaframe.blobstore.Blobstore;
 import org.archboy.clobaframe.blobstore.StoreAgent;
@@ -44,17 +44,17 @@ public class BlobstoreImpl implements Blobstore{
 	}
 
 	@Override
-	public void put(BlobInfo blobInfo) throws IOException {
+	public void put(BlobResourceInfo blobInfo) throws IOException {
 		put(blobInfo, false, false);
 	}
 
 	@Override
-	public void put(BlobInfo blobInfo, boolean publicReadable, boolean minor) throws IOException {
+	public void put(BlobResourceInfo blobInfo, boolean publicReadable, boolean minor) throws IOException {
 		storeAgent.put(blobInfo, publicReadable, minor);
 	}
 
 	@Override
-	public BlobInfo get(BlobKey blobKey) throws IOException {
+	public BlobResourceInfo get(BlobKey blobKey) throws IOException {
 		return storeAgent.get(blobKey);
 	}
 
@@ -64,12 +64,12 @@ public class BlobstoreImpl implements Blobstore{
 	}
 
 	@Override
-	public BlobInfoPartialCollection list(BlobKey prefix) {
+	public BlobResourceInfoPartialCollection list(BlobKey prefix) {
 		return storeAgent.list(prefix);
 	}
 
 	@Override
-	public BlobInfoPartialCollection listNext(BlobInfoPartialCollection collection) {
+	public BlobResourceInfoPartialCollection listNext(BlobResourceInfoPartialCollection collection) {
 		return storeAgent.listNext(collection);
 	}
 

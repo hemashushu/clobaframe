@@ -15,7 +15,6 @@
  */
 package org.archboy.clobaframe.io.http;
 
-import org.archboy.clobaframe.io.ResourceContent;
 import org.archboy.clobaframe.io.http.MultipartFormResourceReceiver;
 import org.archboy.clobaframe.io.http.MultipartFormResourceInfo;
 import java.io.File;
@@ -45,7 +44,6 @@ import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.archboy.clobaframe.io.ResourceContent;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -237,16 +235,17 @@ public class MultipartFormResourceReceiverTest {
 			for(MultipartFormResourceInfo resourceInfo : resourceInfos){
 
 				Map<String, String> itemInfo = new HashMap<String, String>();
-				itemInfo.put("name", resourceInfo.getName());
+				itemInfo.put("name", resourceInfo.getFieldName());
 
-				if (resourceInfo.isFile()){
+				if (!resourceInfo.isFormField()){
 					itemInfo.put("fileName", resourceInfo.getFileName());
 					itemInfo.put("contentType", resourceInfo.getContentType());
 					itemInfo.put("length", new Long(resourceInfo.getContentLength()).toString());
 
-					ResourceContent resourceContent = resourceInfo.getContentSnapshot();
-					String sha256hex = DigestUtils.sha256Hex(resourceContent.getInputStream());
-					resourceContent.close();
+					//ResourceContent resourceContent = resourceInfo.getContentSnapshot();
+					InputStream in = resourceInfo.getInputStream();
+					String sha256hex = DigestUtils.sha256Hex(in);
+					in.close();
 
 					itemInfo.put("contentHash", sha256hex);
 				}else{

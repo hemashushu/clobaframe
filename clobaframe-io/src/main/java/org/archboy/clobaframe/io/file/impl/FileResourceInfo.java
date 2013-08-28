@@ -21,11 +21,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import org.archboy.clobaframe.io.ContentTypeDetector;
-import org.archboy.clobaframe.io.ResourceContent;
-import org.archboy.clobaframe.io.ResourceInfo;
-import org.archboy.clobaframe.io.impl.DefaultResourceContent;
+import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
 
-public class FileResourceInfo implements ResourceInfo {
+public class FileResourceInfo implements FileBaseResourceInfo {
 
 	private File file;
 	private String contentType;
@@ -34,11 +32,11 @@ public class FileResourceInfo implements ResourceInfo {
 	 * Detect the mime type by the file extension name.
 	 * 
 	 * @param file
-	 * @param contentTypeAnalyzer 
+	 * @param contentTypeDetector 
 	 */
-	public FileResourceInfo(File file, ContentTypeDetector contentTypeAnalyzer) {
+	public FileResourceInfo(File file, ContentTypeDetector contentTypeDetector) {
 		this.file = file;
-		this.contentType = contentTypeAnalyzer.getByExtensionName(file.getName());
+		this.contentType = contentTypeDetector.getByExtensionName(file.getName());
 	}
 
 	public FileResourceInfo(File file, String contentType) {
@@ -58,19 +56,17 @@ public class FileResourceInfo implements ResourceInfo {
 	}
 
 	@Override
-	public ResourceContent getContentSnapshot() throws IOException {
-		InputStream in = new FileInputStream(file);
-		return new DefaultResourceContent(in, file.length());
+	public InputStream getInputStream() throws IOException {
+		return new FileInputStream(file);
 	}
 
 	@Override
-	public ResourceContent getContentSnapshot(long start, long length) throws IOException {
-		InputStream in = new PartialFileInputStream(file, start, length);
-		return new DefaultResourceContent(in, length);
+	public InputStream getInputStream(long start, long length) throws IOException {
+		return new PartialFileInputStream(file, start, length);
 	}
 
 	@Override
-	public boolean isContentSeekable() {
+	public boolean isSeekable() {
 		return true;
 	}
 
@@ -79,4 +75,10 @@ public class FileResourceInfo implements ResourceInfo {
 		// get the last modified time just in time.
 		return new Date(file.lastModified());
 	}
+
+	@Override
+	public File getFile() {
+		return file;
+	}
+	
 }

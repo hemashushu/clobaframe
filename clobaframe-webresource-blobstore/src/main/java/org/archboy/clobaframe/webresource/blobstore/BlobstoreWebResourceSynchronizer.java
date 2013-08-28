@@ -16,6 +16,7 @@
 package org.archboy.clobaframe.webresource.blobstore;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -28,12 +29,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.archboy.clobaframe.blobstore.BlobInfo;
-import org.archboy.clobaframe.blobstore.BlobInfoFactory;
+import org.archboy.clobaframe.blobstore.BlobResourceInfo;
+import org.archboy.clobaframe.blobstore.BlobResourceInfoFactory;
 import org.archboy.clobaframe.blobstore.BlobKey;
 import org.archboy.clobaframe.blobstore.Blobstore;
 import org.archboy.clobaframe.blobstore.PartialCollection;
-import org.archboy.clobaframe.io.ResourceContent;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 
 /**
@@ -52,7 +52,7 @@ public class BlobstoreWebResourceSynchronizer{
 //	private BlobstoreBucket blobstoreBucket;
 
 	@Autowired
-	private BlobInfoFactory blobInfoFactory;
+	private BlobResourceInfoFactory blobInfoFactory;
 
 	@Value("${webresource.blobstore.bucketName}")
 	private String bucketName;
@@ -100,7 +100,7 @@ public class BlobstoreWebResourceSynchronizer{
 		}
 
 		// find all web resources that exists in the blobstore
-		Map<String, BlobInfo> remoteResources = new HashMap<String, BlobInfo>();
+		Map<String, BlobResourceInfo> remoteResources = new HashMap<String, BlobResourceInfo>();
 
 		// build a map for remote resource, use the unique name as map key
 		int prefixLength = 0;
@@ -108,7 +108,7 @@ public class BlobstoreWebResourceSynchronizer{
 			prefixLength = keyNamePrefix.length();
 		}
 
-		for (BlobInfo blobInfo : getRemoteBlobInfos()){
+		for (BlobResourceInfo blobInfo : getRemoteBlobInfos()){
 			String uniqueName = blobInfo.getBlobKey().getKey().substring(prefixLength);
 			remoteResources.put(uniqueName, blobInfo);
 		}
@@ -149,7 +149,7 @@ public class BlobstoreWebResourceSynchronizer{
 
 		// delete none exists resource
 		if (deleteNoneExists) {
-			for (BlobInfo blobInfo : remoteResources.values()){
+			for (BlobResourceInfo blobInfo : remoteResources.values()){
 				remove(blobInfo.getBlobKey());
 			}
 		}
@@ -160,15 +160,15 @@ public class BlobstoreWebResourceSynchronizer{
 		}
 	}
 
-	private List<BlobInfo> getRemoteBlobInfos() {
-		List<BlobInfo> blobInfos = new ArrayList<BlobInfo>();
+	private List<BlobResourceInfo> getRemoteBlobInfos() {
+		List<BlobResourceInfo> blobInfos = new ArrayList<BlobResourceInfo>();
 
 		BlobKey prefix = new BlobKey(bucketName, keyNamePrefix);
-		PartialCollection<BlobInfo> partialBlobInfos = null;
+		PartialCollection<BlobResourceInfo> partialBlobInfos = null;
 		do {
 			partialBlobInfos = blobstore.list(prefix);
 
-			for (BlobInfo blobInfo : partialBlobInfos) {
+			for (BlobResourceInfo blobInfo : partialBlobInfos) {
 				blobInfos.add(blobInfo);
 			}
 
@@ -198,20 +198,20 @@ public class BlobstoreWebResourceSynchronizer{
 				blobKey.getBucketName(),
 				blobKey.getKey()});
 
-		ResourceContent resourceContent = webResourceInfo.getContentSnapshot();
-
-		BlobInfo blobInfo = blobInfoFactory.createBlobInfo(
+		//ResourceContent resourceContent = webResourceInfo.getContentSnapshot();
+		InputStream in = webResourceInfo.getInputStream();
+		BlobResourceInfo blobInfo = blobInfoFactory.make(
 				blobKey,
-				resourceContent.getLength(),
 				webResourceInfo.getContentType(),
-				resourceContent.getInputStream());
+				in,
+				webResourceInfo.getContentLength());
 
 		// blobInfo.addMetadata("sha256", webResourceInfo.getHash());
 
 		try{
 			blobstore.put(blobInfo, true, false);
 		}finally{
-			IOUtils.closeQuietly(resourceContent);
+			IOUtils.closeQuietly(in);
 		}
 	}
 }

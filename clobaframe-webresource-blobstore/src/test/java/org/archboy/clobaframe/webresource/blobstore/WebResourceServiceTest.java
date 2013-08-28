@@ -33,7 +33,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.archboy.clobaframe.io.ResourceContent;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceService;
 import static org.junit.Assert.*;
@@ -105,11 +104,12 @@ public class WebResourceServiceTest {
 		assertContentEquals(webResource3, "sample/web/folder/info-32.png");
 
 		// test get a content-replacing resource, this is optional
-		ResourceContent content2 = webResource2.getContentSnapshot();
-		String text2 = IOUtils.toString(content2.getInputStream());
+		//ResourceContent content2 = webResource2.getContentSnapshot();
+		InputStream in2 = webResource2.getInputStream();
+		String text2 = IOUtils.toString(in2);
 		assertTrue(text2.indexOf(resourceService.getLocation(webResource1)) > 0);
 		assertTrue(text2.indexOf(resourceService.getLocation(webResource3)) > 0);
-		IOUtils.closeQuietly(content2);
+		IOUtils.closeQuietly(in2);
 
 		// test get none exists
 		try{
@@ -175,10 +175,10 @@ public class WebResourceServiceTest {
 	}
 
 	private void checkResourceContent(WebResourceInfo resourceInfo, byte[] data) throws IOException {
-		ResourceContent resourceContent = resourceInfo.getContentSnapshot();
-		InputStream in = resourceContent.getInputStream();
+		//ResourceContent resourceContent = resourceInfo.getContentSnapshot();
+		InputStream in = resourceInfo.getInputStream();// resourceContent.getInputStream();
 		byte[] content = IOUtils.toByteArray(in);
-		IOUtils.closeQuietly(resourceContent);
+		IOUtils.closeQuietly(in);
 		assertArrayEquals(data, content);
 	}
 

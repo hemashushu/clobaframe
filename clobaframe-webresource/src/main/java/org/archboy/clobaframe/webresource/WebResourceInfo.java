@@ -29,13 +29,6 @@ import org.archboy.clobaframe.io.ResourceInfo;
 public interface WebResourceInfo extends ResourceInfo{
 
 	/**
-	 * Content hash, use MD5/SHA256 algorithm.
-	 *
-	 * @return
-	 */
-	String getHash();
-
-	/**
 	 * The resource name.
 	 * such as 'common.css', 'index.js'.
 	 * 
@@ -43,6 +36,13 @@ public interface WebResourceInfo extends ResourceInfo{
 	 */
 	String getName();
 
+	/**
+	 * Content hash, use MD5/SHA256 algorithm.
+	 *
+	 * @return
+	 */
+	String getHash();
+	
 	/**
 	 * Get the alias name of web resource.
 	 * <p>

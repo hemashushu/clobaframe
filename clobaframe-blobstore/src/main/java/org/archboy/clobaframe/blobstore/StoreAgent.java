@@ -51,7 +51,7 @@ public interface StoreAgent {
 	/**
 	 * Store the blob object into repository.
 	 *
-	 * @param blobInfo
+	 * @param blobResourceInfo
 	 * @param publicReadable This blob object can be public read.
 	 * @param minor
 	 * <p>
@@ -60,7 +60,8 @@ public interface StoreAgent {
 	 *     reduced redundancy storing.
 	 * </p>
 	 */
-	void put(BlobInfo blobInfo, boolean publicReadable,
+	void put(BlobResourceInfo blobResourceInfo, 
+			boolean publicReadable,
 			boolean minor) throws IOException;
 
 	/**
@@ -70,7 +71,7 @@ public interface StoreAgent {
 	 * @return
 	 * @throws IOException If the specify key does not exists.
 	 */
-	BlobInfo get(BlobKey blobKey) throws IOException;
+	BlobResourceInfo get(BlobKey blobKey) throws IOException;
 
 	/**
 	 * Remove object by key.
@@ -94,7 +95,7 @@ public interface StoreAgent {
 	 * </p>
 	 * @return
 	 */
-	BlobInfoPartialCollection list(BlobKey prefix);
+	BlobResourceInfoPartialCollection list(BlobKey prefix);
 
 	/**
 	 * List the remain objects by the previous result.
@@ -102,6 +103,6 @@ public interface StoreAgent {
 	 * @param collection
 	 * @return
 	 */
-	BlobInfoPartialCollection listNext(BlobInfoPartialCollection collection);
+	BlobResourceInfoPartialCollection listNext(BlobResourceInfoPartialCollection collection);
 
 }
