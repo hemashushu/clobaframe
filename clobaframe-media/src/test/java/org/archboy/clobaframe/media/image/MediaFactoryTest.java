@@ -39,11 +39,11 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.archboy.clobaframe.webio.ContentTypeDetector;
-import org.archboy.clobaframe.webio.ResourceContent;
-import org.archboy.clobaframe.webio.ResourceInfo;
-import org.archboy.clobaframe.webio.impl.FileResourceInfo;
+import org.archboy.clobaframe.io.ResourceContent;
+import org.archboy.clobaframe.io.ResourceInfo;
+import org.archboy.clobaframe.io.impl.FileResourceInfo;
 import static org.junit.Assert.*;
-import org.archboy.clobaframe.webio.ResourceInfoFactory;
+import org.archboy.clobaframe.io.ResourceInfoFactory;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/applicationContext.xml" })

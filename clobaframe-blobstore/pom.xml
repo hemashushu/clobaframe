@@ -31,7 +31,7 @@
 		<!-- Clobaframe -->
 		<dependency>
 			<groupId>org.archboy.clobaframe</groupId>
-			<artifactId>clobaframe-webio</artifactId>
+			<artifactId>clobaframe-io</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -85,20 +85,20 @@
 		</dependency>
 
 		<!-- Apache Commons -->
-		<!-- need by clobaframe-blobstore, clobaframe-webio -->
+		<!-- need by clobaframe-blobstore, clobaframe-io -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
 
-		<!-- need by clobaframe-blobstore, clobaframe-webio -->
+		<!-- need by clobaframe-blobstore, clobaframe-io -->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 		</dependency>
 
 		<!-- javax servlet for test -->
-		<!-- need by clobaframe-webio -->
+		<!-- need by clobaframe-io -->
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>servlet-api</artifactId>

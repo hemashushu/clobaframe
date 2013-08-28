@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.archboy.clobaframe.webio.http.ResourceSender;
+import org.archboy.clobaframe.io.http.ResourceSender;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceSender;
 import org.archboy.clobaframe.webresource.WebResourceService;

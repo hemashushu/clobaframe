@@ -19,7 +19,7 @@ import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.util.Date;
 import org.archboy.clobaframe.media.Media;
-import org.archboy.clobaframe.webio.ResourceInfo;
+import org.archboy.clobaframe.io.ResourceInfo;
 
 
 /**

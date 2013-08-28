@@ -33,7 +33,7 @@ import org.archboy.clobaframe.blobstore.BlobInfoFactory;
 import org.archboy.clobaframe.blobstore.BlobKey;
 import org.archboy.clobaframe.blobstore.Blobstore;
 import org.archboy.clobaframe.blobstore.PartialCollection;
-import org.archboy.clobaframe.webio.ResourceContent;
+import org.archboy.clobaframe.io.ResourceContent;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 
 /**

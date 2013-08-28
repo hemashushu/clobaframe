@@ -33,7 +33,7 @@
 	<modules>
 		<module>clobaframe-query</module>
 		<module>clobaframe-cache</module>
-		<module>clobaframe-webio</module>
+		<module>clobaframe-io</module>
 		<module>clobaframe-media</module>
 		<module>clobaframe-webresource</module>
 		<module>clobaframe-blobstore</module>

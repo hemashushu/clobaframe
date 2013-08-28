@@ -1,7 +1,7 @@
 package org.archboy.clobaframe.media;
 
 import java.io.IOException;
-import org.archboy.clobaframe.webio.ResourceInfo;
+import org.archboy.clobaframe.io.ResourceInfo;
 
 /**
  *

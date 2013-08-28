@@ -23,8 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 import org.archboy.clobaframe.blobstore.BlobInfo;
 import org.archboy.clobaframe.blobstore.BlobKey;
-import org.archboy.clobaframe.webio.ResourceContent;
-import org.archboy.clobaframe.webio.impl.DefaultResourceContent;
+import org.archboy.clobaframe.io.ResourceContent;
+import org.archboy.clobaframe.io.impl.DefaultResourceContent;
 
 /**
  *

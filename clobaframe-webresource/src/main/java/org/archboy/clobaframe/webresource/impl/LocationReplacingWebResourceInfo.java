@@ -28,8 +28,8 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.archboy.clobaframe.webio.ResourceContent;
-import org.archboy.clobaframe.webio.impl.DefaultResourceContent;
+import org.archboy.clobaframe.io.ResourceContent;
+import org.archboy.clobaframe.io.impl.DefaultResourceContent;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 
 /**

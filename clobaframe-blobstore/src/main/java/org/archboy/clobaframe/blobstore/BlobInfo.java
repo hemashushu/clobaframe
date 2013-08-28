@@ -16,7 +16,7 @@
 package org.archboy.clobaframe.blobstore;
 
 import java.util.Map;
-import org.archboy.clobaframe.webio.ResourceInfo;
+import org.archboy.clobaframe.io.ResourceInfo;
 
 /**
  *

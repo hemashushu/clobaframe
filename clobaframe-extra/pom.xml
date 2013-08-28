@@ -99,7 +99,7 @@
 		</dependency>
 
 		<!-- javax servlet for test -->
-		<!-- need by clobaframe-webio -->
+		<!-- need by clobaframe-io -->
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>servlet-api</artifactId>

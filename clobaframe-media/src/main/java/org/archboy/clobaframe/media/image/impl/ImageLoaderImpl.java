@@ -43,8 +43,8 @@ import org.archboy.clobaframe.media.MediaDataSizeLimitExceededException;
 import org.archboy.clobaframe.media.Media;
 import org.archboy.clobaframe.media.MediaLoader;
 import org.archboy.clobaframe.media.image.Image;
-import org.archboy.clobaframe.webio.ResourceContent;
-import org.archboy.clobaframe.webio.ResourceInfo;
+import org.archboy.clobaframe.io.ResourceContent;
+import org.archboy.clobaframe.io.ResourceInfo;
 
 /**
  *

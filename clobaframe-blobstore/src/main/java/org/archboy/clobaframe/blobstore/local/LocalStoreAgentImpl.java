@@ -17,7 +17,7 @@ import org.archboy.clobaframe.blobstore.BlobInfo;
 import org.archboy.clobaframe.blobstore.BlobInfoPartialCollection;
 import org.archboy.clobaframe.blobstore.BlobKey;
 import org.archboy.clobaframe.blobstore.StoreAgent;
-import org.archboy.clobaframe.webio.ResourceContent;
+import org.archboy.clobaframe.io.ResourceContent;
 
 /**
  *

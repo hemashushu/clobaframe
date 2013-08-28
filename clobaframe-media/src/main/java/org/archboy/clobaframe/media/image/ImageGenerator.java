@@ -20,7 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import org.archboy.clobaframe.media.MediaFactory;
-import org.archboy.clobaframe.webio.ResourceInfo;
+import org.archboy.clobaframe.io.ResourceInfo;
 
 /**
  * 

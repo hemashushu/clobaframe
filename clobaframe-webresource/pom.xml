@@ -33,7 +33,7 @@
 		<!-- Clobaframe -->
 		<dependency>
 			<groupId>org.archboy.clobaframe</groupId>
-			<artifactId>clobaframe-webio</artifactId>
+			<artifactId>clobaframe-io</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -87,7 +87,7 @@
 		</dependency>
 
 		<!-- Apache Commons -->
-		<!-- need by clobaframe-webio -->
+		<!-- need by clobaframe-io -->
 		<!--
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -95,7 +95,7 @@
 		</dependency>
 		-->
 
-		<!-- need by clobaframe-webresource, clobaframe-webio -->
+		<!-- need by clobaframe-webresource, clobaframe-io -->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
@@ -108,7 +108,7 @@
 		</dependency>
 
 		<!-- javax servlet -->
-		<!-- need by clobaframe-webresource, clobaframe-webio -->
+		<!-- need by clobaframe-webresource, clobaframe-io -->
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>servlet-api</artifactId>

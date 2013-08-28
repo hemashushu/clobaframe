@@ -6,7 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import org.archboy.clobaframe.media.MediaFactory;
 import org.archboy.clobaframe.media.MetaData;
-import org.archboy.clobaframe.webio.ResourceInfoFactory;
+import org.archboy.clobaframe.io.ResourceInfoFactory;
 import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;

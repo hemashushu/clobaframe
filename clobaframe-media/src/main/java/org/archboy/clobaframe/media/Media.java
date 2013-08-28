@@ -2,7 +2,7 @@ package org.archboy.clobaframe.media;
 
 import java.io.InputStream;
 import java.util.Date;
-import org.archboy.clobaframe.webio.ResourceInfo;
+import org.archboy.clobaframe.io.ResourceInfo;
 
 /**
  *

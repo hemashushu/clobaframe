@@ -15,7 +15,7 @@
  */
 package org.archboy.clobaframe.webresource;
 
-import org.archboy.clobaframe.webio.ResourceInfo;
+import org.archboy.clobaframe.io.ResourceInfo;
 
 /**
  * The web resource object.

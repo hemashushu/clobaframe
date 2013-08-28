@@ -23,8 +23,8 @@ import java.util.Date;
 import org.archboy.clobaframe.media.MetaData;
 import org.archboy.clobaframe.media.image.Image;
 import org.archboy.clobaframe.media.image.OutputSettings;
-import org.archboy.clobaframe.webio.ResourceInfo;
-import org.archboy.clobaframe.webio.impl.ByteArrayResourceInfo;
+import org.archboy.clobaframe.io.ResourceInfo;
+import org.archboy.clobaframe.io.impl.ByteArrayResourceInfo;
 
 public class DefaultImage extends AbstractImage implements Image {
 

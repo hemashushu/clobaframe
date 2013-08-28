@@ -22,9 +22,9 @@ import java.io.InputStream;
 import java.util.Date;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
-import org.archboy.clobaframe.webio.ResourceContent;
-import org.archboy.clobaframe.webio.impl.DefaultResourceContent;
-import org.archboy.clobaframe.webio.impl.PartialFileInputStream;
+import org.archboy.clobaframe.io.ResourceContent;
+import org.archboy.clobaframe.io.impl.DefaultResourceContent;
+import org.archboy.clobaframe.io.impl.PartialFileInputStream;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 
 public class DefaultWebResourceInfo implements WebResourceInfo {

@@ -24,8 +24,8 @@ import org.archboy.clobaframe.media.Media;
 import org.archboy.clobaframe.media.MetaData;
 import org.archboy.clobaframe.media.MetaDataParser;
 import org.archboy.clobaframe.media.image.Image;
-import org.archboy.clobaframe.webio.ResourceContent;
-import org.archboy.clobaframe.webio.ResourceInfo;
+import org.archboy.clobaframe.io.ResourceContent;
+import org.archboy.clobaframe.io.ResourceInfo;
 import org.springframework.stereotype.Component;
 
 /**
