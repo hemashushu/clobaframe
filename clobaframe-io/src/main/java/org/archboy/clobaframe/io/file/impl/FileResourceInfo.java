@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.archboy.clobaframe.io.impl;
+package org.archboy.clobaframe.io.file.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,6 +23,7 @@ import java.util.Date;
 import org.archboy.clobaframe.io.ContentTypeDetector;
 import org.archboy.clobaframe.io.ResourceContent;
 import org.archboy.clobaframe.io.ResourceInfo;
+import org.archboy.clobaframe.io.impl.DefaultResourceContent;
 
 public class FileResourceInfo implements ResourceInfo {
 

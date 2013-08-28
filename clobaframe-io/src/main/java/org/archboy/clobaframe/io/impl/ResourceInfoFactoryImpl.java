@@ -1,5 +1,6 @@
 package org.archboy.clobaframe.io.impl;
 
+import org.archboy.clobaframe.io.file.impl.FileResourceInfo;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Date;

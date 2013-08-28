@@ -1,4 +1,4 @@
-package org.archboy.clobaframe.io;
+package org.archboy.clobaframe.io.file;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,7 +15,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.archboy.clobaframe.io.impl.PartialFileInputStream;
+import org.archboy.clobaframe.io.file.impl.PartialFileInputStream;
 import static org.junit.Assert.*;
 
 /**

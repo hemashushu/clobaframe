@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.archboy.clobaframe.io.impl;
+package org.archboy.clobaframe.io.file.impl;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.archboy.clobaframe.io;
+package org.archboy.clobaframe.io.http;
 
 import org.archboy.clobaframe.io.ResourceContent;
 import org.archboy.clobaframe.io.http.MultipartFormResourceReceiver;
@@ -45,6 +45,7 @@ import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.archboy.clobaframe.io.ResourceContent;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;

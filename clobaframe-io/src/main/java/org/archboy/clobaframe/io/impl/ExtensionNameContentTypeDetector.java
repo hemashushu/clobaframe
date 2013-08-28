@@ -31,7 +31,7 @@ public class ExtensionNameContentTypeDetector implements ContentTypeDetector {
 	private Map<String, String> mimeTypes = new HashMap<String, String>();
 	
 	private static final String UNKNOWN_MIME_TYPE = "application/octet-stream";
-	private static final String mimeTypeListFile = "classpath:org/archboy/clobaframe/webio/mime.types";
+	private static final String mimeTypeListFile = "classpath:org/archboy/clobaframe/io/mime.types";
 	
 	@Autowired
 	private ResourceLoader resourceLoader;

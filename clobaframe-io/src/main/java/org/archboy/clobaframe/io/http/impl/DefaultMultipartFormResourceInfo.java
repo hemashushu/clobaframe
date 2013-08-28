@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.archboy.clobaframe.io.impl;
+package org.archboy.clobaframe.io.http.impl;
 
 import java.io.IOException;
 import java.util.Date;
 import org.apache.commons.fileupload.FileItem;
 import org.archboy.clobaframe.io.ResourceContent;
 import org.archboy.clobaframe.io.http.MultipartFormResourceInfo;
+import org.archboy.clobaframe.io.impl.DefaultResourceContent;
 
 /**
  *

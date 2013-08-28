@@ -10,7 +10,7 @@ import org.archboy.clobaframe.blobstore.BlobInfo;
 import org.archboy.clobaframe.blobstore.BlobKey;
 import org.archboy.clobaframe.io.ResourceContent;
 import org.archboy.clobaframe.io.impl.DefaultResourceContent;
-import org.archboy.clobaframe.io.impl.PartialFileInputStream;
+import org.archboy.clobaframe.io.file.impl.PartialFileInputStream;
 
 /**
  *

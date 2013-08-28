@@ -41,7 +41,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.archboy.clobaframe.webio.ContentTypeDetector;
 import org.archboy.clobaframe.io.ResourceContent;
 import org.archboy.clobaframe.io.ResourceInfo;
-import org.archboy.clobaframe.io.impl.FileResourceInfo;
+import org.archboy.clobaframe.io.file.impl.FileResourceInfo;
 import static org.junit.Assert.*;
 import org.archboy.clobaframe.io.ResourceInfoFactory;
 

@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/applicationContext.xml" })
-public class ContentTypeAnalyzerTest {
+public class ContentTypeDetectorTest {
 
 	@Autowired
 	private ResourceLoader resourceLoader;
