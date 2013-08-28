@@ -121,6 +121,14 @@
 			<version>2.6.2</version>
 		</dependency>		
 
+		<!-- Mp3 meta data -->
+		<dependency>
+			<groupId>com.mpatric</groupId>
+			<artifactId>mp3agic</artifactId>
+			<version>0.8.1</version>
+		</dependency>
+
+
 		<!-- javax servlet for test -->
 		<!-- need by clobaframe-webio -->
 		<dependency>

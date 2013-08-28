@@ -38,7 +38,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.archboy.clobaframe.webio.ContentTypeAnalyzer;
+import org.archboy.clobaframe.webio.ContentTypeDetector;
 import org.archboy.clobaframe.webio.ResourceContent;
 import org.archboy.clobaframe.webio.ResourceInfo;
 import org.archboy.clobaframe.webio.impl.FileResourceInfo;

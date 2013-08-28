@@ -32,7 +32,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
-import org.archboy.clobaframe.webio.ContentTypeAnalyzer;
+import org.archboy.clobaframe.webio.ContentTypeDetector;
 import org.archboy.clobaframe.webresource.ResourceRepository;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.impl.DefaultWebResourceInfo;
@@ -44,7 +44,7 @@ public class LocalWebResourceRepository implements ResourceRepository{
 	private ResourceLoader resourceLoader;
 
 	@Autowired
-	private ContentTypeAnalyzer contentTypeAnalyzer;
+	private ContentTypeDetector contentTypeAnalyzer;
 
 	@Value("${webresource.local.path}")
 	private String localPath;

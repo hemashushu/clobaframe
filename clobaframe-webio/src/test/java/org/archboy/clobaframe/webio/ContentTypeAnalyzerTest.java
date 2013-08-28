@@ -29,7 +29,7 @@ public class ContentTypeAnalyzerTest {
 	private ResourceLoader resourceLoader;
 
 	@Autowired
-	private ContentTypeAnalyzer contentTypeAnalyzer;
+	private ContentTypeDetector contentTypeAnalyzer;
 
 	private String sampleFile1 = "sample/data/test.jpg";
 	private String sampleFile2 = "sample/data/test.png";

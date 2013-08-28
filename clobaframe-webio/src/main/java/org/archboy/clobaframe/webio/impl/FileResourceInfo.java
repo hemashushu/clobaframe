@@ -20,7 +20,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
-import org.archboy.clobaframe.webio.ContentTypeAnalyzer;
+import org.archboy.clobaframe.webio.ContentTypeDetector;
 import org.archboy.clobaframe.webio.ResourceContent;
 import org.archboy.clobaframe.webio.ResourceInfo;
 
@@ -35,7 +35,7 @@ public class FileResourceInfo implements ResourceInfo {
 	 * @param file
 	 * @param contentTypeAnalyzer 
 	 */
-	public FileResourceInfo(File file, ContentTypeAnalyzer contentTypeAnalyzer) {
+	public FileResourceInfo(File file, ContentTypeDetector contentTypeAnalyzer) {
 		this.file = file;
 		this.contentType = contentTypeAnalyzer.getByExtensionName(file.getName());
 	}

@@ -7,7 +7,7 @@ import java.io.InputStream;
  *
  * @author arch
  */
-public interface ContentTypeAnalyzer {
+public interface ContentTypeDetector {
 
 	public static final String CONTENT_TYPE_UNKNOWN = "application/octet-stream";
 

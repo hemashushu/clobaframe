@@ -19,14 +19,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
-import org.archboy.clobaframe.webio.ContentTypeAnalyzer;
+import org.archboy.clobaframe.webio.ContentTypeDetector;
 
 /**
  *
  * @author yang
  */
 @Component
-public class SimpleContentTypeAnalyzerImpl implements ContentTypeAnalyzer {
+public class ExtensionNameContentTypeDetector implements ContentTypeDetector {
 
 	private Map<String, String> mimeTypes = new HashMap<String, String>();
 	
@@ -36,7 +36,7 @@ public class SimpleContentTypeAnalyzerImpl implements ContentTypeAnalyzer {
 	@Autowired
 	private ResourceLoader resourceLoader;
 	
-	private final Logger logger = LoggerFactory.getLogger(SimpleContentTypeAnalyzerImpl.class);
+	private final Logger logger = LoggerFactory.getLogger(ExtensionNameContentTypeDetector.class);
 	
 	@PostConstruct
 	public void init() throws IOException {

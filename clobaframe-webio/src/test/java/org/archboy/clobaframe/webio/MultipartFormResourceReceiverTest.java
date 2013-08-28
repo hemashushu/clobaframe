@@ -15,6 +15,8 @@
  */
 package org.archboy.clobaframe.webio;
 
+import org.archboy.clobaframe.webio.http.MultipartFormResourceReceiver;
+import org.archboy.clobaframe.webio.http.MultipartFormResourceInfo;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

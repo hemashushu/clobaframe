@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Component;
 import org.archboy.clobaframe.webio.ResourceInfo;
-import org.archboy.clobaframe.webio.ResourceSender;
+import org.archboy.clobaframe.webio.http.ResourceSender;
 
 /**
  *

@@ -13,46 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.archboy.clobaframe.webio;
+package org.archboy.clobaframe.webio.http;
 
-import java.nio.charset.Charset;
+import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.archboy.clobaframe.webio.ResourceInfo;
 
 /**
- * Commonly means the multi-part POST form data.
+ * Transfer resource content to the user's browser.
  *
  * @author young
+ *
  */
-public interface MultipartFormResourceInfo extends ResourceInfo{
+public interface ResourceSender {
 
 	/**
-	 * Indicates the current resource is a file or a form field.
+	 * Send resource.
 	 *
-	 * @return
+	 * @param resourceInfo
+	 * @param request
+	 * @param response
+	 * @throws IOException
 	 */
-	boolean isFile();
-
-	/**
-	 * The field name.
-	 *
-	 * @return
-	 */
-	String getName();
-
-	/**
-	 * Get the file name.
-	 * <p>
-	 *     Some browser may send the file name with full path,
-	 *     the caller must handle it by itself.
-	 * </p>
-	 *
-	 * @return
-	 */
-	String getFileName();
-
-	/**
-	 * Get the content as string with the (session) default {@link Charset} encoding.
-	 *
-	 * @return
-	 */
-	String getContentAsString();
+	void send(ResourceInfo resourceInfo, HttpServletRequest request,
+			HttpServletResponse response) throws IOException;
 }

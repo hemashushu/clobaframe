@@ -13,28 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.archboy.clobaframe.webio;
+package org.archboy.clobaframe.webio.http;
 
 import java.io.IOException;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
- * Transfer resource content to the user's browser.
+ * Receive the resource(file/data) from the user's browser.
+ * <p>
+ *     Commonly receive the multi-part POST form data.
+ * </p>
  *
  * @author young
- *
  */
-public interface ResourceSender {
+public interface MultipartFormResourceReceiver {
 
 	/**
-	 * Send resource.
+	 * Receive resources from client (browser)
 	 *
-	 * @param resourceInfo
 	 * @param request
-	 * @param response
+	 * @return
 	 * @throws IOException
 	 */
-	void send(ResourceInfo resourceInfo, HttpServletRequest request,
-			HttpServletResponse response) throws IOException;
+	List<MultipartFormResourceInfo> receive(HttpServletRequest request)
+			throws IOException;
+
+	/**
+	 *
+	 * @param request
+	 * @param maxUploadSize
+	 * @return
+	 * @throws IOException
+	 */
+	List<MultipartFormResourceInfo> receive(HttpServletRequest request,
+			long maxUploadSize) throws IOException;
+
 }

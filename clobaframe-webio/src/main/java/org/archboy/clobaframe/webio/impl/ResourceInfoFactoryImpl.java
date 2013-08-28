@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.archboy.clobaframe.webio.ContentTypeAnalyzer;
+import org.archboy.clobaframe.webio.ContentTypeDetector;
 import org.archboy.clobaframe.webio.ResourceInfo;
 import org.archboy.clobaframe.webio.ResourceInfoFactory;
 
@@ -17,7 +17,7 @@ import org.archboy.clobaframe.webio.ResourceInfoFactory;
 public class ResourceInfoFactoryImpl implements ResourceInfoFactory {
 
 	@Autowired
-	private ContentTypeAnalyzer contentTypeAnalyzer;
+	private ContentTypeDetector contentTypeAnalyzer;
 
 	@Override
 	public ResourceInfo make(File file) {

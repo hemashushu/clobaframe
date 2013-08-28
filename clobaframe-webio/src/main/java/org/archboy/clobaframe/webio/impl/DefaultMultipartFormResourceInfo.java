@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.Date;
 import org.apache.commons.fileupload.FileItem;
 import org.archboy.clobaframe.webio.ResourceContent;
-import org.archboy.clobaframe.webio.MultipartFormResourceInfo;
+import org.archboy.clobaframe.webio.http.MultipartFormResourceInfo;
 
 /**
  *

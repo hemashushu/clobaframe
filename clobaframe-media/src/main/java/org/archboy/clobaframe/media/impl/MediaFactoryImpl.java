@@ -1,7 +1,5 @@
 package org.archboy.clobaframe.media.impl;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -9,13 +7,8 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.archboy.clobaframe.media.Media;
 import org.archboy.clobaframe.media.MediaFactory;
 import org.archboy.clobaframe.media.MediaDataSizeLimitExceededException;
@@ -23,9 +16,6 @@ import org.archboy.clobaframe.media.MediaLoader;
 import org.archboy.clobaframe.media.MediaNotSupportException;
 import org.archboy.clobaframe.media.MetaData;
 import org.archboy.clobaframe.media.MetaDataParser;
-import org.archboy.clobaframe.media.image.impl.DefaultImageFromFactory;
-import org.archboy.clobaframe.media.image.impl.ImageLoaderImpl;
-import org.archboy.clobaframe.webio.ContentTypeAnalyzer;
 import org.archboy.clobaframe.webio.ResourceInfo;
 import org.archboy.clobaframe.webio.ResourceInfoFactory;
 import org.slf4j.Logger;
@@ -46,7 +36,7 @@ public class MediaFactoryImpl implements MediaFactory{
 	private static final long DEFAULT_MAX_HANDLE_SIZE = 32L * 1024 * 1024;
 	private long maxHandleSize = DEFAULT_MAX_HANDLE_SIZE;
 
-	private Logger logger = LoggerFactory.getLogger(ImageLoaderImpl.class);
+	private Logger logger = LoggerFactory.getLogger(MediaFactoryImpl.class);
 
 	@Autowired
 	private ResourceInfoFactory resourceInfoFactory;
@@ -83,7 +73,7 @@ public class MediaFactoryImpl implements MediaFactory{
 		}
 		
 		try{
-			byte[] data = toByteArray(inputStream);
+			byte[] data = toByteArrayWithSizeLimit(inputStream);
 			ResourceInfo resourceInfo = resourceInfoFactory.make(data, contentType, lastModified);
 			return make(resourceInfo);
 		} finally {
@@ -120,7 +110,7 @@ public class MediaFactoryImpl implements MediaFactory{
 		InputStream in = null;
 		try {
 			in = connection.getInputStream();
-			byte[] data = toByteArray(in);
+			byte[] data = toByteArrayWithSizeLimit(in);
 			ResourceInfo resourceInfo = resourceInfoFactory.make(data, contentType, lastModified);
 			return make(resourceInfo);
 			
@@ -219,7 +209,7 @@ public class MediaFactoryImpl implements MediaFactory{
 //		}
 //	}
 	
-	private byte[] toByteArray(InputStream inputStream) throws IOException {
+	private byte[] toByteArrayWithSizeLimit(InputStream inputStream) throws IOException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
 		int totalReadBytes = 0;

@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractImage extends AbstractMedia implements Image {
 
-	private final Logger logger = LoggerFactory.getLogger(DefaultImage.class);
+	private final Logger logger = LoggerFactory.getLogger(AbstractImage.class);
 
 	protected byte[] getData(
 			BufferedImage bufferedImage,
