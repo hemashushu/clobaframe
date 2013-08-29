@@ -24,7 +24,7 @@ import org.archboy.clobaframe.media.image.Image;
 import org.archboy.clobaframe.media.image.Imaging;
 import org.archboy.clobaframe.media.image.Transform;
 
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 import org.springframework.util.Assert;
 
 /**
@@ -32,7 +32,7 @@ import org.springframework.util.Assert;
  * @author young
  *
  */
-@Component
+@Named
 public class ImagingImpl implements Imaging{
 
 	@Override

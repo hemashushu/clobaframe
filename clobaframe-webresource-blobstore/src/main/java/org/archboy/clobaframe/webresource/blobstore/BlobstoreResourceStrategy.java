@@ -20,9 +20,9 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 import org.archboy.clobaframe.webresource.LocationGenerator;
 import org.archboy.clobaframe.webresource.ResourceRepository;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
@@ -32,20 +32,20 @@ import org.archboy.clobaframe.webresource.impl.AbstractResourceStrategy;
  *
  * @author young
  */
-@Component
+@Named
 public class BlobstoreResourceStrategy extends AbstractResourceStrategy{
 
 	private final Logger logger = LoggerFactory.getLogger(BlobstoreResourceStrategy.class);
 
-	@Autowired
+	@Inject
 	@Qualifier("blobstoreLocationGenerator")
 	private LocationGenerator locationGenerator;
 
-	@Autowired
+	@Inject
 	@Qualifier("localWebResourceRepository")
 	private ResourceRepository resourceRepository;
 
-	@Autowired
+	@Inject
 	private BlobstoreWebResourceSynchronizer resourceSynchronizer;
 
 	@Override

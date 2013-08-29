@@ -6,13 +6,13 @@ import java.awt.image.BufferedImage;
 import java.util.Date;
 import org.archboy.clobaframe.media.image.Image;
 import org.archboy.clobaframe.media.image.ImageGenerator;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 
 /**
  *
  * @author yang
  */
-@Component
+@Named
 public class ImageGeneratorImpl implements ImageGenerator{
 
 	@Override

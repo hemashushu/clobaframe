@@ -34,7 +34,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
+import org.archboy.clobaframe.io.TemporaryResources;
+import org.archboy.clobaframe.io.impl.DefaultTemporaryResources;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ContextConfiguration;
@@ -48,30 +50,33 @@ public class ImagingTest {
 	private static final String DEFAULT_SAMPLE_IMAGE_FOLDER = "sample/image/";
 	private String sampleImageFolder = DEFAULT_SAMPLE_IMAGE_FOLDER;
 
-	@Autowired
+	@Inject
 	private ResourceLoader resourceLoader;
 
-	@Autowired
+	@Inject
 	private MediaFactory mediaFactory; 
 
-	@Autowired
+	@Inject
 	private ImageGenerator imageGenerator;
 	
-	@Autowired
+	@Inject
 	private Imaging imaging;
 
+	private TemporaryResources temporaryResources = new DefaultTemporaryResources();
+	
 	@Before
 	public void setUp() throws Exception {
 	}
 
 	@After
 	public void tearDown() throws Exception {
+		temporaryResources.close();
 	}
 
 	@Test
 	public void testMakeCrop() throws IOException {
 		File file1 = getFileByName("test.png");
-		Image image1 = (Image)mediaFactory.make(file1);
+		Image image1 = (Image)mediaFactory.make(file1, temporaryResources);
 		Transform transform = imaging.crop(10, 10, 40, 40);
 		Image image2 = imaging.apply(image1, transform);
 
@@ -103,7 +108,7 @@ public class ImagingTest {
 	@Test
 	public void testMakeResize() throws IOException {
 		File file = getFileByName("test.jpg");
-		Image image1 = (Image)mediaFactory.make(file);
+		Image image1 = (Image)mediaFactory.make(file, temporaryResources);
 
 		// resize to 500
 		Transform transform1 = imaging.resize(500, 500);
@@ -145,7 +150,7 @@ public class ImagingTest {
 
 		// make a look
 		File file1 = getFileByName("test.png");
-		Image imageRotate1 = (Image)mediaFactory.make(file1);
+		Image imageRotate1 = (Image)mediaFactory.make(file1, temporaryResources);
 		Transform transformRotate90cw = imaging.rotate(90);
 		Image imageRotate2 = imaging.apply(imageRotate1, transformRotate90cw);
 		saveImage(imageRotate2, "imaging-rotate90cw");
@@ -154,7 +159,7 @@ public class ImagingTest {
 	@Test
 	public void testMakeSquare() throws IOException{
 		File file1 = getFileByName("test.jpg");
-		Image image1 = (Image)mediaFactory.make(file1);
+		Image image1 = (Image)mediaFactory.make(file1, temporaryResources);
 		assertTrue(image1.getWidth() != image1.getHeight());
 
 		Transform transform1 = imaging.square();
@@ -165,10 +170,10 @@ public class ImagingTest {
 	@Test
 	public void testMakeResizeWithFixHeight() throws IOException{
 		File file1 = getFileByName("test.jpg");
-		Image image1 = (Image)mediaFactory.make(file1);
+		Image image1 = (Image)mediaFactory.make(file1, temporaryResources);
 
 		File file2 = getFileByName("test1.jpg");
-		Image image2 = (Image)mediaFactory.make(file2);
+		Image image2 = (Image)mediaFactory.make(file2, temporaryResources);
 
 		Transform transform1 = imaging.resizeWithFixHeight(100);
 		Image image3 = imaging.apply(image1, transform1);
@@ -190,8 +195,8 @@ public class ImagingTest {
 		File file1 = getFileByName("test.bmp");
 		File file2 = getFileByName("test.png");
 
-		Image image1 = (Image)mediaFactory.make(file1);
-		Image image2 = (Image)mediaFactory.make(file2);
+		Image image1 = (Image)mediaFactory.make(file1, temporaryResources);
+		Image image2 = (Image)mediaFactory.make(file2, temporaryResources);
 
 		Font font1 = new Font("Arial", Font.BOLD, 32);
 		Composite composite1 = imaging.alpha(image1, 100, 100, 1F);
@@ -203,7 +208,7 @@ public class ImagingTest {
 		Composite[] composites = (Composite[])compositeList.toArray();
 
 		File file3 = getFileByName("test.jpg");
-		Image image3 = (Image)mediaFactory.make(file3);
+		Image image3 = (Image)mediaFactory.make(file3, temporaryResources);
 		Image image3b = imaging.apply(image3, composites);
 		saveImage(image3b, "imaging-composite-normal");
 
@@ -223,7 +228,7 @@ public class ImagingTest {
 	@Test
 	public void testImageOutputSettings() throws IOException {
 		File file1 = getFileByName("test2.jpg");
-		Image image1 = (Image)mediaFactory.make(file1);
+		Image image1 = (Image)mediaFactory.make(file1, temporaryResources);
 		assertEquals(Image.Format.JPEG, image1.getFormat());
 
 		// reduce image quality
@@ -241,9 +246,9 @@ public class ImagingTest {
 		assertTrue(resourceInfo2.getContentLength() < resourceInfo1.getContentLength());
 		assertTrue(resourceInfo3.getContentLength() < resourceInfo2.getContentLength());
 		
-		saveImage((Image)mediaFactory.make(resourceInfo1), "outputsetting-png");
-		saveImage((Image)mediaFactory.make(resourceInfo2), "outputsetting-jpeg");
-		saveImage((Image)mediaFactory.make(resourceInfo3), "outputsetting-jpeg-q-50");
+		saveImage((Image)mediaFactory.make(resourceInfo1, temporaryResources), "outputsetting-png");
+		saveImage((Image)mediaFactory.make(resourceInfo2, temporaryResources), "outputsetting-jpeg");
+		saveImage((Image)mediaFactory.make(resourceInfo3, temporaryResources), "outputsetting-jpeg-q-50");
 		
 	}
 

@@ -19,9 +19,9 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 import org.springframework.util.Assert;
 import org.archboy.clobaframe.webresource.ResourceStrategy;
 import org.archboy.clobaframe.webresource.ResourceStrategyFactory;
@@ -30,10 +30,10 @@ import org.archboy.clobaframe.webresource.ResourceStrategyFactory;
  *
  * @author young
  */
-@Component
+@Named
 public class ResourceStrategyFactoryImpl implements ResourceStrategyFactory{
 
-	@Autowired
+	@Inject
 	private List<ResourceStrategy> resourceStrategies;
 
 	@Value("${webresource.strategy}")

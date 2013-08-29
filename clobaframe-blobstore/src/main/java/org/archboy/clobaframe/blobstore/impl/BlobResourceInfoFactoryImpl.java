@@ -19,7 +19,7 @@ package org.archboy.clobaframe.blobstore.impl;
 import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 import org.archboy.clobaframe.blobstore.BlobResourceInfo;
 import org.archboy.clobaframe.blobstore.BlobResourceInfoFactory;
 import org.archboy.clobaframe.blobstore.BlobKey;
@@ -29,7 +29,7 @@ import org.archboy.clobaframe.blobstore.BlobKey;
  * @author young
  *
  */
-@Component
+@Named
 public class BlobResourceInfoFactoryImpl implements BlobResourceInfoFactory {
 
 	@Override

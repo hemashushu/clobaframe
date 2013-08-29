@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 import org.archboy.clobaframe.cache.Cache.SetPolicy;
 import org.archboy.clobaframe.cache.CacheAgent;
 import org.archboy.clobaframe.cache.Expiration;
@@ -14,7 +14,7 @@ import org.archboy.clobaframe.cache.Expiration;
  *
  * @author arch
  */
-@Component
+@Named
 public class NullCacheAgent implements CacheAgent {
 
 	private static final String AGENT_NAME = "null";

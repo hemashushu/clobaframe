@@ -21,8 +21,8 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.archboy.clobaframe.io.http.ResourceSender;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceSender;
@@ -35,13 +35,13 @@ import org.archboy.clobaframe.webresource.WebResourceService;
  * @author young
  *
  */
-@Component
+@Named
 public class WebResourceSenderImpl implements WebResourceSender{
 
-	@Autowired
+	@Inject
 	private ResourceSender resourceSender ;
 
-	@Autowired
+	@Inject
 	private WebResourceService webResourceService;
 
 	/**

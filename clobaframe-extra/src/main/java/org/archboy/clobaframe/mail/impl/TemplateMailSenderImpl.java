@@ -3,10 +3,10 @@ package org.archboy.clobaframe.mail.impl;
 import java.text.MessageFormat;
 import java.util.Locale;
 import javax.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 import org.archboy.clobaframe.mail.SendMailException;
 import org.archboy.clobaframe.mail.SenderAgent;
 import org.archboy.clobaframe.mail.SenderAgentFactory;
@@ -16,16 +16,16 @@ import org.archboy.clobaframe.mail.TemplateMailSender;
  *
  * @author arch
  */
-@Component
+@Named
 public class TemplateMailSenderImpl implements TemplateMailSender {
 
 	private static final String subjectCodeExp = "mail.template.{0}.subject";
 	private static final String contentCodeExp = "mail.template.{0}.content";
 
-	@Autowired
+	@Inject
 	private MessageSource messageSource;
 
-	@Autowired
+	@Inject
 	private SenderAgentFactory senderAgentFactory;
 
 	private SenderAgent senderAgent;

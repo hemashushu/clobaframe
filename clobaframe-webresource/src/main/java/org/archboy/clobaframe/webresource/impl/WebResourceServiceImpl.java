@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.archboy.clobaframe.webresource.LocationGenerator;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.springframework.util.Assert;
 import org.archboy.clobaframe.webresource.ResourceRepository;
 import org.archboy.clobaframe.webresource.ResourceStrategy;
@@ -37,14 +37,14 @@ import org.archboy.clobaframe.webresource.local.LocalLocationGenerator;
  * @author young
  *
  */
-@Component
+@Named
 public class WebResourceServiceImpl implements WebResourceService {
 
 	private Map<String, WebResourceInfo> webResources = new HashMap<String, WebResourceInfo>();
 	//private Map<String, WebResourceInfo> uniqueNameWebResources = new HashMap<String, WebResourceInfo>();
 	private Map<String, String> uniqueNames = new HashMap<String, String>(); // the unique name to resource mapper.
 
-	@Autowired
+	@Inject
 	private ResourceStrategyFactory resourceStrategyFactory;
 
 	//private ResourceStrategy resourceStrategy;

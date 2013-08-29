@@ -9,7 +9,6 @@ import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.TemporaryResources;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
-import org.archboy.clobaframe.io.file.TemporaryResourcesAutoCleaner;
 
 /**
  *
@@ -21,8 +20,8 @@ public class FileBaseResourceInfoFactoryImpl implements FileBaseResourceInfoFact
 	@Inject
 	private ContentTypeDetector contentTypeAnalyzer;
 
-	@Inject
-	private TemporaryResourcesAutoCleaner temporaryResourcesAutoCleaner;
+//	@Inject
+//	private TemporaryResourcesAutoCleaner temporaryResourcesAutoCleaner;
 	
 	@Override
 	public FileBaseResourceInfo make(File file) {

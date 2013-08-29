@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Date;
 import org.archboy.clobaframe.io.ResourceInfo;
+import org.archboy.clobaframe.io.TemporaryResources;
 
 /**
  *
@@ -21,7 +22,7 @@ public interface MediaFactory {
 	 * @return
 	 * @throws ImagingException
 	 */
-	Media make(byte[] data, String contentType, Date lastModified) throws IOException;
+	Media make(byte[] data, String contentType, Date lastModified, TemporaryResources temporaryResources) throws IOException;
 
 	/**
 	 * Make by InputStream.
@@ -35,7 +36,7 @@ public interface MediaFactory {
 	 * @return
 	 * @throws
 	 */
-	Media make(InputStream inputStream, String contentType, Date lastModified) throws IOException;
+	Media make(InputStream inputStream, String contentType, Date lastModified, TemporaryResources temporaryResources) throws IOException;
 	
 	/**
 	 * Make by file.
@@ -44,7 +45,7 @@ public interface MediaFactory {
 	 * @return
 	 * @throws ImagingException
 	 */
-	Media make(File file) throws IOException;
+	Media make(File file, TemporaryResources temporaryResources) throws IOException;
 
 	/**
 	 * Make by URL.
@@ -53,7 +54,7 @@ public interface MediaFactory {
 	 * @return
 	 * @throws ImagingException
 	 */
-	Media make(URL url) throws IOException;
+	Media make(URL url, TemporaryResources temporaryResources) throws IOException;
 
 	/**
 	 * Make by {@link ResourceInfo}.
@@ -62,5 +63,5 @@ public interface MediaFactory {
 	 * @return
 	 * @throws IOException 
 	 */
-	Media make(ResourceInfo resourceInfo) throws IOException;
+	Media make(ResourceInfo resourceInfo, TemporaryResources temporaryResources) throws IOException;
 }

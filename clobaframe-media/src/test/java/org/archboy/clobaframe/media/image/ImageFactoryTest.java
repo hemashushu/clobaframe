@@ -33,7 +33,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ContextConfiguration;
@@ -43,6 +43,9 @@ import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.file.impl.FileResourceInfo;
 import static org.junit.Assert.*;
 import org.archboy.clobaframe.io.ResourceInfoFactory;
+import org.archboy.clobaframe.io.TemporaryResources;
+import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
+import org.archboy.clobaframe.io.impl.DefaultTemporaryResources;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/applicationContext.xml" })
@@ -51,53 +54,59 @@ public class ImageFactoryTest {
 	private static final String DEFAULT_SAMPLE_IMAGE_FOLDER = "sample/image/";
 	private String sampleImageFolder = DEFAULT_SAMPLE_IMAGE_FOLDER;
 
-	@Autowired
+	@Inject
 	private ResourceLoader resourceLoader;
 
-	@Autowired
+	@Inject
 	private MediaFactory mediaFactory;
 	//private ImageGenerator mediaFactory;
 
-	@Autowired
+	@Inject
 	private ResourceInfoFactory resourceInfoFactory;
 
+	@Inject
+	private FileBaseResourceInfoFactory fileBaseResourceInfoFactory;
+	
+	private TemporaryResources temporaryResources = new DefaultTemporaryResources();
+	
 	@Before
 	public void setUp() throws Exception {
 	}
 
 	@After
 	public void tearDown() throws Exception {
+		temporaryResources.close();
 	}
 
 	@Test
 	public void testMakeImageFromFile() throws IOException {
 		File file1 = getFileByName("test.jpg");
-		Image image1 = (Image)mediaFactory.make(file1);
+		Image image1 = (Image)mediaFactory.make(file1, temporaryResources);
 		assertEquals(Image.Format.JPEG, image1.getFormat());
 		assertEquals(480, image1.getWidth());
 		assertEquals(360, image1.getHeight());
 
 		File file2 = getFileByName("test.bmp");
-		Image image2 = (Image)mediaFactory.make(file2);
+		Image image2 = (Image)mediaFactory.make(file2, temporaryResources);
 		assertEquals(Image.Format.BMP, image2.getFormat());
 		assertEquals(48, image2.getWidth());
 		assertEquals(48, image2.getHeight());
 
 		File file3 = getFileByName("test.gif");
-		Image image3 = (Image)mediaFactory.make(file3);
+		Image image3 = (Image)mediaFactory.make(file3, temporaryResources);
 		assertEquals(Image.Format.GIF, image3.getFormat());
 		assertEquals(16, image3.getWidth());
 		assertEquals(16, image3.getHeight());
 
 		File file4 = getFileByName("test.png");
-		Image image4 = (Image)mediaFactory.make(file4);
+		Image image4 = (Image)mediaFactory.make(file4, temporaryResources);
 		assertEquals(Image.Format.PNG, image4.getFormat());
 		assertEquals(64, image4.getWidth());
 		assertEquals(64, image4.getHeight());
 
 		try{
 			File file5 = new File("non-exists");
-			mediaFactory.make(file5);
+			mediaFactory.make(file5, temporaryResources);
 			fail();
 		}catch(IllegalArgumentException e) {
 			// pass
@@ -124,7 +133,7 @@ public class ImageFactoryTest {
 	@Test
 	public void testMakeImageFromByteArray() throws IOException {
 		byte[] data = getFileContent("test.png");
-		Image image1 = (Image)mediaFactory.make(data, ImageLoaderImpl.CONTENT_TYPE_PNG, null);
+		Image image1 = (Image)mediaFactory.make(data, ImageLoaderImpl.CONTENT_TYPE_PNG, null, temporaryResources);
 		assertEquals(Image.Format.PNG, image1.getFormat());
 		assertEquals(64, image1.getWidth());
 		assertEquals(64, image1.getHeight());
@@ -132,7 +141,7 @@ public class ImageFactoryTest {
 		// test get image data from Image
 		//byte[] imageData = image1.getImageData();
 
-		Image image2 = (Image)mediaFactory.make(image1.getResourceInfo());
+		Image image2 = (Image)mediaFactory.make(image1.getResourceInfo(), temporaryResources);
 		assertEquals(Image.Format.PNG, image2.getFormat());
 		assertEquals(64, image2.getWidth());
 		assertEquals(64, image2.getHeight());
@@ -141,7 +150,7 @@ public class ImageFactoryTest {
 	@Test
 	public void testMakeImageFromStream() throws IOException {
 		InputStream in = getFileInputStream("test.png");
-		Image image1 = (Image)mediaFactory.make(in, ImageLoaderImpl.CONTENT_TYPE_PNG,null);
+		Image image1 = (Image)mediaFactory.make(in, ImageLoaderImpl.CONTENT_TYPE_PNG,null, temporaryResources);
 		assertEquals(Image.Format.PNG, image1.getFormat());
 		assertEquals(64, image1.getWidth());
 		assertEquals(64, image1.getHeight());
@@ -150,7 +159,7 @@ public class ImageFactoryTest {
 	@Test
 	public void testMakeImageFromURL() throws MalformedURLException, IOException {
 		URL url = new URL("http://upload.wikimedia.org/wikipedia/en/b/bc/Wiki.png");
-		Image image1 = (Image)mediaFactory.make(url);
+		Image image1 = (Image)mediaFactory.make(url, temporaryResources);
 		assertEquals(Image.Format.PNG, image1.getFormat());
 		assertTrue(image1.getWidth() > 1);
 		assertTrue(image1.getHeight() > 1);
@@ -159,13 +168,11 @@ public class ImageFactoryTest {
 		saveImage(image1, "mediaFactory-from-url");
 	}
 
-
-
 	@Test
 	public void testMakeImageFromResourceInfo() throws IOException{
 		File file = getFileByName("test.jpg");
-		ResourceInfo resourceInfo = resourceInfoFactory.make(file);
-		Image image1 = (Image)mediaFactory.make(resourceInfo);
+		ResourceInfo resourceInfo = fileBaseResourceInfoFactory.make(file);
+		Image image1 = (Image)mediaFactory.make(resourceInfo, temporaryResources);
 		assertEquals(Image.Format.JPEG, image1.getFormat());
 		assertEquals(480, image1.getWidth());
 		assertEquals(360, image1.getHeight());

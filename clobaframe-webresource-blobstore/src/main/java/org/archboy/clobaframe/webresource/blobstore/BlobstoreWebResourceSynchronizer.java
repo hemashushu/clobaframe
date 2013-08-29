@@ -26,9 +26,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 import org.archboy.clobaframe.blobstore.BlobResourceInfo;
 import org.archboy.clobaframe.blobstore.BlobResourceInfoFactory;
 import org.archboy.clobaframe.blobstore.BlobKey;
@@ -40,18 +40,18 @@ import org.archboy.clobaframe.webresource.WebResourceInfo;
  *
  * @author young
  */
-@Component
+@Named
 public class BlobstoreWebResourceSynchronizer{
 
 	private final Logger logger = LoggerFactory.getLogger(BlobstoreWebResourceSynchronizer.class);
 
-	@Autowired
+	@Inject
 	private Blobstore blobstore;
 
-//	@Autowired
+//	@Inject
 //	private BlobstoreBucket blobstoreBucket;
 
-	@Autowired
+	@Inject
 	private BlobResourceInfoFactory blobInfoFactory;
 
 	@Value("${webresource.blobstore.bucketName}")

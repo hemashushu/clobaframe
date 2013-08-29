@@ -16,22 +16,22 @@
 package org.archboy.clobaframe.webresource.local;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 import org.archboy.clobaframe.webresource.LocationGenerator;
 import org.archboy.clobaframe.webresource.ResourceRepository;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.impl.AbstractResourceStrategy;
 
-@Component
+@Named
 public class LocalResourceStrategy extends AbstractResourceStrategy{
 
-	@Autowired
+	@Inject
 	@Qualifier("localLocationGenerator")
 	private LocationGenerator locationGenerator;
 
-	@Autowired
+	@Inject
 	@Qualifier("localWebResourceRepository")
 	private ResourceRepository resourceRepository;
 

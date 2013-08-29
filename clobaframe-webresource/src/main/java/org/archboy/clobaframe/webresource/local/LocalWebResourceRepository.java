@@ -27,22 +27,22 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 import org.archboy.clobaframe.io.ContentTypeDetector;
 import org.archboy.clobaframe.webresource.ResourceRepository;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 
-@Component
+@Named
 public class LocalWebResourceRepository implements ResourceRepository{
 
-	@Autowired
+	@Inject
 	private ResourceLoader resourceLoader;
 
-	@Autowired
+	@Inject
 	private ContentTypeDetector contentTypeAnalyzer;
 
 	@Value("${webresource.local.path}")

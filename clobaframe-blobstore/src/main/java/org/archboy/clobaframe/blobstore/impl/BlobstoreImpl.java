@@ -2,8 +2,8 @@ package org.archboy.clobaframe.blobstore.impl;
 
 import java.io.IOException;
 import javax.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.archboy.clobaframe.blobstore.BlobResourceInfo;
 import org.archboy.clobaframe.blobstore.BlobResourceInfoPartialCollection;
 import org.archboy.clobaframe.blobstore.BlobKey;
@@ -15,10 +15,10 @@ import org.archboy.clobaframe.blobstore.StoreAgentFactory;
  *
  * @author arch
  */
-@Component
+@Named
 public class BlobstoreImpl implements Blobstore{
 
-	@Autowired
+	@Inject
 	private StoreAgentFactory storeAgentFactory;
 
 	private StoreAgent storeAgent;

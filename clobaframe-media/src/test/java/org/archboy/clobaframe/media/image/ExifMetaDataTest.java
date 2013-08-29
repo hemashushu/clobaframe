@@ -12,7 +12,9 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
+import org.archboy.clobaframe.io.TemporaryResources;
+import org.archboy.clobaframe.io.impl.DefaultTemporaryResources;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ContextConfiguration;
@@ -29,11 +31,13 @@ public class ExifMetaDataTest {
 	private static final String DEFAULT_SAMPLE_IMAGE_FOLDER = "sample/image/";
 	private String sampleImageFolder = DEFAULT_SAMPLE_IMAGE_FOLDER;
 	
-	@Autowired
+	@Inject
 	private ResourceLoader resourceLoader;
 
-	@Autowired
+	@Inject
 	private MediaFactory mediaFactory;
+	
+	private TemporaryResources temporaryResources = new DefaultTemporaryResources();
 	
 	@Before
 	public void setUp() throws Exception {
@@ -41,11 +45,12 @@ public class ExifMetaDataTest {
 
 	@After
 	public void tearDown() throws Exception {
+		temporaryResources.close();
 	}
 	
 	@Test
 	public void testGetMetaData() throws IOException {
-		Image image1 = (Image)mediaFactory.make(getFileByName("1.jpg"));
+		Image image1 = (Image)mediaFactory.make(getFileByName("1.jpg"), temporaryResources);
 		MetaData metadata1 = image1.getMetaData();
 		assertNotNull(metadata1);
 
@@ -68,12 +73,12 @@ public class ExifMetaDataTest {
 		assertTrue(Math.abs((Double)metadata1.get(Image.MetaName.GpsLatitude) - 22.5633F) < 0.01);
 		assertTrue(Math.abs((Double)metadata1.get(Image.MetaName.GpsLongitude) - 113.8795F) < 0.01) ;
 
-		Image image2 = (Image)mediaFactory.make(getFileByName("2.jpg"));
+		Image image2 = (Image)mediaFactory.make(getFileByName("2.jpg"), temporaryResources);
 		MetaData metadata2 = image2.getMetaData();
 		assertNotNull(metadata2);
 		assertEquals(Image.Orientation.Rotate90CW, metadata2.get(Image.MetaName.Orientation));
 
-		Image image3 = (Image)mediaFactory.make(getFileByName("3.png"));
+		Image image3 = (Image)mediaFactory.make(getFileByName("3.png"), temporaryResources);
 		MetaData metadata3 = image3.getMetaData();
 		assertNull(metadata3);
 	}

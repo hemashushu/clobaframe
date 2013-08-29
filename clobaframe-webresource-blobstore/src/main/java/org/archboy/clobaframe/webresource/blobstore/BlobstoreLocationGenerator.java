@@ -17,7 +17,7 @@ package org.archboy.clobaframe.webresource.blobstore;
 
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 import org.archboy.clobaframe.webresource.LocationGenerator;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 
@@ -25,7 +25,7 @@ import org.archboy.clobaframe.webresource.WebResourceInfo;
  *
  * @author young
  */
-@Component
+@Named
 public class BlobstoreLocationGenerator implements LocationGenerator{
 
 	@Value("${webresource.blobstore.keyNamePrefix}")

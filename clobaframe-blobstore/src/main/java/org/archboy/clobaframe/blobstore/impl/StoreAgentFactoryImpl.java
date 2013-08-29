@@ -4,9 +4,9 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 import org.springframework.util.Assert;
 import org.archboy.clobaframe.blobstore.StoreAgent;
 import org.archboy.clobaframe.blobstore.StoreAgentFactory;
@@ -15,10 +15,10 @@ import org.archboy.clobaframe.blobstore.StoreAgentFactory;
  *
  * @author arch
  */
-@Component
+@Named
 public class StoreAgentFactoryImpl implements StoreAgentFactory {
 
-	@Autowired
+	@Inject
 	private List<StoreAgent> storeAgents;
 
 	@Value("${blobstore.agent}")

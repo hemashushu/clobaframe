@@ -37,20 +37,21 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 import org.springframework.util.Assert;
 import org.archboy.clobaframe.media.MediaDataSizeLimitExceededException;
 import org.archboy.clobaframe.media.Media;
 import org.archboy.clobaframe.media.MediaLoader;
 import org.archboy.clobaframe.media.image.Image;
 import org.archboy.clobaframe.io.ResourceInfo;
+import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
 
 /**
  *
  * @author young
  *
  */
-@Component
+@Named
 public class ImageLoaderImpl implements MediaLoader {
 
 	public static final String CONTENT_TYPE_JPEG = "image/jpeg";
@@ -76,12 +77,12 @@ public class ImageLoaderImpl implements MediaLoader {
 	}
 
 	@Override
-	public Media load(ResourceInfo resourceInfo) throws IOException {
+	public Media load(FileBaseResourceInfo resourceInfo) throws IOException {
 
 		// OpenJDK current support bmp, jpg, wbmp, jpeg, png, gif
 		
 		//ResourceContent resourceContent = null;
-		InputStream in = null;
+		//InputStream in = null;
 		ImageInputStream stream = null;
 		ImageReader reader = null;
 		Image image = null;
@@ -89,8 +90,9 @@ public class ImageLoaderImpl implements MediaLoader {
 		try {
 			//resourceContent = resourceInfo.getContentSnapshot();
 			//in = resourceContent.getInputStream();
-			in = resourceInfo.getInputStream();
-			stream = ImageIO.createImageInputStream(in);
+			//in = resourceInfo.getInputStream();
+			File file = resourceInfo.getFile();
+			stream = ImageIO.createImageInputStream(file);
 
 			Iterator<ImageReader> readers = ImageIO.getImageReaders(stream);
 			if (!readers.hasNext()) {
@@ -113,7 +115,7 @@ public class ImageLoaderImpl implements MediaLoader {
 			closeQuietly(reader);
 			//IOUtils.closeQuietly(stream); // for java 7
 			closeQuietly(stream);
-			IOUtils.closeQuietly(in);
+			//IOUtils.closeQuietly(in);
 			//IOUtils.closeQuietly(resourceContent);
 		}
 

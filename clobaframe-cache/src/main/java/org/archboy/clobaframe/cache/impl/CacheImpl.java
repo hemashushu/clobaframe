@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.archboy.clobaframe.cache.Cache;
 import org.archboy.clobaframe.cache.CacheAgent;
 import org.archboy.clobaframe.cache.CacheAgentFactory;
@@ -15,10 +15,10 @@ import org.archboy.clobaframe.cache.Expiration;
  *
  * @author arch
  */
-@Component
+@Named
 public class CacheImpl implements Cache {
 
-	@Autowired
+	@Inject
 	private CacheAgentFactory cacheAgentFactory;
 
 	private CacheAgent cacheAgent;

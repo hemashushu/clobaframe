@@ -11,7 +11,6 @@ import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.TemporaryResources;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
-import org.archboy.clobaframe.io.file.TemporaryResourcesAutoCleaner;
 
 /**
  *

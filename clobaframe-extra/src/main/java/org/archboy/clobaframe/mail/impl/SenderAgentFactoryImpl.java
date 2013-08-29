@@ -4,9 +4,9 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 import org.springframework.util.Assert;
 import org.archboy.clobaframe.mail.SenderAgent;
 import org.archboy.clobaframe.mail.SenderAgentFactory;
@@ -15,7 +15,7 @@ import org.archboy.clobaframe.mail.SenderAgentFactory;
  *
  * @author arch
  */
-@Component
+@Named
 public class SenderAgentFactoryImpl implements SenderAgentFactory{
 
 	private static final String DEFAULT_SENDER_AGENT_NAME = "null";
@@ -25,7 +25,7 @@ public class SenderAgentFactoryImpl implements SenderAgentFactory{
 
 	private final Logger logger = LoggerFactory.getLogger(SenderAgentFactoryImpl.class);
 
-	@Autowired
+	@Inject
 	private List<SenderAgent> senderAgents;
 
 	// the default sender agent

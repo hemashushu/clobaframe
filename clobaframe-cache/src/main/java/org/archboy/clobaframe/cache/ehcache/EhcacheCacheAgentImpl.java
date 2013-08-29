@@ -8,11 +8,11 @@ import java.util.Map;
 import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 import org.archboy.clobaframe.cache.CacheAgent;
 import org.archboy.clobaframe.cache.Expiration;
 import net.sf.ehcache.Cache;
@@ -23,7 +23,7 @@ import net.sf.ehcache.Element;
  *
  * @author arch
  */
-@Component
+@Named
 public class EhcacheCacheAgentImpl implements CacheAgent {
 
 	private static final String AGENT_NAME = "ehcache";
@@ -37,7 +37,7 @@ public class EhcacheCacheAgentImpl implements CacheAgent {
 	@Value("${cache.ehcache.configuration}")
 	private String cacheConfigurationFile = DEFAULT_CACHE_CONFIGURATION_FILE;
 
-	@Autowired
+	@Inject
 	private ResourceLoader resourceLoader;
 
 	private CacheManager cacheManager;

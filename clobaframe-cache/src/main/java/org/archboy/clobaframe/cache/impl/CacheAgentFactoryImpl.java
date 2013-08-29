@@ -4,9 +4,9 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 import org.springframework.util.Assert;
 import org.archboy.clobaframe.cache.CacheAgent;
 import org.archboy.clobaframe.cache.CacheAgentFactory;
@@ -15,7 +15,7 @@ import org.archboy.clobaframe.cache.CacheAgentFactory;
  *
  * @author arch
  */
-@Component
+@Named
 public class CacheAgentFactoryImpl implements CacheAgentFactory {
 
 	private static final String DEFAULT_CACHE_AGENT_NAME = "null";
@@ -28,7 +28,7 @@ public class CacheAgentFactoryImpl implements CacheAgentFactory {
 
 	private final Logger logger = LoggerFactory.getLogger(CacheAgentFactoryImpl.class);
 
-	@Autowired
+	@Inject
 	private List<CacheAgent> cacheAgents;
 
 	@PostConstruct

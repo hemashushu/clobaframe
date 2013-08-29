@@ -8,11 +8,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 import org.archboy.clobaframe.blobstore.BlobResourceInfo;
 import org.archboy.clobaframe.blobstore.BlobResourceInfoPartialCollection;
 import org.archboy.clobaframe.blobstore.BlobKey;
@@ -24,10 +24,10 @@ import org.archboy.clobaframe.blobstore.StoreAgent;
  *
  * @author arch
  */
-@Component
+@Named
 public class LocalStoreAgentImpl implements StoreAgent {
 
-	@Autowired
+	@Inject
 	private ResourceLoader resourceLoader;
 
 	@Value("${blobstore.local.path}")

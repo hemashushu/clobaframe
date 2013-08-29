@@ -16,7 +16,6 @@
 package org.archboy.clobaframe.io.http.impl;
 
 import java.io.Closeable;
-import org.archboy.clobaframe.io.file.TemporaryResourcesAutoCleaner;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

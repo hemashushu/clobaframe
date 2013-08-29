@@ -13,6 +13,7 @@ import com.drew.metadata.exif.ExifSubIFDDirectory;
 import com.drew.metadata.exif.GpsDirectory;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
@@ -25,7 +26,8 @@ import org.archboy.clobaframe.media.MetaData;
 import org.archboy.clobaframe.media.MetaDataParser;
 import org.archboy.clobaframe.media.image.Image;
 import org.archboy.clobaframe.io.ResourceInfo;
-import org.springframework.stereotype.Component;
+import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
+import javax.inject.Named;
 
 /**
  *
@@ -34,7 +36,7 @@ import org.springframework.stereotype.Component;
  * 
  * @author yang
  */
-@Component
+@Named
 public class ExifMetaDataPaser implements MetaDataParser {
 
 	private final static String CONTENT_TYPE_IMAGE_JPEG = "image/jpeg";
@@ -51,18 +53,19 @@ public class ExifMetaDataPaser implements MetaDataParser {
 	}
 
 	@Override
-	public MetaData parse(Media media) {
-		Image image = (Image)media;
-		ResourceInfo resourceInfo = image.getResourceInfo();
-		InputStream in = null;
+	public MetaData parse(FileBaseResourceInfo resourceInfo) {
+		//Image image = (Image)media;
+		//ResourceInfo resourceInfo = image.getResourceInfo();
+		//InputStream in = null;
 		//ResourceContent resourceContent = null;
 		
 		try {
 			//resourceContent = resourceInfo.getContentSnapshot();
 			//InputStream in = resourceContent.getInputStream();
-			in = resourceInfo.getInputStream();
-			BufferedInputStream bin = new BufferedInputStream(in);
-			Metadata metadata = ImageMetadataReader.readMetadata(bin, false);
+			//in = resourceInfo.getInputStream();
+			//BufferedInputStream bin = new BufferedInputStream(in);
+			File file = resourceInfo.getFile();
+			Metadata metadata = ImageMetadataReader.readMetadata(file);
 
 			MetaData metaData = new MetaData();
 			
@@ -93,9 +96,10 @@ public class ExifMetaDataPaser implements MetaDataParser {
 			//
 		} catch (MetadataException ex){
 			//
-		} finally {
-			IOUtils.closeQuietly(in);
 		}
+//		finally {
+//			IOUtils.closeQuietly(in);
+//		}
 		
 		return null;
 	}

@@ -2,7 +2,7 @@ package org.archboy.clobaframe.mail.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 import org.archboy.clobaframe.mail.SenderAgent;
 
 /**
@@ -12,7 +12,7 @@ import org.archboy.clobaframe.mail.SenderAgent;
  *
  * @author yang
  */
-@Component
+@Named
 public class NullSenderAgent implements SenderAgent{
 
 	private static final String AGENT_NAME = "null";

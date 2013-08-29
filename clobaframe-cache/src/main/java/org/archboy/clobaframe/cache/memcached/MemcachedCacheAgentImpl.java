@@ -26,7 +26,7 @@ import java.util.concurrent.Future;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 import org.archboy.clobaframe.cache.Cache.SetPolicy;
 import org.archboy.clobaframe.cache.CacheAgent;
 import org.archboy.clobaframe.cache.Expiration;
@@ -41,7 +41,7 @@ import net.spy.memcached.MemcachedClient;
  * @author young
  *
  */
-@Component
+@Named
 public class MemcachedCacheAgentImpl implements CacheAgent {
 
 	private static final String AGENT_NAME = "memcached";

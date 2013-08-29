@@ -18,18 +18,21 @@ import org.archboy.clobaframe.media.MetaData;
 import org.archboy.clobaframe.media.MetaDataParser;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.ResourceInfoFactory;
+import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
+import org.archboy.clobaframe.io.TemporaryResources;
+import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
 import org.springframework.util.Assert;
 
 /**
  *
  * @author yang
  */
-@Component
+@Named
 public class MediaFactoryImpl implements MediaFactory{
 
 	// default 32 MB
@@ -38,13 +41,16 @@ public class MediaFactoryImpl implements MediaFactory{
 
 	private Logger logger = LoggerFactory.getLogger(MediaFactoryImpl.class);
 
-	@Autowired
+	@Inject
 	private ResourceInfoFactory resourceInfoFactory;
 	
-	@Autowired
+	@Inject
+	private FileBaseResourceInfoFactory fileBaseResourceInfoFactory;
+	
+	@Inject
 	private List<MediaLoader> mediaLoaders;
 
-	@Autowired
+	@Inject
 	private List<MetaDataParser> metaDataParsers;
 	
 	@Value("${media.maxHandleSize}")
@@ -53,21 +59,17 @@ public class MediaFactoryImpl implements MediaFactory{
 	}
 	
 	@Override
-	public Media make(byte[] data, String contentType, Date lastModified) throws IOException {
-//		if (data.length > maxHandleSize) {
-//			throw new MediaDataSizeLimitExceededException();
-//		}
+	public Media make(byte[] data, String contentType, Date lastModified, TemporaryResources temporaryResources) throws IOException {
 		if (lastModified == null) {
 			lastModified = new Date();
 		}
 		
 		ResourceInfo resourceInfo = resourceInfoFactory.make(data, contentType, lastModified);
-		return make(resourceInfo);
+		return make(resourceInfo, temporaryResources);
 	}
 
 	@Override
-	public Media make(InputStream inputStream, String contentType, Date lastModified) throws IOException {
-		
+	public Media make(InputStream inputStream, String contentType, Date lastModified, TemporaryResources temporaryResources) throws IOException {
 		if (lastModified == null) {
 			lastModified = new Date();
 		}
@@ -75,24 +77,20 @@ public class MediaFactoryImpl implements MediaFactory{
 		try{
 			byte[] data = toByteArrayWithSizeLimit(inputStream);
 			ResourceInfo resourceInfo = resourceInfoFactory.make(data, contentType, lastModified);
-			return make(resourceInfo);
+			return make(resourceInfo, temporaryResources);
 		} finally {
 			IOUtils.closeQuietly(inputStream);
 		}
 	}
 
 	@Override
-	public Media make(File file) throws IOException {
-//		if (file.length() > maxHandleSize) {
-//			throw new MediaDataSizeLimitExceededException();
-//		}
-		
-		ResourceInfo resourceInfo = resourceInfoFactory.make(file);
-		return make(resourceInfo);
+	public Media make(File file, TemporaryResources temporaryResources) throws IOException {
+		ResourceInfo resourceInfo = fileBaseResourceInfoFactory.make(file);
+		return make(resourceInfo, temporaryResources);
 	}
 
 	@Override
-	public Media make(URL url) throws IOException {
+	public Media make(URL url, TemporaryResources temporaryResources) throws IOException {
 		Assert.isTrue("http".equals(url.getProtocol()) || "https".equals(url.getProtocol()));
 
 		HttpURLConnection connection = (HttpURLConnection)url.openConnection();
@@ -112,7 +110,7 @@ public class MediaFactoryImpl implements MediaFactory{
 			in = connection.getInputStream();
 			byte[] data = toByteArrayWithSizeLimit(in);
 			ResourceInfo resourceInfo = resourceInfoFactory.make(data, contentType, lastModified);
-			return make(resourceInfo);
+			return make(resourceInfo, temporaryResources);
 			
 		} finally {
 			IOUtils.closeQuietly(in);
@@ -121,73 +119,47 @@ public class MediaFactoryImpl implements MediaFactory{
 	}
 
 	@Override
-	public Media make(ResourceInfo resourceInfo) throws IOException {
+	public Media make(ResourceInfo resourceInfo, TemporaryResources temporaryResources) throws IOException {
 		Assert.isTrue(resourceInfo.getContentLength() > 0);
 		
 		if (resourceInfo.getContentLength() > maxHandleSize){
 			throw new MediaDataSizeLimitExceededException();
 		}
 		
-		Media media = null;
+		//TemporaryResources temporaryResources = new TemporaryResources();
+		FileBaseResourceInfo fileBaseResourceInfo = fileBaseResourceInfoFactory.wrap(
+				resourceInfo, temporaryResources);
 		
+		//try{
+		Media media = null;
+
 		for (MediaLoader mediaLoader : mediaLoaders){
 			if (mediaLoader.support(resourceInfo.getContentType())){
-				media = mediaLoader.load(resourceInfo);
+				media = mediaLoader.load(fileBaseResourceInfo);
 				break;
 			}
 		}
-		
+
 		if (media == null){
 			throw new MediaNotSupportException("Content type is: " + resourceInfo.getContentType());
 		}
-		
+
 		if (media instanceof AbstractMedia){
 			for(MetaDataParser metaDataParser : metaDataParsers){
 				if (metaDataParser.support(media.getContentType())){
-					MetaData metaData = metaDataParser.parse(media);
+					MetaData metaData = metaDataParser.parse(fileBaseResourceInfo);
 					((AbstractMedia)media).setMetaData(metaData);
 					break;
 				}
 			}
 		}
-		
+
 		return media;
-//
-//		// OpenJDK current support bmp, jpg, wbmp, jpeg, png, gif
-//		InputStream in = null;
-//		ImageInputStream stream = null;
-//		ImageReader reader = null;
-//		Image image = null;
-//
-//		try {
-//			in = new ByteArrayInputStream(imageData);
-//			stream = ImageIO.createImageInputStream(in);
-//
-//			Iterator<ImageReader> readers = ImageIO.getImageReaders(stream);
-//			if (!readers.hasNext()) {
-//				throw new IOException("The image format is not supported.");
-//			}
-//
-//			reader = readers.next();
-//			Image.Format format = Image.Format.fromFormatName(reader.getFormatName());
-//
-//			if (format == null) {
-//				throw new IOException("The image format is not supported.");
-//			}
-//
-//			reader.setInput(stream);
-//			BufferedImage bufferedImage = reader.read(0);
-//
-//			image = new DefaultImageFromFactory(format, bufferedImage, imageData);
-//
-//		} finally {
-//			closeQuietly(reader);
-//			//IOUtils.closeQuietly(stream); // for java 7
-//			closeQuietly(stream);
-//			IOUtils.closeQuietly(in);
+			
+//		}finally{
+//			// close the temp file.
+//			temporaryResources.close();
 //		}
-//
-//		return image;
 	}
 
 //	/*

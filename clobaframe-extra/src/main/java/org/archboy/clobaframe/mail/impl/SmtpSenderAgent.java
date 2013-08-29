@@ -8,7 +8,7 @@ import org.apache.commons.mail.SimpleEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 import org.archboy.clobaframe.mail.SenderAgent;
 import org.archboy.clobaframe.mail.SendMailException;
 
@@ -16,7 +16,7 @@ import org.archboy.clobaframe.mail.SendMailException;
  *
  * @author arch
  */
-@Component
+@Named
 public class SmtpSenderAgent implements SenderAgent {
 
 	private static final String AGENT_NAME = "smtp";

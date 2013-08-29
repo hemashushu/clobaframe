@@ -1,8 +1,8 @@
 package org.archboy.clobaframe.mail.impl;
 
 import javax.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.archboy.clobaframe.mail.MailSender;
 import org.archboy.clobaframe.mail.SendMailException;
 import org.archboy.clobaframe.mail.SenderAgent;
@@ -12,10 +12,10 @@ import org.archboy.clobaframe.mail.SenderAgentFactory;
  *
  * @author arch
  */
-@Component
+@Named
 public class MailSenderImpl implements MailSender {
 
-	@Autowired
+	@Inject
 	private SenderAgentFactory senderAgentFactory;
 
 	private SenderAgent senderAgent;
