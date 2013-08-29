@@ -77,7 +77,7 @@ public class PartialFileInputStream extends InputStream {
 
 	@Override
 	public int read(byte[] b) throws IOException {
-		return in.read(b, 0, b.length);
+		return read(b, 0, b.length);
 	}
 
 	@Override

@@ -57,6 +57,12 @@
 			<artifactId>junit</artifactId>
 		</dependency>
 
+		<!-- IoC -->
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+		</dependency>
+		
 		<!-- Spring Core -->
 		<dependency>
 			<groupId>org.springframework</groupId>

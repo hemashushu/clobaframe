@@ -15,17 +15,17 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 import org.archboy.clobaframe.io.ContentTypeDetector;
 
 /**
  *
  * @author yang
  */
-@Component
+@Named
 public class ExtensionNameContentTypeDetector implements ContentTypeDetector {
 
 	private Map<String, String> mimeTypes = new HashMap<String, String>();
@@ -33,7 +33,7 @@ public class ExtensionNameContentTypeDetector implements ContentTypeDetector {
 	private static final String UNKNOWN_MIME_TYPE = "application/octet-stream";
 	private static final String mimeTypeListFile = "classpath:org/archboy/clobaframe/io/mime.types";
 	
-	@Autowired
+	@Inject
 	private ResourceLoader resourceLoader;
 	
 	private final Logger logger = LoggerFactory.getLogger(ExtensionNameContentTypeDetector.class);

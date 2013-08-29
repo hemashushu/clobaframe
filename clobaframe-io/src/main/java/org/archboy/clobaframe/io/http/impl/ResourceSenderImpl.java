@@ -20,7 +20,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.http.ResourceSender;
 
@@ -29,7 +29,7 @@ import org.archboy.clobaframe.io.http.ResourceSender;
  * @author young
  *
  */
-@Component
+@Named
 public class ResourceSenderImpl extends AbstractDataSenderWithLastModifiedAndRangeCheck
 	implements ResourceSender {
 

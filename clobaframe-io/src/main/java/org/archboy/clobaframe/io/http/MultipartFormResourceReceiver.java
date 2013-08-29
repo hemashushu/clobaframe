@@ -18,6 +18,7 @@ package org.archboy.clobaframe.io.http;
 import java.io.IOException;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import org.archboy.clobaframe.io.TemporaryResources;
 
 /**
  * Receive the resource(file/data) from the user's browser.
@@ -36,7 +37,9 @@ public interface MultipartFormResourceReceiver {
 	 * @return
 	 * @throws IOException
 	 */
-	List<MultipartFormResourceInfo> receive(HttpServletRequest request)
+	List<MultipartFormResourceInfo> receive(
+			HttpServletRequest request,
+			TemporaryResources temporaryResources)
 			throws IOException;
 
 	/**
@@ -46,7 +49,9 @@ public interface MultipartFormResourceReceiver {
 	 * @return
 	 * @throws IOException
 	 */
-	List<MultipartFormResourceInfo> receive(HttpServletRequest request,
+	List<MultipartFormResourceInfo> receive(
+			HttpServletRequest request,
+			TemporaryResources temporaryResources,
 			long maxUploadSize) throws IOException;
 
 }

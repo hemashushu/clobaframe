@@ -10,7 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ContextConfiguration;
@@ -25,10 +25,10 @@ import static org.junit.Assert.*;
 @ContextConfiguration(locations = { "/applicationContext.xml" })
 public class ContentTypeDetectorTest {
 
-	@Autowired
+	@Inject
 	private ResourceLoader resourceLoader;
 
-	@Autowired
+	@Inject
 	private ContentTypeDetector contentTypeAnalyzer;
 
 	private String sampleFile1 = "sample/data/test.jpg";

@@ -13,34 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.archboy.clobaframe.io.http.impl;
+package org.archboy.clobaframe.io.file;
 
+import java.io.File;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.apache.commons.io.FileCleaningTracker;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 
 /**
  *
  * @author young
  */
-@Component
-public class UploadedTemporaryFileCleanner {
+public interface TemporaryResourcesAutoCleaner {
 
-	private FileCleaningTracker fileCleaningTracker;
-
-	@PostConstruct
-	public void init(){
-		fileCleaningTracker = new FileCleaningTracker();
-	}
-
-	@PreDestroy
-	public void destory(){
-		fileCleaningTracker.exitWhenFinished();
-	}
-
-	public FileCleaningTracker getFileCleaningTracker() {
-		return fileCleaningTracker;
-	}
-
+	//FileCleaningTracker getFileCleaningTracker();
+	
+	void track(File file, Object marker);
 }

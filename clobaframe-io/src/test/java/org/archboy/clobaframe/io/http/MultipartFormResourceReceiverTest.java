@@ -52,7 +52,9 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
+import org.archboy.clobaframe.io.TemporaryResources;
+import org.archboy.clobaframe.io.impl.DefaultTemporaryResources;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ContextConfiguration;
@@ -76,10 +78,10 @@ public class MultipartFormResourceReceiverTest {
 
 	private Server server;
 
-	@Autowired
+	@Inject
 	private MultipartFormResourceReceiver resourceReceiver;
 
-	@Autowired
+	@Inject
 	private ResourceLoader resourceLoader;
 
 	@Before
@@ -90,7 +92,7 @@ public class MultipartFormResourceReceiverTest {
 		context.setContextPath("/");
 		server.setHandler(context);
 
-		Servlet receivePage = new MultipartPostReceiverServlet();
+		Servlet receivePage = new MultipartPostReceiverServlet(resourceReceiver);
 		context.addServlet(new ServletHolder(receivePage),"/post");
 
 		server.start();
@@ -221,17 +223,24 @@ public class MultipartFormResourceReceiverTest {
 		return data;
 	}
 
-	public class MultipartPostReceiverServlet extends HttpServlet {
+	public static class MultipartPostReceiverServlet extends HttpServlet {
 
 		private static final long serialVersionUID = 1L;
 
+		private MultipartFormResourceReceiver receiver;
+
+		public MultipartPostReceiverServlet(MultipartFormResourceReceiver receiver) {
+			this.receiver = receiver;
+		}
+		
 		@Override
 		protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 			//Map<String, Object> items = new HashMap<String, Object>();
 			List<Map<String, String>> items = new ArrayList<Map<String,String>>();
-
-			List<MultipartFormResourceInfo> resourceInfos = resourceReceiver.receive(request);
+			TemporaryResources temporaryResources = new DefaultTemporaryResources();
+			
+			List<MultipartFormResourceInfo> resourceInfos = receiver.receive(request, temporaryResources);
 			for(MultipartFormResourceInfo resourceInfo : resourceInfos){
 
 				Map<String, String> itemInfo = new HashMap<String, String>();
@@ -262,22 +271,25 @@ public class MultipartFormResourceReceiverTest {
 			String content = serialize(items);
 			IOUtils.write(content, out);
 			out.close();
+			
+			// clean temp resources
+			temporaryResources.close();
 		}
-
-	}
-
-	private String serialize(List<Map<String, String>> items){
-		StringBuilder builder = new StringBuilder();
-		for(Map<String, String> item : items){
-			for(String key : item.keySet()){
-				builder.append(key);
-				builder.append("=");
-				builder.append(item.get(key));
-				builder.append(",");
+		
+		private String serialize(List<Map<String, String>> items){
+			StringBuilder builder = new StringBuilder();
+			for(Map<String, String> item : items){
+				for(String key : item.keySet()){
+					builder.append(key);
+					builder.append("=");
+					builder.append(item.get(key));
+					builder.append(",");
+				}
+				builder.append("\n");
 			}
-			builder.append("\n");
+			return builder.toString();
 		}
-		return builder.toString();
+
 	}
 
 	private List<Map<String, String>> deserialize(String content){

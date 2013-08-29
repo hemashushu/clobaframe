@@ -4,8 +4,8 @@ import org.archboy.clobaframe.io.file.impl.FileResourceInfo;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Date;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.archboy.clobaframe.io.ContentTypeDetector;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.ResourceInfoFactory;
@@ -14,16 +14,8 @@ import org.archboy.clobaframe.io.ResourceInfoFactory;
  *
  * @author arch
  */
-@Component
+@Named
 public class ResourceInfoFactoryImpl implements ResourceInfoFactory {
-
-	@Autowired
-	private ContentTypeDetector contentTypeAnalyzer;
-
-	@Override
-	public ResourceInfo make(File file) {
-		return new FileResourceInfo(file, contentTypeAnalyzer);
-	}
 
 	@Override
 	public ResourceInfo make(byte[] content, String contentType, Date lastModified) {

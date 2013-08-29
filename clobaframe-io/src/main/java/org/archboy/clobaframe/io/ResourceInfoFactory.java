@@ -10,8 +10,6 @@ import java.util.Date;
  */
 public interface ResourceInfoFactory {
 
-	ResourceInfo make(File file);
-
 	ResourceInfo make(byte[] content, String contentType, Date lastModified);
 	
 	ResourceInfo make(InputStream inputStream, long contentLength, String contentType, Date lastModified);

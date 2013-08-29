@@ -50,7 +50,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
+import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ContextConfiguration;
@@ -75,14 +76,14 @@ public class ResourceSenderTest {
 
 	private Server server;
 
-	@Autowired
+	@Inject
 	private ResourceSender resourceSender;
 
-	@Autowired
+	@Inject
 	private ResourceLoader resourceLoader;
 
-	@Autowired
-	private ResourceInfoFactory resourceInfoFactory;
+	@Inject
+	private FileBaseResourceInfoFactory resourceInfoFactory;
 
 	@Before
 	public void setUp() throws Exception {

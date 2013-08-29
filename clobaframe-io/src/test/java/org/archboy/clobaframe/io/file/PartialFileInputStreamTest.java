@@ -10,7 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ContextConfiguration;
@@ -26,11 +26,13 @@ import static org.junit.Assert.*;
 @ContextConfiguration(locations = { "/applicationContext.xml" })
 public class PartialFileInputStreamTest {
 
+	/**
+	 * The data of the sample file is: '0123456789'
+	 */
 	private static final String DEFAULT_SAMPLE_FILE = "sample/data/test.txt";
-
 	private String sampleFile = DEFAULT_SAMPLE_FILE;
 
-	@Autowired
+	@Inject
 	private ResourceLoader resourceLoader;
 
 	@Before
@@ -76,13 +78,21 @@ public class PartialFileInputStreamTest {
 		in2.close();
 
 		// test range
-		InputStream in3 = new PartialFileInputStream(file, 0, 3);
-		int readBytes4 = in3.read(buffer, 0, 3);
+		InputStream in3 = new PartialFileInputStream(file, 3, 3);
+		int readBytes4 = in3.read(buffer, 0, 10);
 		assertEquals(3, readBytes4);
-		int readBytes5 = in3.read(buffer, 0, 3);
+		assertArrayEquals(new byte[]{51,52,53}, buffer);
+		
+		int readBytes5 = in3.read(buffer, 0, 10);
 		assertEquals(-1, readBytes5);
 
 		in3.close();
+		
+		// test range 2
+		InputStream in4 = new PartialFileInputStream(file, 3, 3);
+		assertArrayEquals(new byte[]{51,52,53}, IOUtils.toByteArray(in4));
+		in4.close();
+		
 	}
 
 	/**

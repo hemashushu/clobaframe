@@ -15,6 +15,8 @@
  */
 package org.archboy.clobaframe.io.http.impl;
 
+import java.io.Closeable;
+import org.archboy.clobaframe.io.file.TemporaryResourcesAutoCleaner;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +27,10 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
+import org.archboy.clobaframe.io.TemporaryResources;
 import org.springframework.util.Assert;
 import org.archboy.clobaframe.io.http.MultipartFormResourceReceiver;
 import org.archboy.clobaframe.io.http.MultipartFormResourceInfo;
@@ -36,7 +39,7 @@ import org.archboy.clobaframe.io.http.MultipartFormResourceInfo;
  *
  * @author young
  */
-@Component
+@Named
 public class MultipartFormResourceReceiverImpl implements MultipartFormResourceReceiver {
 
 	// default 10MByte
@@ -44,8 +47,8 @@ public class MultipartFormResourceReceiverImpl implements MultipartFormResourceR
 
 	private long maxUploadSize = DEFAULT_MAX_UPLOAD_SIZE;
 
-	@Autowired
-	private UploadedTemporaryFileCleanner fileCleanner;
+//	@Inject
+//	private TemporaryResourcesAutoCleaner temporaryFileCleanner;
 
 	@Value("${io.maxUploadSize}")
 	public void setMaxUploadSizeKB(int maxUploadSizeKB) {
@@ -53,14 +56,16 @@ public class MultipartFormResourceReceiverImpl implements MultipartFormResourceR
 	}
 
 	@Override
-	public List<MultipartFormResourceInfo> receive(HttpServletRequest request) throws IOException {
-		return receive(request, maxUploadSize);
+	public List<MultipartFormResourceInfo> receive(HttpServletRequest request,
+		TemporaryResources temporaryResources) throws IOException {
+		return receive(request, temporaryResources, maxUploadSize);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<MultipartFormResourceInfo> receive(HttpServletRequest request, long maxUploadSize)
-			throws IOException {
+	public List<MultipartFormResourceInfo> receive(HttpServletRequest request,
+		TemporaryResources temporaryResources,
+		long maxUploadSize) throws IOException {
 
 		// Check that we have a file upload request
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
@@ -68,7 +73,14 @@ public class MultipartFormResourceReceiverImpl implements MultipartFormResourceR
 
 		// Create a factory for disk-based file items
 		DiskFileItemFactory factory = new DiskFileItemFactory();
-		factory.setFileCleaningTracker(fileCleanner.getFileCleaningTracker());
+		
+		/** the DiskFileItemFactory object hold the cleaning tracker object.
+		 * 
+		 * It's seems the temporary file cleaner doesn't works here,
+		 * so use the TemporaryResource to delete temp file manually.
+		 * 
+		 */
+		//factory.setFileCleaningTracker(temporaryFileCleanner.getFileCleaningTracker());
 		
 		ServletFileUpload upload = new ServletFileUpload(factory);
 		upload.setSizeMax(maxUploadSize);
@@ -81,8 +93,15 @@ public class MultipartFormResourceReceiverImpl implements MultipartFormResourceR
 		}
 
 		List<MultipartFormResourceInfo> resources = new ArrayList<MultipartFormResourceInfo>();
-		for (FileItem item : items){
-			resources.add(new DefaultMultipartFormResourceInfo(item, factory));
+		for (final FileItem item : items){
+			temporaryResources.addResource(new Closeable() {
+				@Override
+				public void close() throws IOException {
+					item.delete();
+				}
+			});
+			
+			resources.add(new DefaultMultipartFormResourceInfo(item));
 		}
 		return resources;
 	}
