@@ -22,19 +22,19 @@ import java.io.IOException;
  *
  * @author young
  */
-public class MediaNotSupportException extends IOException{
+public class UnsupportedMediaException extends IOException{
 
 	private static final long serialVersionUID = 1L;
 
-	public MediaNotSupportException() {
+	public UnsupportedMediaException() {
 		super("Doesn't supports this media.");
 	}
 
-	public MediaNotSupportException(String message){
+	public UnsupportedMediaException(String message){
 		super(message);
 	}
 
-	public MediaNotSupportException(Throwable cause) {
+	public UnsupportedMediaException(Throwable cause) {
 		super(cause);
 	}
 }

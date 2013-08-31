@@ -225,7 +225,7 @@ public class ImageFactoryTest {
 		FileOutputStream out = new FileOutputStream(file);
 		IOUtils.copy(in, out);
 		
-		IOUtils.closeQuietly(out);
-		IOUtils.closeQuietly(in);
+		out.close();
+		in.close();
 	}
 }

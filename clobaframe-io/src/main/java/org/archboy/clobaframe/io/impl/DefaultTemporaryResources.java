@@ -24,7 +24,14 @@ public class DefaultTemporaryResources implements TemporaryResources {
     /**
      * Directory for temporary files, <code>null</code> for the system default.
      */
-    private File tmp = null;
+    private File temporaryDirectory = null;
+
+	public DefaultTemporaryResources() {
+	}
+
+	public DefaultTemporaryResources(File temporaryDirectory) {
+		this.temporaryDirectory = temporaryDirectory;
+	}
 
     /**
      * Sets the directory to be used for the temporary files created by
@@ -33,9 +40,9 @@ public class DefaultTemporaryResources implements TemporaryResources {
      * @param tmp temporary file directory,
      *            or <code>null</code> for the system default
      */
-	@Override
-    public void setTemporaryFileDirectory(File tmp) {
-        this.tmp = tmp;
+	//@Override
+    public void setTemporaryFileDirectory(File temporaryDirectory) {
+        this.temporaryDirectory = temporaryDirectory;
     }
 
     /**
@@ -47,7 +54,7 @@ public class DefaultTemporaryResources implements TemporaryResources {
      */
 	@Override
     public File createTemporaryFile() throws IOException {
-        final File file = File.createTempFile("clobaframe-io-", ".tmp", tmp);
+        final File file = File.createTempFile("clobaframe-io-", ".tmp", temporaryDirectory);
         addResource(new Closeable() {
 			@Override
             public void close() throws IOException {

@@ -44,13 +44,13 @@ public class BlobstoreImpl implements Blobstore{
 	}
 
 	@Override
-	public void put(BlobResourceInfo blobInfo) throws IOException {
-		put(blobInfo, false, false);
+	public void put(BlobResourceInfo blobResourceInfo) throws IOException {
+		put(blobResourceInfo, false, false);
 	}
 
 	@Override
-	public void put(BlobResourceInfo blobInfo, boolean publicReadable, boolean minor) throws IOException {
-		storeAgent.put(blobInfo, publicReadable, minor);
+	public void put(BlobResourceInfo blobResourceInfo, boolean publicReadable, boolean minor) throws IOException {
+		storeAgent.put(blobResourceInfo, publicReadable, minor);
 	}
 
 	@Override

@@ -72,11 +72,11 @@ public class FileBaseResourceInfoFactoryTest {
 		
 		InputStream in1 = resourceInfo.getInputStream();
 		assertArrayEquals(data, IOUtils.toByteArray(in1));
-		IOUtils.closeQuietly(in1);
+		in1.close();
 		
 		InputStream in2 = resourceInfo.getInputStream(1, 3);
 		assertArrayEquals(new byte[]{0x31,0x32,0x33}, IOUtils.toByteArray(in2));
-		IOUtils.closeQuietly(in2);
+		in2.close();
 		
 	}
 	
@@ -105,16 +105,16 @@ public class FileBaseResourceInfoFactoryTest {
 		
 		InputStream in1 = fileBaseResourceInfo.getInputStream();
 		assertArrayEquals(data, IOUtils.toByteArray(in1));
-		IOUtils.closeQuietly(in1);
+		in1.close();
 		
 		InputStream in2 = fileBaseResourceInfo.getInputStream(1, 3);
 		assertArrayEquals(new byte[]{1,2,3}, IOUtils.toByteArray(in2));
-		IOUtils.closeQuietly(in2);
+		in2.close();
 		
 		// check file content
 		InputStream in3 = new FileInputStream(file);
 		assertArrayEquals(data, IOUtils.toByteArray(in3));
-		IOUtils.closeQuietly(in1);
+		in3.close();
 		
 		// check close
 		assertTrue(file.exists());
@@ -146,7 +146,7 @@ public class FileBaseResourceInfoFactoryTest {
 		File file = getFileByName(name);
 		InputStream in = new FileInputStream(file);
 		byte[] data = IOUtils.toByteArray(in);
-		IOUtils.closeQuietly(in);
+		in.close();
 		return data;
 	}
 	

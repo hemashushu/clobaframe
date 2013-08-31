@@ -86,13 +86,13 @@ public class LocalStoreAgentImpl implements StoreAgent {
 	}
 
 	@Override
-	public void put(BlobResourceInfo blobInfo, boolean publicReadable, boolean minor) throws IOException {
-		BlobKey blobKey = blobInfo.getBlobKey();
+	public void put(BlobResourceInfo blobResourceInfo, boolean publicReadable, boolean minor) throws IOException {
+		BlobKey blobKey = blobResourceInfo.getBlobKey();
 		File bucket = new File(localDir, blobKey.getBucketName());
 		File file = new File(bucket, blobKey.getKey());
 
 		//ResourceContent content = blobInfo.getContentSnapshot();
-		InputStream in = blobInfo.getInputStream(); // content.getInputStream();
+		InputStream in = blobResourceInfo.getInputStream(); // content.getInputStream();
 		FileOutputStream out = new FileOutputStream(file);
 		IOUtils.copy(in, out);
 

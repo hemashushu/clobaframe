@@ -49,7 +49,7 @@ public class LocalBlobstoreTest {
 //	private BlobstoreBucket blobstoreBucket;
 
 	@Inject
-	private BlobResourceInfoFactory blobInfoFactory;
+	private BlobResourceInfoFactory blobResourceInfoFactory;
 
 	private static final String DEFAULT_BUCKET_NAME = "test-clobaframe-bucket";
 
@@ -141,27 +141,27 @@ public class LocalBlobstoreTest {
 		writeContent(blobstore, blobKey1, "hello");
 
 		// test get blob by key
-		BlobResourceInfo blobInfoByKey1 = blobstore.get(blobKey1);
-		assertEquals(blobKey1, blobInfoByKey1.getBlobKey());
+		BlobResourceInfo blobByKey1 = blobstore.get(blobKey1);
+		assertEquals(blobKey1, blobByKey1.getBlobKey());
 
 		// NOTE:: local implements does not support the specify content type.
 		// assertEquals("text/plain", blobInfoByKey1.getContentType());
-		assertEquals(5, blobInfoByKey1.getContentLength());
-		assertNotNull(blobInfoByKey1.getLastModified());
+		assertEquals(5, blobByKey1.getContentLength());
+		assertNotNull(blobByKey1.getLastModified());
 
 //		assertEquals(blobInfoByKey1.getMetadata().get("author"), "test");
 //		assertEquals(blobInfoByKey1.getMetadata().get("price"), "99.0");
 
 		// test get blob content
-		assertEquals("hello", readContent(blobInfoByKey1));
+		assertEquals("hello", readContent(blobByKey1));
 
 		// test get blob content partial
-		assertEquals("ll", readContent(blobInfoByKey1,2,2));
+		assertEquals("ll", readContent(blobByKey1,2,2));
 
 		// test overwrite blob content
 		writeContent(blobstore, blobKey1, "woo");
-		BlobResourceInfo blobByKey2 = blobstore.get(blobKey1);
-		assertEquals("woo", readContent(blobByKey2));
+		BlobResourceInfo overwriteBlobByKey2 = blobstore.get(blobKey1);
+		assertEquals("woo", readContent(overwriteBlobByKey2));
 
 		// test get none-exists blob
 		BlobKey blobKeyNoneExists = new BlobKey(bucketName, "noneExists");
@@ -297,15 +297,15 @@ public class LocalBlobstoreTest {
 			Map<String, String> metadata) throws IOException{
 		byte[] data = content.getBytes();
 		ByteArrayInputStream in = new ByteArrayInputStream(data);
-		BlobResourceInfo blobInfo = blobInfoFactory.make(blobKey, "text/plain", in, data.length);
+		BlobResourceInfo blobResourceInfo = blobResourceInfoFactory.make(blobKey, "text/plain", in, data.length);
 
 		if (metadata != null){
 			for(String key : metadata.keySet()){
-				blobInfo.addMetadata(key, metadata.get(key));
+				blobResourceInfo.addMetadata(key, metadata.get(key));
 			}
 		}
-		blobstore.put(blobInfo);
-		IOUtils.closeQuietly(in);
+		blobstore.put(blobResourceInfo);
+		in.close();
 	}
 
 	private String readContent(
@@ -315,8 +315,8 @@ public class LocalBlobstoreTest {
 		BufferedReader reader = new BufferedReader(
 				new InputStreamReader(in));
 		String content = reader.readLine();
-		IOUtils.closeQuietly(reader);
-		IOUtils.closeQuietly(in);
+		reader.close();
+		in.close();
 		return content;
 	}
 
@@ -327,8 +327,8 @@ public class LocalBlobstoreTest {
 		BufferedReader reader = new BufferedReader(
 				new InputStreamReader(in));
 		String content = reader.readLine();
-		IOUtils.closeQuietly(reader);
-		IOUtils.closeQuietly(in);
+		reader.close();
+		in.close();
 		return content;
 	}
 

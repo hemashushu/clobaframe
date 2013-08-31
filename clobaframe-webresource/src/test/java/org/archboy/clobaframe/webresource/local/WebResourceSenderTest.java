@@ -134,7 +134,7 @@ public class WebResourceSenderTest {
 		//ResourceContent resourceContent = resourceInfo.getContentSnapshot();
 		InputStream in = resourceInfo.getInputStream(); // resourceContent.getInputStream();
 		byte[] content = IOUtils.toByteArray(in);
-		IOUtils.closeQuietly(in);
+		in.close();
 
 		checkResponseContent(client, method, content);
 	}

@@ -98,10 +98,6 @@ public class WebResourceServiceTest {
 		assertEquals("image/png", webResource1.getContentType());
 
 		// test the content
-//		ResourceContent content1 = webResource1.getContentSnapshot();
-//		assertTrue(content1.getLength() > 0);
-//		IOUtils.closeQuietly(content1);
-
 		assertContentEquals(webResource1, "sample/web/test.png");
 		//assertContentEquals(webResource2, "sample/web/test.css");
 		assertContentEquals(webResource3, "sample/web/folder/info-32.png");
@@ -112,7 +108,7 @@ public class WebResourceServiceTest {
 		String text2 = IOUtils.toString(in2); //content2.getInputStream());
 		assertTrue(text2.indexOf(resourceService.getLocation(webResource1)) > 0);
 		assertTrue(text2.indexOf(resourceService.getLocation(webResource3)) > 0);
-		IOUtils.closeQuietly(in2);
+		in2.close();
 
 		// test get none exists
 		try{
@@ -173,7 +169,7 @@ public class WebResourceServiceTest {
 		File file = getFileByName(name);
 		InputStream in = new FileInputStream(file);
 		byte[] data = IOUtils.toByteArray(in);
-		IOUtils.closeQuietly(in);
+		in.close();
 		return data;
 	}
 
@@ -181,7 +177,7 @@ public class WebResourceServiceTest {
 		//ResourceContent resourceContent = resourceInfo.getContentSnapshot();
 		InputStream in = resourceInfo.getInputStream(); // resourceContent.getInputStream();
 		byte[] content = IOUtils.toByteArray(in);
-		IOUtils.closeQuietly(in);
+		in.close();
 		assertArrayEquals(data, content);
 	}
 

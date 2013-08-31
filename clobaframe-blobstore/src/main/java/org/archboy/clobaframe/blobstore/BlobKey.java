@@ -20,7 +20,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
- * The key of {@link BlobInfo} object.
+ * The key of {@link BlobResourceInfo} object.
  *
  * @author young
  *

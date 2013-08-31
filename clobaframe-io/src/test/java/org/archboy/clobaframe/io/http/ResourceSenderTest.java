@@ -251,7 +251,7 @@ public class ResourceSenderTest {
 		File file = getFileByName(name);
 		InputStream in = new FileInputStream(file);
 		byte[] data = IOUtils.toByteArray(in);
-		IOUtils.closeQuietly(in);
+		in.close();
 		return data;
 	}
 

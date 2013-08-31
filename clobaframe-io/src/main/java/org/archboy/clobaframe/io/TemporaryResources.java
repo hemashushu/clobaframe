@@ -22,7 +22,7 @@ public interface TemporaryResources extends Closeable {
      * @param tmp temporary file directory,
      *            or <code>null</code> for the system default
      */
-    void setTemporaryFileDirectory(File tmp);
+    //void setTemporaryFileDirectory(File tmp);
 
     /**
      * Creates and returns a temporary file that will automatically be

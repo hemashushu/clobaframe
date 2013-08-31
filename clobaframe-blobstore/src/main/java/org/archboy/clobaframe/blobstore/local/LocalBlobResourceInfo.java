@@ -8,13 +8,14 @@ import java.util.Date;
 import java.util.Map;
 import org.archboy.clobaframe.blobstore.BlobResourceInfo;
 import org.archboy.clobaframe.blobstore.BlobKey;
+import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
 import org.archboy.clobaframe.io.file.impl.PartialFileInputStream;
 
 /**
  *
  * @author arch
  */
-public class LocalBlobResourceInfo implements BlobResourceInfo{
+public class LocalBlobResourceInfo implements BlobResourceInfo, FileBaseResourceInfo {
 
 	private BlobKey blobKey;
 	private File file;
@@ -69,5 +70,10 @@ public class LocalBlobResourceInfo implements BlobResourceInfo{
 	@Override
 	public boolean isSeekable() {
 		return true;
+	}
+
+	@Override
+	public File getFile() {
+		return file;
 	}
 }

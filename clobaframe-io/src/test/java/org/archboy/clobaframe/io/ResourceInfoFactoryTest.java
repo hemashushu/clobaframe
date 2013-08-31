@@ -55,11 +55,11 @@ public class ResourceInfoFactoryTest {
 		
 		InputStream in1 = resourceInfo.getInputStream();
 		assertArrayEquals(data, IOUtils.toByteArray(in1));
-		IOUtils.closeQuietly(in1);
+		in1.close();
 		
 		InputStream in2 = resourceInfo.getInputStream(1, 3);
 		assertArrayEquals(new byte[]{1,2,3}, IOUtils.toByteArray(in2));
-		IOUtils.closeQuietly(in2);
+		in2.close();
 	}
 	
 	@Test
@@ -79,7 +79,9 @@ public class ResourceInfoFactoryTest {
 		
 		InputStream in1 = resourceInfo.getInputStream();
 		assertArrayEquals(data, IOUtils.toByteArray(in1));
-		IOUtils.closeQuietly(in1);
+		in1.close();
+		
+		in.close();
 	}
 	
 	

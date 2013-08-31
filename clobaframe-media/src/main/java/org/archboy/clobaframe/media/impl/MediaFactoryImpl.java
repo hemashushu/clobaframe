@@ -13,7 +13,7 @@ import org.archboy.clobaframe.media.Media;
 import org.archboy.clobaframe.media.MediaFactory;
 import org.archboy.clobaframe.media.MediaDataSizeLimitExceededException;
 import org.archboy.clobaframe.media.MediaLoader;
-import org.archboy.clobaframe.media.MediaNotSupportException;
+import org.archboy.clobaframe.media.UnsupportedMediaException;
 import org.archboy.clobaframe.media.MetaData;
 import org.archboy.clobaframe.media.MetaDataParser;
 import org.archboy.clobaframe.io.ResourceInfo;
@@ -141,7 +141,7 @@ public class MediaFactoryImpl implements MediaFactory{
 		}
 
 		if (media == null){
-			throw new MediaNotSupportException("Content type is: " + resourceInfo.getContentType());
+			throw new UnsupportedMediaException("Content type is: " + resourceInfo.getContentType());
 		}
 
 		if (media instanceof AbstractMedia){

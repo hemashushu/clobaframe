@@ -52,7 +52,7 @@ public class BlobstoreWebResourceSynchronizer{
 //	private BlobstoreBucket blobstoreBucket;
 
 	@Inject
-	private BlobResourceInfoFactory blobInfoFactory;
+	private BlobResourceInfoFactory blobResourceInfoFactory;
 
 	@Value("${webresource.blobstore.bucketName}")
 	private String bucketName;
@@ -108,17 +108,17 @@ public class BlobstoreWebResourceSynchronizer{
 			prefixLength = keyNamePrefix.length();
 		}
 
-		for (BlobResourceInfo blobInfo : getRemoteBlobInfos()){
-			String uniqueName = blobInfo.getBlobKey().getKey().substring(prefixLength);
-			remoteResources.put(uniqueName, blobInfo);
+		for (BlobResourceInfo blobResourceInfo : getRemoteBlobResourceInfos()){
+			String uniqueName = blobResourceInfo.getBlobKey().getKey().substring(prefixLength);
+			remoteResources.put(uniqueName, blobResourceInfo);
 		}
 
 		// build a map for local resource, use the unique name as map key
 		Map<String, WebResourceInfo> localResources = new HashMap<String, WebResourceInfo>();
-		for (WebResourceInfo webResource : webResourceInfos) {
+		for (WebResourceInfo webResourceInfo : webResourceInfos) {
 			localResources.put(
-				webResource.getUniqueName(),
-				webResource);
+				webResourceInfo.getUniqueName(),
+				webResourceInfo);
 		}
 
 		// find the already update-to-date resources
@@ -149,8 +149,8 @@ public class BlobstoreWebResourceSynchronizer{
 
 		// delete none exists resource
 		if (deleteNoneExists) {
-			for (BlobResourceInfo blobInfo : remoteResources.values()){
-				remove(blobInfo.getBlobKey());
+			for (BlobResourceInfo blobResourceInfo : remoteResources.values()){
+				remove(blobResourceInfo.getBlobKey());
 			}
 		}
 
@@ -160,25 +160,25 @@ public class BlobstoreWebResourceSynchronizer{
 		}
 	}
 
-	private List<BlobResourceInfo> getRemoteBlobInfos() {
-		List<BlobResourceInfo> blobInfos = new ArrayList<BlobResourceInfo>();
+	private List<BlobResourceInfo> getRemoteBlobResourceInfos() {
+		List<BlobResourceInfo> blobResourceInfos = new ArrayList<BlobResourceInfo>();
 
 		BlobKey prefix = new BlobKey(bucketName, keyNamePrefix);
-		PartialCollection<BlobResourceInfo> partialBlobInfos = null;
+		PartialCollection<BlobResourceInfo> partialBlobResourceInfos = null;
 		do {
-			partialBlobInfos = blobstore.list(prefix);
+			partialBlobResourceInfos = blobstore.list(prefix);
 
-			for (BlobResourceInfo blobInfo : partialBlobInfos) {
-				blobInfos.add(blobInfo);
+			for (BlobResourceInfo blobResourceInfo : partialBlobResourceInfos) {
+				blobResourceInfos.add(blobResourceInfo);
 			}
 
-			if (blobInfos.size() > remoteResourceMaxItems) {
+			if (blobResourceInfos.size() > remoteResourceMaxItems) {
 				break;
 			}
 
-		} while (partialBlobInfos.hasMore());
+		} while (partialBlobResourceInfos.hasMore());
 
-		return blobInfos;
+		return blobResourceInfos;
 	}
 
 	private void remove(BlobKey blobKey) throws IOException {
@@ -200,7 +200,7 @@ public class BlobstoreWebResourceSynchronizer{
 
 		//ResourceContent resourceContent = webResourceInfo.getContentSnapshot();
 		InputStream in = webResourceInfo.getInputStream();
-		BlobResourceInfo blobInfo = blobInfoFactory.make(
+		BlobResourceInfo blobResourceInfo = blobResourceInfoFactory.make(
 				blobKey,
 				webResourceInfo.getContentType(),
 				in,
@@ -209,7 +209,7 @@ public class BlobstoreWebResourceSynchronizer{
 		// blobInfo.addMetadata("sha256", webResourceInfo.getHash());
 
 		try{
-			blobstore.put(blobInfo, true, false);
+			blobstore.put(blobResourceInfo, true, false);
 		}finally{
 			IOUtils.closeQuietly(in);
 		}
