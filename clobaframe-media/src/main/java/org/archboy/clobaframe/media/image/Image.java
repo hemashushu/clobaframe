@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.util.Date;
 import org.archboy.clobaframe.media.Media;
 import org.archboy.clobaframe.io.ResourceInfo;
+import org.archboy.clobaframe.media.impl.MetaDataSettableMedia;
 
 
 /**
@@ -27,7 +28,7 @@ import org.archboy.clobaframe.io.ResourceInfo;
  * @author young
  *
  */
-public interface Image extends Media {
+public interface Image extends Media, MetaDataSettableMedia {
 
 	/**
 	 * 

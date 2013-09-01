@@ -7,8 +7,6 @@ import org.archboy.clobaframe.media.MetaData;
  *
  * @author yang
  */
-public abstract class AbstractMedia implements Media {
-	
-	public abstract void setMetaData(MetaData metaData);
-	
+public interface MetaDataSettableMedia  {
+	void setMetaData(MetaData metaData);
 }

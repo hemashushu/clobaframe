@@ -15,8 +15,6 @@
  */
 package org.archboy.clobaframe.media.image;
 
-import java.awt.Color;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,10 +23,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.Date;
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.media.MediaFactory;
-import org.archboy.clobaframe.media.image.impl.ImageLoaderImpl;
+import org.archboy.clobaframe.media.image.impl.ImageLoader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,14 +37,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.archboy.clobaframe.io.ContentTypeDetector;
 import org.archboy.clobaframe.io.ResourceInfo;
-import org.archboy.clobaframe.io.file.impl.FileResourceInfo;
 import static org.junit.Assert.*;
-import org.archboy.clobaframe.io.ResourceInfoFactory;
 import org.archboy.clobaframe.io.TemporaryResources;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
 import org.archboy.clobaframe.io.impl.DefaultTemporaryResources;
+import org.archboy.clobaframe.media.MetaData;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/applicationContext.xml" })
@@ -59,10 +56,6 @@ public class ImageFactoryTest {
 
 	@Inject
 	private MediaFactory mediaFactory;
-	//private ImageGenerator mediaFactory;
-
-	@Inject
-	private ResourceInfoFactory resourceInfoFactory;
 
 	@Inject
 	private FileBaseResourceInfoFactory fileBaseResourceInfoFactory;
@@ -133,7 +126,7 @@ public class ImageFactoryTest {
 	@Test
 	public void testMakeImageFromByteArray() throws IOException {
 		byte[] data = getFileContent("test.png");
-		Image image1 = (Image)mediaFactory.make(data, ImageLoaderImpl.CONTENT_TYPE_PNG, null, temporaryResources);
+		Image image1 = (Image)mediaFactory.make(data, ImageLoader.CONTENT_TYPE_IMAGE_PNG, null, temporaryResources);
 		assertEquals(Image.Format.PNG, image1.getFormat());
 		assertEquals(64, image1.getWidth());
 		assertEquals(64, image1.getHeight());
@@ -150,7 +143,7 @@ public class ImageFactoryTest {
 	@Test
 	public void testMakeImageFromStream() throws IOException {
 		InputStream in = getFileInputStream("test.png");
-		Image image1 = (Image)mediaFactory.make(in, ImageLoaderImpl.CONTENT_TYPE_PNG,null, temporaryResources);
+		Image image1 = (Image)mediaFactory.make(in, ImageLoader.CONTENT_TYPE_IMAGE_PNG,null, temporaryResources);
 		assertEquals(Image.Format.PNG, image1.getFormat());
 		assertEquals(64, image1.getWidth());
 		assertEquals(64, image1.getHeight());
@@ -178,6 +171,41 @@ public class ImageFactoryTest {
 		assertEquals(360, image1.getHeight());
 	}
 
+	@Test
+	public void testGetMetaData() throws IOException {
+		Image image1 = (Image)mediaFactory.make(getFileByName("meta1.jpg"), temporaryResources);
+		MetaData metadata1 = image1.getMetaData();
+		assertNotNull(metadata1);
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.clear();
+		calendar.set(2011, 9, 16, 14, 46, 40); // the month is 0-base
+		long timeExp = calendar.getTime().getTime();
+		long timeAct = ((Date)metadata1.get(Image.MetaName.DateTimeOriginal)).getTime();
+		long timeSpan = Math.abs(timeExp - timeAct);
+		assertTrue(timeSpan<1000);
+		
+		assertEquals("1/120", metadata1.get(Image.MetaName.ExposureTime));
+		assertEquals(Boolean.FALSE, metadata1.get(Image.MetaName.Flash));
+		assertEquals("2.8", metadata1.get(Image.MetaName.fNumber));
+		assertEquals("3.85", metadata1.get(Image.MetaName.FocalLength));
+		assertEquals(new Integer(125), metadata1.get(Image.MetaName.ISOSpeedRatings));
+		assertEquals("Apple", metadata1.get(Image.MetaName.Make));
+		assertEquals("iPhone 4", metadata1.get(Image.MetaName.Model));
+		assertEquals(Image.Orientation.Normal, metadata1.get(Image.MetaName.Orientation));
+		assertTrue(Math.abs((Double)metadata1.get(Image.MetaName.GpsLatitude) - 22.5633F) < 0.01);
+		assertTrue(Math.abs((Double)metadata1.get(Image.MetaName.GpsLongitude) - 113.8795F) < 0.01) ;
+
+		Image image2 = (Image)mediaFactory.make(getFileByName("meta2-vertical.jpg"), temporaryResources);
+		MetaData metadata2 = image2.getMetaData();
+		assertNotNull(metadata2);
+		assertEquals(Image.Orientation.Rotate90CW, metadata2.get(Image.MetaName.Orientation));
+
+		Image image3 = (Image)mediaFactory.make(getFileByName("meta3-no-meta.png"), temporaryResources);
+		MetaData metadata3 = image3.getMetaData();
+		assertNull(metadata3);
+	}
+	
 	private File getFileByName(String fileName) throws IOException{
 		Resource resource = resourceLoader.getResource(sampleImageFolder + fileName);
 		return resource.getFile();

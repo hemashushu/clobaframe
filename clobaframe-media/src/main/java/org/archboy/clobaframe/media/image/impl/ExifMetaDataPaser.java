@@ -23,11 +23,12 @@ import java.util.Iterator;
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.media.Media;
 import org.archboy.clobaframe.media.MetaData;
-import org.archboy.clobaframe.media.MetaDataParser;
+import org.archboy.clobaframe.media.impl.MetaDataParser;
 import org.archboy.clobaframe.media.image.Image;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
 import javax.inject.Named;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -36,7 +37,6 @@ import javax.inject.Named;
  * 
  * @author yang
  */
-@Named
 public class ExifMetaDataPaser implements MetaDataParser {
 
 	private final static String CONTENT_TYPE_IMAGE_JPEG = "image/jpeg";
@@ -46,16 +46,19 @@ public class ExifMetaDataPaser implements MetaDataParser {
 	private static final DecimalFormat decimalPoint1Formatter = new DecimalFormat("0.#");
 	private static final SimpleDateFormat noTimezoneFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 	
-	@Override
-	public boolean support(String contentType) {
-		return (CONTENT_TYPE_IMAGE_JPEG.equals(contentType) || 
-				CONTENT_TYPE_IMAGE_TIFF.equals(contentType));
-	}
+//	@Override
+//	public boolean support(String contentType) {
+//		return (CONTENT_TYPE_IMAGE_JPEG.equals(contentType) || 
+//				CONTENT_TYPE_IMAGE_TIFF.equals(contentType));
+//	}
 
 	@Override
-	public MetaData parse(FileBaseResourceInfo resourceInfo) {
+	public MetaData parse(Object object) {
+
+		Assert.isTrue(object instanceof FileBaseResourceInfo);
+		
 		//Image image = (Image)media;
-		//ResourceInfo resourceInfo = image.getResourceInfo();
+		FileBaseResourceInfo resourceInfo = (FileBaseResourceInfo)object;
 		//InputStream in = null;
 		//ResourceContent resourceContent = null;
 		

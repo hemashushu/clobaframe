@@ -28,7 +28,7 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.media.MediaFactory;
 import org.archboy.clobaframe.media.image.impl.DefaultImage;
-import org.archboy.clobaframe.media.image.impl.ImageLoaderImpl;
+import org.archboy.clobaframe.media.image.impl.ImageLoader;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.junit.After;
 import org.junit.Before;
@@ -319,6 +319,6 @@ public class ImagingTest {
     	graphics.fillRect(0, 0, 1, 1);
     	graphics.dispose();
 
-    	return new DefaultImage(ImageLoaderImpl.CONTENT_TYPE_PNG, null, Image.Format.PNG, bufferedImage);
+    	return new DefaultImage(ImageLoader.CONTENT_TYPE_IMAGE_PNG, null, Image.Format.PNG, bufferedImage);
 	}
 }

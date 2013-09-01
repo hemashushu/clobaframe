@@ -11,7 +11,6 @@ import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.ResourceInfoFactory;
 import org.archboy.clobaframe.io.TemporaryResources;
-import org.archboy.clobaframe.io.impl.ByteArrayResourceInfo;
 import org.archboy.clobaframe.io.impl.DefaultTemporaryResources;
 import org.junit.After;
 import static org.junit.Assert.*;

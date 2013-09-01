@@ -26,7 +26,7 @@ public class ImageGeneratorImpl implements ImageGenerator{
 		
 		Date now = new Date();
 		
-		return new DefaultImage(ImageLoaderImpl.CONTENT_TYPE_PNG, now, Image.Format.PNG, bufferedImage);
+		return new DefaultImage(ImageLoader.CONTENT_TYPE_IMAGE_PNG, now, Image.Format.PNG, bufferedImage);
 	}
 	
 }

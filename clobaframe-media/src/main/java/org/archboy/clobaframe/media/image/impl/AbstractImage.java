@@ -31,9 +31,9 @@ import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import javax.imageio.stream.ImageOutputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.archboy.clobaframe.media.impl.AbstractMedia;
 import org.archboy.clobaframe.media.image.Image;
 import org.archboy.clobaframe.media.image.OutputSettings;
+import org.archboy.clobaframe.media.impl.MetaDataSettableMedia;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author young
  */
-public abstract class AbstractImage extends AbstractMedia implements Image {
+public abstract class AbstractImage implements Image {
 
 	private final Logger logger = LoggerFactory.getLogger(AbstractImage.class);
 

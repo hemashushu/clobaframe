@@ -26,7 +26,7 @@ import org.archboy.clobaframe.media.image.OutputSettings;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.impl.ByteArrayResourceInfo;
 
-public class DefaultImage extends AbstractImage implements Image {
+public class DefaultImage extends AbstractImage {
 
 	//private ResourceInfo resourceInfo;
 	private MetaData metaData;

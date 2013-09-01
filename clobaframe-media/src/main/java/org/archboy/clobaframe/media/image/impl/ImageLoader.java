@@ -16,35 +16,21 @@
 
 package org.archboy.clobaframe.media.image.impl;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import javax.inject.Named;
-import org.springframework.util.Assert;
-import org.archboy.clobaframe.media.MediaDataSizeLimitExceededException;
 import org.archboy.clobaframe.media.Media;
 import org.archboy.clobaframe.media.MediaLoader;
 import org.archboy.clobaframe.media.image.Image;
-import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
+import org.archboy.clobaframe.media.impl.MetaDataParser;
 
 /**
  *
@@ -52,18 +38,18 @@ import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
  *
  */
 @Named
-public class ImageLoaderImpl implements MediaLoader {
+public class ImageLoader implements MediaLoader {
 
-	public static final String CONTENT_TYPE_JPEG = "image/jpeg";
-	public static final String CONTENT_TYPE_PNG = "image/png";
-	public static final String CONTENT_TYPE_BMP = "image/bmp";
-	public static final String CONTENT_TYPE_GIF = "image/gif";
+	public static final String CONTENT_TYPE_IMAGE_JPEG = "image/jpeg";
+	public static final String CONTENT_TYPE_IMAGE_PNG = "image/png";
+	public static final String CONTENT_TYPE_IMAGE_BMP = "image/bmp";
+	public static final String CONTENT_TYPE_IMAGE_GIF = "image/gif";
 	
 	private List<String> supportContentTypes = Arrays.asList(
-			CONTENT_TYPE_JPEG, 
-			CONTENT_TYPE_PNG, 
-			CONTENT_TYPE_GIF, 
-			CONTENT_TYPE_BMP);
+			CONTENT_TYPE_IMAGE_JPEG, 
+			CONTENT_TYPE_IMAGE_PNG,
+			CONTENT_TYPE_IMAGE_GIF, 
+			CONTENT_TYPE_IMAGE_BMP);
 	
 	@Override
 	public boolean support(String contentType) {
@@ -77,7 +63,7 @@ public class ImageLoaderImpl implements MediaLoader {
 	}
 
 	@Override
-	public Media load(FileBaseResourceInfo resourceInfo) throws IOException {
+	public Media load(FileBaseResourceInfo fileBaseResourceInfo) throws IOException {
 
 		// OpenJDK current support bmp, jpg, wbmp, jpeg, png, gif
 		
@@ -91,7 +77,7 @@ public class ImageLoaderImpl implements MediaLoader {
 			//resourceContent = resourceInfo.getContentSnapshot();
 			//in = resourceContent.getInputStream();
 			//in = resourceInfo.getInputStream();
-			File file = resourceInfo.getFile();
+			File file = fileBaseResourceInfo.getFile();
 			stream = ImageIO.createImageInputStream(file);
 
 			Iterator<ImageReader> readers = ImageIO.getImageReaders(stream);
@@ -109,8 +95,13 @@ public class ImageLoaderImpl implements MediaLoader {
 			reader.setInput(stream);
 			BufferedImage bufferedImage = reader.read(0);
 
-			image = new DefaultImageFromFactory(resourceInfo, format, bufferedImage);
+			image = new DefaultImageFromFactory(fileBaseResourceInfo, format, bufferedImage);
 
+			if (image.getFormat() == Image.Format.JPEG){
+				MetaDataParser metaDataParser = new ExifMetaDataPaser();
+				image.setMetaData(metaDataParser.parse(fileBaseResourceInfo));
+			}
+			
 		} finally {
 			closeQuietly(reader);
 			//IOUtils.closeQuietly(stream); // for java 7

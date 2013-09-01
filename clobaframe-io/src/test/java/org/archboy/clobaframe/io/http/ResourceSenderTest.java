@@ -15,9 +15,6 @@
  */
 package org.archboy.clobaframe.io.http;
 
-import org.archboy.clobaframe.io.ResourceInfoFactory;
-import org.archboy.clobaframe.io.ResourceInfo;
-import org.archboy.clobaframe.io.http.ResourceSender;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -42,7 +39,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.archboy.clobaframe.io.ResourceInfo;
-import org.archboy.clobaframe.io.ResourceInfoFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -56,7 +52,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.archboy.clobaframe.io.file.impl.FileResourceInfo;
 import static org.junit.Assert.*;
 
 /**
@@ -83,7 +78,7 @@ public class ResourceSenderTest {
 	private ResourceLoader resourceLoader;
 
 	@Inject
-	private FileBaseResourceInfoFactory resourceInfoFactory;
+	private FileBaseResourceInfoFactory fileBaseResourceInfoFactory;
 
 	@Before
 	public void setUp() throws Exception {
@@ -93,7 +88,7 @@ public class ResourceSenderTest {
 		context.setContextPath("/");
 		server.setHandler(context);
 
-		ResourceInfo resourceInfo = resourceInfoFactory.make(getFileByName(sampleFile));
+		ResourceInfo resourceInfo = fileBaseResourceInfoFactory.make(getFileByName(sampleFile));
 		ServletHolder servletHolder = new ServletHolder(
 				new ResourceSenderServlet(resourceSender, resourceInfo));
 		

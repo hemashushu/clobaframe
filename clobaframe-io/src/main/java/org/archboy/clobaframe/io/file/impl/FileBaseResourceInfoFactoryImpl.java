@@ -2,6 +2,8 @@ package org.archboy.clobaframe.io.file.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Date;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.archboy.clobaframe.io.ContentTypeDetector;
@@ -9,6 +11,9 @@ import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.TemporaryResources;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
+import org.archboy.clobaframe.io.impl.ByteArrayResourceInfo;
+import org.archboy.clobaframe.io.impl.InputStreamResourceInfo;
+import org.archboy.clobaframe.io.impl.ResourceInfoFactoryImpl;
 
 /**
  *
@@ -34,4 +39,5 @@ public class FileBaseResourceInfoFactoryImpl implements FileBaseResourceInfoFact
 				resourceInfo, temporaryResources);
 		//return fb;
 	}
+
 }

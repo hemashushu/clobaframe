@@ -14,16 +14,14 @@ import org.archboy.clobaframe.media.MediaFactory;
 import org.archboy.clobaframe.media.MediaDataSizeLimitExceededException;
 import org.archboy.clobaframe.media.MediaLoader;
 import org.archboy.clobaframe.media.UnsupportedMediaException;
-import org.archboy.clobaframe.media.MetaData;
-import org.archboy.clobaframe.media.MetaDataParser;
 import org.archboy.clobaframe.io.ResourceInfo;
-import org.archboy.clobaframe.io.ResourceInfoFactory;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Value;
 import javax.inject.Named;
+import org.archboy.clobaframe.io.ResourceInfoFactory;
 import org.archboy.clobaframe.io.TemporaryResources;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
 import org.springframework.util.Assert;
@@ -49,9 +47,6 @@ public class MediaFactoryImpl implements MediaFactory{
 	
 	@Inject
 	private List<MediaLoader> mediaLoaders;
-
-	@Inject
-	private List<MetaDataParser> metaDataParsers;
 	
 	@Value("${media.maxHandleSize}")
 	public void setMaxHandleSizeKB(int maxHandleSizeKB) {
@@ -141,18 +136,18 @@ public class MediaFactoryImpl implements MediaFactory{
 		}
 
 		if (media == null){
-			throw new UnsupportedMediaException("Content type is: " + resourceInfo.getContentType());
+			throw new UnsupportedMediaException("Content type [" + resourceInfo.getContentType() + "] unsupported.");
 		}
 
-		if (media instanceof AbstractMedia){
-			for(MetaDataParser metaDataParser : metaDataParsers){
-				if (metaDataParser.support(media.getContentType())){
-					MetaData metaData = metaDataParser.parse(fileBaseResourceInfo);
-					((AbstractMedia)media).setMetaData(metaData);
-					break;
-				}
-			}
-		}
+//		if (media instanceof AbstractMedia){
+//			for(MetaDataParser metaDataParser : metaDataParsers){
+//				if (metaDataParser.support(media.getContentType())){
+//					MetaData metaData = metaDataParser.parse(fileBaseResourceInfo);
+//					((AbstractMedia)media).setMetaData(metaData);
+//					break;
+//				}
+//			}
+//		}
 
 		return media;
 			
