@@ -10,7 +10,7 @@ import org.archboy.clobaframe.io.ResourceInfo;
  */
 public interface Media {
 	
-	String getContentType();
+	//String getContentType();
 	
 	MetaData getMetaData();
 	

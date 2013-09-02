@@ -23,10 +23,8 @@ public class ImageGeneratorImpl implements ImageGenerator{
 		graphics2D.setBackground(backgroundColor);
 		graphics2D.clearRect(0, 0, width, height);
 		graphics2D.dispose();
-		
-		Date now = new Date();
-		
-		return new DefaultImage(ImageLoader.CONTENT_TYPE_IMAGE_PNG, now, Image.Format.PNG, bufferedImage);
+
+		return new DefaultImage(null, Image.Format.PNG, bufferedImage);
 	}
 	
 }

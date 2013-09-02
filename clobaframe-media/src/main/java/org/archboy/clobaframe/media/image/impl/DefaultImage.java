@@ -30,7 +30,7 @@ public class DefaultImage extends AbstractImage {
 
 	//private ResourceInfo resourceInfo;
 	private MetaData metaData;
-	private String contentType;
+	//private String contentType;
 	private Date lastModified;
 	
 	private Format format;
@@ -38,13 +38,13 @@ public class DefaultImage extends AbstractImage {
 
 	/**
 	 * 
-	 * @param contentType
 	 * @param lastModified NULL for the current date.
 	 * @param format
 	 * @param bufferedImage 
 	 */
-	public DefaultImage(String contentType, Date lastModified, Format format, BufferedImage bufferedImage) {
-		this.contentType = contentType;
+	public DefaultImage( //String contentType, 
+			Date lastModified, Format format, BufferedImage bufferedImage) {
+		//this.contentType = contentType;
 		this.lastModified = (lastModified==null?new Date():lastModified);
 		this.format = format;
 		this.bufferedImage = bufferedImage;
@@ -81,10 +81,10 @@ public class DefaultImage extends AbstractImage {
 //		
 //	}
 
-	@Override
-	public String getContentType() {
-		return contentType;
-	}
+//	@Override
+//	public String getContentType() {
+//		return contentType;
+//	}
 
 	@Override
 	public MetaData getMetaData() {
@@ -120,7 +120,13 @@ public class DefaultImage extends AbstractImage {
 	@Override
 	public ResourceInfo getResourceInfo(Date lastModified, OutputSettings outputSettings) {
 		byte[] data = getData(bufferedImage, outputSettings);
+		
+		String contentType = 
+				(outputSettings.getOutputEncoding() == OutputSettings.OutputEncoding.JPEG) ?
+				ImageLoader.CONTENT_TYPE_IMAGE_JPEG :
+				ImageLoader.CONTENT_TYPE_IMAGE_PNG;
+		
 		return new ByteArrayResourceInfo(data, contentType, 
-				(lastModified ==null? this.lastModified:lastModified));
+				(lastModified ==null ? this.lastModified:lastModified));
 	}
 }

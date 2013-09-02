@@ -74,10 +74,10 @@ public class DefaultAudio implements Audio {
 		this.bitrateMode = bitrateMode;
 	}
 
-	@Override
-	public String getContentType() {
-		return resourceInfo.getContentType();
-	}
+//	@Override
+//	public String getContentType() {
+//		return resourceInfo.getContentType();
+//	}
 
 	@Override
 	public ResourceInfo getResourceInfo() {
@@ -89,10 +89,12 @@ public class DefaultAudio implements Audio {
 		throw new UnsupportedOperationException("Does not supported.");
 	}
 
+	@Override
 	public MetaData getMetaData() {
 		return metaData;
 	}
 
+	@Override
 	public void setMetaData(MetaData metaData) {
 		this.metaData = metaData;
 	}

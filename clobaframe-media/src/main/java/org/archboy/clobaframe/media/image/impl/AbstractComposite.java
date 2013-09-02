@@ -11,14 +11,13 @@ import org.archboy.clobaframe.media.image.Transform;
  */
 public abstract class AbstractComposite implements Composite {
 
-	public static final String CONTENT_TYPE_IMAGE_PNG = "image/png";
+	//public static final String CONTENT_TYPE_IMAGE_PNG = "image/png";
 
 	@Override
 	public Image composite(Image image) {
 		BufferedImage bufferedImageBefore = image.getBufferedImage();
 		BufferedImage bufferedImageAfter = handle(bufferedImageBefore);
-		return new DefaultImage(CONTENT_TYPE_IMAGE_PNG, 
-				image.getResourceInfo().getLastModified(), 
+		return new DefaultImage(image.getResourceInfo().getLastModified(), 
 				Image.Format.PNG, bufferedImageAfter);
 	}
 	

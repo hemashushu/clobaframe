@@ -319,6 +319,6 @@ public class ImagingTest {
     	graphics.fillRect(0, 0, 1, 1);
     	graphics.dispose();
 
-    	return new DefaultImage(ImageLoader.CONTENT_TYPE_IMAGE_PNG, null, Image.Format.PNG, bufferedImage);
+    	return new DefaultImage(null, Image.Format.PNG, bufferedImage);
 	}
 }
