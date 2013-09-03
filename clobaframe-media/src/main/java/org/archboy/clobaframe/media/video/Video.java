@@ -1,10 +1,35 @@
 package org.archboy.clobaframe.media.video;
 
+import org.archboy.clobaframe.media.Media;
+import org.archboy.clobaframe.media.impl.MetaDataSettableMedia;
+
 /**
  *
  * @author yang
  */
-public interface Video {
-	public static final String CONTENT_TYPE_VIDEO_MP4 = "video/mp4"; // *.mp4
-	public static final String CONTENT_TYPE_VIDEO_MOV = "video/quicktime"; // *.mov
+public interface Video extends Media, MetaDataSettableMedia  {
+	
+	Format getFormat(); // container format: *.mp3 *.m4a
+	
+	/**
+	 * Video width
+	 * 
+	 * @return 
+	 */
+	int getWidth();
+
+	/**
+	 * Video height
+	 * 
+	 * @return 
+	 */
+	int getHeight();
+	
+	long getDuration(); // second
+	
+	public static enum Format {
+		mp4,
+		mov
+	}
+	
 }

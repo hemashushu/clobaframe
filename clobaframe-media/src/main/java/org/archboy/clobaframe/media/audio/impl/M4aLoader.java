@@ -31,11 +31,11 @@ public class M4aLoader implements MediaLoader{
 //			CONTENT_TYPE_AUDIO_MPEG, 
 //			CONTENT_TYPE_AUDIO_MP4);
 	
-	private static final List<String> mp4_audio_brands = Arrays.asList(
-             "M4A ", "M4B ", "F4A ", "F4B ");
-	
-	private static final List<String> mp4_video_brands = Arrays.asList(
-             "mp41", "mp42");
+//	private static final List<String> mp4_audio_brands = Arrays.asList(
+//             "M4A ", "M4B ", "F4A ", "F4B ");
+//	
+//	private static final List<String> mp4_video_brands = Arrays.asList(
+//             "mp41", "mp42");
 	
 	   
 	@Override
@@ -80,26 +80,26 @@ public class M4aLoader implements MediaLoader{
 			return null;
 		}
 		
-		String brand = fileType.getMajorBrand();
-		String type = null;
-		
-		for(String t : mp4_audio_brands) {
-			if (brand.equals(t)){
-				type = t;
-				break;
-			}
-		}
-			
-		for(String t : mp4_video_brands) {
-			if (brand.equals(t)){
-				type = t;
-				break;
-			}
-		}
-		
-		if (type == null){
-			return null;
-		}
+//		String brand = fileType.getMajorBrand();
+//		String type = null;
+//		
+//		for(String t : mp4_audio_brands) {
+//			if (brand.equals(t)){
+//				type = t;
+//				break;
+//			}
+//		}
+//			
+//		for(String t : mp4_video_brands) {
+//			if (brand.equals(t)){
+//				type = t;
+//				break;
+//			}
+//		}
+//		
+//		if (type == null){
+//			return null;
+//		}
 		
 //		Audio.Format format = null;
 //		String encoding = null;
@@ -123,14 +123,15 @@ public class M4aLoader implements MediaLoader{
 		
 		// Pull out some information from the header box
         MovieHeaderBox mHeader = getOrNull(moov, MovieHeaderBox.class);
-        if (mHeader != null) {
-          
-           // Get the duration. Seconds
-           duration = mHeader.getDuration() / mHeader.getTimescale();
-        }
+        if (mHeader == null) {
+			return null;
+		}
+         
+		// Get the duration. Seconds
+		duration = mHeader.getDuration() / mHeader.getTimescale();
 		
 		if (duration == 0){
-			return null;
+			duration = 1;
 		}
 		
 		int bitrate = (int)(fileBaseResourceInfo.getContentLength() / 1024 / duration * 8);
@@ -141,6 +142,9 @@ public class M4aLoader implements MediaLoader{
 				duration,
 				bitrate,
 				Audio.BitrateMode.variable);
+		
+		M4aMetaDataParser metaDataParser = new M4aMetaDataParser();
+		audio.setMetaData(metaDataParser.parse(moov));
 		
 		return audio;
 

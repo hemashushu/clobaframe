@@ -83,7 +83,7 @@ public class AudioFactoryTest {
 		File file1 = getFileByName("test1.m4a");
 		InputStream in1 = new FileInputStream(file1);
 		Audio audio1 = (Audio)mediaFactory.make(in1, "audio/mp4", new Date(), temporaryResources);
-		//Audio audio1 = (Audio)mediaFactory.make(file1, temporaryResources);
+		
 		assertEquals(160, audio1.getBitrate());
 		assertEquals(Audio.BitrateMode.variable, audio1.getBitrateMode());
 		assertEquals(19, audio1.getDuration());
@@ -93,6 +93,25 @@ public class AudioFactoryTest {
 		in1.close();
 	}
 	
+	@Test
+	public void testM4aMetaData() throws IOException {
+		File file1 = getFileByName("test2.m4a");
+		InputStream in1 = new FileInputStream(file1);
+		Audio audio1 = (Audio)mediaFactory.make(in1, "audio/mp4", new Date(), temporaryResources);
+		//Audio audio1 = (Audio)mediaFactory.make(file1, temporaryResources); // wrong content type.
+		
+		MetaData metaData1 = audio1.getMetaData();
+		assertNotNull(metaData1);
+		
+		assertEquals("test42", metaData1.get(Audio.MetaName.Title));
+		assertEquals("artist", metaData1.get(Audio.MetaName.Artist));
+		assertEquals("album", metaData1.get(Audio.MetaName.Album));
+		//assertEquals("01", metaData1.get(Audio.MetaName.Track));
+		//assertEquals("Pop", metaData1.get(Audio.MetaName.Genre));
+		
+		in1.close();
+	}
+
 	private File getFileByName(String fileName) throws IOException{
 		Resource resource = resourceLoader.getResource(sampleAudioFolder + fileName);
 		return resource.getFile();
