@@ -255,6 +255,36 @@ public class QueryTest {
 	public void testFirst() {
 		//
 	}
+	
+	@Test
+	public void testLimit() {
+		
+		// test limit
+		List<Bean> result1 = SimpleQuery.from(beans).limit(3).list();
+		assertEquals(3, result1.size());
+		assertEquals(bean1, result1.get(0));
+		assertEquals(bean2, result1.get(1));
+		assertEquals(bean3, result1.get(2));
+
+		// test limit with order
+		List<Bean> result2 = SimpleQuery.from(beans)
+				.orderByDesc("score")
+				.limit(2)
+				.list();
+		assertEquals(2, result2.size());
+		assertEquals(bean5, result2.get(0));
+		assertEquals(bean1, result2.get(1));
+		
+		// test limit with select
+		List<Map<String, Object>> result3 = SimpleQuery.from(beans)
+				.orderBy("name")
+				.limit(2)
+				.select("name");
+		assertEquals(2, result3.size());
+		assertEquals("bar", result3.get(0).get("name"));
+		assertEquals("foo", result3.get(1).get("name"));
+		
+	}
 
 	@Test
 	public void testQueryException(){

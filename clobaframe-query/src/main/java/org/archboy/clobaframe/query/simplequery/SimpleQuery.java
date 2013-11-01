@@ -38,6 +38,8 @@ public class SimpleQuery<T> implements Query<T>{
 	private List<Predicate> predicates = null;
 	private List<Comparator<T>> comparators = null;
 
+	private int size;
+	
 	public SimpleQuery(Collection<T> collection) {
 		this.collection = collection;
 	}
@@ -119,6 +121,12 @@ public class SimpleQuery<T> implements Query<T>{
 		return this;
 	}
 
+	@Override
+	public Query<T> limit(int size) {
+		this.size = size;
+		return this;
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<T> list() {
@@ -131,7 +139,11 @@ public class SimpleQuery<T> implements Query<T>{
 		}
 
 		if (items.isEmpty() || comparators == null){
-			return new ArrayList(items);
+			if (size == 0){
+				return new ArrayList(items);
+			}else{
+				return copy(items, size);
+			}
 		}
 
 		Comparator<T>[] comparatorArray = (Comparator<T>[])comparators.toArray(new Comparator[0]);
@@ -140,9 +152,28 @@ public class SimpleQuery<T> implements Query<T>{
 		List<T> result = new ArrayList(items);
 		Collections.sort(result, comparator);
 
-		return result;
+		if (size == 0){
+			return result;
+		}else{
+			return copy(result, size);
+		}
 	}
 
+	private List<T> copy(Collection<T> items, int maxItems){
+		int count = (maxItems > items.size() ? items.size() : maxItems);
+		
+		List<T> result = new ArrayList<T>(count);
+		int done = 0;
+		for(T t : items) {
+			done++;
+			if (done > count) {
+				break;
+			}
+			result.add(t);
+		}
+		return result;
+	}
+	
 	@Override
 	public T first() {
 		Collection<T> items = list();

@@ -61,6 +61,13 @@ public interface Query<T> {
 	Query<T> orderBy(Comparator<T> comparator);
 
 	/**
+	 * Limit the result list items.
+	 * @param size
+	 * @return 
+	 */
+	Query<T> limit(int size);
+	
+	/**
 	 * Return a result list.
 	 *
 	 * @return
