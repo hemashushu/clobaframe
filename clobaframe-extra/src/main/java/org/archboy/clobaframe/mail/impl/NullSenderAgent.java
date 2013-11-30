@@ -17,7 +17,7 @@ public class NullSenderAgent implements SenderAgent{
 
 	private static final String AGENT_NAME = "null";
 
-	private Logger logger = LoggerFactory.getLogger(NullSenderAgent.class);
+	private final Logger logger = LoggerFactory.getLogger(NullSenderAgent.class);
 
 	@Override
 	public String getName() {

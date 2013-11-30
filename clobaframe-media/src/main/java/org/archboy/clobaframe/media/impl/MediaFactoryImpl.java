@@ -37,7 +37,7 @@ public class MediaFactoryImpl implements MediaFactory{
 	private static final long DEFAULT_MAX_HANDLE_SIZE = 32L * 1024 * 1024;
 	private long maxHandleSize = DEFAULT_MAX_HANDLE_SIZE;
 
-	private Logger logger = LoggerFactory.getLogger(MediaFactoryImpl.class);
+	private final Logger logger = LoggerFactory.getLogger(MediaFactoryImpl.class);
 
 	@Inject
 	private ResourceInfoFactory resourceInfoFactory;

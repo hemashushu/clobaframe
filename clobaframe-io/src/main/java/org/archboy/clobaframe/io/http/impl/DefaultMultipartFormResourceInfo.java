@@ -42,7 +42,7 @@ public class DefaultMultipartFormResourceInfo implements MultipartFormResourceIn
 	 */
 	//private Object fileCleanerMarker;
 
-	//private Logger logger = LoggerFactory.getLogger(DefaultMultipartFormResourceInfo.class);
+	//private final Logger logger = LoggerFactory.getLogger(DefaultMultipartFormResourceInfo.class);
 
 	public DefaultMultipartFormResourceInfo(FileItem fileItem){ //, Object fileCleanerMarker) {
 		this.fileItem = fileItem;

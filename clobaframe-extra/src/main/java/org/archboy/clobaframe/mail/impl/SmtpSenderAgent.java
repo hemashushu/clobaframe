@@ -41,7 +41,7 @@ public class SmtpSenderAgent implements SenderAgent {
 	@Value("${mail.smtp.fromAddress}")
 	private String fromAddress;
 
-	private Logger logger = LoggerFactory.getLogger(SmtpSenderAgent.class);
+	private final Logger logger = LoggerFactory.getLogger(SmtpSenderAgent.class);
 
 	@Override
 	public String getName() {
