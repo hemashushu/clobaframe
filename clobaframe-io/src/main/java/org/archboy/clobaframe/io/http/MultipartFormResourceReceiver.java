@@ -45,13 +45,13 @@ public interface MultipartFormResourceReceiver {
 	/**
 	 *
 	 * @param request
-	 * @param maxUploadSize
+	 * @param maxUploadSizeByte unit in Byte.
 	 * @return
 	 * @throws IOException
 	 */
 	List<MultipartFormResourceInfo> receive(
 			HttpServletRequest request,
 			TemporaryResources temporaryResources,
-			long maxUploadSize) throws IOException;
+			long maxUploadSizeByte) throws IOException;
 
 }

@@ -104,12 +104,5 @@
 			<version>1.2</version>
 		</dependency>
 
-		<!-- javax servlet for test -->
-		<!-- need by clobaframe-io -->
-		<dependency>
-			<groupId>org.mortbay.jetty</groupId>
-			<artifactId>servlet-api</artifactId>
-		</dependency>
-
 	</dependencies>
 </project>

@@ -34,8 +34,10 @@ import org.springframework.util.Assert;
 public class MediaFactoryImpl implements MediaFactory{
 
 	// default 32 MB
-	private static final long DEFAULT_MAX_HANDLE_SIZE = 32L * 1024 * 1024;
-	private long maxHandleSize = DEFAULT_MAX_HANDLE_SIZE;
+	private static final long DEFAULT_MAX_HANDLE_SIZE_BYTE = 32L * 1024 * 1024;
+	
+	@Value("${media.maxHandleSize}")
+	private long maxHandleSizeByte = DEFAULT_MAX_HANDLE_SIZE_BYTE;
 
 	private final Logger logger = LoggerFactory.getLogger(MediaFactoryImpl.class);
 
@@ -48,10 +50,9 @@ public class MediaFactoryImpl implements MediaFactory{
 	@Inject
 	private List<MediaLoader> mediaLoaders;
 	
-	@Value("${media.maxHandleSize}")
-	public void setMaxHandleSizeKB(int maxHandleSizeKB) {
-		this.maxHandleSize = maxHandleSizeKB * 1024L;
-	}
+//	public void setMaxHandleSizeKB(int maxHandleSizeKB) {
+//		this.maxHandleSizeByte = maxHandleSizeKB * 1024L;
+//	}
 	
 	@Override
 	public Media make(byte[] data, String contentType, Date lastModified, TemporaryResources temporaryResources) throws IOException {
@@ -117,7 +118,7 @@ public class MediaFactoryImpl implements MediaFactory{
 	public Media make(ResourceInfo resourceInfo, TemporaryResources temporaryResources) throws IOException {
 		Assert.isTrue(resourceInfo.getContentLength() > 0);
 		
-		if (resourceInfo.getContentLength() > maxHandleSize){
+		if (resourceInfo.getContentLength() > maxHandleSizeByte){
 			throw new MediaDataSizeLimitExceededException();
 		}
 		
@@ -188,7 +189,7 @@ public class MediaFactoryImpl implements MediaFactory{
 				break;
 			}
 			totalReadBytes += readBytes;
-			if (totalReadBytes > maxHandleSize) {
+			if (totalReadBytes > maxHandleSizeByte) {
 				throw new MediaDataSizeLimitExceededException();
 			}
 			out.write(buffer, 0, readBytes);

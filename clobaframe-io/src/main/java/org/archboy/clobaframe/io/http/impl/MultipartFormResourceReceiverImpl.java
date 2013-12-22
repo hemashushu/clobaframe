@@ -41,30 +41,24 @@ import org.archboy.clobaframe.io.http.MultipartFormResourceInfo;
 @Named
 public class MultipartFormResourceReceiverImpl implements MultipartFormResourceReceiver {
 
-	// default 10MByte
-	private static final long DEFAULT_MAX_UPLOAD_SIZE = 10L * 1024 * 1024;
-
-	private long maxUploadSize = DEFAULT_MAX_UPLOAD_SIZE;
-
-//	@Inject
-//	private TemporaryResourcesAutoCleaner temporaryFileCleanner;
+	// default 12 MByte
+	private static final long DEFAULT_MAX_UPLOAD_SIZE_BYTE = 12L * 1024 * 1024;
 
 	@Value("${io.maxUploadSize}")
-	public void setMaxUploadSizeKB(int maxUploadSizeKB) {
-		this.maxUploadSize = maxUploadSizeKB * 1024L;
-	}
+	private long maxUploadSizeByte = DEFAULT_MAX_UPLOAD_SIZE_BYTE;
+
 
 	@Override
 	public List<MultipartFormResourceInfo> receive(HttpServletRequest request,
 		TemporaryResources temporaryResources) throws IOException {
-		return receive(request, temporaryResources, maxUploadSize);
+		return receive(request, temporaryResources, maxUploadSizeByte);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<MultipartFormResourceInfo> receive(HttpServletRequest request,
 		TemporaryResources temporaryResources,
-		long maxUploadSize) throws IOException {
+		long maxUploadSizeByte) throws IOException {
 
 		// Check that we have a file upload request
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
@@ -82,7 +76,7 @@ public class MultipartFormResourceReceiverImpl implements MultipartFormResourceR
 		//factory.setFileCleaningTracker(temporaryFileCleanner.getFileCleaningTracker());
 		
 		ServletFileUpload upload = new ServletFileUpload(factory);
-		upload.setSizeMax(maxUploadSize);
+		upload.setSizeMax(maxUploadSizeByte);
 
 		List<FileItem> items = null;
 		try {
