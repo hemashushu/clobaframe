@@ -5,6 +5,8 @@ import com.coremedia.iso.IsoFile;
 import com.coremedia.iso.boxes.Box;
 import com.coremedia.iso.boxes.ContainerBox;
 import com.coremedia.iso.boxes.FileTypeBox;
+import com.coremedia.iso.boxes.MediaBox;
+import com.coremedia.iso.boxes.MediaHeaderBox;
 import com.coremedia.iso.boxes.MetaBox;
 import com.coremedia.iso.boxes.MovieBox;
 import com.coremedia.iso.boxes.MovieHeaderBox;
@@ -107,19 +109,38 @@ public class VideoLoader implements MediaLoader {
 		}
 		
         // Get some more information from the track header
-        // TODO Decide how to handle multiple tracks
         List<TrackBox> tb = moov.getBoxes(TrackBox.class);
         if (tb.isEmpty()) {
 			return null;
 		}
 		
-		TrackBox track = tb.get(0);
-		TrackHeaderBox header = track.getTrackHeaderBox();
-            
 		// Get the video with and height
-		int width = (int)header.getWidth();
-		int height =(int)header.getHeight();
+		int width = 0;
+		int height = 0;
 
+		for(int idx=0; idx<tb.size(); idx++){
+			TrackBox track = tb.get(idx);
+			TrackHeaderBox header = track.getTrackHeaderBox();
+
+			int w = (int)header.getWidth();
+			int h = (int)header.getHeight();
+			
+			if (w==0 && h==0){
+				// skip the none-video track
+				continue;
+			}
+			
+			// Get the video with and height
+			width = w;
+			height = h;
+			break;
+		}
+
+		if (width == 0 && height == 0) {
+			// no video track found.
+			return null;
+		}
+		
 		Video.Format format = (
 				CONTENT_TYPE_VIDEO_MP4.equals(fileBaseResourceInfo.getContentType())?
 				Video.Format.mp4:

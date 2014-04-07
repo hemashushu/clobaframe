@@ -135,7 +135,7 @@ public class LocationReplacingWebResourceInfo implements WebResourceInfo{
 			InputStreamReader reader = new InputStreamReader(in, "utf-8");
 			text = IOUtils.toString(reader);
 		} catch (IOException e) {
-			logger.warn("Fail to load web resource [{}].", webResourceInfo.getName());
+			logger.error("Fail to load web resource [{}].", webResourceInfo.getName());
 		} finally{
 			IOUtils.closeQuietly(in);
 		}

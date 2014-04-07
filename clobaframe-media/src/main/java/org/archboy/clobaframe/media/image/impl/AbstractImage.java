@@ -56,7 +56,7 @@ public abstract class AbstractImage implements Image {
 				.getImageWritersByFormatName(formatName);
 
 		if (!imageWriters.hasNext()) {
-			logger.warn("No image writer for [{}] format.", formatName);
+			logger.info("No image writer for [{}] format.", formatName);
 			return null;
 		}
 
@@ -92,7 +92,7 @@ public abstract class AbstractImage implements Image {
 			bufferedImageData = out.toByteArray();
 
 		} catch(IOException e) {
-			logger.warn("Write image to byte array fail, [{}]",
+			logger.info("Write image to byte array fail, [{}]",
 					e.getMessage());
 		} finally {
 			closeQuietly(imageOutputStream);

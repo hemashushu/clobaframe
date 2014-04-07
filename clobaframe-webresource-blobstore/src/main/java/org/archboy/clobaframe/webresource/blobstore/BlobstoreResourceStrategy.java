@@ -68,7 +68,7 @@ public class BlobstoreResourceStrategy extends AbstractResourceStrategy{
 		try{
 			resourceSynchronizer.update(webResourceInfos);
 		}catch(IOException e){
-			logger.warn("Fail to synchronize the remote web resources.", e);
+			logger.error("Fail to synchronize the remote web resources.", e);
 		}
 
 		return webResourceInfos;

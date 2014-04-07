@@ -132,7 +132,7 @@ public class BufferedWebResourceInfo implements WebResourceInfo {
 			this.content = IOUtils.toByteArray(in);
 			this.hash = DigestUtils.sha256Hex(this.content);
 		} catch (IOException e) {
-			logger.warn("Read the web resource [{}] content fail.", webResourceInfo.getName());
+			logger.error("Read the web resource [{}] content fail.", webResourceInfo.getName());
 		} finally {
 			IOUtils.closeQuietly(in);
 		}
