@@ -9,10 +9,10 @@
 		<version>2.3</version>
 	</parent>
 
-	<artifactId>clobaframe-extra</artifactId>
+	<artifactId>clobaframe-dynamodel</artifactId>
 	<packaging>jar</packaging>
 
-	<name>clobaframe-extra</name>
+	<name>clobaframe-dynamodel</name>
 	<url>https://github.com/sparkyoungs/clobaframe</url>
 
 	<developers>
@@ -83,25 +83,16 @@
 		</dependency>
 
 		<!-- Apache Commons -->
-		<!-- need by clobaframe-extra -->
+		<!-- need by clobaframe-dynamodel -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
 
-		<!-- need by clobaframe-extra -->
+		<!-- need by clobaframe-dynamodel -->
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
-		</dependency>
-
-
-		<!-- Email -->
-		<!-- need by clobaframe-extra -->
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-email</artifactId>
-			<version>1.2</version>
 		</dependency>
 
 	</dependencies>
