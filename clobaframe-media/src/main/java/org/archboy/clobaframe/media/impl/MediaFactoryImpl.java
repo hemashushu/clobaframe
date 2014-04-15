@@ -56,6 +56,10 @@ public class MediaFactoryImpl implements MediaFactory{
 	
 	@Override
 	public Media make(byte[] data, String contentType, Date lastModified, TemporaryResources temporaryResources) throws IOException {
+		Assert.notNull(data);
+		Assert.hasText(contentType);
+		Assert.notNull(temporaryResources);
+		
 		if (lastModified == null) {
 			lastModified = new Date();
 		}
@@ -66,6 +70,10 @@ public class MediaFactoryImpl implements MediaFactory{
 
 	@Override
 	public Media make(InputStream inputStream, String contentType, Date lastModified, TemporaryResources temporaryResources) throws IOException {
+		Assert.notNull(inputStream);
+		Assert.hasText(contentType);
+		Assert.notNull(temporaryResources);
+		
 		if (lastModified == null) {
 			lastModified = new Date();
 		}
@@ -81,14 +89,18 @@ public class MediaFactoryImpl implements MediaFactory{
 
 	@Override
 	public Media make(File file, TemporaryResources temporaryResources) throws IOException {
+		Assert.notNull(file);
+		Assert.notNull(temporaryResources);
+		
 		ResourceInfo resourceInfo = fileBaseResourceInfoFactory.make(file);
 		return make(resourceInfo, temporaryResources);
 	}
 
 	@Override
 	public Media make(URL url, TemporaryResources temporaryResources) throws IOException {
-		Assert.isTrue("http".equals(url.getProtocol()) || "https".equals(url.getProtocol()));
-
+		Assert.isTrue("http".equals(url.getProtocol()) || "https".equals(url.getProtocol()), "Only support the http and https protocol.");
+		Assert.notNull(temporaryResources);
+		
 		HttpURLConnection connection = (HttpURLConnection)url.openConnection();
 		
 		String contentType = connection.getContentType();
@@ -116,6 +128,8 @@ public class MediaFactoryImpl implements MediaFactory{
 
 	@Override
 	public Media make(ResourceInfo resourceInfo, TemporaryResources temporaryResources) throws IOException {
+		Assert.notNull(resourceInfo);
+		Assert.notNull(temporaryResources);
 		Assert.isTrue(resourceInfo.getContentLength() > 0);
 		
 		if (resourceInfo.getContentLength() > maxHandleSizeByte){

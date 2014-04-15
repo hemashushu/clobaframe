@@ -8,6 +8,10 @@ import java.util.List;
  */
 public interface SenderAgentFactory {
 
+	/**
+	 * 
+	 * @return 
+	 */
 	List<SenderAgent> getSenderAgents();
 
 	/**

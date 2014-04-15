@@ -1,19 +1,13 @@
 package org.archboy.clobaframe.io.impl;
 
-import org.archboy.clobaframe.io.*;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
-import java.util.List;
+import org.archboy.clobaframe.io.TemporaryResources;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * Utility class for tracking and ultimately closing or otherwise disposing
- * a collection of temporary resources.
- * <p>
- * Note that this class is not thread-safe.
- * It's from Apache Tika.
- */
 public class DefaultTemporaryResources implements TemporaryResources {
 
     /**
@@ -26,32 +20,16 @@ public class DefaultTemporaryResources implements TemporaryResources {
      */
     private File temporaryDirectory = null;
 
+	private final Logger logger = LoggerFactory.getLogger(DefaultTemporaryResources.class);
+	
 	public DefaultTemporaryResources() {
 	}
 
-	public DefaultTemporaryResources(File temporaryDirectory) {
-		this.temporaryDirectory = temporaryDirectory;
-	}
-
-    /**
-     * Sets the directory to be used for the temporary files created by
-     * the {@link #createTemporaryFile()} method.
-     *
-     * @param tmp temporary file directory,
-     *            or <code>null</code> for the system default
-     */
-	//@Override
-    public void setTemporaryFileDirectory(File temporaryDirectory) {
-        this.temporaryDirectory = temporaryDirectory;
+	@Override
+    public void setTemporaryFileDirectory(File tmp) {
+        this.temporaryDirectory = tmp;
     }
 
-    /**
-     * Creates and returns a temporary file that will automatically be
-     * deleted when the {@link #close()} method is called.
-     *
-     * @return
-     * @throws IOException
-     */
 	@Override
     public File createTemporaryFile() throws IOException {
         final File file = File.createTempFile("clobaframe-io-", ".tmp", temporaryDirectory);
@@ -64,24 +42,11 @@ public class DefaultTemporaryResources implements TemporaryResources {
         return file;
     }
 
-    /**
-     * Adds a new resource to the set of tracked resources that will all be
-     * closed when the {@link #close()} method is called.
-     *
-     * @param resource resource to be tracked
-     */
 	@Override
     public void addResource(Closeable resource) {
         resources.addFirst(resource);
     }
 
-    /**
-     * Returns the latest of the tracked resources that implements or
-     * extends the given interface or class.
-     *
-     * @param clazz interface or class
-     * @return matching resource, or <code>null</code> if not found
-     */
     //@SuppressWarnings("unchecked")
 	@Override
     public <T extends Closeable> T getResource(Class<T> clazz) {
@@ -93,25 +58,15 @@ public class DefaultTemporaryResources implements TemporaryResources {
         return null;
     }
 
-    /**
-     * Closes all tracked resources. The resources are closed in reverse order
-     * from how they were added.
-     * <p>
-     * Any thrown exceptions from managed resources are collected and
-     * then re-thrown only once all the resources have been closed.
-     *
-     * @throws IOException if one or more of the tracked resources
-     *                     could not be closed
-     */
+
 	@Override
     public void close() throws IOException {
-        // Release all resources and keep track of any exceptions
-        // List<IOException> exceptions = new LinkedList<IOException>();
+        // Release all resources.
         for (Closeable resource : resources) {
             try {
                 resource.close();
             } catch (IOException e) {
-                // ignore
+                logger.error("Can not close the resource.", e);
             }
         }
         resources.clear();

@@ -23,7 +23,7 @@ public class Mp3MetaDataPaser implements MetaDataParser{
 
 	@Override
 	public MetaData parse(Object object) {
-		Assert.isTrue(object instanceof Mp3File);
+		Assert.isTrue(object instanceof Mp3File, "Support Mp3File class only.");
 		
 //		FileBaseResourceInfo fileBaseResourceInfo = (FileBaseResourceInfo)object;
 //		

@@ -26,7 +26,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Value;
 import javax.inject.Named;
 import org.archboy.clobaframe.io.TemporaryResources;
@@ -66,14 +65,12 @@ public class MultipartFormResourceReceiverImpl implements MultipartFormResourceR
 
 		// Create a factory for disk-based file items
 		DiskFileItemFactory factory = new DiskFileItemFactory();
-		
-		/** the DiskFileItemFactory object hold the cleaning tracker object.
-		 * 
-		 * It's seems the temporary file cleaner doesn't works here,
-		 * so use the TemporaryResource to delete temp file manually.
-		 * 
-		 */
 		//factory.setFileCleaningTracker(temporaryFileCleanner.getFileCleaningTracker());
+		
+		/*
+		 * It's seems the TemporaryFileCleanner doesn't works here,
+		 * so use the TemporaryResource to delete temp file manually.
+		 */
 		
 		ServletFileUpload upload = new ServletFileUpload(factory);
 		upload.setSizeMax(maxUploadSizeByte);

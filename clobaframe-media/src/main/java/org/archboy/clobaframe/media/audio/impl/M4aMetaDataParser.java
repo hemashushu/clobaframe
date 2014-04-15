@@ -27,8 +27,8 @@ public class M4aMetaDataParser implements MetaDataParser{
 
 	@Override
 	public MetaData parse(Object object) {
-
-		Assert.isTrue(object instanceof MovieBox);
+		Assert.isTrue(object instanceof MovieBox, "Support MovieBox class only.");
+		
 		MovieBox moov = (MovieBox)object;
 
         

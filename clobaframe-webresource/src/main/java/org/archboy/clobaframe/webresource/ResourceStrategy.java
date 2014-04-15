@@ -30,7 +30,15 @@ public interface ResourceStrategy {
 	 */
 	String getName();
 
+	/**
+	 * 
+	 * @return 
+	 */
 	LocationGenerator getLocationGenerator();
 
+	/**
+	 * 
+	 * @return 
+	 */
 	ResourceRepository getResourceRepository();
 }

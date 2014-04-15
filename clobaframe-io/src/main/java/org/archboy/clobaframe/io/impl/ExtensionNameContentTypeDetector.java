@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.FilenameUtils;
@@ -20,6 +19,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import javax.inject.Named;
 import org.archboy.clobaframe.io.ContentTypeDetector;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -83,6 +83,8 @@ public class ExtensionNameContentTypeDetector implements ContentTypeDetector {
 	
 	@Override
 	public String getByFile(File file) {
+		Assert.notNull(file);
+		
 		String extension = FilenameUtils.getExtension(file.getName());
 		String name = mimeTypes.get(extension);
 		return (name == null?UNKNOWN_MIME_TYPE:name);
@@ -90,6 +92,8 @@ public class ExtensionNameContentTypeDetector implements ContentTypeDetector {
 
 	@Override
 	public String getByExtensionName(String filename) {
+		Assert.hasText(filename);
+		
 		String extension = FilenameUtils.getExtension(filename);
 		String name = mimeTypes.get(extension);
 		return (name == null?UNKNOWN_MIME_TYPE:name);
@@ -97,6 +101,8 @@ public class ExtensionNameContentTypeDetector implements ContentTypeDetector {
 
 	@Override
 	public String getByContent(InputStream in) {
+		Assert.notNull(in);
+		
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 	

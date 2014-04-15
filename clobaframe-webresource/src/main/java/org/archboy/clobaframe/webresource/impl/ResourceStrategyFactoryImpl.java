@@ -66,6 +66,8 @@ public class ResourceStrategyFactoryImpl implements ResourceStrategyFactory{
 
 	@Override
 	public ResourceStrategy getResourceStrategy(String name) {
+		Assert.hasText(name);
+		
 		for(ResourceStrategy strategy : resourceStrategies){
 			if (strategy.getName().equals(name)){
 				return strategy;

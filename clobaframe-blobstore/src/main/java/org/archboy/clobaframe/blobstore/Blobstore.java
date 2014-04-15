@@ -68,6 +68,7 @@ public interface Blobstore {
 	 *</p>
 	 *
 	 * @param blobResourceInfo
+	 * @throws java.io.IOException
 	 */
 	void put(BlobResourceInfo blobResourceInfo) throws IOException;
 
@@ -82,6 +83,7 @@ public interface Blobstore {
 	 *     minor repository (if possible). "Minor repository" means
 	 *     reduced redundancy storing.
 	 * </p>
+	 * @throws java.io.IOException
 	 */
 	void put(BlobResourceInfo blobResourceInfo, 
 			boolean publicReadable,
@@ -90,7 +92,7 @@ public interface Blobstore {
 	/**
 	 * Get object by key.
 	 *
-	 * @param key
+	 * @param blobKey
 	 * @return
 	 * @throws IOException If the specify key does not exists.
 	 */
@@ -103,6 +105,7 @@ public interface Blobstore {
 	 * </p>
 	 *
 	 * @param blobKey
+	 * @throws java.io.IOException
 	 */
 	void delete(BlobKey blobKey) throws IOException;
 

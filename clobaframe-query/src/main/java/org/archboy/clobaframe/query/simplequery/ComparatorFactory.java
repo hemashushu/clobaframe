@@ -16,7 +16,7 @@
 package org.archboy.clobaframe.query.simplequery;
 
 import java.util.Comparator;
-import org.archboy.clobaframe.query.QueryException;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -24,39 +24,52 @@ import org.archboy.clobaframe.query.QueryException;
  */
 public class ComparatorFactory {
 
+	/**
+	 * 
+	 * @param <T>
+	 * @param key
+	 * @param ascOrder
+	 * @return 
+	 */
 	public static <T> Comparator<T> build(final String key, final boolean ascOrder){
+		Assert.hasText(key);
+		
 		Comparator<T> comparator = new Comparator<T>() {
 			@SuppressWarnings("unchecked")
 			@Override
 			public int compare(T o1, T o2) {
-				try{
-					Object value1 = BeanUtils.getPropertyValue(o1, key);
-					Object value2 = BeanUtils.getPropertyValue(o2, key);
-					int result = 0;
-					if (value1 == null){
-						result = (value2 == null ? 0 : -1);
-					}else{
-						result = (value2 == null ? 1 :
-								((Comparable<Object>)value1).compareTo(value2));
-					}
-					return (ascOrder ? result : -result);
-				} catch (Exception ex) {
-					throw new QueryException(
-							String.format("Exception occur while getting the value of property [%s] " +
-								"from object [%s], or the value is not comparable, message: %s",
-								key, o1.getClass().getName(), ex.getMessage())
-							);
+				Object value1 = QuerySupport.getPropertyValue(o1, key);
+				Object value2 = QuerySupport.getPropertyValue(o2, key);
+				int result = 0;
+				if (value1 == null){
+					result = (value2 == null ? 0 : -1);
+				}else{
+					result = (value2 == null ? 1 : QuerySupport.compareValue(value1, value2));
 				}
+				return (ascOrder ? result : -result);
 			}
 		};
 		return comparator;
 	}
 
+	/**
+	 * 
+	 * @param <T>
+	 * @param comparators
+	 * @return 
+	 */
 	public static <T> Comparator<T> combine(
 			final Comparator<T>[] comparators){
 		return combine(comparators, 0);
 	}
 
+	/**
+	 * 
+	 * @param <T>
+	 * @param comparators
+	 * @param level to mark the steps of the self-call.
+	 * @return 
+	 */
 	private static <T> Comparator<T> combine(
 			final Comparator<T>[] comparators, final int level){
 

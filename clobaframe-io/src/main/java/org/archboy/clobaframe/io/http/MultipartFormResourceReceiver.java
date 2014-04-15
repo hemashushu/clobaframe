@@ -34,6 +34,7 @@ public interface MultipartFormResourceReceiver {
 	 * Receive resources from client (browser)
 	 *
 	 * @param request
+	 * @param temporaryResources
 	 * @return
 	 * @throws IOException
 	 */
@@ -45,6 +46,7 @@ public interface MultipartFormResourceReceiver {
 	/**
 	 *
 	 * @param request
+	 * @param temporaryResources
 	 * @param maxUploadSizeByte unit in Byte.
 	 * @return
 	 * @throws IOException

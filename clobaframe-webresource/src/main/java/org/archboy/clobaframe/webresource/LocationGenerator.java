@@ -24,7 +24,7 @@ public interface LocationGenerator {
 	/**
 	 * Get the full location (URL) of the specify web resource.
 	 *
-	 * @param webResource
+	 * @param webResourceInfo
 	 * @return
 	 */
 	String getLocation(WebResourceInfo webResourceInfo);

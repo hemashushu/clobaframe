@@ -22,6 +22,7 @@ import org.apache.commons.beanutils.DynaClass;
 import org.apache.commons.beanutils.DynaProperty;
 import org.apache.commons.beanutils.WrapDynaBean;
 import org.archboy.clobaframe.dynamodel.DynaModel;
+import org.springframework.util.Assert;
 
 /**
  * Wrap a POJO object into DynaModel, all properties value will be copied.
@@ -35,7 +36,8 @@ public class WrapDynaModel extends HashMap<String, Object>
 	private static final long serialVersionUID = 1L;
 
 	public WrapDynaModel(Object object){
-
+		Assert.notNull(object);
+		
 		DynaBean dynaBean = new WrapDynaBean(object);
 
 		// add all properties (except 'class') to map

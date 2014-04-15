@@ -17,7 +17,6 @@ package org.archboy.clobaframe.query;
 
 import java.util.Comparator;
 import java.util.List;
-
 import java.util.Map;
 import org.apache.commons.collections.Predicate;
 
@@ -28,6 +27,7 @@ import org.apache.commons.collections.Predicate;
  * </p>
  *
  * @author young
+ * @param <T>
  */
 public interface Query<T> {
 
@@ -42,22 +42,73 @@ public interface Query<T> {
 	 */
 	Query<T> where(Predicate predicate);
 
+	/**
+	 * 
+	 * @param key
+	 * @param value
+	 * @return 
+	 */
 	Query<T> whereEquals(String key, Object value);
 
+	/**
+	 * 
+	 * @param key
+	 * @param value
+	 * @return 
+	 */
 	Query<T> whereNotEquals(String key, Object value);
 
+	/**
+	 * 
+	 * @param key
+	 * @param value
+	 * @return 
+	 */
 	Query<T> whereGreaterThan(String key, Object value);
 
+	/**
+	 * 
+	 * @param key
+	 * @param value
+	 * @return 
+	 */
 	Query<T> whereGreaterThanOrEqual(String key, Object value);
 
+	/**
+	 * 
+	 * @param key
+	 * @param value
+	 * @return 
+	 */
 	Query<T> whereLessThan(String key, Object value);
 
+	/**
+	 * 
+	 * @param key
+	 * @param value
+	 * @return 
+	 */
 	Query<T> whereLessThanOrEqual(String key, Object value);
 
+	/**
+	 * 
+	 * @param key
+	 * @return 
+	 */
 	Query<T> orderBy(String key);
 
+	/**
+	 * 
+	 * @param key
+	 * @return 
+	 */
 	Query<T> orderByDesc(String key);
 
+	/**
+	 * 
+	 * @param comparator
+	 * @return 
+	 */
 	Query<T> orderBy(Comparator<T> comparator);
 
 	/**

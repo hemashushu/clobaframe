@@ -52,6 +52,8 @@ public class CacheAgentFactoryImpl implements CacheAgentFactory {
 
 	@Override
 	public CacheAgent getCacheAgent(String name) {
+		Assert.hasText(name);
+		
 		for (CacheAgent agent : cacheAgents){
 			if (agent.getName().equals(name)) {
 				return agent;

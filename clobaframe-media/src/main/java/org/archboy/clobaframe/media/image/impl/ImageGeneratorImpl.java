@@ -7,6 +7,7 @@ import java.util.Date;
 import org.archboy.clobaframe.media.image.Image;
 import org.archboy.clobaframe.media.image.ImageGenerator;
 import javax.inject.Named;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -17,6 +18,10 @@ public class ImageGeneratorImpl implements ImageGenerator{
 
 	@Override
 	public Image make(int width, int height, Color backgroundColor) {
+		Assert.isTrue(width > 0);
+		Assert.isTrue(height > 0);
+		Assert.notNull(backgroundColor);
+				
 		BufferedImage bufferedImage = new BufferedImage(width, height,
 				BufferedImage.TYPE_INT_ARGB);
 		Graphics2D graphics2D = bufferedImage.createGraphics();

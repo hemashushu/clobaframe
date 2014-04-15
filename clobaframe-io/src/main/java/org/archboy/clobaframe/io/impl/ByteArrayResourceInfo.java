@@ -3,9 +3,7 @@ package org.archboy.clobaframe.io.impl;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Date;
-import org.springframework.util.Assert;
 import org.archboy.clobaframe.io.ResourceInfo;
 
 /**

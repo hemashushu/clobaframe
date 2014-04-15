@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.archboy.clobaframe.io.http.MultipartFormResourceInfo;
 
 /**
@@ -30,23 +29,8 @@ public class DefaultMultipartFormResourceInfo implements MultipartFormResourceIn
 
 	private FileItem fileItem;
 
-	/**
-	 * This object is used to hold the disk temporary file.
-	 *
-	 * Because the {@link DiskFileItemFactory} object keep the marker object, so
-	 * this ResourceInfo keep the {@link DiskFileItemFactory} object is same as keep
-	 * the marker object.
-	 * 
-	 * Details see:
-	 * {@link org.apache.commons.fileupload.disk.DiskFileItemFactory#createItem}
-	 */
-	//private Object fileCleanerMarker;
-
-	//private final Logger logger = LoggerFactory.getLogger(DefaultMultipartFormResourceInfo.class);
-
-	public DefaultMultipartFormResourceInfo(FileItem fileItem){ //, Object fileCleanerMarker) {
+	public DefaultMultipartFormResourceInfo(FileItem fileItem){ 
 		this.fileItem = fileItem;
-		//this.fileCleanerMarker = fileCleanerMarker;
 	}
 
 	@Override

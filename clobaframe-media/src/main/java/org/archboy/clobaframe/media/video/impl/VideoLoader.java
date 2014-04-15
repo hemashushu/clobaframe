@@ -5,46 +5,20 @@ import com.coremedia.iso.IsoFile;
 import com.coremedia.iso.boxes.Box;
 import com.coremedia.iso.boxes.ContainerBox;
 import com.coremedia.iso.boxes.FileTypeBox;
-import com.coremedia.iso.boxes.MediaBox;
-import com.coremedia.iso.boxes.MediaHeaderBox;
-import com.coremedia.iso.boxes.MetaBox;
 import com.coremedia.iso.boxes.MovieBox;
 import com.coremedia.iso.boxes.MovieHeaderBox;
-import com.coremedia.iso.boxes.SampleDescriptionBox;
-import com.coremedia.iso.boxes.SampleTableBox;
 import com.coremedia.iso.boxes.TrackBox;
 import com.coremedia.iso.boxes.TrackHeaderBox;
-import com.coremedia.iso.boxes.UserDataBox;
-import com.coremedia.iso.boxes.apple.AbstractAppleMetaDataBox;
-import com.coremedia.iso.boxes.apple.AppleAlbumBox;
-import com.coremedia.iso.boxes.apple.AppleArtistBox;
-import com.coremedia.iso.boxes.apple.AppleCommentBox;
-import com.coremedia.iso.boxes.apple.AppleCustomGenreBox;
-import com.coremedia.iso.boxes.apple.AppleEncoderBox;
-import com.coremedia.iso.boxes.apple.AppleItemListBox;
-import com.coremedia.iso.boxes.apple.AppleRecordingYearBox;
-import com.coremedia.iso.boxes.apple.AppleStandardGenreBox;
-import com.coremedia.iso.boxes.apple.AppleTrackAuthorBox;
-import com.coremedia.iso.boxes.apple.AppleTrackNumberBox;
-import com.coremedia.iso.boxes.apple.AppleTrackTitleBox;
-import com.coremedia.iso.boxes.sampleentry.AudioSampleEntry;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import javax.inject.Named;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
 import org.archboy.clobaframe.media.Media;
 import org.archboy.clobaframe.media.MediaLoader;
-import static org.archboy.clobaframe.media.image.impl.ImageLoader.CONTENT_TYPE_IMAGE_BMP;
-import static org.archboy.clobaframe.media.image.impl.ImageLoader.CONTENT_TYPE_IMAGE_GIF;
-import static org.archboy.clobaframe.media.image.impl.ImageLoader.CONTENT_TYPE_IMAGE_JPEG;
-import static org.archboy.clobaframe.media.image.impl.ImageLoader.CONTENT_TYPE_IMAGE_PNG;
 import org.archboy.clobaframe.media.video.Video;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -75,6 +49,7 @@ public class VideoLoader implements MediaLoader {
 
 	@Override
 	public Media load(FileBaseResourceInfo fileBaseResourceInfo) throws IOException {
+		Assert.notNull(fileBaseResourceInfo);
 		
 		File file = fileBaseResourceInfo.getFile();
 		

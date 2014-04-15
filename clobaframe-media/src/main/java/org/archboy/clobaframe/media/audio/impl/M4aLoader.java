@@ -16,6 +16,7 @@ import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
 import org.archboy.clobaframe.media.Media;
 import org.archboy.clobaframe.media.MediaLoader;
 import org.archboy.clobaframe.media.audio.Audio;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -52,6 +53,7 @@ public class M4aLoader implements MediaLoader{
 
 	@Override
 	public Media load(FileBaseResourceInfo fileBaseResourceInfo) throws IOException {
+		Assert.notNull(fileBaseResourceInfo);
 		
 		File file = fileBaseResourceInfo.getFile();
 		

@@ -31,6 +31,7 @@ import org.archboy.clobaframe.media.MediaLoader;
 import org.archboy.clobaframe.media.image.Image;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
 import org.archboy.clobaframe.media.impl.MetaDataParser;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -64,7 +65,8 @@ public class ImageLoader implements MediaLoader {
 
 	@Override
 	public Media load(FileBaseResourceInfo fileBaseResourceInfo) throws IOException {
-
+		Assert.notNull(fileBaseResourceInfo);
+		
 		// OpenJDK current support bmp, jpg, wbmp, jpeg, png, gif
 		
 		//ResourceContent resourceContent = null;

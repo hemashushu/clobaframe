@@ -326,15 +326,15 @@ public class QueryTest {
 			// success
 		}
 
-		// test uncomparable value
-		try{
-			SimpleQuery.from(unbeans)
-					.whereGreaterThan("unvalue", new BeanUncomparable("v1"))
-					.first();
-			fail("Uncomparable property.");
-		}catch(QueryException e){
-			// pass
-		}
+//		// test uncomparable value
+//		try{
+//			SimpleQuery.from(unbeans)
+//					.whereGreaterThan("unvalue", new BeanUncomparable("v1"))
+//					.first();
+//			fail("Uncomparable property.");
+//		}catch(QueryException e){
+//			// pass
+//		}
 
 		// test unsortable value
 		try{

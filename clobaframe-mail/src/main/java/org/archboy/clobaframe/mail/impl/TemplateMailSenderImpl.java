@@ -11,6 +11,7 @@ import org.archboy.clobaframe.mail.SendMailException;
 import org.archboy.clobaframe.mail.SenderAgent;
 import org.archboy.clobaframe.mail.SenderAgentFactory;
 import org.archboy.clobaframe.mail.TemplateMailSender;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -37,6 +38,10 @@ public class TemplateMailSenderImpl implements TemplateMailSender {
 
 	@Override
 	public void send(String recipient, String templateName, Object[] args) throws SendMailException{
+		Assert.hasText(recipient);
+		Assert.hasText(templateName);
+		Assert.notNull(args);
+		
 		String subjectCode = MessageFormat.format(subjectCodeExp, templateName);
 		String contentCode = MessageFormat.format(contentCodeExp, templateName);
 

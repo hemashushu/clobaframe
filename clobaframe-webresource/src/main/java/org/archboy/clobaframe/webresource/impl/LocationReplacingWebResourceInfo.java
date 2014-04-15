@@ -29,6 +29,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
+import org.springframework.util.Assert;
 
 /**
  * Replace "[[RESOURCE_NAME]]" in the script or style sheet with the
@@ -54,6 +55,9 @@ public class LocationReplacingWebResourceInfo implements WebResourceInfo{
 			WebResourceInfo webResourceInfo,
 			Map<String, String> locations) {
 
+		Assert.notNull(webResourceInfo);
+		Assert.notNull(locations);
+		
 		this.webResourceInfo = webResourceInfo;
 		this.locations = locations;
 		buildSnapshot();

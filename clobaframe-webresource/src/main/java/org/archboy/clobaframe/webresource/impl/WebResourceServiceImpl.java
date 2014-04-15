@@ -41,13 +41,11 @@ import org.archboy.clobaframe.webresource.local.LocalLocationGenerator;
 public class WebResourceServiceImpl implements WebResourceService {
 
 	private Map<String, WebResourceInfo> webResources = new HashMap<String, WebResourceInfo>();
-	//private Map<String, WebResourceInfo> uniqueNameWebResources = new HashMap<String, WebResourceInfo>();
 	private Map<String, String> uniqueNames = new HashMap<String, String>(); // the unique name to resource mapper.
 
 	@Inject
 	private ResourceStrategyFactory resourceStrategyFactory;
 
-	//private ResourceStrategy resourceStrategy;
 	private LocationGenerator locationGenerator;
 
 	@PostConstruct
@@ -81,6 +79,8 @@ public class WebResourceServiceImpl implements WebResourceService {
 
 	@Override
 	public String getLocation(String name) {
+		Assert.hasText(name, "Name should not empty.");
+		
 		WebResourceInfo webResourceInfo = webResources.get(name);
 		return getLocation(webResourceInfo);
 	}
@@ -88,11 +88,14 @@ public class WebResourceServiceImpl implements WebResourceService {
 	@Override
 	public String getLocation(WebResourceInfo webResourceInfo) {
 		Assert.notNull(webResourceInfo);
+		
 		return locationGenerator.getLocation(webResourceInfo);
 	}
 
 	@Override
 	public WebResourceInfo getResource(String name) throws FileNotFoundException {
+		Assert.hasText(name, "Resource name should not empty.");
+		
 		WebResourceInfo info = webResources.get(name);
 		if (info == null) {
 			throw new FileNotFoundException(name);
@@ -102,6 +105,8 @@ public class WebResourceServiceImpl implements WebResourceService {
 
 	@Override
 	public WebResourceInfo getResourceByUniqueName(String uniqueName) throws FileNotFoundException {
+		Assert.hasText(uniqueName, "Resource unique name should not empty.");
+		
 		String name = uniqueNames.get(uniqueName);
 		if (name == null) {
 			throw new FileNotFoundException(name);

@@ -34,12 +34,9 @@ public class TemporaryFileBaseResourceInfo implements FileBaseResourceInfo{
 		this.lastModified = resourceInfo.getLastModified();
 			
 		if (resourceInfo instanceof FileBaseResourceInfo){
-			//this.wrapped = false;
 			this.file = ((FileBaseResourceInfo)resourceInfo).getFile();
 		}else{
 			// write all data into a temporary file.
-			//this.wrapped = true;
-			//this.file = File.createTempFile("clobaframe-io-", ".tmp");
 			this.file = temporaryResources.createTemporaryFile();
 			
 			InputStream in = resourceInfo.getInputStream();
@@ -47,8 +44,6 @@ public class TemporaryFileBaseResourceInfo implements FileBaseResourceInfo{
 			IOUtils.copy(in, out);
 			IOUtils.closeQuietly(out);
 			IOUtils.closeQuietly(in);
-			
-			//temporaryResourcesAutoCleaner.track(file, this);
 		}
 	}
 	

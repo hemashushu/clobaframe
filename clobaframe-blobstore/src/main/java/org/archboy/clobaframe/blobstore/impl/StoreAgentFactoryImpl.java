@@ -51,6 +51,8 @@ public class StoreAgentFactoryImpl implements StoreAgentFactory {
 
 	@Override
 	public StoreAgent getStoreAgent(String name) {
+		Assert.hasText(name);
+		
 		for(StoreAgent agent : storeAgents) {
 			if (agent.getName().equals(name)) {
 				return agent;

@@ -63,26 +63,6 @@ public interface Cache {
 	 */
 	Map<String, Object> getAll(Collection<String> keys);
 
-//	/**
-//	 * Atom increment,
-//	 *
-//	 * @param key
-//	 * @param by
-//	 * @return Return -1 if the key does not exists.
-//	 */
-//	long increment(String key, int by);
-//
-//	/**
-//	 * Atom increment.
-//	 *
-//	 * @param key
-//	 * @param by
-//	 * @param defaultValue If the specify key does not exists, this value
-//	 * will be return.
-//	 * @return
-//	 */
-//	long increment(String key, int by, long defaultValue);
-
 	/**
 	 * Put a cache item with no expired and SetPolicy.SET_ALWAYS.
 	 *
@@ -107,23 +87,23 @@ public interface Cache {
 	 *
 	 * @param key
 	 * @param value
-	 * @param expires Pass null equals no expired.
+	 * @param expiration Pass null equals no expired.
 	 * @param policy
 	 * @return whether or not the operation was performed
 	 */
-	boolean put(String key, Object value, Expiration expires,
+	boolean put(String key, Object value, Expiration expiration,
 			Cache.SetPolicy policy);
 
 	/**
 	 * Bulk put.
 	 *
 	 * @param values
-	 * @param expires
+	 * @param expiration
 	 * @param policy
 	 * @return
 	 */
 	Set<String> putAll(java.util.Map<String, ? extends Object> values,
-			Expiration expires, Cache.SetPolicy policy);
+			Expiration expiration, Cache.SetPolicy policy);
 
 	public static enum SetPolicy {
 		ADD_ONLY_IF_NOT_PRESENT,

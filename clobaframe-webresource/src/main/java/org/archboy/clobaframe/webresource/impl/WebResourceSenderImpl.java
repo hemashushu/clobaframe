@@ -27,6 +27,7 @@ import org.archboy.clobaframe.io.http.ResourceSender;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceSender;
 import org.archboy.clobaframe.webresource.WebResourceService;
+import org.springframework.util.Assert;
 
 /**
  * Send the web static resources.
@@ -56,6 +57,10 @@ public class WebResourceSenderImpl implements WebResourceSender{
 	public void send(String resourceName, HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 
+		Assert.hasText(resourceName, "Resource name should not empty.");
+		Assert.notNull(request);
+		Assert.notNull(response);
+		
 		// get resource
 		WebResourceInfo webResourceInfo = null;
 
@@ -82,6 +87,10 @@ public class WebResourceSenderImpl implements WebResourceSender{
 	public void sendByUniqueName(String resourceUniqueName, HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 
+		Assert.hasText(resourceUniqueName, "Resource unique name should not empty.");
+		Assert.notNull(request);
+		Assert.notNull(response);
+		
 		// get resource
 		WebResourceInfo webResourceInfo = null;
 

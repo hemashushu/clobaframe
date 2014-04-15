@@ -10,6 +10,7 @@ import org.archboy.clobaframe.cache.Cache;
 import org.archboy.clobaframe.cache.CacheAgent;
 import org.archboy.clobaframe.cache.CacheAgentFactory;
 import org.archboy.clobaframe.cache.Expiration;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -35,41 +36,57 @@ public class CacheImpl implements Cache {
 
 	@Override
 	public boolean delete(String key) {
+		Assert.hasText(key);
+		
 		return cacheAgent.delete(key);
 	}
 
 	@Override
 	public void deleteAll(Collection<String> keys) {
+		Assert.notNull(keys);
+		
 		cacheAgent.deleteAll(keys);
 	}
 
 	@Override
 	public Object get(String key) {
+		Assert.hasText(key);
+		
 		return cacheAgent.get(key);
 	}
 
 	@Override
 	public Map<String, Object> getAll(Collection<String> keys) {
+		Assert.notNull(keys);
+		
 		return cacheAgent.getAll(keys);
 	}
 
 	@Override
 	public boolean put(String key, Object value) {
+		Assert.hasText(key);
+		
 		return cacheAgent.put(key, value, null, SetPolicy.SET_ALWAYS);
 	}
 
 	@Override
 	public boolean put(String key, Object value, Expiration expiration) {
+		Assert.hasText(key);
+		
 		return cacheAgent.put(key, value, expiration, SetPolicy.SET_ALWAYS);
 	}
 
 	@Override
-	public boolean put(String key, Object value, Expiration expires, SetPolicy policy) {
-		return cacheAgent.put(key, value, expires, policy);
+	public boolean put(String key, Object value, Expiration expiration, SetPolicy policy) {
+		Assert.hasText(key);
+		
+		return cacheAgent.put(key, value, expiration, policy);
 	}
 
 	@Override
-	public Set<String> putAll(Map<String, ? extends Object> values, Expiration expires, SetPolicy policy) {
-		return cacheAgent.putAll(values, expires, policy);
+	public Set<String> putAll(Map<String, ? extends Object> values, Expiration expiration, SetPolicy policy) {
+		Assert.notNull(values);
+		
+		return cacheAgent.putAll(values, expiration, policy);
 	}
 }

@@ -57,6 +57,8 @@ public class SenderAgentFactoryImpl implements SenderAgentFactory{
 
 	@Override
 	public SenderAgent getSenderAgentByName(String name) {
+		Assert.hasText(name);
+		
 		for(SenderAgent agent : senderAgents){
 			if (agent.getName().equals(senderAgentName)){
 				return agent;

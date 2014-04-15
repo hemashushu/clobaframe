@@ -7,27 +7,19 @@ import com.drew.lang.Rational;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
-import com.drew.metadata.Tag;
 import com.drew.metadata.exif.ExifIFD0Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
 import com.drew.metadata.exif.GpsDirectory;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
-import org.apache.commons.io.IOUtils;
-import org.archboy.clobaframe.media.Media;
 import org.archboy.clobaframe.media.MetaData;
 import org.archboy.clobaframe.media.impl.MetaDataParser;
 import org.archboy.clobaframe.media.image.Image;
-import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
-import javax.inject.Named;
 import org.springframework.util.Assert;
 
 /**
@@ -55,7 +47,7 @@ public class ExifMetaDataPaser implements MetaDataParser {
 	@Override
 	public MetaData parse(Object object) {
 
-		Assert.isTrue(object instanceof FileBaseResourceInfo);
+		Assert.isTrue(object instanceof FileBaseResourceInfo, "Support FileBaseResourceInfo class only.");
 		
 		//Image image = (Image)media;
 		FileBaseResourceInfo resourceInfo = (FileBaseResourceInfo)object;

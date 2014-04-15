@@ -31,7 +31,7 @@ public class BlobKey {
 	private String key;
 
 	public BlobKey() {
-		//aasdf
+		//
 	}
 
 	public BlobKey(String bucketName, String key) {

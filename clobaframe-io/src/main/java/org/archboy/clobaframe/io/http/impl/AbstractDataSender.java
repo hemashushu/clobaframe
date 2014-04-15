@@ -18,7 +18,6 @@ package org.archboy.clobaframe.io.http.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
@@ -41,7 +40,7 @@ public abstract class AbstractDataSender {
 	public void sendData(HttpServletResponse response, ResourceInfo resourceInfo,
 			Map<String, String> extraHeaders) throws IOException {
 
-		Assert.hasText(resourceInfo.getContentType());
+		Assert.hasText(resourceInfo.getContentType(), "Content type should not empty.");
 
 		response.setBufferSize(sendBufferSize);
 
@@ -51,7 +50,7 @@ public abstract class AbstractDataSender {
 				new Long(resourceInfo.getContentLength()).toString());
 		response.setDateHeader("Date", new Date().getTime());// Calendar.getInstance().getTimeInMillis());
 
-		if (resourceInfo.isSeekable()) { // instanceof SeekableInputStream) {
+		if (resourceInfo.isSeekable()) { 
 			response.addHeader("Accept-Ranges", "bytes");
 		} else {
 			response.addHeader("Accept-Ranges", "none");
@@ -60,7 +59,6 @@ public abstract class AbstractDataSender {
 		// add other headers
 		addHeaders(response, extraHeaders);
 
-		//ResourceContent resourceContent = resourceInfo.getContentSnapshot();
 		InputStream in = resourceInfo.getInputStream();
 
 		OutputStream out = null;
@@ -77,35 +75,26 @@ public abstract class AbstractDataSender {
 			ResourceInfo resourceInfo, Map<String, String> extraHeaders,
 			long startPosition, long length) throws IOException {
 
-		Assert.hasText(resourceInfo.getContentType());
-		Assert.isTrue(resourceInfo.isSeekable());
-
-//		if (!(in instanceof SeekableInputStream)){
-//			// close resource content
-//			IOUtils.closeQuietly(resourceContent);
-//			throw new IllegalArgumentException("Resource must seekable.");
-//		}
+		Assert.hasText(resourceInfo.getContentType(), "Content type should empty.");
+		Assert.isTrue(resourceInfo.isSeekable(), "Resource must seekable.");
 
 		long contentLength = resourceInfo.getContentLength();
 
 		if (startPosition < 0 || length < 0 || startPosition + length > contentLength) {
 			response.setStatus(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-
-			// close resource content
-			//IOUtils.closeQuietly(resourceContent);
 			return;
 		}
 
 		response.setBufferSize(sendBufferSize);
 
 		// startPosition and endPosition are include
-		long lengthToBeSent = length; //endPosition - startPosition + 1;
+		long lengthToBeSent = length; 
 
 		response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
 		response.setContentType(resourceInfo.getContentType());
 		response.addHeader("Content-Length",
 				new Long(lengthToBeSent).toString());
-		response.setDateHeader("Date", new Date().getTime()); // Calendar.getInstance().getTimeInMillis());
+		response.setDateHeader("Date", new Date().getTime()); 
 
 		response.addHeader("Accept-Ranges", "bytes");
 		String contentRange = String.format("bytes %d-%d/%d",
@@ -117,16 +106,12 @@ public abstract class AbstractDataSender {
 		// add other headers
 		addHeaders(response, extraHeaders);
 
-		//ResourceContent resourceContent = resourceInfo.getContentSnapshot(startPosition, length);
 		InputStream in = resourceInfo.getInputStream(startPosition, length);
-
 		OutputStream out = null;
 		try {
 			out = response.getOutputStream();
 
 			// seek to the startup position
-			//seekableIn = (SeekableInputStream) resourceContent.getInputStream();
-			//seekableIn.position(startPosition);
 			send(in, out, lengthToBeSent);
 		} finally {
 			IOUtils.closeQuietly(out);

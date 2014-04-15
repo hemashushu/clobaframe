@@ -1,6 +1,5 @@
 package org.archboy.clobaframe.media.impl;
 
-import org.archboy.clobaframe.media.Media;
 import org.archboy.clobaframe.media.MetaData;
 
 /**
@@ -8,5 +7,10 @@ import org.archboy.clobaframe.media.MetaData;
  * @author yang
  */
 public interface MetaDataSettableMedia  {
+	
+	/**
+	 * 
+	 * @param metaData 
+	 */
 	void setMetaData(MetaData metaData);
 }

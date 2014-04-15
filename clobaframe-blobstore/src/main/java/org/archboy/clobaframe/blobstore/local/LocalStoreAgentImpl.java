@@ -17,6 +17,7 @@ import org.archboy.clobaframe.blobstore.BlobResourceInfo;
 import org.archboy.clobaframe.blobstore.BlobResourceInfoPartialCollection;
 import org.archboy.clobaframe.blobstore.BlobKey;
 import org.archboy.clobaframe.blobstore.StoreAgent;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -55,12 +56,15 @@ public class LocalStoreAgentImpl implements StoreAgent {
 
 	@Override
 	public boolean existBucket(String name) {
+		Assert.hasText(name);
 		File bucket = new File(localDir, name);
 		return (bucket.exists() && bucket.isDirectory());
 	}
 
 	@Override
 	public void createBucket(String name) throws IOException {
+		Assert.hasText(name);
+		
 		File bucket = new File(localDir, name);
 		if (bucket.exists() && bucket.isDirectory()) {
 			return;
@@ -74,6 +78,8 @@ public class LocalStoreAgentImpl implements StoreAgent {
 
 	@Override
 	public void deleteBucket(String name) throws IOException {
+		Assert.hasText(name);
+		
 		File bucket = new File(localDir, name);
 		if (!bucket.exists()) {
 			return;
@@ -87,6 +93,8 @@ public class LocalStoreAgentImpl implements StoreAgent {
 
 	@Override
 	public void put(BlobResourceInfo blobResourceInfo, boolean publicReadable, boolean minor) throws IOException {
+		Assert.notNull(blobResourceInfo);
+		
 		BlobKey blobKey = blobResourceInfo.getBlobKey();
 		File bucket = new File(localDir, blobKey.getBucketName());
 		File file = new File(bucket, blobKey.getKey());
@@ -102,6 +110,8 @@ public class LocalStoreAgentImpl implements StoreAgent {
 
 	@Override
 	public BlobResourceInfo get(BlobKey blobKey) throws IOException {
+		Assert.notNull(blobKey);
+		
 		File bucket = new File(localDir, blobKey.getBucketName());
 		File file = new File(bucket, blobKey.getKey());
 		if (!file.exists() || file.isDirectory()) {
@@ -116,6 +126,8 @@ public class LocalStoreAgentImpl implements StoreAgent {
 
 	@Override
 	public void delete(BlobKey blobKey) throws IOException {
+		Assert.notNull(blobKey);
+		
 		File bucket = new File(localDir, blobKey.getBucketName());
 		File file = new File(bucket, blobKey.getKey());
 
@@ -131,6 +143,8 @@ public class LocalStoreAgentImpl implements StoreAgent {
 
 	@Override
 	public BlobResourceInfoPartialCollection list(BlobKey prefix) {
+		Assert.notNull(prefix);
+		
 		String bucketName = prefix.getBucketName();
 		File bucket = new File(localDir, bucketName);
 		final String startName = prefix.getKey();

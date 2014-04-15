@@ -19,6 +19,7 @@ import java.util.Date;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.springframework.util.Assert;
 
 /**
  * The expiration of a cache item.
@@ -40,6 +41,8 @@ public class Expiration {
 	 * @return
 	 */
 	public static Expiration byMilliseconds(int milliseconds) {
+		Assert.isTrue(milliseconds > 0);
+		
 		return new Expiration(milliseconds);
 	}
 
@@ -49,6 +52,8 @@ public class Expiration {
 	 * @return
 	 */
 	public static Expiration bySeconds(int seconds) {
+		Assert.isTrue(seconds > 0);
+		
 		return new Expiration(seconds * 1000L);
 	}
 
@@ -58,6 +63,8 @@ public class Expiration {
 	 * @return
 	 */
 	public static Expiration onDate(Date expirationTime) {
+		Assert.notNull(expirationTime);
+		
 		Date now = new Date();
 		long span = expirationTime.getTime() - now.getTime();
 		return new Expiration(span);

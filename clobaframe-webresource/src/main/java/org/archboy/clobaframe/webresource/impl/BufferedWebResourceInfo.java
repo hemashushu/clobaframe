@@ -24,6 +24,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
+import org.springframework.util.Assert;
 
 public class BufferedWebResourceInfo implements WebResourceInfo {
 
@@ -42,6 +43,8 @@ public class BufferedWebResourceInfo implements WebResourceInfo {
 	private String hash;
 
 	public BufferedWebResourceInfo(WebResourceInfo webResourceInfo, int cacheSeconds) {
+		Assert.notNull(webResourceInfo);
+		
 		this.webResourceInfo = webResourceInfo;
 		this.cacheMilliSeconds = cacheSeconds * 1000;
 		rebuildSnapshot();

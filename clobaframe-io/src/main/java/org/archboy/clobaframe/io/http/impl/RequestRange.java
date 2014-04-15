@@ -77,11 +77,8 @@ public class RequestRange {
 		return endPosition;
 	}
 
-	/**
-	 * The request length.
-	 * @return
-	 */
 	public long getLength() {
+		//The request length.
 		return length;
 	}
 
