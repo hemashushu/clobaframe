@@ -14,7 +14,7 @@ public class SendMailException extends IOException{
 		super(message);
 	}
 
-	public SendMailException(Throwable cause) {
-		super(cause);
+	public SendMailException(String message, Throwable cause) {
+		super(message, cause);
 	}
 }

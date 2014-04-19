@@ -130,10 +130,12 @@ public class MediaFactoryImpl implements MediaFactory{
 	public Media make(ResourceInfo resourceInfo, TemporaryResources temporaryResources) throws IOException {
 		Assert.notNull(resourceInfo);
 		Assert.notNull(temporaryResources);
-		Assert.isTrue(resourceInfo.getContentLength() > 0);
+		Assert.isTrue(resourceInfo.getContentLength() > 0, "ResourceInfo content should not empty.");
 		
 		if (resourceInfo.getContentLength() > maxHandleSizeByte){
-			throw new MediaDataSizeLimitExceededException();
+			throw new MediaDataSizeLimitExceededException(
+					String.format("Max supports %s bytes, actually is %s bytes.", 
+							maxHandleSizeByte, resourceInfo.getContentLength()));
 		}
 		
 		//TemporaryResources temporaryResources = new TemporaryResources();
@@ -151,7 +153,9 @@ public class MediaFactoryImpl implements MediaFactory{
 		}
 
 		if (media == null){
-			throw new UnsupportedMediaException("Content type [" + resourceInfo.getContentType() + "] unsupported.");
+			throw new UnsupportedMediaException(
+					String.format("Does not support content type %s.", 
+							resourceInfo.getContentType()));
 		}
 
 //		if (media instanceof AbstractMedia){
@@ -204,7 +208,9 @@ public class MediaFactoryImpl implements MediaFactory{
 			}
 			totalReadBytes += readBytes;
 			if (totalReadBytes > maxHandleSizeByte) {
-				throw new MediaDataSizeLimitExceededException();
+				throw new MediaDataSizeLimitExceededException(
+					String.format("Max supports %s bytes, actually is %s bytes.", 
+							maxHandleSizeByte, totalReadBytes));
 			}
 			out.write(buffer, 0, readBytes);
 		}

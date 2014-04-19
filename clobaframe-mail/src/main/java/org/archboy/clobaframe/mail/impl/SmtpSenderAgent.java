@@ -64,9 +64,8 @@ public class SmtpSenderAgent implements SenderAgent {
 			email.addTo(recipient);
 			email.send();
 		} catch (EmailException e) {
-			logger.error("Send mail from Gmail agent error.", e);
 			throw new SendMailException(
-					String.format("Failed to send mail to %s.", recipient));
+					String.format("Failed to send mail to %s.", recipient), e);
 
 		}
 	}
@@ -87,9 +86,8 @@ public class SmtpSenderAgent implements SenderAgent {
 			email.addTo(recipient);
 			email.send();
 		} catch (EmailException e) {
-			logger.error("Send mail from Gmail agent error.", e);
 			throw new SendMailException(
-					String.format("Failed to send mail to %s.", recipient));
+					String.format("Failed to send mail to %s.", recipient), e);
 		}
 	}
 }

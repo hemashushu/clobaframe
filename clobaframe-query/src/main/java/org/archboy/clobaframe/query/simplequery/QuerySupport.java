@@ -41,22 +41,20 @@ class QuerySupport {
 				return PropertyUtils.getSimpleProperty(object, key);
 			} catch (IllegalAccessException ex) {
 				throw new QueryException(
-						String.format("Can not get the value of property [%s] "
-								+ "from object [%s], cause: %s",
-								key, object.getClass().getName(), ex.getMessage())
-				);
+						String.format(
+								"Can not get the value of property [%s] " +
+								"from object [%s].", key, object.getClass().getName()),
+						ex);
 			} catch (InvocationTargetException ex) {
 				throw new QueryException(
 						String.format("Can not get the value of property [%s] "
-								+ "from object [%s], cause: %s",
-								key, object.getClass().getName(), ex.getMessage())
-				);
+								+ "from object [%s].", key, object.getClass().getName()),
+						ex);
 			} catch (NoSuchMethodException ex) {
 				throw new QueryException(
 						String.format("Can not get the value of property [%s] "
-								+ "from object [%s], cause: %s",
-								key, object.getClass().getName(), ex.getMessage())
-				);
+								+ "from object [%s].", key, object.getClass().getName()),
+						ex);
 			}
 		}
 	}
@@ -73,8 +71,8 @@ class QuerySupport {
 		} catch (ClassCastException ex) {
 			throw new QueryException(
 					String.format("Can not compare object [%s].",
-							value1.getClass().getName())
-			);
+							value1.getClass().getName()),
+					ex);
 		}
 	}
 }
