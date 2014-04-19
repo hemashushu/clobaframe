@@ -51,10 +51,10 @@ public class SmtpSenderAgent implements SenderAgent {
 	@Override
 	public void send(String recipient, String subject, String content) throws SendMailException {
 		Email email = new SimpleEmail();
-		email.setHostName("smtp.gmail.com");
+		email.setHostName(host);
 		email.setAuthenticator(new DefaultAuthenticator(loginName, loginPassword));
-		email.setSmtpPort(587);
-		email.setTLS(true);
+		email.setSmtpPort(port);
+		email.setTLS(tls);
 
 		try {
 			email.setCharset("UTF-8"); // specify the charset.
@@ -73,10 +73,10 @@ public class SmtpSenderAgent implements SenderAgent {
 	@Override
 	public void sendWithHtml(String recipient, String subject, String content) throws SendMailException {
 		HtmlEmail email = new HtmlEmail();
-		email.setHostName("smtp.gmail.com");
+		email.setHostName(host);
 		email.setAuthenticator(new DefaultAuthenticator(loginName, loginPassword));
-		email.setSmtpPort(587);
-		email.setTLS(true);
+		email.setSmtpPort(port);
+		email.setTLS(tls);
 
 		try {
 			email.setFrom(fromAddress);
