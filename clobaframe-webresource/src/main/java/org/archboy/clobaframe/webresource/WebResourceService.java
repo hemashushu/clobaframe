@@ -66,6 +66,7 @@ public interface WebResourceService {
 	 *
 	 * @param name
 	 * @return
+	 * @throws java.io.FileNotFoundException
 	 */
 	WebResourceInfo getResource(String name) throws FileNotFoundException;
 
@@ -73,6 +74,7 @@ public interface WebResourceService {
 	 *
 	 * @param uniqueName
 	 * @return
+	 * @throws java.io.FileNotFoundException
 	 */
 	WebResourceInfo getResourceByUniqueName(String uniqueName) throws FileNotFoundException;
 
@@ -84,8 +86,9 @@ public interface WebResourceService {
 	 *
 	 * @param name
 	 * @return
+	 * @throws java.io.FileNotFoundException
 	 */
-	String getLocation(String name);
+	String getLocation(String name) throws FileNotFoundException;
 
 	/**
 	 * Get the location (URL) of the specify resource.

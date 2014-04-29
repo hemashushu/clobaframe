@@ -78,10 +78,13 @@ public class WebResourceServiceImpl implements WebResourceService {
 	}
 
 	@Override
-	public String getLocation(String name) {
+	public String getLocation(String name) throws FileNotFoundException {
 		Assert.hasText(name, "Name should not empty.");
 		
 		WebResourceInfo webResourceInfo = webResources.get(name);
+		if (webResourceInfo == null) {
+			throw new FileNotFoundException(name);
+		}
 		return getLocation(webResourceInfo);
 	}
 
