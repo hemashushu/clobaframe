@@ -1,0 +1,7 @@
+/* test2.css */
+
+@import url('test3.css');
+
+.info {
+	background: url('../image/info-32.png') no-repeat 0px 0px;
+}

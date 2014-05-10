@@ -16,6 +16,8 @@
 package org.archboy.clobaframe.webresource.impl;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -26,6 +28,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
@@ -48,8 +51,13 @@ public class LocationReplacingWebResourceInfo implements WebResourceInfo{
 	private byte[] content;
 	private String hash;
 
-	private static final String resourceNameRegex = "\\[\\[([\\/\\w\\.-]+)\\]\\]";
-	private static final Pattern pattern = Pattern.compile(resourceNameRegex);
+	private static final String resourceNameRegex = "([\\/\\w\\.-]+)(.*)";
+	
+	private static final String placeHoldRegex = "\\[\\[" + resourceNameRegex + "\\]\\]";
+	private static final Pattern placeHoldPattern = Pattern.compile(placeHoldRegex);
+	
+	private static final String cssUrlRegex = "url\\(['|\"]" + resourceNameRegex + "['|\"]\\)";
+	private static final Pattern cssUrlPattern = Pattern.compile(cssUrlRegex);
 
 	public LocationReplacingWebResourceInfo(
 			WebResourceInfo webResourceInfo,
@@ -138,31 +146,80 @@ public class LocationReplacingWebResourceInfo implements WebResourceInfo{
 			
 			InputStreamReader reader = new InputStreamReader(in, "utf-8");
 			text = IOUtils.toString(reader);
+			
+			// replace the css 'url' location.
+			text = replaceLocation(cssUrlPattern, text);
+			
+			// replace the location placehold.
+			text = replaceLocation(placeHoldPattern, text);
+			
 		} catch (IOException e) {
 			logger.error("Fail to load web resource [{}].", webResourceInfo.getName());
 		} finally{
 			IOUtils.closeQuietly(in);
 		}
+				
+		// convert text into input stream
+		this.content = text == null ? new byte[0]: text.getBytes(Charset.forName("utf-8"));
+		this.hash = DigestUtils.sha256Hex(content);
+	}
 
-		// convert replacing locations
+	/**
+	 * convert replacing locations
+	 * @param text
+	 * @return 
+	 */
+	private String replaceLocation(Pattern pattern, String text) throws FileNotFoundException {
 		StringBuffer builder = new StringBuffer();
 		Matcher matcher = pattern.matcher(text);
-
 		while(matcher.find()){
 			String name = matcher.group(1);
-			String location = locations.get(name);
+			String canonicalName = getCanonicalName(name);
+			
+			String location = locations.get(canonicalName);
 			if (location != null){
 				matcher.appendReplacement(builder, location);
 			}else{
+				// the specify resource can not be found.
 				matcher.appendReplacement(builder, matcher.group());
 			}
 		}
+
 		matcher.appendTail(builder);
 		String replacedText = builder.toString();
-
-		// convert text into input stream
-		this.content = replacedText.getBytes(Charset.forName("utf-8"));
-		this.hash = DigestUtils.sha256Hex(content);
+		return replacedText;
+	}
+	
+	/**
+	 * Remove the ./ ../ and /
+	 * @param pathName
+	 * @return 
+	 */
+	private String getCanonicalName(String pathName) throws FileNotFoundException {
+		if (pathName.startsWith("/")){
+			pathName = pathName.substring(1);
+		}
+		
+		if (pathName.startsWith("./")){
+			pathName = pathName.substring(2);
+		}
+		
+		String currentName = webResourceInfo.getName();
+		int pathIdx = currentName.lastIndexOf('/');
+		String currentPath = pathIdx < 0 ? "":currentName.substring(0, pathIdx);
+		
+		while(pathName.startsWith("../")){
+			if (currentPath.equals("")){
+				throw new FileNotFoundException(pathName);
+			}
+			
+			pathName = pathName.substring(3);
+			pathIdx = currentPath.lastIndexOf('/');
+			currentPath = pathIdx < 0 ? "":currentPath.substring(0, pathIdx);
+		}
+		
+		return currentPath.equals("") ? pathName : currentPath + "/" + pathName;
+		
 	}
 
 }

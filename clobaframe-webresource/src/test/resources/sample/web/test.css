@@ -1,16 +1,19 @@
-.frame {
-	width: 24px;
-	height: 24px;
-	position: absolute;
-	top: 0px;
-	left: 0px;
-	margin: 3px 0px 3px 0px;
-}
+/* test.css */
 
-.button {
-	background: url("[[test.png]]") no-repeat 0px 0px;
+.test {
+	background: url('test.png') no-repeat 0px 0px;
 }
 
 .info {
-	background: url("[[folder/info-32.png]]") no-repeat 0px 0px;
+	background: url('image/info-32.png') no-repeat 0px 0px;
+}
+
+.success {
+	background: url('[[image/success-16.png]]') no-repeat 0px 0px;
+}
+
+@font-face {
+	font-family: 'Glyphicons Halflings';
+	src: url('fonts/glyphicons-halflings-regular.ttf');
+	src: url('fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
 }

@@ -220,6 +220,11 @@
 					<configuration>
 						<source>1.6</source>
 						<target>1.6</target>
+						<!--
+						To check the javac warning:
+						mvn clean -DcompilerArgument=-Xlint:deprecation -DcompilerArgument=-Xlint:unchecked compile
+						-->
+						<compilerArgument>${compilerArgument}</compilerArgument>
 					</configuration>
 				</plugin>
 

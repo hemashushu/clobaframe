@@ -1,4 +1,1 @@
-user = {
-	id:"001",
-	name:"young"
-};
+/* test.js */

@@ -78,37 +78,38 @@ public class WebResourceServiceTest {
 		assertTrue(names.contains("test.js"));
 		assertTrue(names.contains("test.png"));
 		assertTrue(names.contains("test.txt"));
-		assertTrue(names.contains("folder/info-32.png"));
+		assertTrue(names.contains("image/info-32.png"));
 	}
 
 	@Test
 	public void testGetResource() throws IOException {
 		// test get a resource
 
-		WebResourceInfo webResource1 = resourceService.getResource("test.png");
-		WebResourceInfo webResource2 = resourceService.getResource("test.css");
-		WebResourceInfo webResource3 = resourceService.getResource("folder/info-32.png");
-
-//		assertNotNull(webResource1);
-//		assertNotNull(webResource2);
-//		assertNotNull(webResource3);
+		WebResourceInfo webResource1 = resourceService.getResource("test.css");
+		
+		WebResourceInfo webResource2 = resourceService.getResource("test.png");
+		WebResourceInfo webResource3 = resourceService.getResource("image/info-32.png");
+		WebResourceInfo webResource4 = resourceService.getResource("image/success-16.png");
+		WebResourceInfo webResource5 = resourceService.getResource("fonts/glyphicons-halflings-regular.ttf");
+		WebResourceInfo webResource6 = resourceService.getResource("fonts/glyphicons-halflings-regular.svg");
 
 		assertNotNull(webResource1.getUniqueName());
 		assertNotNull(resourceService.getLocation(webResource1));
-		assertEquals("image/png", webResource1.getContentType());
+		assertEquals("text/css", webResource1.getContentType());
 
 		// test the content
-		assertContentEquals(webResource1, "sample/web/test.png");
-		//assertContentEquals(webResource2, "sample/web/test.css");
-		assertContentEquals(webResource3, "sample/web/folder/info-32.png");
+		assertContentEquals(webResource2, "sample/web/test.png");
+		assertContentEquals(webResource3, "sample/web/image/info-32.png");
 
 		// test get a content-replacing resource, this is optional
-		//ResourceContent content2 = webResource2.getContentSnapshot();
-		InputStream in2 = webResource2.getInputStream();
-		String text2 = IOUtils.toString(in2); //content2.getInputStream());
-		assertTrue(text2.indexOf(resourceService.getLocation(webResource1)) > 0);
-		assertTrue(text2.indexOf(resourceService.getLocation(webResource3)) > 0);
-		in2.close();
+		InputStream in1 = webResource1.getInputStream();
+		String text1 = IOUtils.toString(in1);
+		assertTrue(text1.indexOf(resourceService.getLocation(webResource2)) > 0);
+		assertTrue(text1.indexOf(resourceService.getLocation(webResource3)) > 0);
+		assertTrue(text1.indexOf(resourceService.getLocation(webResource4)) > 0);
+		assertTrue(text1.indexOf(resourceService.getLocation(webResource5)) > 0);
+		assertTrue(text1.indexOf(resourceService.getLocation(webResource6)) > 0);
+		in1.close();
 
 		// test get none exists
 		try{
@@ -119,6 +120,24 @@ public class WebResourceServiceTest {
 		}
 	}
 
+	@Test
+	public void testGetLocationReplaceResource() throws IOException {
+		// test get a resource
+
+		WebResourceInfo webResource1 = resourceService.getResource("css/test2.css");
+		
+		WebResourceInfo webResource2 = resourceService.getResource("css/test3.css");
+		WebResourceInfo webResource3 = resourceService.getResource("image/info-32.png");
+
+
+		// test get a content-replacing resource, this is optional
+		InputStream in1 = webResource1.getInputStream();
+		String text1 = IOUtils.toString(in1);
+		assertTrue(text1.indexOf(resourceService.getLocation(webResource2)) > 0);
+		assertTrue(text1.indexOf(resourceService.getLocation(webResource3)) > 0);
+		in1.close();
+	}
+	
 	@Test
 	public void testGetResourceByUniqueName() throws FileNotFoundException {
 		// test get by unique name
@@ -187,3 +206,4 @@ public class WebResourceServiceTest {
 	}
 
 }
+

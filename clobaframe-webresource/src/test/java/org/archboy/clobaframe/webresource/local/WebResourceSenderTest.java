@@ -37,6 +37,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import javax.inject.Inject;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
@@ -92,7 +94,7 @@ public class WebResourceSenderTest {
 		WebResourceInfo webResource1 = resourceService.getResource("test.png");
 		WebResourceInfo webResource2 = resourceService.getResource("test.css");
 
-		HttpClient client = new DefaultHttpClient();
+		CloseableHttpClient client = HttpClientBuilder.create().build();
 
 		HttpGet method1 = new HttpGet("http://localhost:18080/get?name=" + webResource1.getName());
 		HttpGet method2 = new HttpGet("http://localhost:18080/getByUniqueName?name=" + webResource2.getUniqueName());
@@ -113,7 +115,7 @@ public class WebResourceSenderTest {
 		} catch (IOException e) {
 			fail(e.getMessage());
 		} finally {
-			client.getConnectionManager().shutdown();
+			IOUtils.closeQuietly(client);
 		}
 	}
 
