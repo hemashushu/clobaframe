@@ -46,6 +46,9 @@ public abstract class AbstractResourceStrategy implements ResourceStrategy{
 	@Value("${webresource.cacheSeconds}")
 	private int cacheSeconds;
 
+	@Value("${webresource.autoConvertCssUrl}")
+	private boolean autoConvertCssUrl;
+	
 	// cache the file that less than 1MiB.
 	private static final int MAX_CACHE_FILE_SIZE = 1024 * 1024;
 	private int maxCacheFileSize = MAX_CACHE_FILE_SIZE;
@@ -76,7 +79,7 @@ public abstract class AbstractResourceStrategy implements ResourceStrategy{
 			// convert into location-replacing resource
 			if (contentTypes.contains(webResourceInfo.getContentType())) {
 				webResourceInfo = new LocationReplacingWebResourceInfo(
-					webResourceInfo, locations);
+					webResourceInfo, locations, autoConvertCssUrl);
 			}
 
 			// convert info buffered web resource

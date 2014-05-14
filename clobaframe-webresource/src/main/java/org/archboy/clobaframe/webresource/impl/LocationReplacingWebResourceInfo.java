@@ -46,12 +46,12 @@ public class LocationReplacingWebResourceInfo implements WebResourceInfo{
 
 	private WebResourceInfo webResourceInfo;
 	private Map<String, String> locations;
-
+	
 	private Date lastModified;
 	private byte[] content;
 	private String hash;
 
-	private static final String resourceNameRegex = "([\\/\\w\\.-]+)(.*)";
+	private static final String resourceNameRegex = "([\\/\\w\\.-]+)([^'\"]*)";
 	
 	private static final String placeHoldRegex = "\\[\\[" + resourceNameRegex + "\\]\\]";
 	private static final Pattern placeHoldPattern = Pattern.compile(placeHoldRegex);
@@ -59,15 +59,18 @@ public class LocationReplacingWebResourceInfo implements WebResourceInfo{
 	private static final String cssUrlRegex = "url\\(['|\"]" + resourceNameRegex + "['|\"]\\)";
 	private static final Pattern cssUrlPattern = Pattern.compile(cssUrlRegex);
 
+	private boolean autoConvertCssUrl;
+	
 	public LocationReplacingWebResourceInfo(
 			WebResourceInfo webResourceInfo,
-			Map<String, String> locations) {
+			Map<String, String> locations, boolean autoConvertCssUrl) {
 
 		Assert.notNull(webResourceInfo);
 		Assert.notNull(locations);
 		
 		this.webResourceInfo = webResourceInfo;
 		this.locations = locations;
+		this.autoConvertCssUrl = autoConvertCssUrl;
 		buildSnapshot();
 	}
 
@@ -148,7 +151,9 @@ public class LocationReplacingWebResourceInfo implements WebResourceInfo{
 			text = IOUtils.toString(reader);
 			
 			// replace the css 'url' location.
-			text = replaceLocation(cssUrlPattern, text);
+			if (autoConvertCssUrl) {
+				text = replaceLocation(cssUrlPattern, text);
+			}
 			
 			// replace the location placehold.
 			text = replaceLocation(placeHoldPattern, text);
@@ -178,7 +183,15 @@ public class LocationReplacingWebResourceInfo implements WebResourceInfo{
 			
 			String location = locations.get(canonicalName);
 			if (location != null){
-				matcher.appendReplacement(builder, location);
+				
+				if (pattern == cssUrlPattern) {
+					String group = matcher.group();
+					String result= group.replace(name, location);
+					
+					matcher.appendReplacement(builder, result);
+				}else{
+					matcher.appendReplacement(builder, location);
+				}
 			}else{
 				// the specify resource can not be found.
 				matcher.appendReplacement(builder, matcher.group());
@@ -187,6 +200,7 @@ public class LocationReplacingWebResourceInfo implements WebResourceInfo{
 
 		matcher.appendTail(builder);
 		String replacedText = builder.toString();
+		
 		return replacedText;
 	}
 	
