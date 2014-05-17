@@ -16,11 +16,11 @@ public class DefaultAudio implements Audio {
 	
 	private Format format;
 	private String encoding;
-	private long duration;
+	private double duration;
 	private int bitrate;
 	private BitrateMode bitrateMode;
 
-	public DefaultAudio(ResourceInfo resourceInfo, Format format, String encoding, long duration, int bitrate, BitrateMode bitrateMode) {
+	public DefaultAudio(ResourceInfo resourceInfo, Format format, String encoding, double duration, int bitrate, BitrateMode bitrateMode) {
 		this.resourceInfo = resourceInfo;
 		this.format = format;
 		this.encoding = encoding;
@@ -48,11 +48,11 @@ public class DefaultAudio implements Audio {
 	}
 
 	@Override
-	public long getDuration() {
+	public double getDuration() {
 		return duration;
 	}
 
-	public void setDuration(int duration) {
+	public void setDuration(double duration) {
 		this.duration = duration;
 	}
 

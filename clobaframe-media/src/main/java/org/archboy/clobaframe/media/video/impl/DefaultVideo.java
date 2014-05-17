@@ -17,9 +17,9 @@ public class DefaultVideo implements Video {
 	private Format format;
 	private int width;
 	private int height;
-	private long duration;
+	private double duration;
 
-	public DefaultVideo(ResourceInfo resourceInfo, Format format, int width, int height, long duration) {
+	public DefaultVideo(ResourceInfo resourceInfo, Format format, int width, int height, double duration) {
 		this.resourceInfo = resourceInfo;
 		this.format = format;
 		this.width = width;
@@ -43,11 +43,11 @@ public class DefaultVideo implements Video {
 	}
 
 	@Override
-	public long getDuration() {
+	public double getDuration() {
 		return duration;
 	}
 
-	public void setDuration(long duration) {
+	public void setDuration(double duration) {
 		this.duration = duration;
 	}
 

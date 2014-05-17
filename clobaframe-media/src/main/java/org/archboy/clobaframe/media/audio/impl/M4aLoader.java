@@ -121,7 +121,7 @@ public class M4aLoader implements MediaLoader{
            return null;
         }
 
-		long duration = 0;
+		double duration = 0;
 		
 		// Pull out some information from the header box
         MovieHeaderBox mHeader = getOrNull(moov, MovieHeaderBox.class);
@@ -130,13 +130,10 @@ public class M4aLoader implements MediaLoader{
 		}
          
 		// Get the duration. Seconds
-		duration = mHeader.getDuration() / mHeader.getTimescale();
+		duration = (double)mHeader.getDuration() / mHeader.getTimescale();
 		
-		if (duration == 0){
-			duration = 1;
-		}
-		
-		int bitrate = (int)(fileBaseResourceInfo.getContentLength() / 1024 / duration * 8);
+		// see: http://en.wikipedia.org/wiki/Bit_rate
+		int bitrate = (int)(fileBaseResourceInfo.getContentLength() * 8 / duration / 1000);
 		
 		Audio audio = new DefaultAudio(
 				fileBaseResourceInfo, 

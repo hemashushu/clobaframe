@@ -51,8 +51,8 @@ public class VideoFactoryTest {
 		// test video 1
 		File file1 = getFileByName("test1.mp4");
 		Video video1 = (Video)mediaFactory.make(file1, temporaryResources);
-		
-		assertEquals(1, video1.getDuration());
+				
+		assertEquals(1, Math.round(video1.getDuration()));
 		assertEquals(Video.Format.mp4, video1.getFormat());
 		assertEquals(720, video1.getHeight());
 		assertEquals(1280, video1.getWidth());
@@ -61,7 +61,7 @@ public class VideoFactoryTest {
 		File file2 = getFileByName("test2.mp4");
 		Video video2 = (Video)mediaFactory.make(file2, temporaryResources);
 		
-		assertEquals(18, video2.getDuration());
+		assertEquals(19, Math.round(video2.getDuration()));
 		assertEquals(Video.Format.mp4, video2.getFormat());
 		assertEquals(368, video2.getHeight());
 		assertEquals(368, video2.getWidth());
@@ -74,7 +74,7 @@ public class VideoFactoryTest {
 		File file1 = getFileByName("test1.mov");
 		Video video1 = (Video)mediaFactory.make(file1, temporaryResources);
 		
-		assertEquals(1, video1.getDuration());
+		assertEquals(1, Math.round(video1.getDuration()));
 		assertEquals(Video.Format.mov, video1.getFormat());
 		assertEquals(720, video1.getHeight());
 		assertEquals(1280, video1.getWidth());

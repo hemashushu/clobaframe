@@ -2,6 +2,7 @@ package org.archboy.clobaframe.media.audio;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
@@ -57,7 +58,7 @@ public class AudioFactoryTest {
 		
 		assertEquals(168, audio1.getBitrate());
 		assertEquals(Audio.BitrateMode.variable, audio1.getBitrateMode());
-		assertEquals(15, audio1.getDuration());
+		assertEquals(15, Math.round(audio1.getDuration()));
 		assertEquals("mp3", audio1.getEncoding());
 		assertEquals(Audio.Format.mp3, audio1.getFormat());
 	}
@@ -84,9 +85,9 @@ public class AudioFactoryTest {
 		InputStream in1 = new FileInputStream(file1);
 		Audio audio1 = (Audio)mediaFactory.make(in1, "audio/mp4", new Date(), temporaryResources);
 		
-		assertEquals(160, audio1.getBitrate());
+		assertEquals(165, audio1.getBitrate());
 		assertEquals(Audio.BitrateMode.variable, audio1.getBitrateMode());
-		assertEquals(19, audio1.getDuration());
+		assertEquals(19, Math.round(audio1.getDuration()));
 		assertEquals("aac", audio1.getEncoding());
 		assertEquals(Audio.Format.m4a, audio1.getFormat());
 		

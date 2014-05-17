@@ -11,7 +11,7 @@ public interface Audio extends Media, MetaDataSettableMedia {
 	
 	// audio common
 	Format getFormat(); // container format: *.mp3 *.m4a
-	long getDuration(); // second
+	double getDuration(); // second
 	
 	String getEncoding(); // mp3,aac
 	int getBitrate(); // kbps

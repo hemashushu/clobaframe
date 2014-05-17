@@ -68,7 +68,7 @@ public class VideoLoader implements MediaLoader {
            return null;
         }
 
-		long duration = 0;
+		double duration = 0;
 		
 		// Pull out some information from the header box
         MovieHeaderBox mHeader = getOrNull(moov, MovieHeaderBox.class);
@@ -77,7 +77,7 @@ public class VideoLoader implements MediaLoader {
 		}
          
 		// Get the duration. Seconds
-		duration = mHeader.getDuration() / mHeader.getTimescale();
+		duration = (double)mHeader.getDuration() / mHeader.getTimescale();
 		
 		if (duration == 0){
 			duration = 1;

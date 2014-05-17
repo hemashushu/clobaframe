@@ -25,7 +25,7 @@ public interface Video extends Media, MetaDataSettableMedia  {
 	 */
 	int getHeight();
 	
-	long getDuration(); // second
+	double getDuration(); // second
 	
 	public static enum Format {
 		mp4,
