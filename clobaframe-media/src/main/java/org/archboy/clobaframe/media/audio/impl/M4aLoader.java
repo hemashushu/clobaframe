@@ -2,16 +2,20 @@ package org.archboy.clobaframe.media.audio.impl;
 
 import com.coremedia.iso.IsoFile;
 import com.coremedia.iso.boxes.Box;
-import com.coremedia.iso.boxes.ContainerBox;
+import com.coremedia.iso.boxes.Container;
 import com.coremedia.iso.boxes.FileTypeBox;
 import com.coremedia.iso.boxes.MovieBox;
 import com.coremedia.iso.boxes.MovieHeaderBox;
+import com.googlecode.mp4parser.DataSource;
+import com.googlecode.mp4parser.FileDataSourceImpl;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.InputStream;
+import java.nio.channels.FileChannel;
 import java.util.List;
 import javax.inject.Named;
+import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
 import org.archboy.clobaframe.media.Media;
 import org.archboy.clobaframe.media.MediaLoader;
@@ -74,11 +78,19 @@ public class M4aLoader implements MediaLoader{
 //		AudioHeader audioHeader = audioFile.getAudioHeader();
 //		audioHeader.getFormat() // AAC, MPEG-1 Layer 3
 
-		IsoFile isoFile = new IsoFile(file);
-		
+		DataSource dataSource = new FileDataSourceImpl(file);
+		try{
+			IsoFile isoFile = new IsoFile(dataSource);
+			return loadIsoFile(isoFile, fileBaseResourceInfo);
+		}finally{
+			IOUtils.closeQuietly(dataSource);
+		}
+	}
+
+	private Media loadIsoFile(IsoFile isoFile, FileBaseResourceInfo fileBaseResourceInfo) {
 		// Grab the file type box
-        FileTypeBox fileType = getOrNull(isoFile, FileTypeBox.class);
-        if (fileType == null) {
+		FileTypeBox fileType = getOrNull(isoFile, FileTypeBox.class);
+		if (fileType == null) {
 			return null;
 		}
 		
@@ -115,17 +127,17 @@ public class M4aLoader implements MediaLoader{
 //		
 		
 		// Get the main MOOV box
-        MovieBox moov = getOrNull(isoFile, MovieBox.class);
-        if (moov == null) {
-           // Bail out
-           return null;
-        }
-
+		MovieBox moov = getOrNull(isoFile, MovieBox.class);
+		if (moov == null) {
+			// Bail out
+			return null;
+		}
+		
 		double duration = 0;
 		
 		// Pull out some information from the header box
-        MovieHeaderBox mHeader = getOrNull(moov, MovieHeaderBox.class);
-        if (mHeader == null) {
+		MovieHeaderBox mHeader = getOrNull(moov, MovieHeaderBox.class);
+		if (mHeader == null) {
 			return null;
 		}
          
@@ -136,7 +148,7 @@ public class M4aLoader implements MediaLoader{
 		int bitrate = (int)(fileBaseResourceInfo.getContentLength() * 8 / duration / 1000);
 		
 		Audio audio = new DefaultAudio(
-				fileBaseResourceInfo, 
+				fileBaseResourceInfo,
 				Audio.Format.m4a, "aac", 
 				duration,
 				bitrate,
@@ -146,13 +158,12 @@ public class M4aLoader implements MediaLoader{
 		audio.setMetaData(metaDataParser.parse(moov));
 		
 		return audio;
-
 	}
 	
-	private static <T extends Box> T getOrNull(ContainerBox box, Class<T> clazz) {
-       if (box == null) return null;
+	private static <T extends Box> T getOrNull(Container container, Class<T> clazz) {
+       if (container == null) return null;
 
-       List<T> boxes = box.getBoxes(clazz);
+       List<T> boxes = container.getBoxes(clazz);
        if (boxes.isEmpty()) {
           return null;
        }

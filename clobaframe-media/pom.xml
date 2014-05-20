@@ -137,7 +137,7 @@
 		<dependency>
 			<groupId>com.mpatric</groupId>
 			<artifactId>mp3agic</artifactId>
-			<version>0.8.1</version>
+			<version>0.8.2</version>
 		</dependency>
 
 		<!-- M4a meta data -->
@@ -155,7 +155,7 @@
 		<dependency>
 			<groupId>com.googlecode.mp4parser</groupId> 
 			<artifactId>isoparser</artifactId> 
-			<version>1.0-RC-15</version> 
+			<version>1.0.1</version> 
 		</dependency>
 		
 		<!-- javax servlet for test -->
