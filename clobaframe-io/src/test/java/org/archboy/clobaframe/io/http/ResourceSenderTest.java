@@ -36,7 +36,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.eclipse.jetty.server.Server;
@@ -47,6 +46,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import javax.inject.Inject;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -107,11 +110,12 @@ public class ResourceSenderTest {
 	public void testBaseSend() throws IOException{
 		byte[] sampleData = getFileContent(sampleFile);
 
-		HttpClient client = new DefaultHttpClient();
+		CloseableHttpClient client = HttpClients.createDefault();
 		HttpGet method = new HttpGet(sampleFileUrl);
-
+		CloseableHttpResponse response = client.execute(method);
+		
 		try {
-			HttpResponse response = client.execute(method);
+			
 			int statusCode = response.getStatusLine().getStatusCode();
 			assertEquals(HttpStatus.SC_OK, statusCode);
 			InputStream in = response.getEntity().getContent();
@@ -121,12 +125,14 @@ public class ResourceSenderTest {
 		}catch(IOException e){
 			fail(e.getMessage());
 		} finally {
-			client.getConnectionManager().shutdown();
+			response.close();
 		}
+		
+		IOUtils.closeQuietly(client);
 	}
 
 	@Test
-	public void testSendWithLastModified() {
+	public void testSendWithLastModified() throws IOException {
 		TimeZone timeZone = TimeZone.getTimeZone("GMT");
 		SimpleDateFormat format = new SimpleDateFormat(
 				"EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.US);
@@ -134,11 +140,12 @@ public class ResourceSenderTest {
 
 		Date lastModified = null;
 
-		HttpClient client = new DefaultHttpClient();
+		CloseableHttpClient client = HttpClients.createDefault();
 		HttpGet method1 = new HttpGet(sampleFileUrl);
 
+		CloseableHttpResponse response = client.execute(method1);
+		
 		try {
-			HttpResponse response = client.execute(method1);
 			int statusCode = response.getStatusLine().getStatusCode();
 			assertEquals(HttpStatus.SC_OK, statusCode);
 
@@ -152,6 +159,8 @@ public class ResourceSenderTest {
 			fail(e.getMessage());
 		} catch (ParseException e) {
 			fail(e.getMessage());
+		} finally {
+			response.close();
 		}
 
 		// test if-modified-since
@@ -182,8 +191,10 @@ public class ResourceSenderTest {
 		} catch (IOException e) {
 			fail(e.getMessage());
 		} finally {
-			client.getConnectionManager().shutdown();
+
 		}
+		
+		IOUtils.closeQuietly(client);
 	}
 
 	@Test
@@ -198,7 +209,7 @@ public class ResourceSenderTest {
 		byte[] subSampleData3 = Arrays.copyOfRange(sampleData,
 				sampleData.length - 2, sampleData.length);
 
-		HttpClient client = new DefaultHttpClient();
+		CloseableHttpClient client = HttpClients.createDefault();
 
 		// get from last 2 bytes
 		HttpGet method1 = new HttpGet(sampleFileUrl);
@@ -220,8 +231,10 @@ public class ResourceSenderTest {
 		} catch (IOException e) {
 			fail(e.getMessage());
 		} finally {
-			client.getConnectionManager().shutdown();
+
 		}
+		
+		IOUtils.closeQuietly(client);
 	}
 
 	/**
@@ -250,20 +263,22 @@ public class ResourceSenderTest {
 		return data;
 	}
 
-	private void checkResponseContent(HttpClient client, HttpGet method, int status, byte[] data)
+	private void checkResponseContent(CloseableHttpClient client, HttpGet method, int status, byte[] data)
 			throws IllegalStateException, IOException {
-		HttpResponse response = client.execute(method);
+		CloseableHttpResponse response = client.execute(method);
 		int statusCode = response.getStatusLine().getStatusCode();
 		assertEquals(status, statusCode);
 		assertArrayEquals(data, EntityUtils.toByteArray(response.getEntity()));
+		response.close();
 	}
 
-	private void checkStatusCode(HttpClient client, HttpGet method, int status)
+	private void checkStatusCode(CloseableHttpClient client, HttpGet method, int status)
 			throws IOException {
-		HttpResponse response = client.execute(method);
+		CloseableHttpResponse response = client.execute(method);
 		int statusCode = response.getStatusLine().getStatusCode();
 		EntityUtils.consume(response.getEntity());
 		assertEquals(status, statusCode);
+		response.close();
 	}
 
 	/**

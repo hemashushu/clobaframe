@@ -37,8 +37,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import javax.inject.Inject;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
@@ -94,7 +96,7 @@ public class WebResourceSenderTest {
 		WebResourceInfo webResource1 = resourceService.getResource("test.png");
 		WebResourceInfo webResource2 = resourceService.getResource("test.css");
 
-		CloseableHttpClient client = HttpClientBuilder.create().build();
+		CloseableHttpClient client = HttpClients.createDefault();
 
 		HttpGet method1 = new HttpGet("http://localhost:18080/get?name=" + webResource1.getName());
 		HttpGet method2 = new HttpGet("http://localhost:18080/getByUniqueName?name=" + webResource2.getUniqueName());
@@ -104,8 +106,6 @@ public class WebResourceSenderTest {
 			checkResponseContent(client, method2, webResource2);
 		} catch (IOException e) {
 			fail(e.getMessage());
-		} finally {
-			//client.getConnectionManager().shutdown();
 		}
 
 		// test none exists resource
@@ -114,25 +114,27 @@ public class WebResourceSenderTest {
 			checkStatusCode(client, method3, HttpStatus.SC_NOT_FOUND);
 		} catch (IOException e) {
 			fail(e.getMessage());
-		} finally {
-			IOUtils.closeQuietly(client);
 		}
+		
+		IOUtils.closeQuietly(client);
 	}
 
 	public void testSendByUniqueName() {
 		//
 	}
 
-	private void checkResponseContent(HttpClient client, HttpGet method, byte[] data)
+	private void checkResponseContent(CloseableHttpClient client, HttpGet method, byte[] data)
 			throws IllegalStateException, IOException {
-		HttpResponse response = client.execute(method);
+		CloseableHttpResponse response = client.execute(method);
 		//int statusCode = response.getStatusLine().getStatusCode();
 		//assertEquals(HttpStatus.SC_PARTIAL_CONTENT, statusCode);
 		//assertEquals(2, response.getEntity().getContentLength());
 		assertArrayEquals(data, EntityUtils.toByteArray(response.getEntity()));
+		
+		response.close();
 	}
 
-	private void checkResponseContent(HttpClient client, HttpGet method, WebResourceInfo resourceInfo) throws IOException {
+	private void checkResponseContent(CloseableHttpClient client, HttpGet method, WebResourceInfo resourceInfo) throws IOException {
 		//ResourceContent resourceContent = resourceInfo.getContentSnapshot();
 		InputStream in = resourceInfo.getInputStream(); // resourceContent.getInputStream();
 		byte[] content = IOUtils.toByteArray(in);
@@ -141,12 +143,14 @@ public class WebResourceSenderTest {
 		checkResponseContent(client, method, content);
 	}
 
-	private void checkStatusCode(HttpClient client, HttpGet method, int status)
+	private void checkStatusCode(CloseableHttpClient client, HttpGet method, int status)
 			throws IOException {
-		HttpResponse response = client.execute(method);
+		CloseableHttpResponse response = client.execute(method);
 		int statusCode = response.getStatusLine().getStatusCode();
 		EntityUtils.consume(response.getEntity());
 		assertEquals(status, statusCode);
+		
+		response.close();
 	}
 
 	/**

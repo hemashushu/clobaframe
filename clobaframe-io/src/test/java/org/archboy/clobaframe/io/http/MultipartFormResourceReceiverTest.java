@@ -53,6 +53,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import javax.inject.Inject;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.archboy.clobaframe.io.TemporaryResources;
 import org.archboy.clobaframe.io.impl.DefaultTemporaryResources;
 import org.springframework.core.io.Resource;
@@ -105,21 +111,25 @@ public class MultipartFormResourceReceiverTest {
 	}
 
 	@Test
-	public void testBaseFormDataReceive() throws UnsupportedEncodingException{
+	public void testBaseFormDataReceive() throws UnsupportedEncodingException, IOException{
 
-		HttpClient client = new DefaultHttpClient();
+		//HttpClient client = new DefaultHttpClient();
+		CloseableHttpClient client = HttpClients.createDefault();
 		HttpPost method = new HttpPost(postUrl);
 
-		ContentBody part1 = new StringBody("001");
-		ContentBody part2 = new StringBody("foo");
+		ContentBody part1 = new StringBody("001", ContentType.TEXT_PLAIN);
+		ContentBody part2 = new StringBody("foo", ContentType.TEXT_PLAIN);
 
-		MultipartEntity entity = new MultipartEntity();
-		entity.addPart("id", part1);
-		entity.addPart("name", part2);
-		method.setEntity(entity);
+		//MultipartEntity entity = new MultipartEntity();
+		MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+		
+		entityBuilder.addPart("id", part1);
+		entityBuilder.addPart("name", part2);
+		method.setEntity(entityBuilder.build());
 
+		CloseableHttpResponse response = client.execute(method);
+		
 		try {
-			HttpResponse response = client.execute(method);
 			int status = response.getStatusLine().getStatusCode();
 			assertEquals(HttpStatus.SC_OK, status);
 
@@ -142,28 +152,34 @@ public class MultipartFormResourceReceiverTest {
 		} catch (IOException e) {
 			fail(e.getMessage());
 		}finally{
-			client.getConnectionManager().shutdown();
+			response.close();
 		}
+		
+		IOUtils.closeQuietly(client);
 	}
 
 	@Test
 	public void testMultiPartFormDataReceive() throws IOException{
 
-		HttpClient client = new DefaultHttpClient();
+		//HttpClient client = new DefaultHttpClient();
+		CloseableHttpClient client = HttpClients.createDefault();
 		HttpPost method = new HttpPost(postUrl);
 
-		ContentBody part1 = new StringBody("001");
+		ContentBody part1 = new StringBody("001", ContentType.TEXT_PLAIN);
 		ContentBody part2 = new FileBody(getFileByName(sampleFile1));
 		ContentBody part3 = new FileBody(getFileByName(sampleFile2));
 
-		MultipartEntity entity = new MultipartEntity();
-		entity.addPart("id", part1);
-		entity.addPart("file1", part2);
-		entity.addPart("file2", part3);
-		method.setEntity(entity);
+		//MultipartEntity entity = new MultipartEntity();
+		MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+		entityBuilder.addPart("id", part1);
+		entityBuilder.addPart("file1", part2);
+		entityBuilder.addPart("file2", part3);
+		method.setEntity(entityBuilder.build());
 
+		CloseableHttpResponse response = client.execute(method);
+		
 		try {
-			HttpResponse response = client.execute(method);
+			//HttpResponse response = client.execute(method);
 			int status = response.getStatusLine().getStatusCode();
 			assertEquals(HttpStatus.SC_OK, status);
 
@@ -193,8 +209,10 @@ public class MultipartFormResourceReceiverTest {
 		} catch (IOException e) {
 			fail(e.getMessage());
 		} finally {
-			client.getConnectionManager().shutdown();
+			response.close();
 		}
+		
+		IOUtils.closeQuietly(client);
 	}
 
 	/**

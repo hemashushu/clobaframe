@@ -65,6 +65,7 @@ class QuerySupport {
 	 * @param value2
 	 * @return 
 	 */
+	@SuppressWarnings("unchecked")
 	public static int compareValue(Object value1, Object value2) {
 		try {
 			return ((Comparable<Object>) value1).compareTo(value2);

@@ -1,0 +1,16 @@
+#!/bin/bash
+# add <compilerArgument> to <maven-compiler-plugin> configuration first.
+# see http://stackoverflow.com/questions/18653947/how-to-compile-maven-project-with-xlint
+#
+#<!-- Java compile version -->
+#<plugin>
+#	<groupId>org.apache.maven.plugins</groupId>
+#	<artifactId>maven-compiler-plugin</artifactId>
+#	<version>3.1</version>
+#	<configuration>
+#		<source>1.6</source>
+#		<target>1.6</target>
+#		<compilerArgument>${compilerArgument}</compilerArgument>
+#	</configuration>
+#</plugin>
+mvn clean -DcompilerArgument=-Xlint:deprecation -DcompilerArgument=-Xlint:unchecked compile

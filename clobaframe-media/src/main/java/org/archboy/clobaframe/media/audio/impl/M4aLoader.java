@@ -125,6 +125,8 @@ public class M4aLoader implements MediaLoader{
 //			encoding = "aac";
 //		}
 //		
+		// mp4 file format, see:
+		// http://1.richitec.sinaapp.com/?p=46
 		
 		// Get the main MOOV box
 		MovieBox moov = getOrNull(isoFile, MovieBox.class);

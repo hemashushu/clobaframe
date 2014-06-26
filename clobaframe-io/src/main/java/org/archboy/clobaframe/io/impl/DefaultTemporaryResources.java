@@ -47,8 +47,8 @@ public class DefaultTemporaryResources implements TemporaryResources {
         resources.addFirst(resource);
     }
 
-    //@SuppressWarnings("unchecked")
 	@Override
+	@SuppressWarnings("unchecked")
     public <T extends Closeable> T getResource(Class<T> clazz) {
         for (Closeable resource : resources) {
             if (clazz.isAssignableFrom(resource.getClass())) {
