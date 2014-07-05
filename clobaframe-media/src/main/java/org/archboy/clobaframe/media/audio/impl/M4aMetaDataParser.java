@@ -47,10 +47,6 @@ public class M4aMetaDataParser implements MetaDataParser{
 			return null;
 		}
 		
-		for(Box box: apple.getBoxes()){
-			System.out.println("BOX:" + box.getType() + "," + box.getClass().getName());
-		}
-		
 		MetaData metaData = new MetaData();
 		
 		// Title
