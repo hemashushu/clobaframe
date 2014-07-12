@@ -6,7 +6,7 @@ import java.util.Date;
 
 /**
  *
- * @author arch
+ * @author yang
  */
 public interface ResourceInfoFactory {
 

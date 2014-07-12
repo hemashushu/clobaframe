@@ -9,7 +9,7 @@ import org.springframework.util.Assert;
 
 /**
  *
- * @author arch
+ * @author yang
  */
 @Named
 public class ResourceInfoFactoryImpl implements ResourceInfoFactory {

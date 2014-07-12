@@ -2,7 +2,7 @@ package org.archboy.clobaframe.mail;
 
 /**
  *
- * @author arch
+ * @author yang
  */
 public interface TemplateMailSender {
 

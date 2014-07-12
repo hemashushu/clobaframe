@@ -5,7 +5,7 @@ import java.io.InputStream;
 
 /**
  *
- * @author arch
+ * @author yang
  */
 public interface ContentTypeDetector {
 

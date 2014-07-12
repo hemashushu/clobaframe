@@ -1,10 +1,12 @@
-package org.archboy.clobaframe.mail;
+package org.archboy.clobaframe.mail.impl;
+
+import org.archboy.clobaframe.mail.SendMailException;
 
 /**
  *
- * @author arch
+ * @author yang
  */
-public interface SenderAgent {
+public interface MailSenderClientAdapter {
 
 	String getName();
 

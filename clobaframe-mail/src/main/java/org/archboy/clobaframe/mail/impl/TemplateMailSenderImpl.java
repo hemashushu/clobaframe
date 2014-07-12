@@ -7,15 +7,14 @@ import javax.inject.Inject;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import javax.inject.Named;
+import org.archboy.clobaframe.mail.MailSender;
 import org.archboy.clobaframe.mail.SendMailException;
-import org.archboy.clobaframe.mail.SenderAgent;
-import org.archboy.clobaframe.mail.SenderAgentFactory;
 import org.archboy.clobaframe.mail.TemplateMailSender;
 import org.springframework.util.Assert;
 
 /**
  *
- * @author arch
+ * @author yang
  */
 @Named
 public class TemplateMailSenderImpl implements TemplateMailSender {
@@ -27,14 +26,7 @@ public class TemplateMailSenderImpl implements TemplateMailSender {
 	private MessageSource messageSource;
 
 	@Inject
-	private SenderAgentFactory senderAgentFactory;
-
-	private SenderAgent senderAgent;
-
-	@PostConstruct
-	public void init() {
-		senderAgent = senderAgentFactory.getSenderAgent();
-	}
+	private MailSender mailSender;
 
 	@Override
 	public void send(String recipient, String templateName, Object[] args) throws SendMailException{
@@ -49,6 +41,6 @@ public class TemplateMailSenderImpl implements TemplateMailSender {
 		String subject = messageSource.getMessage(subjectCode, null, locale);
 		String content = messageSource.getMessage(contentCode, args, locale);
 
-		senderAgent.send(recipient, subject, content);
+		mailSender.send(recipient, subject, content);
 	}
 }

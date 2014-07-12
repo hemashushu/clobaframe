@@ -3,7 +3,6 @@ package org.archboy.clobaframe.mail.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.inject.Named;
-import org.archboy.clobaframe.mail.SenderAgent;
 
 /**
  * A mail agent for development and test environments.
@@ -13,15 +12,13 @@ import org.archboy.clobaframe.mail.SenderAgent;
  * @author yang
  */
 @Named
-public class NullSenderAgent implements SenderAgent{
+public class NullMailSenderClientAdapter implements MailSenderClientAdapter{
 
-	private static final String AGENT_NAME = "null";
-
-	private final Logger logger = LoggerFactory.getLogger(NullSenderAgent.class);
+	private final Logger logger = LoggerFactory.getLogger(NullMailSenderClientAdapter.class);
 
 	@Override
 	public String getName() {
-		return AGENT_NAME;
+		return "null";
 	}
 
 	@Override

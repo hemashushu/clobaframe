@@ -1,18 +1,3 @@
-/*
- * Copyright 2011 Spark Young (sparkyoungs@gmail.com). All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.archboy.clobaframe.query.simplequery;
 
 import java.util.ArrayList;
@@ -29,7 +14,7 @@ import org.springframework.util.Assert;
 
 /**
  *
- * @author young
+ * @author yang
  * @param <T>
  */
 public class SimpleQuery<T> implements Query<T>{
@@ -161,7 +146,7 @@ public class SimpleQuery<T> implements Query<T>{
 
 		if (items.isEmpty() || comparators == null) {
 			if (limit == 0) { // un-specify the limit size
-				return new ArrayList(items);
+				return new ArrayList<T>(items);
 			} else {
 				return copy(items, limit);
 			}
@@ -170,7 +155,7 @@ public class SimpleQuery<T> implements Query<T>{
 		Comparator<T>[] comparatorArray = (Comparator<T>[]) comparators.toArray(new Comparator[0]);
 		Comparator<T> comparator = ComparatorFactory.combine(comparatorArray);
 
-		List<T> result = new ArrayList(items);
+		List<T> result = new ArrayList<T>(items);
 		Collections.sort(result, comparator);
 
 		if (limit == 0) { // un-specify the limit size
@@ -206,7 +191,7 @@ public class SimpleQuery<T> implements Query<T>{
 	}
 
 	@Override
-	public List<Map<String, Object>> select(String[] keys) {
+	public List<Map<String, Object>> select(String... keys) {
 		Assert.notNull(keys);
 		
 		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();

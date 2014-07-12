@@ -6,7 +6,7 @@ import org.archboy.clobaframe.blobstore.BlobResourceInfoPartialCollection;
 
 /**
  *
- * @author arch
+ * @author yang
  */
 public abstract class AbstractBlobResourceInfoPartialCollection
 		extends ArrayList<BlobResourceInfo>

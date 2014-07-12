@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author arch
+ * @author yang
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/applicationContext.xml" })

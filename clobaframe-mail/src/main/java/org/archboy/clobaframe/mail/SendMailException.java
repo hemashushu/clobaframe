@@ -4,7 +4,7 @@ import java.io.IOException;
 
 /**
  *
- * @author arch
+ * @author yang
  */
 public class SendMailException extends IOException{
 

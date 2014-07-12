@@ -2,7 +2,7 @@ package org.archboy.clobaframe.blobstore;
 
 /**
  *
- * @author arch
+ * @author yang
  */
 public interface BlobResourceInfoPartialCollection extends PartialCollection<BlobResourceInfo> {
 	//

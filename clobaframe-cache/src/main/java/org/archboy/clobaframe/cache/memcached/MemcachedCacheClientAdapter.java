@@ -1,21 +1,6 @@
-/*
- * Copyright 2011 Spark Young (sparkyoungs@gmail.com). All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.archboy.clobaframe.cache.memcached;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -28,7 +13,7 @@ import javax.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Value;
 import javax.inject.Named;
 import org.archboy.clobaframe.cache.Cache.SetPolicy;
-import org.archboy.clobaframe.cache.CacheAgent;
+import org.archboy.clobaframe.cache.impl.CacheClientAdapter;
 import org.archboy.clobaframe.cache.Expiration;
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.ConnectionFactoryBuilder;
@@ -38,13 +23,11 @@ import net.spy.memcached.MemcachedClient;
 /**
  * Memcached implementation.
  *
- * @author young
+ * @author yang
  *
  */
 @Named
-public class MemcachedCacheAgentImpl implements CacheAgent {
-
-	private static final String AGENT_NAME = "memcached";
+public class MemcachedCacheClientAdapter implements CacheClientAdapter, Closeable {
 
 	private MemcachedClient client;
 
@@ -72,7 +55,8 @@ public class MemcachedCacheAgentImpl implements CacheAgent {
 	}
 
 	@PreDestroy
-	public void destory(){
+	@Override
+	public void close(){
 		client.shutdown();
 	}
 
@@ -82,7 +66,7 @@ public class MemcachedCacheAgentImpl implements CacheAgent {
 
 	@Override
 	public String getName() {
-		return AGENT_NAME;
+		return "memcached";
 	}
 
 	@Override

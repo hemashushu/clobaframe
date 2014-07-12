@@ -16,17 +16,17 @@ import javax.inject.Named;
 import org.archboy.clobaframe.blobstore.BlobResourceInfo;
 import org.archboy.clobaframe.blobstore.BlobResourceInfoPartialCollection;
 import org.archboy.clobaframe.blobstore.BlobKey;
-import org.archboy.clobaframe.blobstore.StoreAgent;
+import org.archboy.clobaframe.blobstore.impl.BlobstoreClientAdapter;
 import org.springframework.util.Assert;
 
 /**
  *
  * Local blob store for test and development only.
  *
- * @author arch
+ * @author yang
  */
 @Named
-public class LocalStoreAgentImpl implements StoreAgent {
+public class LocalBlobstoreClientAdapter implements BlobstoreClientAdapter {
 
 	@Inject
 	private ResourceLoader resourceLoader;
@@ -92,7 +92,7 @@ public class LocalStoreAgentImpl implements StoreAgent {
 	}
 
 	@Override
-	public void put(BlobResourceInfo blobResourceInfo, boolean publicReadable, boolean minor) throws IOException {
+	public void put(BlobResourceInfo blobResourceInfo, boolean publicReadable, int priority) throws IOException {
 		Assert.notNull(blobResourceInfo);
 		
 		BlobKey blobKey = blobResourceInfo.getBlobKey();

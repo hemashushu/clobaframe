@@ -4,7 +4,7 @@ import org.archboy.clobaframe.blobstore.impl.AbstractBlobResourceInfoPartialColl
 
 /**
  *
- * @author arch
+ * @author yang
  */
 public class LocalBlobResourceInfoPartialCollection extends AbstractBlobResourceInfoPartialCollection{
 

@@ -9,17 +9,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import javax.inject.Named;
-import org.archboy.clobaframe.mail.SenderAgent;
 import org.archboy.clobaframe.mail.SendMailException;
 
 /**
  *
- * @author arch
+ * @author yang
  */
 @Named
-public class SmtpSenderAgent implements SenderAgent {
+public class SmtpMailSenderClientAdapter implements MailSenderClientAdapter {
 
-	private static final String AGENT_NAME = "smtp";
 	private static final int DEFAULT_PORT = 25; // smtp standard port, the port with TLS usually is 587.
 	private static final boolean DEFAULT_TLS = false; // do not use TLS by default.
 	
@@ -41,11 +39,11 @@ public class SmtpSenderAgent implements SenderAgent {
 	@Value("${mail.smtp.fromAddress}")
 	private String fromAddress;
 
-	private final Logger logger = LoggerFactory.getLogger(SmtpSenderAgent.class);
+	private final Logger logger = LoggerFactory.getLogger(SmtpMailSenderClientAdapter.class);
 
 	@Override
 	public String getName() {
-		return AGENT_NAME;
+		return "smtp";
 	}
 
 	@Override

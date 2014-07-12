@@ -1,5 +1,6 @@
 package org.archboy.clobaframe.cache.ehcache;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,7 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import javax.inject.Named;
-import org.archboy.clobaframe.cache.CacheAgent;
+import org.archboy.clobaframe.cache.impl.CacheClientAdapter;
 import org.archboy.clobaframe.cache.Expiration;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -21,12 +22,10 @@ import net.sf.ehcache.Element;
 
 /**
  *
- * @author arch
+ * @author yang
  */
 @Named
-public class EhcacheCacheAgentImpl implements CacheAgent {
-
-	private static final String AGENT_NAME = "ehcache";
+public class EhcacheCacheClientAdapter implements CacheClientAdapter, Closeable {
 
 	private static final String DEFAULT_CACHE_REGION_NAME = "common";
 	private static final String DEFAULT_CACHE_CONFIGURATION_FILE = "ehcache.xml";
@@ -51,13 +50,14 @@ public class EhcacheCacheAgentImpl implements CacheAgent {
 	}
 
 	@PreDestroy
-	public void destory(){
+	@Override
+	public void close(){
 		cacheManager.shutdown();
 	}
 
 	@Override
 	public String getName() {
-		return AGENT_NAME;
+		return "ehcache";
 	}
 
 	@Override

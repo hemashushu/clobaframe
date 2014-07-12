@@ -13,7 +13,7 @@ import org.archboy.clobaframe.io.file.impl.PartialFileInputStream;
 
 /**
  *
- * @author arch
+ * @author yang
  */
 public class LocalBlobResourceInfo implements BlobResourceInfo, FileBaseResourceInfo {
 

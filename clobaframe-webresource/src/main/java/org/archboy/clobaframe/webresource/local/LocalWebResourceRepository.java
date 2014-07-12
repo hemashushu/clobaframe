@@ -1,26 +1,13 @@
-/*
- * Copyright 2011 Spark Young (sparkyoungs@gmail.com). All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.archboy.clobaframe.webresource.local;
 
-import java.io.*;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Stack;
 import javax.annotation.PostConstruct;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -33,12 +20,17 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import javax.inject.Named;
 import org.archboy.clobaframe.io.ContentTypeDetector;
+import org.archboy.clobaframe.webresource.ResourceLocationGenerator;
 import org.archboy.clobaframe.webresource.ResourceRepository;
+import org.archboy.clobaframe.webresource.UniqueNameGenerator;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
+import org.springframework.util.Assert;
 
 @Named
 public class LocalWebResourceRepository implements ResourceRepository{
 
+	private static final String REPOSITORY_NAME = "local";
+	
 	@Inject
 	private ResourceLoader resourceLoader;
 
@@ -48,9 +40,36 @@ public class LocalWebResourceRepository implements ResourceRepository{
 	@Value("${webresource.local.path}")
 	private String localPath;
 
+	@Value("${webresource.local.location}")
+	private String localLocationPrefix;
+	
+	@Value("${webresource.uniqueNameGenerator}")
+	private String uniqueNameGeneratorName;
+		
+	private static final String combineWebResourceConfigurationFileName = "classpath:combineWebResource.properties";
+
+	private ResourceLocationGenerator resourceLocationGenerator;
+	
+	@Inject
+	private List<UniqueNameGenerator> uniqueNameGenerators;
+	
+	// the default unique name generator
+	private UniqueNameGenerator uniqueNameGenerator;
+	
 	private List<WebResourceInfo> webResourceInfos;
+	
 	private final Logger logger = LoggerFactory.getLogger(LocalWebResourceRepository.class);
 
+	@Override
+	public String getName() {
+		return REPOSITORY_NAME;
+	}
+
+	@Override
+	public ResourceLocationGenerator getResourceLocationGenerator() {
+		return resourceLocationGenerator;
+	}
+	
 	@Override
 	public List<WebResourceInfo> findAll() {
 		return webResourceInfos;
@@ -58,6 +77,9 @@ public class LocalWebResourceRepository implements ResourceRepository{
 
 	@PostConstruct
 	public void init() throws IOException {
+		uniqueNameGenerator = getUniqueNameGenerator(uniqueNameGeneratorName);
+		logger.info("Using [{}] web resource unique name generator as the default.", uniqueNameGeneratorName);
+		
 		Resource resource = resourceLoader.getResource(localPath);
 		File file = resource.getFile();
 		if (!file.exists()){
@@ -68,9 +90,30 @@ public class LocalWebResourceRepository implements ResourceRepository{
 		}
 
 		logger.debug("Scan web resource folder [{}].", file.getAbsolutePath());
+		
 		webResourceInfos = getLocalWebResources(file);
+		webResourceInfos.addAll(getCombineResources(webResourceInfos));
+		
+		resourceLocationGenerator = new LocalResourceLocationGenerator(localLocationPrefix);
 	}
 
+	public List<UniqueNameGenerator> getUniqueNameGenerators() {
+		return uniqueNameGenerators;
+	}
+
+	public UniqueNameGenerator getUniqueNameGenerator(String name) {
+		Assert.hasText(name);
+		
+		for (UniqueNameGenerator generator : uniqueNameGenerators){
+			if (generator.getName().equals(name)){
+				return generator;
+			}
+		}
+		
+		throw new IllegalArgumentException(
+				String.format("The specify web resource unique name generator [%s] not found", name));
+	}
+	
 	/**
 	 * Scan all resources in the specify local directory
 	 *
@@ -90,12 +133,16 @@ public class LocalWebResourceRepository implements ResourceRepository{
 				if (file.isDirectory()) {
 					dirs.push(file);
 				} else {
-					String name = getName(resourceDir, file);
-					String uniqueName = getUniqueName(resourceDir, file);
+					String name = getResourceName(resourceDir, file);
+					//String uniqueName = getUniqueName(resourceDir, file);
 					String contentType = getContentType(file);
 
-					WebResourceInfo webResourceInfo = new DefaultWebResourceInfo(
-							file, name, uniqueName, contentType);
+					DefaultWebResourceInfo webResourceInfo = new DefaultWebResourceInfo(
+							file, name, contentType);
+					
+					String uniqueName = uniqueNameGenerator.getUniqueName(webResourceInfo);
+					webResourceInfo.setUniqueName(uniqueName);
+					
 					webResourcesInfos.add(webResourceInfo);
 
 					logger.debug(
@@ -112,41 +159,71 @@ public class LocalWebResourceRepository implements ResourceRepository{
 		return webResourcesInfos;
 	}
 
+	private List<WebResourceInfo> getCombineResources(List<WebResourceInfo> webResourceInfos) {
+		Resource resource = resourceLoader.getResource(combineWebResourceConfigurationFileName);
+		if (!resource.exists()){
+			return webResourceInfos;
+		}
+		
+		Properties properties = new Properties();
+		InputStream in = null;
+		
+		try{
+			in = resource.getInputStream();
+			properties.load(in);
+			in.close();
+		}catch(IOException e){
+			//
+		}finally{
+			IOUtils.closeQuietly(in);
+		}
+		
+		List<WebResourceInfo> combineWebResourceInfos = new ArrayList<WebResourceInfo>();
+		
+		for(Object combineName : properties.keySet()){
+			String resourceNames = properties.getProperty((String)combineName);
+			String[] resourceNameArray = resourceNames.split(",");
+			
+			List<WebResourceInfo> selected = new ArrayList<WebResourceInfo>();
+			for (String resourceName : resourceNameArray){
+				for (WebResourceInfo r : webResourceInfos){
+					if (r.getName().equals(resourceName)){
+						selected.add(r);
+						break;
+					}
+				}
+			}
+			
+			CombineWebResourceInfo resourceInfo = new CombineWebResourceInfo(
+					selected, (String)combineName, selected.get(0).getContentType());
+			
+			String uniqueName = uniqueNameGenerator.getUniqueName(resourceInfo);
+			resourceInfo.setUniqueName(uniqueName);
+			
+			combineWebResourceInfos.add(resourceInfo);
+		}		
+		
+		return combineWebResourceInfos;
+	}
+	
 	private String getContentType(File file){
 		String fileName = file.getName();
 		return contentTypeAnalyzer.getByExtensionName(fileName);
 	}
 
-/**
- * It's the sha256hex the relation file name and the content data.
- */
-	private String getUniqueName(File resourceDir, File file) throws IOException{
-
-
-		String hash = null;
-		InputStream in = null;
-		try {
-			in = new FileInputStream(file);
-			hash = DigestUtils.sha256Hex(in);
-		}finally{
-			IOUtils.closeQuietly(in);
-		}
-
-
-//		String extensionName = FilenameUtils.getExtension(file.getName());
-//		if (StringUtils.isNotEmpty(extensionName)) {
-//			return hash + "." + extensionName;
-//		}else{
-//			return hash;
-//		}
-
-//		return hash;
-		String name = file.getPath().substring(resourceDir.getPath().length() + 1);
-		return DigestUtils.sha256Hex(hash + name);				
-	}
-
-	private String getName(File resourceDir, File file){
+	
+	/**
+	 * Return resource name by file.
+	 * By default, the resource name is the file name that excludes the resource dir path.
+	 * such as 'css/common.css', 'js/moments.js'.
+	 * 
+	 * @param resourceDir
+	 * @param file
+	 * @return 
+	 */
+	protected String getResourceName(File resourceDir, File file){
 		String name = file.getPath().substring(resourceDir.getPath().length() + 1);
 		return name.replace('\\', '/');
 	}
+
 }

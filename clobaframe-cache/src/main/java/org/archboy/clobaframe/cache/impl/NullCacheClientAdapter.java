@@ -7,26 +7,23 @@ import java.util.Map;
 import java.util.Set;
 import javax.inject.Named;
 import org.archboy.clobaframe.cache.Cache.SetPolicy;
-import org.archboy.clobaframe.cache.CacheAgent;
 import org.archboy.clobaframe.cache.Expiration;
 
 /**
  *
- * @author arch
+ * @author yang
  */
 @Named
-public class NullCacheAgent implements CacheAgent {
-
-	private static final String AGENT_NAME = "null";
+public class NullCacheClientAdapter implements CacheClientAdapter {
 
 	@Override
 	public String getName() {
-		return AGENT_NAME;
+		return "null";
 	}
 
 	@Override
 	public void clearAll() {
-		//
+		// ignore
 	}
 
 	@Override
@@ -36,7 +33,7 @@ public class NullCacheAgent implements CacheAgent {
 
 	@Override
 	public void deleteAll(Collection<String> keys) {
-		//
+		// ignore
 	}
 
 	@Override

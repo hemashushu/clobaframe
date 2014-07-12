@@ -8,7 +8,7 @@ import org.archboy.clobaframe.io.ResourceInfo;
 
 /**
  *
- * @author arch
+ * @author yang
  */
 public class ByteArrayResourceInfo implements ResourceInfo {
 
