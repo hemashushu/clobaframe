@@ -1,4 +1,4 @@
-package org.archboy.clobaframe.mail.impl;
+package org.archboy.clobaframe.mail.smtp;
 
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;
@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import javax.inject.Named;
 import org.archboy.clobaframe.mail.SendMailException;
+import org.archboy.clobaframe.mail.impl.MailSenderClientAdapter;
 
 /**
  *
