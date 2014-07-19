@@ -58,7 +58,7 @@ public class CombineWebResourceInfo implements WebResourceInfo {
 			length += resourceInfo.getContentLength();
 		}
 		
-		return length;
+		return length + resourceInfos.size() - 1; // add the '\n' symbol between each resource.
 	}
 
 	@Override

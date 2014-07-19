@@ -1,7 +1,6 @@
 package org.archboy.clobaframe.webresource.local;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,7 +9,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Stack;
 import javax.annotation.PostConstruct;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -159,7 +157,7 @@ public class LocalWebResourceRepository implements ResourceRepository{
 		return webResourcesInfos;
 	}
 
-	private List<WebResourceInfo> getCombineResources(List<WebResourceInfo> webResourceInfos) {
+	private List<WebResourceInfo> getCombineResources(List<WebResourceInfo> webResourceInfos) throws FileNotFoundException {
 		Resource resource = resourceLoader.getResource(combineWebResourceConfigurationFileName);
 		if (!resource.exists()){
 			return webResourceInfos;
@@ -185,12 +183,21 @@ public class LocalWebResourceRepository implements ResourceRepository{
 			String[] resourceNameArray = resourceNames.split(",");
 			
 			List<WebResourceInfo> selected = new ArrayList<WebResourceInfo>();
+			
 			for (String resourceName : resourceNameArray){
+				
+				boolean found = false;
 				for (WebResourceInfo r : webResourceInfos){
 					if (r.getName().equals(resourceName)){
+						found = true;
 						selected.add(r);
 						break;
 					}
+				}
+				
+				if (!found) {
+					throw new FileNotFoundException(String.format(
+							"Can not found the web resource [%s]", resourceName));
 				}
 			}
 			
