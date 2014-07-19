@@ -17,8 +17,9 @@ Unit test
 
 2. Make the following folder and change the folder owner to the current user:
 
-    # mkdir /var/lib/clobaframe
-    # chown `whoami` /var/lib/clobaframe
+    $ sudo mkdir /var/lib/clobaframe
+    
+    $ sudo chown `whoami` /var/lib/clobaframe
 
 3. Run the unit test with Apache Maven:
 
@@ -34,4 +35,4 @@ Install clobaframe into Apache Maven local repository:
 Manual
 ------
 
-See "doc/manual_zh-CN.pdf".
+See "doc/manual_zh-CN.pdf" (some kind of old).
