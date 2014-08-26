@@ -22,6 +22,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceManager;
 import static org.junit.Assert.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
@@ -40,6 +42,8 @@ public class WebResourceManagerTest {
 	@Inject
 	private ResourceLoader resourceLoader;
 
+	private final Logger logger = LoggerFactory.getLogger(WebResourceManagerTest.class);
+
 	@Before
 	public void setUp() {
 	}
@@ -52,7 +56,7 @@ public class WebResourceManagerTest {
 	public void testGetAllResources() {
 		// test get all resources
 
-		// note: can not assume/assert the collection size because 
+		// note: can not assume/assert the collection size because
 		// it may be exists web resource files before test.
 		Collection<WebResourceInfo> webResources = resourceManager.getAllResources();
 
@@ -66,7 +70,7 @@ public class WebResourceManagerTest {
 		assertTrue(names.contains("test.png"));
 		assertTrue(names.contains("test.txt"));
 		assertTrue(names.contains("image/info-32.png"));
-		
+
 		// check combine web resource
 		assertTrue(names.contains("css/cob-t3-t4.css"));
 		assertTrue(names.contains("css/cob-t3-t4-t5.css"));
@@ -82,6 +86,7 @@ public class WebResourceManagerTest {
 		WebResourceInfo webResource4 = resourceManager.getResource("image/success-16.png");
 		WebResourceInfo webResource5 = resourceManager.getResource("fonts/glyphicons-halflings-regular.ttf");
 		WebResourceInfo webResource6 = resourceManager.getResource("fonts/glyphicons-halflings-regular.svg");
+		WebResourceInfo webResource7 = resourceManager.getResource("fonts/glyphicons-halflings-regular.eot");
 
 		assertNotNull(webResource1.getUniqueName());
 		assertNotNull(resourceManager.getLocation(webResource1));
@@ -94,13 +99,17 @@ public class WebResourceManagerTest {
 		// test get a content-replacing resource, this is optional
 		InputStream in1 = webResource1.getInputStream();
 		String text1 = IOUtils.toString(in1);
+
+		logger.info(text1);
+
 		assertTrue(text1.indexOf(resourceManager.getLocation(webResource2)) > 0);
 		assertTrue(text1.indexOf(resourceManager.getLocation(webResource3)) > 0);
 		assertTrue(text1.indexOf(resourceManager.getLocation(webResource4)) > 0);
 		assertTrue(text1.indexOf(resourceManager.getLocation(webResource5)) > 0);
 		assertTrue(text1.indexOf(resourceManager.getLocation(webResource6)) > 0);
+		assertTrue(text1.indexOf(resourceManager.getLocation(webResource7)) > 0);
 		in1.close();
-		
+
 		// test get a content-replacing resource with relate folder url.
 		WebResourceInfo webResource11 = resourceManager.getResource("css/test2.css");
 		WebResourceInfo webResource12 = resourceManager.getResource("css/test3.css");
@@ -125,18 +134,18 @@ public class WebResourceManagerTest {
 	public void testGetLocationReplaceResource() throws IOException {
 		WebResourceInfo webResource1 = resourceManager.getResource("css/cob-t3-t4.css");
 		WebResourceInfo webResource2 = resourceManager.getResource("css/cob-t3-t4-t5.css");
-		
+
 		// test the content
 		assertTextContentEquals(webResource1, "/* test3.css */\n/* test4.css */");
 		assertTextContentEquals(webResource2, "/* test3.css */\n/* test4.css */\n/* test5.css */");
-		
+
 	}
-	
+
 	@Test
 	public void testGetCombineResource() throws IOException {
-		
+
 	}
-	
+
 	@Test
 	public void testGetResourceByUniqueName() throws FileNotFoundException {
 		// test get by unique name
@@ -196,7 +205,7 @@ public class WebResourceManagerTest {
 		InputStream in = resourceInfo.getInputStream(); // resourceContent.getInputStream();
 		byte[] content = IOUtils.toByteArray(in);
 		in.close();
-				
+
 		assertArrayEquals(data, content);
 	}
 
