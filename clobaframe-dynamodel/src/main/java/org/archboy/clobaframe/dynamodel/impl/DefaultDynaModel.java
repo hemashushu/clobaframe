@@ -18,10 +18,10 @@ public class DefaultDynaModel extends HashMap<String, Object>
 		return this;
 	}
 
-	@Override
-	public DynaModel addModel(String name, DynaModel model) {
-		put(name, model);
-		return this;
-	}
+//	@Override
+//	public DynaModel addModel(String name, DynaModel model) {
+//		put(name, model);
+//		return this;
+//	}
 
 }

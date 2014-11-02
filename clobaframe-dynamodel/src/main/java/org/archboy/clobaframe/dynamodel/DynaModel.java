@@ -31,5 +31,5 @@ public interface DynaModel extends Map<String, Object> {
 	 *
 	 * @return Return model itself.
 	 */
-	DynaModel addModel(String name, DynaModel model);
+	//DynaModel addModel(String name, DynaModel model);
 }

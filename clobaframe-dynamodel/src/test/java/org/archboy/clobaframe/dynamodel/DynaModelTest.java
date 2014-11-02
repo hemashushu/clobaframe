@@ -71,12 +71,15 @@ public class DynaModelTest {
 		assertFalse(keys.contains("none"));
 
 		// test child model
-		DynaModel childModel = new DefaultDynaModel();
-		childModel.add("width", 2).add("height", 3);
+//		DynaModel childModel = new DefaultDynaModel();
+//		childModel.add("width", 2).add("height", 3);
 
-		model.addModel("child", childModel);
+		model.add("child", new DefaultDynaModel()
+				.add("width", 2)
+				.add("height", 3));
 
-		assertEquals(childModel, model.get("child"));
+		DynaModel childModel = (DynaModel)model.get("child");
+		assertNotNull(childModel);
 		assertEquals(2, childModel.get("width"));
 		assertEquals(3, childModel.get("height"));
 	}

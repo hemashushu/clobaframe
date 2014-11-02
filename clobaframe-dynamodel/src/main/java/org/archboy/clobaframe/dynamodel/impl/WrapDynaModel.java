@@ -20,6 +20,10 @@ public class WrapDynaModel extends HashMap<String, Object>
 
 	private static final long serialVersionUID = 1L;
 
+	public static WrapDynaModel wrap(Object object){
+		return new WrapDynaModel(object);
+	}
+	
 	public WrapDynaModel(Object object){
 		Assert.notNull(object);
 		
@@ -50,9 +54,9 @@ public class WrapDynaModel extends HashMap<String, Object>
 //		return model;
 //	}
 
-	@Override
-	public DynaModel addModel(String name, DynaModel model) {
-		put(name, model);
-		return this;
-	}
+//	@Override
+//	public DynaModel addModel(String name, DynaModel model) {
+//		put(name, model);
+//		return this;
+//	}
 }
