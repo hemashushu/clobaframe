@@ -69,6 +69,26 @@ public class ImagingTest {
 		assertEquals(40, image2.getHeight());
 		saveImage(image2, "imaging-crop-(10,10,40,40)");
 	}
+	
+	@Test
+	public void testMakeFixAspectRatioCrop() throws IOException {
+		Transform transform = imaging.fixAspectRatioCrop(3D/4, 4D/3);
+		
+		File file1 = getFileByName("too-wide.jpg");
+		Image image1 = (Image)mediaFactory.make(file1, temporaryResources);
+		Image image2 = imaging.apply(image1, transform);
+		saveImage(image2, "imaging-fix-aspect-ratio-too-wide");
+		double actualRatio1 = (double)image2.getWidth() / image2.getHeight();
+		assertTrue(Math.abs(actualRatio1 - 4D/3) < 0.01);
+		
+		
+		File file2 = getFileByName("too-high.jpg");
+		Image image3 = (Image)mediaFactory.make(file2, temporaryResources);
+		Image image4 = imaging.apply(image3, transform);
+		double actualRatio2 = (double)image4.getWidth() / image4.getHeight();
+		assertTrue(Math.abs(actualRatio2 - 3D/4) < 0.01);
+		saveImage(image4, "imaging-fix-aspect-ratio-too-high");
+	}
 
 	@Test
 	public void testMakeHorizontalFlip() {

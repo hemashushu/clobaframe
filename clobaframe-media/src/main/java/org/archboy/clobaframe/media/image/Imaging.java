@@ -23,6 +23,8 @@ public interface Imaging {
 	 */
 	Transform crop(int left, int top, int width, int height);
 
+	Transform fixAspectRatioCrop(double minRatio, double maxRatio);
+	
 	/**
 	 * Make horizontal flip transform.
 	 *

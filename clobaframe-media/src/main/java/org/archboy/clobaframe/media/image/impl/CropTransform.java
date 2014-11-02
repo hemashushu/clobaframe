@@ -2,8 +2,6 @@ package org.archboy.clobaframe.media.image.impl;
 
 import java.awt.image.BufferedImage;
 import com.jhlabs.image.CropFilter;
-import org.archboy.clobaframe.media.image.Image;
-import org.archboy.clobaframe.media.image.Transform;
 
 /**
  *

@@ -30,6 +30,14 @@ public class ImagingImpl implements Imaging{
 	}
 
 	@Override
+	public Transform fixAspectRatioCrop(double minRatio, double maxRatio) {
+		Assert.isTrue(minRatio > 0);
+		Assert.isTrue(maxRatio > 0);
+		Assert.isTrue(maxRatio > minRatio);
+		return new FixAspectRatioCropTransform(minRatio, maxRatio);
+	}
+	
+	@Override
 	public Transform horizontalFlip() {
 		return new FlipTransform(FlipTransform.FlipDirection.Horizontal);
 	}
