@@ -71,6 +71,8 @@ public interface Imaging {
 	 */
 	Transform resizeWithFixHeight(int height);
 
+	Transform resizeWithFixWidth(int width);
+	
 	/**
 	 * Make an image composite.
 	 *

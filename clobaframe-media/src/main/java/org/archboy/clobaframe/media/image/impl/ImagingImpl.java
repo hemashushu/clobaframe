@@ -83,6 +83,12 @@ public class ImagingImpl implements Imaging{
 	}
 
 	@Override
+	public Transform resizeWithFixWidth(int width) {
+		Assert.isTrue(width > 0);
+		return new ResizeWithFixWidthTransform(width);
+	}
+	
+	@Override
 	public Composite alpha(Image image, int xOffset, int yOffset,
 			float opacity) {
 		Assert.notNull(image);

@@ -184,12 +184,30 @@ public class ImagingTest {
 		Image image3 = imaging.apply(image1, transform1);
 		Image image4 = imaging.apply(image2, transform1);
 
-		assertEquals(image3.getHeight(), image4.getHeight());
+		assertEquals(100, image3.getHeight());
+		assertEquals(100, image4.getHeight());
 		assertEquals((int)(image1.getWidth() * 100 / image1.getHeight()), image3.getWidth());
 		assertEquals((int)(image2.getWidth() * 100 / image2.getHeight()), image4.getWidth());
 	}
 
+	@Test
+	public void testMakeResizeWithFixWidth() throws IOException{
+		File file1 = getFileByName("test.jpg");
+		Image image1 = (Image)mediaFactory.make(file1, temporaryResources);
 
+		File file2 = getFileByName("test1.jpg");
+		Image image2 = (Image)mediaFactory.make(file2, temporaryResources);
+
+		Transform transform1 = imaging.resizeWithFixWidth(100);
+		Image image3 = imaging.apply(image1, transform1);
+		Image image4 = imaging.apply(image2, transform1);
+
+		assertEquals(100, image3.getWidth());
+		assertEquals(100, image4.getWidth());
+		assertEquals((int)(100 * image1.getHeight() / image1.getWidth()), image3.getHeight());
+		assertEquals((int)(100 * image2.getHeight() / image2.getWidth()), image4.getHeight());
+	}
+	
 	public void testApplyTransform() {
 		//
 	}

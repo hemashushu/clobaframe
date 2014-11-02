@@ -10,12 +10,12 @@ import com.mortennobel.imagescaling.MultiStepRescaleOp;
  *
  * @author yang
  */
-public class ResizeWithFixHeightTransform extends AbstractTransform {
+public class ResizeWithFixWidthTransform extends AbstractTransform {
 
-	private int frameHeight;
+	private int frameWidth;
 
-	public ResizeWithFixHeightTransform(int frameHeight) {
-		this.frameHeight = frameHeight;
+	public ResizeWithFixWidthTransform(int frameWidth) {
+		this.frameWidth = frameWidth;
 	}
 
 	@Override
@@ -25,10 +25,10 @@ public class ResizeWithFixHeightTransform extends AbstractTransform {
 		double sourceHeight = bufferedImage.getHeight();
 
 		double sourceRatio = (double) sourceWidth / (double) sourceHeight;
-		int targetWidth = (int)((double)frameHeight * sourceRatio);
+		int targetHeight = (int)((double)sourceWidth / sourceRatio);
 
-		MultiStepRescaleOp rescaleOp = new MultiStepRescaleOp(targetWidth,
-				frameHeight);
+		MultiStepRescaleOp rescaleOp = new MultiStepRescaleOp(frameWidth,
+				targetHeight);
 		rescaleOp.setUnsharpenMask(UnsharpenMask.Normal);
 		BufferedImage rescaled = rescaleOp.filter(bufferedImage, null);
 		return rescaled;
