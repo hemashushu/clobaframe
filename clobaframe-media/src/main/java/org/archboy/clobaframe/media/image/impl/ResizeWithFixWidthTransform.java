@@ -25,7 +25,7 @@ public class ResizeWithFixWidthTransform extends AbstractTransform {
 		double sourceHeight = bufferedImage.getHeight();
 
 		double sourceRatio = (double) sourceWidth / (double) sourceHeight;
-		int targetHeight = (int)((double)sourceWidth / sourceRatio);
+		int targetHeight = (int)((double)frameWidth / sourceRatio);
 
 		MultiStepRescaleOp rescaleOp = new MultiStepRescaleOp(frameWidth,
 				targetHeight);
