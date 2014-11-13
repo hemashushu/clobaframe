@@ -186,8 +186,8 @@ public class ImagingTest {
 
 		assertEquals(100, image3.getHeight());
 		assertEquals(100, image4.getHeight());
-		assertEquals((int)(image1.getWidth() * 100 / image1.getHeight()), image3.getWidth());
-		assertEquals((int)(image2.getWidth() * 100 / image2.getHeight()), image4.getWidth());
+		assertEquals((Math.round(image1.getWidth() * 100.0D / image1.getHeight())), image3.getWidth());
+		assertEquals((Math.round(image2.getWidth() * 100.0D / image2.getHeight())), image4.getWidth());
 	}
 
 	@Test
@@ -204,8 +204,8 @@ public class ImagingTest {
 
 		assertEquals(100, image3.getWidth());
 		assertEquals(100, image4.getWidth());
-		assertEquals((int)(100 * image1.getHeight() / image1.getWidth()), image3.getHeight());
-		assertEquals((int)(100 * image2.getHeight() / image2.getWidth()), image4.getHeight());
+		assertEquals(Math.round(100D * image1.getHeight() / image1.getWidth()), image3.getHeight());
+		assertEquals(Math.round(100D * image2.getHeight() / image2.getWidth()), image4.getHeight());
 	}
 	
 	public void testApplyTransform() {
