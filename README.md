@@ -1,14 +1,14 @@
 clobaframe
 ==========
 
-a web application supports components that provides:
+web application common components, includes:
 
  * blob store - store and fetch the big binary object to/from cloud service.
- * caching - simplied the caching access interface.
- * io - a core component, to abstract the data stream.
- * media - load the image, audio and video, and parse the meta data and provides some common functions such as scale image.
- * query - a SQL like query tool for collection.
- * web resource - manage the (image/css/js) web resources.
+ * caching - simplified the cache access.
+ * io - abstract the local file and web i/o stream.
+ * media - load the image, audio and video file, and parse the meta data and provides some common functions such as image scaling.
+ * query - a SQL like query tool for the object collection.
+ * web resource - manage the web resources (i.e. image/css/js).
 
 Unit test
 ---------

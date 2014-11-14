@@ -1,4 +1,4 @@
-package org.archboy.clobaframe.cache.ehcache;
+package org.archboy.clobaframe.cache;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -14,8 +14,8 @@ import org.archboy.clobaframe.cache.Expiration;
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/applicationContext_ehcache.xml" })
-public class EhCacheTest {
+@ContextConfiguration(locations = { "/applicationContext.xml" })
+public class CacheTest {
 
 	@Inject
 	private Cache cache;

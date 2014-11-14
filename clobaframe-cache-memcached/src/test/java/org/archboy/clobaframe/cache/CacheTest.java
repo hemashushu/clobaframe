@@ -1,4 +1,4 @@
-package org.archboy.clobaframe.cache.memcached;
+package org.archboy.clobaframe.cache;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/applicationContext.xml" })
-public class MemcacheTest {
+public class CacheTest {
 
 	@Inject
 	private Cache cache;

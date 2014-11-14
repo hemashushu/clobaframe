@@ -33,10 +33,11 @@
 	<modules>
 		<module>clobaframe-query</module>
 		<module>clobaframe-cache</module>
+		<module>clobaframe-cache-memcached</module>
 		<module>clobaframe-io</module>
 		<module>clobaframe-media</module>
-		<module>clobaframe-webresource</module>
 		<module>clobaframe-blobstore</module>
+		<module>clobaframe-webresource</module>
 		<module>clobaframe-webresource-blobstore</module>
 		<module>clobaframe-dynamodel</module>
 		<module>clobaframe-mail</module>
