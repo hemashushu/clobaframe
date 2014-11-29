@@ -1,7 +1,7 @@
 package org.archboy.clobaframe.media.image.impl;
 
 import java.awt.image.BufferedImage;
-import com.jhlabs.image.CropFilter;
+import org.imgscalr.Scalr;
 
 /**
  *
@@ -24,8 +24,11 @@ public class CropTransform extends AbstractTransform {
 
 	@Override
 	protected BufferedImage handle(BufferedImage bufferedImage) {
-		CropFilter filter = new CropFilter(left, top, width, height);
-		return filter.filter(bufferedImage, null);
+//		CropFilter filter = new CropFilter(left, top, width, height);
+//		return filter.filter(bufferedImage, null);
+		BufferedImage croped = Scalr.crop(bufferedImage, 
+				left, top, width, height, Scalr.OP_ANTIALIAS);
+		return croped;
 	}
 
 }
