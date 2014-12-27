@@ -8,11 +8,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -24,7 +21,6 @@ import org.junit.runner.RunWith;
 import javax.inject.Inject;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -45,7 +41,7 @@ public class WebResourceSenderTest {
 	private Server server;
 
 	@Inject
-	private WebResourceManager resourceService;
+	private WebResourceManager resourceManager;
 
 	@Inject
 	private WebResourceSender resourceSender;
@@ -78,17 +74,24 @@ public class WebResourceSenderTest {
 	@Test
 	public void testSend() throws FileNotFoundException {
 
-		WebResourceInfo webResource1 = resourceService.getResource("test.png");
-		WebResourceInfo webResource2 = resourceService.getResource("test.css");
+		WebResourceInfo webResource1 = resourceManager.getResource("test.png");
+		//WebResourceInfo webResource1 = resourceService.getResource("test.css");
 
 		CloseableHttpClient client = HttpClients.createDefault();
 
+		// test get by resource name
 		HttpGet method1 = new HttpGet("http://localhost:18080/get?name=" + webResource1.getName());
-		HttpGet method2 = new HttpGet("http://localhost:18080/getByUniqueName?name=" + webResource2.getUniqueName());
 
 		try {
-			checkResponseContent(client, method1, webResource1);
-			checkResponseContent(client, method2, webResource2);
+			assertResponseContentEquals(client, method1, webResource1);
+		} catch (IOException e) {
+			fail(e.getMessage());
+		}
+
+		// test get by resource unique name
+		HttpGet method2 = new HttpGet("http://localhost:18080/getByUniqueName?name=" + webResource1.getUniqueName());
+		try {
+			assertResponseContentEquals(client, method2, webResource1);
 		} catch (IOException e) {
 			fail(e.getMessage());
 		}
@@ -96,10 +99,20 @@ public class WebResourceSenderTest {
 		// test none exists resource
 		HttpGet method3 = new HttpGet("http://localhost:18080/get?name=noneExists");
 		try {
-			checkStatusCode(client, method3, HttpStatus.SC_NOT_FOUND);
+			assertStatusCodeEquals(client, method3, HttpStatus.SC_NOT_FOUND);
 		} catch (IOException e) {
 			fail(e.getMessage());
 		}
+		
+		// test get by resource location
+		String location1 = resourceManager.getLocation(webResource1);
+		HttpGet method4 = new HttpGet("http://localhost:18080" + location1);
+		try {
+			assertResponseContentEquals(client, method4, webResource1);
+		} catch (IOException e) {
+			fail(e.getMessage());
+		}
+		
 		
 		IOUtils.closeQuietly(client);
 	}
@@ -108,7 +121,7 @@ public class WebResourceSenderTest {
 		//
 	}
 
-	private void checkResponseContent(CloseableHttpClient client, HttpGet method, byte[] data)
+	private void assertResponseContentEquals(CloseableHttpClient client, HttpGet method, byte[] data)
 			throws IllegalStateException, IOException {
 		CloseableHttpResponse response = client.execute(method);
 		//int statusCode = response.getStatusLine().getStatusCode();
@@ -119,16 +132,16 @@ public class WebResourceSenderTest {
 		response.close();
 	}
 
-	private void checkResponseContent(CloseableHttpClient client, HttpGet method, WebResourceInfo resourceInfo) throws IOException {
+	private void assertResponseContentEquals(CloseableHttpClient client, HttpGet method, WebResourceInfo resourceInfo) throws IOException {
 		//ResourceContent resourceContent = resourceInfo.getContentSnapshot();
 		InputStream in = resourceInfo.getInputStream(); // resourceContent.getInputStream();
 		byte[] content = IOUtils.toByteArray(in);
 		in.close();
 
-		checkResponseContent(client, method, content);
+		assertResponseContentEquals(client, method, content);
 	}
 
-	private void checkStatusCode(CloseableHttpClient client, HttpGet method, int status)
+	private void assertStatusCodeEquals(CloseableHttpClient client, HttpGet method, int status)
 			throws IOException {
 		CloseableHttpResponse response = client.execute(method);
 		int statusCode = response.getStatusLine().getStatusCode();

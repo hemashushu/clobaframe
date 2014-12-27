@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +36,7 @@ public class WebResourceManagerTest {
 
 	@Inject
 	private WebResourceManager resourceManager;
-
+	
 	@Inject
 	private ResourceLoader resourceLoader;
 
@@ -49,14 +47,15 @@ public class WebResourceManagerTest {
 	}
 
 	@After
-	public void tearDown() {
+	public void tearDown() throws Exception {
+
 	}
 
 	@Test
 	public void testGetAllResources() {
 		// test get all resources
 
-		// note: can not assume/assert the collection size because
+		// note: can not assume/assert the collection items count because
 		// it may be exists web resource files before test.
 		Collection<WebResourceInfo> webResources = resourceManager.getAllResources();
 
@@ -79,7 +78,6 @@ public class WebResourceManagerTest {
 	@Test
 	public void testGetResource() throws IOException {
 		// test get a resource
-
 		WebResourceInfo webResource1 = resourceManager.getResource("test.css");
 		WebResourceInfo webResource2 = resourceManager.getResource("test.png");
 		WebResourceInfo webResource3 = resourceManager.getResource("image/info-32.png");
@@ -91,16 +89,18 @@ public class WebResourceManagerTest {
 		assertNotNull(webResource1.getUniqueName());
 		assertNotNull(resourceManager.getLocation(webResource1));
 		assertEquals("text/css", webResource1.getContentType());
+		
+		// test get location by name
+		String location1 = resourceManager.getLocation("test.css");
+		assertEquals(resourceManager.getLocation(webResource1), location1);
 
 		// test the content
-		assertFileContentEquals(webResource2, "sample/web/test.png");
-		assertFileContentEquals(webResource3, "sample/web/image/info-32.png");
+		assertResourceContentEquals(webResource2, "sample/web/test.png");
+		assertResourceContentEquals(webResource3, "sample/web/image/info-32.png");
 
-		// test get a content-replacing resource, this is optional
+		// test get a content-replacing resource, this test is optional
 		InputStream in1 = webResource1.getInputStream();
 		String text1 = IOUtils.toString(in1);
-
-		logger.info(text1);
 
 		assertTrue(text1.indexOf(resourceManager.getLocation(webResource2)) > 0);
 		assertTrue(text1.indexOf(resourceManager.getLocation(webResource3)) > 0);
@@ -114,7 +114,7 @@ public class WebResourceManagerTest {
 		WebResourceInfo webResource11 = resourceManager.getResource("css/test2.css");
 		WebResourceInfo webResource12 = resourceManager.getResource("css/test3.css");
 
-		// test get a content-replacing resource, this is optional
+		// test get a content-replacing resource with relate folder url. this test is optional
 		InputStream in11 = webResource11.getInputStream();
 		String text11 = IOUtils.toString(in11);
 		assertTrue(text11.indexOf(resourceManager.getLocation(webResource12)) > 0);
@@ -132,18 +132,16 @@ public class WebResourceManagerTest {
 
 	@Test
 	public void testGetLocationReplaceResource() throws IOException {
-		WebResourceInfo webResource1 = resourceManager.getResource("css/cob-t3-t4.css");
-		WebResourceInfo webResource2 = resourceManager.getResource("css/cob-t3-t4-t5.css");
-
-		// test the content
-		assertTextContentEquals(webResource1, "/* test3.css */\n/* test4.css */");
-		assertTextContentEquals(webResource2, "/* test3.css */\n/* test4.css */\n/* test5.css */");
-
 	}
 
 	@Test
 	public void testGetCombineResource() throws IOException {
+		WebResourceInfo webResource1 = resourceManager.getResource("css/cob-t3-t4.css");
+		WebResourceInfo webResource2 = resourceManager.getResource("css/cob-t3-t4-t5.css");
 
+		// test the content
+		assertTextResourceContentEquals(webResource1, "/* test3.css */\n/* test4.css */");
+		assertTextResourceContentEquals(webResource2, "/* test3.css */\n/* test4.css */\n/* test5.css */");
 	}
 
 	@Test
@@ -174,16 +172,23 @@ public class WebResourceManagerTest {
 		//
 	}
 
-	/**
-	 * Get the test resources by file name.
-	 *
-	 * @param name Relate to the 'src/test/resources' folder.
-	 * @return
-	 * @throws IOException
-	 */
-	private File getFileByName(String name) throws IOException{
-		Resource resource = resourceLoader.getResource(name); //"file:target/test-classes/" +
-		return resource.getFile();
+	private void assertResourceContentEquals(WebResourceInfo resourceInfo, String resourceName) throws IOException {
+		byte[] data = getFileContent(resourceName);
+		assertResourceContentEquals(resourceInfo, data);
+	}
+
+	private void assertTextResourceContentEquals(WebResourceInfo resourceInfo, String text) throws IOException {
+		byte[] data = text.getBytes(Charset.defaultCharset());
+		assertResourceContentEquals(resourceInfo, data);
+	}
+
+	private void assertResourceContentEquals(WebResourceInfo resourceInfo, byte[] data) throws IOException {
+		//ResourceContent resourceContent = resourceInfo.getContentSnapshot();
+		InputStream in = resourceInfo.getInputStream(); // resourceContent.getInputStream();
+		byte[] content = IOUtils.toByteArray(in);
+		in.close();
+
+		assertArrayEquals(data, content);
 	}
 
 	/**
@@ -200,23 +205,17 @@ public class WebResourceManagerTest {
 		return data;
 	}
 
-	private void checkResourceContent(WebResourceInfo resourceInfo, byte[] data) throws IOException {
-		//ResourceContent resourceContent = resourceInfo.getContentSnapshot();
-		InputStream in = resourceInfo.getInputStream(); // resourceContent.getInputStream();
-		byte[] content = IOUtils.toByteArray(in);
-		in.close();
+	/**
+	 * Get the test resources by file name.
+	 *
+	 * @param name Relate to the 'src/test/resources' folder.
+	 * @return
+	 * @throws IOException
+	 */
+	private File getFileByName(String name) throws IOException{
+		Resource resource = resourceLoader.getResource(name); //"file:target/test-classes/" +
+		return resource.getFile();
+	}	
 
-		assertArrayEquals(data, content);
-	}
-
-	private void assertFileContentEquals(WebResourceInfo resourceInfo, String resourceName) throws IOException {
-		byte[] data = getFileContent(resourceName);
-		checkResourceContent(resourceInfo, data);
-	}
-
-	private void assertTextContentEquals(WebResourceInfo resourceInfo, String text) throws IOException {
-		byte[] data = text.getBytes(Charset.defaultCharset());
-		checkResourceContent(resourceInfo, data);
-	}
 }
 

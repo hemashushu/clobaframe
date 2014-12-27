@@ -44,7 +44,7 @@ public class ImageGeneratorTest {
 		assertEquals(Color.darkGray.getRGB(), getImageColor(image1, 0, 0));
 
 		// manual check
-		saveImage(image1, "imageGenerator-darkGray-200x300");
+		Utils.saveImage(image1, "imageGenerator-darkGray-200x300");
 
 		Color transparent = new Color(0, 0, 0, 0);
 		Image image2 = imageGenerator.make(300, 100, transparent);
@@ -53,34 +53,12 @@ public class ImageGeneratorTest {
 		assertEquals(transparent.getRGB(), getImageColor(image2, 0, 0));
 
 		// manual check
-		saveImage(image2, "imageGenerator-transparent-300x100");
+		Utils.saveImage(image2, "imageGenerator-transparent-300x100");
 	}
 	
 	private int getImageColor(Image image, int x, int y){
 		BufferedImage bufferedImage = image.getBufferedImage();
 		return bufferedImage.getRGB(x, y);
 	}
-	
-	/**
-	 * Save image to file, for manual checking.
-	 *
-	 * @param image
-	 * @param filename
-	 * @throws IOException
-	 */
-	private void saveImage(Image image, String filename) throws IOException{
-		String formatName = image.getFormat().toString().toLowerCase();
-		File tempDir = new File(System.getProperty("java.io.tmpdir"));
-		File file = new File(tempDir, filename + "." + formatName);
-		
-		
-		ResourceInfo resourceInfo = image.getResourceInfo();
-		//ResourceContent resourceContent = resourceInfo.getContentSnapshot();
-		InputStream in = resourceInfo.getInputStream();
-		FileOutputStream out = new FileOutputStream(file);
-		IOUtils.copy(in, out);
-		
-		out.close();
-		in.close();
-	}
+
 }

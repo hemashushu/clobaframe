@@ -67,7 +67,7 @@ public class ImagingTest {
 
 		assertEquals(40, image2.getWidth());
 		assertEquals(40, image2.getHeight());
-		saveImage(image2, "imaging-crop-(10,10,40,40)");
+		Utils.saveImage(image2, "imaging-crop-(10,10,40,40)");
 	}
 	
 	@Test
@@ -77,7 +77,7 @@ public class ImagingTest {
 		File file1 = getFileByName("too-wide.jpg");
 		Image image1 = (Image)mediaFactory.make(file1, temporaryResources);
 		Image image2 = imaging.apply(image1, transform);
-		saveImage(image2, "imaging-fix-aspect-ratio-too-wide");
+		Utils.saveImage(image2, "imaging-fix-aspect-ratio-too-wide");
 		double actualRatio1 = (double)image2.getWidth() / image2.getHeight();
 		assertTrue(Math.abs(actualRatio1 - 4D/3) < 0.01);
 		
@@ -87,7 +87,7 @@ public class ImagingTest {
 		Image image4 = imaging.apply(image3, transform);
 		double actualRatio2 = (double)image4.getWidth() / image4.getHeight();
 		assertTrue(Math.abs(actualRatio2 - 3D/4) < 0.01);
-		saveImage(image4, "imaging-fix-aspect-ratio-too-high");
+		Utils.saveImage(image4, "imaging-fix-aspect-ratio-too-high");
 	}
 
 	@Test
@@ -128,8 +128,8 @@ public class ImagingTest {
 		assertTrue(image3.getWidth() == 200 || image3.getHeight() == 200);
 
 		// save to file
-		saveImage(image2, "imaging-resize-500x500");
-		saveImage(image3, "imaging-resize-200x200");
+		Utils.saveImage(image2, "imaging-resize-500x500");
+		Utils.saveImage(image3, "imaging-resize-200x200");
 	}
 
 	@Test
@@ -158,7 +158,7 @@ public class ImagingTest {
 		Image imageRotate1 = (Image)mediaFactory.make(file1, temporaryResources);
 		Transform transformRotate90cw = imaging.rotate(90);
 		Image imageRotate2 = imaging.apply(imageRotate1, transformRotate90cw);
-		saveImage(imageRotate2, "imaging-rotate90cw");
+		Utils.saveImage(imageRotate2, "imaging-rotate90cw");
 	}
 
 	@Test
@@ -233,11 +233,11 @@ public class ImagingTest {
 		File file3 = getFileByName("test.jpg");
 		Image image3 = (Image)mediaFactory.make(file3, temporaryResources);
 		Image image3b = imaging.apply(image3, composites);
-		saveImage(image3b, "imaging-composite-normal");
+		Utils.saveImage(image3b, "imaging-composite-normal");
 
 		Image image4 = imageGenerator.make(400, 400, new Color(0,0,0,0));
 		Image image4b = imaging.apply(image4, composites);
-		saveImage(image4b, "imaging-composite-transparent");
+		Utils.saveImage(image4b, "imaging-composite-transparent");
 	}
 
 	public void testMakeTextComposite() {
@@ -269,9 +269,9 @@ public class ImagingTest {
 		assertTrue(resourceInfo2.getContentLength() < resourceInfo1.getContentLength());
 		assertTrue(resourceInfo3.getContentLength() < resourceInfo2.getContentLength());
 		
-		saveImage((Image)mediaFactory.make(resourceInfo1, temporaryResources), "outputsetting-png");
-		saveImage((Image)mediaFactory.make(resourceInfo2, temporaryResources), "outputsetting-jpeg");
-		saveImage((Image)mediaFactory.make(resourceInfo3, temporaryResources), "outputsetting-jpeg-q-50");
+		Utils.saveImage((Image)mediaFactory.make(resourceInfo1, temporaryResources), "outputsetting-png");
+		Utils.saveImage((Image)mediaFactory.make(resourceInfo2, temporaryResources), "outputsetting-jpeg");
+		Utils.saveImage((Image)mediaFactory.make(resourceInfo3, temporaryResources), "outputsetting-jpeg-q-50");
 		
 	}
 
@@ -304,28 +304,6 @@ public class ImagingTest {
 			}
 		}
 		return -1;
-	}
-
-	/**
-	 * save image to file, for human eyes check ;-)
-	 *
-	 * @param image
-	 * @throws IOException
-	 */
-	private void saveImage(Image image, String filename) throws IOException{
-		String formatName = image.getFormat().toString().toLowerCase();
-		File tempDir = new File(System.getProperty("java.io.tmpdir"));
-		File file = new File(tempDir, filename + "." + formatName);
-		
-		ResourceInfo resourceInfo = image.getResourceInfo();
-		//ResourceContent resourceContent = resourceInfo.getContentSnapshot();
-		InputStream in = resourceInfo.getInputStream();
-		
-		FileOutputStream out = new FileOutputStream(file);
-		IOUtils.copy(in, out);
-		
-		out.close();
-		in.close();
 	}
 
 	private Image makeSampleImage(){
