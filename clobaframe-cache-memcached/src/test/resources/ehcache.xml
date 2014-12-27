@@ -14,7 +14,7 @@ Details see:
          updateCheck="false" monitoring="autodetect"
          dynamicConfig="true" name="cache">
 
-	<diskStore path="java.io.tmpdir/archboy/clobaframe"/>
+	<diskStore path="java.io.tmpdir/clobaframe"/>
 
 	<!-- RMI Replicated Caching -->
 	<!--

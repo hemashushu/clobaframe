@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,18 +30,37 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/applicationContext.xml"})
 public class WebResourceManagerTest {
-@Inject
+
+//	private Server server;
+	
+	@Inject
 	private WebResourceManager resourceManager;
 
 	@Inject
 	private ResourceLoader resourceLoader;
+	
+//	@Inject
+//	private WebResourceSender resourceSender;
 
 	@Before
 	public void setUp() {
+		// start http server
+//		server = new Server(18080);
+//		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+//		context.setContextPath("/");
+//		server.setHandler(context);
+//
+//		ServletHolder servletHolder1 = new ServletHolder(
+//				new WebResourceSenderServlet(resourceSender));
+//		context.addServlet(servletHolder1,"/getByUniqueName");
+//
+//		server.start();
 	}
 
 	@After
 	public void tearDown() {
+		// stop http server
+//		server.stop();
 	}
 
 	@Test
@@ -69,61 +87,19 @@ public class WebResourceManagerTest {
 		// test get a resource
 
 		WebResourceInfo webResource1 = resourceManager.getResource("test.png");
-		WebResourceInfo webResource2 = resourceManager.getResource("test.css");
-		WebResourceInfo webResource3 = resourceManager.getResource("folder/info-32.png");
+		WebResourceInfo webResource2 = resourceManager.getResource("folder/info-32.png");
 
-//		assertNotNull(webResource1);
-//		assertNotNull(webResource2);
-//		assertNotNull(webResource3);
+		assertResourceContentEquals(webResource1, "sample/web/test.png");
+		assertResourceContentEquals(webResource2, "sample/web/folder/info-32.png");
 
-		assertNotNull(webResource1.getUniqueName());
-		assertNotNull(resourceManager.getLocation(webResource1));
-		assertEquals("image/png", webResource1.getContentType());
-
-		// test the content
-//		ResourceContent content1 = webResource1.getContentSnapshot();
-//		assertTrue(content1.getLength() > 0);
-//		IOUtils.closeQuietly(content1);
-
-		assertRemoteContentEquals(webResource1, "sample/web/test.png");
-		//assertContentEquals(webResource2, "sample/web/test.css");
-		assertRemoteContentEquals(webResource3, "sample/web/folder/info-32.png");
-
-//		// test get a content-replacing resource, this is optional
-//		//ResourceContent content2 = webResource2.getContentSnapshot();
-//		InputStream in2 = webResource2.getInputStream();
-//		String text2 = IOUtils.toString(in2);
-//		assertTrue(text2.indexOf(resourceService.getLocation(webResource1)) > 0);
-//		assertTrue(text2.indexOf(resourceService.getLocation(webResource3)) > 0);
-//		in2.close();
-//
-//		// test get none exists
-//		try{
-//			resourceService.getResource("noneExists.png");
-//			fail();
-//		}catch(FileNotFoundException e){
-//			// pass
-//		}
+//		checkRemoteResource("test.css");
+//		checkRemoteResource("test.png");
+//		checkRemoteResource("folder/info-32.png");
 	}
 
 	@Test
 	public void testGetResourceByUniqueName() throws FileNotFoundException {
-//		// test get by unique name
-//		WebResourceInfo webResource1 = resourceService.getResource("test.png");
-//		String uniqueName1 = webResource1.getUniqueName();
-//
-//		WebResourceInfo webResource2 = resourceService.getResourceByUniqueName(uniqueName1);
-//
-//		assertEquals(webResource1.getName(), webResource2.getName());
-//		assertEquals(uniqueName1, webResource2.getUniqueName());
-//
-//		// test get none exists
-//		try{
-//			resourceService.getResourceByUniqueName("noneExists");
-//			fail();
-//		}catch(FileNotFoundException e){
-//			// pass
-//		}
+
 	}
 
 	public void testGetLocation(){
@@ -134,18 +110,19 @@ public class WebResourceManagerTest {
 		//
 	}
 
-	/**
-	 * Get the test resources by file name.
-	 *
-	 * @param name Relate to the 'src/test/resources' folder.
-	 * @return
-	 * @throws IOException
-	 */
-	private File getFileByName(String name) throws IOException{
-		Resource resource = resourceLoader.getResource(name); //"file:target/test-classes/" +
-		return resource.getFile();
+	private void assertResourceContentEquals(WebResourceInfo resourceInfo, String resourceName) throws IOException {
+		byte[] data = getFileContent(resourceName);
+		assertResourceContentEquals(resourceInfo, data);
 	}
-
+	
+	private void assertResourceContentEquals(WebResourceInfo resourceInfo, byte[] data) throws IOException {
+		InputStream in = resourceInfo.getInputStream(); // resourceContent.getInputStream();
+		byte[] content = IOUtils.toByteArray(in);
+		in.close();
+		
+		assertArrayEquals(data, content);
+	}
+	
 	/**
 	 *
 	 * @param name Relate to the 'src/test/resources' folder.
@@ -159,25 +136,74 @@ public class WebResourceManagerTest {
 		in.close();
 		return data;
 	}
-
-	private void checkRemoteResourceContent(WebResourceInfo resourceInfo, byte[] data) throws IOException {
-		//ResourceContent resourceContent = resourceInfo.getContentSnapshot();
-//		InputStream in = resourceInfo.getInputStream();// resourceContent.getInputStream();
+	
+	/**
+	 * Get the test resources by file name.
+	 *
+	 * @param name Relate to the 'src/test/resources' folder.
+	 * @return
+	 * @throws IOException
+	 */
+	private File getFileByName(String name) throws IOException{
+		Resource resource = resourceLoader.getResource(name); //"file:target/test-classes/" +
+		return resource.getFile();
+	}
+	
+//	private void checkRemoteResource(String resourceName) throws IOException {
+//		WebResourceInfo webResource1 = resourceManager.getResource(resourceName);
+//		
+//		CloseableHttpClient client = HttpClients.createDefault();
+//
+//		HttpGet method1 = new HttpGet("http://localhost:18080" + resourceManager.getLocation(webResource1));
+//
+//		try {
+//			assertResponseContentEquals(client, method1, webResource1);
+//		} catch (IOException e) {
+//			fail(e.getMessage());
+//		}
+//		
+//		IOUtils.closeQuietly(client);
+//	}
+//	
+//	private void assertResponseContentEquals(CloseableHttpClient client, HttpGet method, WebResourceInfo resourceInfo) throws IOException {
+//		//ResourceContent resourceContent = resourceInfo.getContentSnapshot();
+//		InputStream in = resourceInfo.getInputStream(); // resourceContent.getInputStream();
 //		byte[] content = IOUtils.toByteArray(in);
 //		in.close();
-
-		String location = resourceManager.getLocation(resourceInfo);
-		
-		File file = new File(location);
-		InputStream in = new FileInputStream(file);
-		byte[] content = IOUtils.toByteArray(in);
-		in.close();
-		
-		assertArrayEquals(data, content);
-	}
-
-	private void assertRemoteContentEquals(WebResourceInfo resourceInfo, String resourceName) throws IOException {
-		byte[] data = getFileContent(resourceName);
-		checkRemoteResourceContent(resourceInfo, data);
-	}
+//
+//		assertResponseContentEquals(client, method, content);
+//	}
+//	
+//	
+//	private void assertResponseContentEquals(CloseableHttpClient client, HttpGet method, byte[] data)
+//			throws IllegalStateException, IOException {
+//		CloseableHttpResponse response = client.execute(method);
+//		//int statusCode = response.getStatusLine().getStatusCode();
+//		//assertEquals(HttpStatus.SC_PARTIAL_CONTENT, statusCode);
+//		//assertEquals(2, response.getEntity().getContentLength());
+//		assertArrayEquals(data, EntityUtils.toByteArray(response.getEntity()));
+//		
+//		response.close();
+//	}
+//	
+//	/**
+//	 * HttpServlet implementations for testing.
+//	 */
+//	public class WebResourceSenderServlet extends HttpServlet {
+//
+//		private static final long serialVersionUID = 1L;
+//
+//		private WebResourceSender webResourceSender;
+//
+//		public WebResourceSenderServlet(WebResourceSender webResourceSender) {
+//			this.webResourceSender = webResourceSender;
+//		}
+//
+//		@Override
+//		protected void doGet(HttpServletRequest request, HttpServletResponse response)
+//				throws ServletException, IOException {
+//			String name = request.getParameter("name");
+//			webResourceSender.sendByUniqueName(name, request, response);
+//		}
+//	}
 }

@@ -143,7 +143,7 @@ public class ImageFactoryTest {
 		assertTrue(image1.getHeight() > 1);
 
 		// manual check
-		saveImage(image1, "mediaFactory-from-url");
+		Utils.saveImage(image1, "mediaFactory-from-url");
 	}
 
 	@Test
@@ -216,29 +216,5 @@ public class ImageFactoryTest {
 		byte[] data = out.toByteArray();
 		out.close();
 		return data;
-	}
-
-	/**
-	 * Save image to file, for manual checking.
-	 *
-	 * @param image
-	 * @param filename
-	 * @throws IOException
-	 */
-	private void saveImage(Image image, String filename) throws IOException{
-		String formatName = image.getFormat().toString().toLowerCase();
-		File tempDir = new File(System.getProperty("java.io.tmpdir"));
-		File file = new File(tempDir, filename + "." + formatName);
-		
-		
-		ResourceInfo resourceInfo = image.getResourceInfo();
-		//ResourceContent resourceContent = resourceInfo.getContentSnapshot();
-		InputStream in = resourceInfo.getInputStream();
-		
-		FileOutputStream out = new FileOutputStream(file);
-		IOUtils.copy(in, out);
-		
-		out.close();
-		in.close();
 	}
 }
