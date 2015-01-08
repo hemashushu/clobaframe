@@ -1,7 +1,12 @@
 clobaframe
 ==========
 
-Common components for web application, includes:
+Common components for web application.
+It abstracts the underlay service that runs on cloud platforms,
+such as VPS, Google cloud platform, Amazon web service, enable you to migrate
+web application between variable cloud platforms.
+
+Interfaces:
 
  * query: a SQL like query tool for collections.
  * cache: simplified the cache access.
