@@ -93,11 +93,11 @@ public class ImageFactoryTest {
 		// test image resource info
 		ResourceInfo info1 = image1.getResourceInfo();
 		assertEquals(file1.length(), info1.getContentLength());
-		assertEquals("image/jpeg", info1.getContentType());
+		assertEquals("image/jpeg", info1.getMimeType());
 		assertEquals(file1.lastModified(), info1.getLastModified().getTime());
 
 		//ResourceContent content1 = info1.getContentSnapshot();
-		InputStream in = info1.getInputStream();
+		InputStream in = info1.getContent();
 		byte[] contentData1 = IOUtils.toByteArray(in);
 		in.close();
 
@@ -111,7 +111,7 @@ public class ImageFactoryTest {
 	@Test
 	public void testMakeImageFromByteArray() throws IOException {
 		byte[] data = getFileContent("test.png");
-		Image image1 = (Image)mediaFactory.make(data, ImageLoader.CONTENT_TYPE_IMAGE_PNG, null, temporaryResources);
+		Image image1 = (Image)mediaFactory.make(data, ImageLoader.MIME_TYPE_IMAGE_PNG, null, temporaryResources);
 		assertEquals(Image.Format.PNG, image1.getFormat());
 		assertEquals(64, image1.getWidth());
 		assertEquals(64, image1.getHeight());
@@ -128,7 +128,7 @@ public class ImageFactoryTest {
 	@Test
 	public void testMakeImageFromStream() throws IOException {
 		InputStream in = getFileInputStream("test.png");
-		Image image1 = (Image)mediaFactory.make(in, ImageLoader.CONTENT_TYPE_IMAGE_PNG,null, temporaryResources);
+		Image image1 = (Image)mediaFactory.make(in, ImageLoader.MIME_TYPE_IMAGE_PNG,null, temporaryResources);
 		assertEquals(Image.Format.PNG, image1.getFormat());
 		assertEquals(64, image1.getWidth());
 		assertEquals(64, image1.getHeight());

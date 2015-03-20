@@ -200,7 +200,7 @@ public class SimpleQuery<T> implements Query<T>{
 		for (T item : items) {
 			Map<String, Object> obj = new HashMap<String, Object>();
 			for (String key : keys) {
-				obj.put(key, QuerySupport.getPropertyValue(item, key));
+				obj.put(key, Support.getPropertyValue(item, key));
 			}
 
 			result.add(obj);

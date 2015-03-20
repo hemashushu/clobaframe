@@ -17,8 +17,8 @@
 
 	<developers>
 		<developer>
-			<id>young</id>
-			<email>sparkyoungs@gmail.com</email>
+			<id>yang</id>
+			<email>hippospark@gmail.com</email>
 		</developer>
 	</developers>
 
@@ -99,23 +99,11 @@
 		<!-- Spy memcached client -->
 		<!-- need by clobaframe-cache -->
 		<dependency>
-			<groupId>spy</groupId>
+			<groupId>net.spy</groupId>
 			<artifactId>spymemcached</artifactId>
-			<version>2.8.12</version>
+			<version>2.11.6</version>
 		</dependency>
 
 	</dependencies>
 
-	<repositories>
-		<!-- Spy memcached client repository-->
-		<repository>
-			<id>spy</id>
-			<name>Spy Repository</name>
-			<layout>default</layout>
-			<url>http://files.couchbase.com/maven2/</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
 </project>

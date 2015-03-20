@@ -10,7 +10,7 @@ import java.util.Date;
  */
 public interface ResourceInfoFactory {
 
-	ResourceInfo make(byte[] content, String contentType, Date lastModified);
+	ResourceInfo make(byte[] content, String mimeType, Date lastModified);
 	
-	ResourceInfo make(InputStream inputStream, long contentLength, String contentType, Date lastModified);
+	ResourceInfo make(InputStream inputStream, long contentLength, String mimeType, Date lastModified);
 }

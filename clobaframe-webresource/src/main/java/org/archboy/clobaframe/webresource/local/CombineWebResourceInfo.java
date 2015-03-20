@@ -22,13 +22,13 @@ public class CombineWebResourceInfo implements WebResourceInfo {
 	private List<WebResourceInfo> resourceInfos;
 	private String name;
 	private String uniqueName;
-	private String contentType;
+	private String mimeType;
 
 	public CombineWebResourceInfo(
-			List<WebResourceInfo> resourceInfos, String name, String contentType) {
+			List<WebResourceInfo> resourceInfos, String name, String mimeType) {
 		this.resourceInfos = resourceInfos;
 		this.name = name;
-		this.contentType = contentType;
+		this.mimeType = mimeType;
 	}
 
 	@Override
@@ -62,18 +62,18 @@ public class CombineWebResourceInfo implements WebResourceInfo {
 	}
 
 	@Override
-	public String getContentType() {
-		return contentType;
+	public String getMimeType() {
+		return mimeType;
 	}
 
 	@Override
-	public InputStream getInputStream() throws IOException {
+	public InputStream getContent() throws IOException {
 		byte[] data = getCombineData();
 		return new ByteArrayInputStream(data);
 	}
 
 	@Override
-	public InputStream getInputStream(long start, long length) throws IOException {
+	public InputStream getContent(long start, long length) throws IOException {
 		byte[] data = getCombineData();
 		return new ByteArrayInputStream(data, (int)start, (int)length);
 	}
@@ -109,7 +109,7 @@ public class CombineWebResourceInfo implements WebResourceInfo {
 		
 		for(int idx=0; idx<resourceInfos.size(); idx++){
 			WebResourceInfo resourceInfo = resourceInfos.get(idx);
-			InputStream in = resourceInfo.getInputStream();
+			InputStream in = resourceInfo.getContent();
 			IOUtils.copy(in, out);
 			in.close();
 			

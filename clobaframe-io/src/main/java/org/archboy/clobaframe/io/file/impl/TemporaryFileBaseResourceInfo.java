@@ -18,18 +18,16 @@ import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
  */
 public class TemporaryFileBaseResourceInfo implements FileBaseResourceInfo{
 
-	//private boolean wrapped;
-	
 	private File file;
 	private long contentLength;
-	private String contentType;
+	private String mimeType;
 	private Date lastModified;
 
 	public TemporaryFileBaseResourceInfo(
 			ResourceInfo resourceInfo, 
 			TemporaryResources temporaryResources) throws IOException {
 		
-		this.contentType = resourceInfo.getContentType();
+		this.mimeType = resourceInfo.getMimeType();
 		this.contentLength = resourceInfo.getContentLength();
 		this.lastModified = resourceInfo.getLastModified();
 			
@@ -39,7 +37,7 @@ public class TemporaryFileBaseResourceInfo implements FileBaseResourceInfo{
 			// write all data into a temporary file.
 			this.file = temporaryResources.createTemporaryFile();
 			
-			InputStream in = resourceInfo.getInputStream();
+			InputStream in = resourceInfo.getContent();
 			OutputStream out = new FileOutputStream(file);
 			IOUtils.copy(in, out);
 			IOUtils.closeQuietly(out);
@@ -58,17 +56,17 @@ public class TemporaryFileBaseResourceInfo implements FileBaseResourceInfo{
 	}
 
 	@Override
-	public String getContentType() {
-		return contentType;
+	public String getMimeType() {
+		return mimeType;
 	}
 
 	@Override
-	public InputStream getInputStream() throws IOException {
+	public InputStream getContent() throws IOException {
 		return new FileInputStream(file);
 	}
 
 	@Override
-	public InputStream getInputStream(long start, long length) throws IOException {
+	public InputStream getContent(long start, long length) throws IOException {
 		return new PartialFileInputStream(file, start, length);
 	}
 

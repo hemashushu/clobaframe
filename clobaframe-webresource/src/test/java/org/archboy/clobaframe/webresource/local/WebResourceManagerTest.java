@@ -88,7 +88,7 @@ public class WebResourceManagerTest {
 
 		assertNotNull(webResource1.getUniqueName());
 		assertNotNull(resourceManager.getLocation(webResource1));
-		assertEquals("text/css", webResource1.getContentType());
+		assertEquals("text/css", webResource1.getMimeType());
 		
 		// test get location by name
 		String location1 = resourceManager.getLocation("test.css");

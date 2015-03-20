@@ -77,8 +77,8 @@ public class LocationReplacingWebResourceInfo implements WebResourceInfo{
 	}
 
 	@Override
-	public String getContentType() {
-		return webResourceInfo.getContentType();
+	public String getMimeType() {
+		return webResourceInfo.getMimeType();
 	}
 
 	@Override
@@ -92,13 +92,13 @@ public class LocationReplacingWebResourceInfo implements WebResourceInfo{
 	}
 
 	@Override
-	public InputStream getInputStream() throws IOException {
+	public InputStream getContent() throws IOException {
 		refresh();
 		return new ByteArrayInputStream(content);
 	}
 
 	@Override
-	public InputStream getInputStream(long start, long length) throws IOException {
+	public InputStream getContent(long start, long length) throws IOException {
 		refresh();
 		return new ByteArrayInputStream(
 				content, (int)start, (int)length);
@@ -129,8 +129,8 @@ public class LocationReplacingWebResourceInfo implements WebResourceInfo{
 
 		try{
 //			resourceContent = webResourceInfo.getContentSnapshot();
-//			InputStream in = resourceContent.getInputStream();
-			in = webResourceInfo.getInputStream();
+//			InputStream in = resourceContent.getContent();
+			in = webResourceInfo.getContent();
 
 			InputStreamReader reader = new InputStreamReader(in, "utf-8");
 			text = IOUtils.toString(reader);

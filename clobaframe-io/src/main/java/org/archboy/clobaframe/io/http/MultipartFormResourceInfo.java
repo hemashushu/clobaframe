@@ -4,7 +4,7 @@ import java.nio.charset.Charset;
 import org.archboy.clobaframe.io.ResourceInfo;
 
 /**
- * Commonly means the multi-part POST form data.
+ * The multi-part POST FORM data.
  *
  * @author yang
  */
@@ -24,13 +24,13 @@ public interface MultipartFormResourceInfo extends ResourceInfo{
 	 */
 	boolean isFormField();
 
+	boolean isFileField();
 	
 	/**
 	 * Get the file name.
-	 * <p>
-	 *     Some browser may send the file name with full path,
-	 *     the caller must handle it by itself.
-	 * </p>
+	 * 
+	 * Some browser may send the file name with full path,
+	 * the invoker must handle this by itself.
 	 *
 	 * @return
 	 */

@@ -5,28 +5,28 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
-import org.archboy.clobaframe.io.ContentTypeDetector;
+import org.archboy.clobaframe.io.MimeTypeDetector;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
 
 public class FileResourceInfo implements FileBaseResourceInfo {
 
 	private File file;
-	private String contentType;
+	private String mimeType;
 
 	/**
 	 * Detect the mime type by the file extension name.
 	 * 
 	 * @param file
-	 * @param contentTypeDetector 
+	 * @param mimeTypeDetector 
 	 */
-	public FileResourceInfo(File file, ContentTypeDetector contentTypeDetector) {
+	public FileResourceInfo(File file, MimeTypeDetector mimeTypeDetector) {
 		this.file = file;
-		this.contentType = contentTypeDetector.getByExtensionName(file.getName());
+		this.mimeType = mimeTypeDetector.getByExtensionName(file.getName());
 	}
 
-	public FileResourceInfo(File file, String contentType) {
+	public FileResourceInfo(File file, String mimeType) {
 		this.file = file;
-		this.contentType = contentType;
+		this.mimeType = mimeType;
 	}
 
 	@Override
@@ -36,17 +36,17 @@ public class FileResourceInfo implements FileBaseResourceInfo {
 	}
 
 	@Override
-	public String getContentType() {
-		return contentType;
+	public String getMimeType() {
+		return mimeType;
 	}
 
 	@Override
-	public InputStream getInputStream() throws IOException {
+	public InputStream getContent() throws IOException {
 		return new FileInputStream(file);
 	}
 
 	@Override
-	public InputStream getInputStream(long start, long length) throws IOException {
+	public InputStream getContent(long start, long length) throws IOException {
 		return new PartialFileInputStream(file, start, length);
 	}
 

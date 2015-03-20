@@ -105,12 +105,12 @@ public class DefaultImage extends AbstractImage {
 	public ResourceInfo getResourceInfo(Date lastModified, OutputSettings outputSettings) {
 		byte[] data = getData(bufferedImage, outputSettings);
 		
-		String contentType = 
+		String mimeType = 
 				(outputSettings.getOutputEncoding() == OutputSettings.OutputEncoding.JPEG) ?
-				ImageLoader.CONTENT_TYPE_IMAGE_JPEG :
-				ImageLoader.CONTENT_TYPE_IMAGE_PNG;
+				ImageLoader.MIME_TYPE_IMAGE_JPEG :
+				ImageLoader.MIME_TYPE_IMAGE_PNG;
 		
-		return new ByteArrayResourceInfo(data, contentType, 
+		return new ByteArrayResourceInfo(data, mimeType, 
 				(lastModified ==null ? this.lastModified:lastModified));
 	}
 }

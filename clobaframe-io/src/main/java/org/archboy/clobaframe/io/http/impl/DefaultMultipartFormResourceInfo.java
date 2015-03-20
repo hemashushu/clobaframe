@@ -24,6 +24,11 @@ public class DefaultMultipartFormResourceInfo implements MultipartFormResourceIn
 	}
 
 	@Override
+	public boolean isFileField() {
+		return !fileItem.isFormField();
+	}
+
+	@Override
 	public String getFileName() {
 		return fileItem.getName();
 	}
@@ -39,17 +44,17 @@ public class DefaultMultipartFormResourceInfo implements MultipartFormResourceIn
 	}
 
 	@Override
-	public String getContentType() {
+	public String getMimeType() {
 		return fileItem.getContentType();
 	}
 
 	@Override
-	public InputStream getInputStream() throws IOException {
+	public InputStream getContent() throws IOException {
 		return fileItem.getInputStream();
 	}
 
 	@Override
-	public InputStream getInputStream(long start, long length) throws IOException {
+	public InputStream getContent(long start, long length) throws IOException {
 		throw new UnsupportedOperationException("Does not supported.");
 	}
 

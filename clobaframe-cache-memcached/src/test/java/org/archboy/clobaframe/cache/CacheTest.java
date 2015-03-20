@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import javax.inject.Inject;
+import javax.inject.Named;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.archboy.clobaframe.cache.Cache;
@@ -18,6 +19,7 @@ import static org.junit.Assert.*;
 public class CacheTest {
 
 	@Inject
+	@Named("default")
 	private Cache cache;
 
 	@Before
@@ -89,9 +91,9 @@ public class CacheTest {
 
 		// test put
 		assertTrue(cache.put(key1, "FOO", Expiration.bySeconds(1),
-				Cache.SetPolicy.SET_ALWAYS));
+				Cache.Policy.SET_ALWAYS));
 		assertTrue(cache.put(key2, "BAR", Expiration.bySeconds(3),
-				Cache.SetPolicy.SET_ALWAYS));
+				Cache.Policy.SET_ALWAYS));
 
 		assertEquals("FOO", cache.get(key1));
 		assertEquals("BAR", cache.get(key2));
@@ -99,11 +101,11 @@ public class CacheTest {
 
 		// test put with policy
 		assertFalse(cache.put(key1, "FOO1", Expiration.bySeconds(1),
-				Cache.SetPolicy.ADD_ONLY_IF_NOT_PRESENT));
+				Cache.Policy.ADD_ONLY_IF_NOT_PRESENT));
 		assertFalse(cache.put(key3, "FOOBAR", Expiration.bySeconds(1),
-				Cache.SetPolicy.REPLACE_ONLY_IF_PRESENT));
+				Cache.Policy.REPLACE_ONLY_IF_PRESENT));
 		assertTrue(cache.put(key1, "FOO2", Expiration.bySeconds(1),
-				Cache.SetPolicy.REPLACE_ONLY_IF_PRESENT));
+				Cache.Policy.REPLACE_ONLY_IF_PRESENT));
 
 		assertEquals("FOO2", cache.get(key1));
 

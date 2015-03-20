@@ -6,11 +6,10 @@ import java.util.Date;
 
 /**
  * A resource object.
- * <p>
- *     A resource means a set of binary or text data with
- *     the fixed length and content type defined,
- *     optional with the name and the last modified time properties.
- * </p>
+ * 
+ * A resource means a set of binary or text data with
+ * the fixed length and mime type defined,
+ * optional with the name and the last modified time properties.
  *
  * @author yang
  *
@@ -25,11 +24,11 @@ public interface ResourceInfo {
 	long getContentLength();
 
 	/**
-	 * The content type.
+	 * The mime type.
 	 *
 	 * @return The mime type name.
 	 */
-	String getContentType();
+	String getMimeType();
 
 	/**
 	 * Get the content snapshot.
@@ -38,7 +37,7 @@ public interface ResourceInfo {
 	 * @return
 	 * @throws IOException
 	 */
-	InputStream getInputStream() throws IOException;
+	InputStream getContent() throws IOException;
 
 	/**
 	 * Get the content snapshot with the specify range.
@@ -47,15 +46,15 @@ public interface ResourceInfo {
 	 * @param start
 	 * @param length
 	 * @return
-	 * @throws IOException If the resource content is not seekable.
+	 * @throws IOException If the resource content is not seek-able.
 	 */
-	InputStream getInputStream(long start, long length) throws IOException;
+	InputStream getContent(long start, long length) throws IOException;
 
 
 	/**
 	 * Optional property.
 	 * 
-	 * Indicates the method {@link ResourceInfo#getInputStream(long, long) } can be invoked.
+	 * Indicates the method {@link ResourceInfo#getContent(long, long) } can be invoked.
 	 * 
 	 * @return
 	 */

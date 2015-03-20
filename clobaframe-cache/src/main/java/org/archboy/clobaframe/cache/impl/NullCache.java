@@ -1,12 +1,13 @@
 package org.archboy.clobaframe.cache.impl;
 
+import org.archboy.clobaframe.cache.AbstractCache;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.inject.Named;
-import org.archboy.clobaframe.cache.Cache.SetPolicy;
+import org.archboy.clobaframe.cache.Cache.Policy;
 import org.archboy.clobaframe.cache.Expiration;
 
 /**
@@ -14,7 +15,7 @@ import org.archboy.clobaframe.cache.Expiration;
  * @author yang
  */
 @Named
-public class NullCacheClientAdapter implements CacheClientAdapter {
+public class NullCache extends AbstractCache {
 
 	@Override
 	public String getName() {
@@ -23,7 +24,6 @@ public class NullCacheClientAdapter implements CacheClientAdapter {
 
 	@Override
 	public void clearAll() {
-		// ignore
 	}
 
 	@Override
@@ -33,7 +33,6 @@ public class NullCacheClientAdapter implements CacheClientAdapter {
 
 	@Override
 	public void deleteAll(Collection<String> keys) {
-		// ignore
 	}
 
 	@Override
@@ -47,12 +46,22 @@ public class NullCacheClientAdapter implements CacheClientAdapter {
 	}
 
 	@Override
-	public boolean put(String key, Object value, Expiration expires, SetPolicy policy) {
+	public boolean put(String key, Object value, Expiration expires, Policy policy) {
 		return true;
 	}
 
 	@Override
-	public Set<String> putAll(Map<String, ? extends Object> values, Expiration expires, SetPolicy policy) {
+	public Set<String> putAll(Map<String, ? extends Object> values, Expiration expires, Policy policy) {
 		return new HashSet<String>();
+	}
+
+	@Override
+	public boolean put(String key, Object value) {
+		return true;
+	}
+
+	@Override
+	public boolean put(String key, Object value, Expiration expiration) {
+		return true;
 	}
 }

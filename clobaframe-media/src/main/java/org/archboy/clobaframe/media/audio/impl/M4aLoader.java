@@ -29,12 +29,12 @@ import org.springframework.util.Assert;
 @Named
 public class M4aLoader implements MediaLoader{
 	
-	public static final String CONTENT_TYPE_AUDIO_MP4 = "audio/mp4"; // *.m4a, *.mp4a
+	public static final String MIME_TYPE_AUDIO_MP4 = "audio/mp4"; // *.m4a, *.mp4a
 //	public static final String CONTENT_TYPE_AUDIO_MPEG = "audio/mpeg"; // *.mp3
 	
 //	private List<String> supportContentTypes = Arrays.asList(
 //			CONTENT_TYPE_AUDIO_MPEG, 
-//			CONTENT_TYPE_AUDIO_MP4);
+//			MIME_TYPE_AUDIO_MP4);
 	
 //	private static final List<String> mp4_audio_brands = Arrays.asList(
 //             "M4A ", "M4B ", "F4A ", "F4B ");
@@ -44,7 +44,7 @@ public class M4aLoader implements MediaLoader{
 	
 	   
 	@Override
-	public boolean support(String contentType) {
+	public boolean support(String mimeType) {
 //		for (String supportContentType : supportContentTypes){
 //			if (supportContentType.equals(contentType)){
 //				return true;
@@ -52,7 +52,7 @@ public class M4aLoader implements MediaLoader{
 //		}
 //		
 //		return false;
-		return CONTENT_TYPE_AUDIO_MP4.equals(contentType);
+		return MIME_TYPE_AUDIO_MP4.equals(mimeType);
 	}
 
 	@Override

@@ -17,8 +17,8 @@
 
 	<developers>
 		<developer>
-			<id>young</id>
-			<email>sparkyoungs@gmail.com</email>
+			<id>yang</id>
+			<email>hippospark@gmail.com</email>
 		</developer>
 	</developers>
 
@@ -26,7 +26,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- for test resource sending -->
-		<org.eclipse.jetty-version>8.1.10.v20130312</org.eclipse.jetty-version>
+		<org.eclipse.jetty-version>9.2.10.v20150310</org.eclipse.jetty-version>
+		<org.apache.tomcat-version>7.0.59</org.apache.tomcat-version>
 	</properties>
 
 	<dependencies>
@@ -166,7 +167,7 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Jetty for test -->
+		<!-- Embed Jetty for test -->
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-server</artifactId>
@@ -178,6 +179,52 @@
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-servlet</artifactId>
 			<version>${org.eclipse.jetty-version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<!-- Embed Tomcat for test -->
+		<!--
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-catalina</artifactId>
+			<version>${org.apache.tomcat-version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-util</artifactId>
+			<version>${org.apache.tomcat-version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-core</artifactId>
+			<version>${org.apache.tomcat-version}</version>
+			<scope>test</scope>
+		</dependency>
+		-->
+		
+		<!-- Jackson JSON Mapper for test-->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>2.3.2</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.3.2</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.3.2</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

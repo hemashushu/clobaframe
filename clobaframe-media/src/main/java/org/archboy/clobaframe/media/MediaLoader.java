@@ -10,7 +10,7 @@ import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
  */
 public interface MediaLoader {
 	
-	boolean support(String contentType);
+	boolean support(String mimeType);
 	
 	/**
 	 * 

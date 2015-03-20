@@ -13,15 +13,15 @@ import org.archboy.clobaframe.io.ResourceInfo;
 public class ByteArrayResourceInfo implements ResourceInfo {
 
 	private long contentLength;
-	private String contentType;
+	private String mimeType;
 	private Date lastModified;
 	private byte[] content;
 
 	public ByteArrayResourceInfo(byte[] content,
-			String contentType,
+			String mimeType,
 			Date lastModified) {
 		this.contentLength = content.length;
-		this.contentType = contentType;
+		this.mimeType = mimeType;
 		this.lastModified = lastModified;
 		this.content = content;
 	}
@@ -32,17 +32,17 @@ public class ByteArrayResourceInfo implements ResourceInfo {
 	}
 
 	@Override
-	public String getContentType() {
-		return contentType;
+	public String getMimeType() {
+		return mimeType;
 	}
 
 	@Override
-	public InputStream getInputStream() throws IOException {
+	public InputStream getContent() throws IOException {
 		return new ByteArrayInputStream(content);
 	}
 
 	@Override
-	public InputStream getInputStream(long start, long length) throws IOException {
+	public InputStream getContent(long start, long length) throws IOException {
 		return new ByteArrayInputStream(
 				content, (int)start, (int)length);
 	}

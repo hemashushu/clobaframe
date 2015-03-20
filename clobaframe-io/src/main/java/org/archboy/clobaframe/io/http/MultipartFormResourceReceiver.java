@@ -6,11 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.archboy.clobaframe.io.TemporaryResources;
 
 /**
- * Receive the resource(file/data) from the user's browser.
- * <p>
- *     Commonly receive the multi-part POST form data.
- * </p>
- *
+ * Receive the resource(multi-part POST form data) from the user's browser.
+ * 
  * @author yang
  */
 public interface MultipartFormResourceReceiver {

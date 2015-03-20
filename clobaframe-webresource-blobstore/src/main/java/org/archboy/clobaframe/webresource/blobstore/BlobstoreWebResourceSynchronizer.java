@@ -184,10 +184,10 @@ public class BlobstoreWebResourceSynchronizer{
 				blobKey.getKey()});
 
 		//ResourceContent resourceContent = webResourceInfo.getContentSnapshot();
-		InputStream in = webResourceInfo.getInputStream();
+		InputStream in = webResourceInfo.getContent();
 		BlobResourceInfo blobResourceInfo = blobResourceInfoFactory.make(
 				blobKey,
-				webResourceInfo.getContentType(),
+				webResourceInfo.getMimeType(),
 				in,
 				webResourceInfo.getContentLength());
 

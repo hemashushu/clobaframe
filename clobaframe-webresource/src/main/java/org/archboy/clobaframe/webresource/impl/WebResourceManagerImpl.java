@@ -51,7 +51,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	private ResourceLocationGenerator locationGenerator;
 	
 	// the content types that can be location replaced.
-	private List<String> contentTypes = Arrays.asList(
+	private List<String> mimeTypes = Arrays.asList(
 			"text/javascript",
 			"text/css",
 			"application/x-javascript");
@@ -184,7 +184,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 		// select web resources that can be location replaced.
 		for (WebResourceInfo webResourceInfo : webResourceInfos) {
 			// convert into location-replacing resource
-			if (contentTypes.contains(webResourceInfo.getContentType())) {
+			if (mimeTypes.contains(webResourceInfo.getMimeType())) {
 				webResourceInfo = new LocationReplacingWebResourceInfo(
 						webResourceInfo, locations, autoConvertCssUrl);
 			}

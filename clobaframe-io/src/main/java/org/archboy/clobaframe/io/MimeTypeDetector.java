@@ -7,22 +7,22 @@ import java.io.InputStream;
  *
  * @author yang
  */
-public interface ContentTypeDetector {
+public interface MimeTypeDetector {
 
-	public static final String CONTENT_TYPE_UNKNOWN = "application/octet-stream";
+	public static final String MIME_TYPE_UNKNOWN = "application/octet-stream";
 
 	/**
 	 * This function will check both the extension name and file stream.
 	 * 
 	 * @param file
-	 * @return CONTENT_TYPE_UNKNOWN if can not detect.
+	 * @return MIME_TYPE_UNKNOWN if can not detect.
 	 */
 	String getByFile(File file);
 	
 	/**
 	 *
 	 * @param filename
-	 * @return CONTENT_TYPE_UNKNOWN if can not detect.
+	 * @return MIME_TYPE_UNKNOWN if can not detect.
 	 */
 	String getByExtensionName(String filename);
 
@@ -30,7 +30,7 @@ public interface ContentTypeDetector {
 	 * This function works not very well.
 	 * 
 	 * @param in
-	 * @return CONTENT_TYPE_UNKNOWN if can not detect.
+	 * @return MIME_TYPE_UNKNOWN if can not detect.
 	 */
 	String getByContent(InputStream in);
 }

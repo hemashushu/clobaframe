@@ -9,13 +9,13 @@ import org.archboy.clobaframe.query.QueryException;
  *
  * @author yang
  */
-class QuerySupport {
+class Support {
 
 	/**
-	 * Get the object property value by key (i.e. property name).
+	 * Get the value of the specify object property.
 	 * 
 	 * @param object Should not NULL.
-	 * @param key Should not empty.
+	 * @param key Should not EMPTY.
 	 * @return
 	 */
 	public static Object getPropertyValue(Object object, String key) {
@@ -32,20 +32,23 @@ class QuerySupport {
 						ex);
 			} catch (InvocationTargetException ex) {
 				throw new QueryException(
-						String.format("Can not get the value of property [%s] "
-								+ "from object [%s].", key, object.getClass().getName()),
+						String.format(
+								"Can not get the value of property [%s] " + 
+								"from object [%s].", key, object.getClass().getName()),
 						ex);
 			} catch (NoSuchMethodException ex) {
 				throw new QueryException(
-						String.format("Can not get the value of property [%s] "
-								+ "from object [%s].", key, object.getClass().getName()),
+						String.format(
+								"Can not get the value of property [%s] " + 
+								"from object [%s].", key, object.getClass().getName()),
 						ex);
 			}
 		}
 	}
 
 	/**
-	 * Compare the two value objects.
+	 * Compare two objects (should be comparable).
+	 * 
 	 * @param value1
 	 * @param value2
 	 * @return 

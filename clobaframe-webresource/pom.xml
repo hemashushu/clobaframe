@@ -17,8 +17,8 @@
 
 	<developers>
 		<developer>
-			<id>young</id>
-			<email>sparkyoungs@gmail.com</email>
+			<id>yang</id>
+			<email>hippospark@gmail.com</email>
 		</developer>
 	</developers>
 
@@ -26,7 +26,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- for test resource sending -->
-		<org.eclipse.jetty-version>8.1.10.v20130312</org.eclipse.jetty-version>
+		<org.eclipse.jetty-version>9.2.10.v20150310</org.eclipse.jetty-version>
 	</properties>
 
 	<dependencies>

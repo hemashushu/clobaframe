@@ -17,12 +17,12 @@ public interface MediaFactory {
 	 * Make by byte array.
 	 *
 	 * @param data
-	 * @param contentType 
+	 * @param mimeType 
 	 * @param lastModified Specify the last modified date, NULL for current date.
 	 * @return
 	 * @throws ImagingException
 	 */
-	Media make(byte[] data, String contentType, Date lastModified, TemporaryResources temporaryResources) throws IOException;
+	Media make(byte[] data, String mimeType, Date lastModified, TemporaryResources temporaryResources) throws IOException;
 
 	/**
 	 * Make by InputStream.
@@ -31,12 +31,12 @@ public interface MediaFactory {
 	 * <p>
 	 *     The stream will be closed after this call.
 	 * </p>
-	 * @param contentType 
+	 * @param mimeType 
 	 * @param lastModified Specify the last modified date, NULL for current date.
 	 * @return
 	 * @throws
 	 */
-	Media make(InputStream inputStream, String contentType, Date lastModified, TemporaryResources temporaryResources) throws IOException;
+	Media make(InputStream inputStream, String mimeType, Date lastModified, TemporaryResources temporaryResources) throws IOException;
 	
 	/**
 	 * Make by file.

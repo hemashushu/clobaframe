@@ -5,13 +5,18 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A simple interface for accessing memory cache.
- *
+ * The cache abstracting.
+ * 
  * @author yang
- *
  */
 public interface Cache {
 
+	public static enum Policy {
+		ADD_ONLY_IF_NOT_PRESENT,
+		REPLACE_ONLY_IF_PRESENT,
+		SET_ALWAYS
+	}
+		
 	/**
 	 * Clean all cache items.
 	 */
@@ -21,7 +26,7 @@ public interface Cache {
 	 * Delete a cache item.
 	 *
 	 * @param key
-	 * @return whether or not the operation was performed.
+	 * @return TRUE if the operation was performed.
 	 */
 	boolean delete(String key);
 
@@ -36,7 +41,7 @@ public interface Cache {
 	 * Get a cache item.
 	 *
 	 * @param key
-	 * @return Return null if the specify item does not exists.
+	 * @return NULL if the specify item does not exists.
 	 */
 	Object get(String key);
 
@@ -49,7 +54,7 @@ public interface Cache {
 	Map<String, Object> getAll(Collection<String> keys);
 
 	/**
-	 * Put a cache item with no expired and SetPolicy.SET_ALWAYS.
+	 * Put a cache item with no expired and Policy.SET_ALWAYS.
 	 *
 	 * @param key
 	 * @param value
@@ -58,7 +63,7 @@ public interface Cache {
 	boolean put(String key, Object value);
 
 	/**
-	 * Put a cache item with SetPolicy.SET_ALWAYS.
+	 * Put a cache item with Policy.SET_ALWAYS.
 	 *
 	 * @param key
 	 * @param value
@@ -74,10 +79,10 @@ public interface Cache {
 	 * @param value
 	 * @param expiration Pass null equals no expired.
 	 * @param policy
-	 * @return whether or not the operation was performed
+	 * @return TRUE if the operation was performed
 	 */
-	boolean put(String key, Object value, Expiration expiration,
-			Cache.SetPolicy policy);
+	boolean put(String key, Object value,
+			Expiration expiration, Policy policy);
 
 	/**
 	 * Bulk put.
@@ -88,11 +93,6 @@ public interface Cache {
 	 * @return
 	 */
 	Set<String> putAll(java.util.Map<String, ? extends Object> values,
-			Expiration expiration, Cache.SetPolicy policy);
+			Expiration expiration, Policy policy);
 
-	public static enum SetPolicy {
-		ADD_ONLY_IF_NOT_PRESENT,
-		REPLACE_ONLY_IF_PRESENT,
-		SET_ALWAYS
-	}
 }

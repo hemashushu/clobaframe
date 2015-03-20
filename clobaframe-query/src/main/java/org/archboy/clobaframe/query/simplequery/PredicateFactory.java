@@ -22,7 +22,7 @@ public class PredicateFactory {
 		Predicate predicate = new Predicate() {
 			@Override
 			public boolean evaluate(Object object) {
-				Object actualValue = QuerySupport.getPropertyValue(object, key);
+				Object actualValue = Support.getPropertyValue(object, key);
 				if (value == null){
 					return (actualValue == null);
 				}else{
@@ -46,7 +46,7 @@ public class PredicateFactory {
 			@SuppressWarnings("unchecked")
 			@Override
 			public boolean evaluate(Object object) {
-				Object actualValue = QuerySupport.getPropertyValue(object, key);
+				Object actualValue = Support.getPropertyValue(object, key);
 				if (value == null && actualValue == null){
 					return false;
 				}else if (value == null){
@@ -54,7 +54,7 @@ public class PredicateFactory {
 				}else if (actualValue == null) {
 					return false;
 				}else{
-					int result = QuerySupport.compareValue(actualValue, value); //((Comparable<Object>)actualValue).compareTo(value);
+					int result = Support.compareValue(actualValue, value);
 					return result > 0;
 				}
 			}
@@ -75,7 +75,7 @@ public class PredicateFactory {
 			@SuppressWarnings("unchecked")
 			@Override
 			public boolean evaluate(Object object) {
-				Object actualValue = QuerySupport.getPropertyValue(object, key);
+				Object actualValue = Support.getPropertyValue(object, key);
 				if (value == null&& actualValue == null){
 					return false;
 				}else if (value == null){
@@ -83,7 +83,7 @@ public class PredicateFactory {
 				}else if (actualValue == null) {
 					return true;
 				}else{
-					int result = QuerySupport.compareValue(actualValue, value); //((Comparable<Object>)actualValue).compareTo(value);
+					int result = Support.compareValue(actualValue, value);
 					return result < 0;
 				}
 			}

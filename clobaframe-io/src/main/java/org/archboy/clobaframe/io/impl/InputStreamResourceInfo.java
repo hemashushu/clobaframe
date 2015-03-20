@@ -12,15 +12,16 @@ import org.archboy.clobaframe.io.ResourceInfo;
 public class InputStreamResourceInfo implements ResourceInfo {
 
 	private long contentLength;
-	private String contentType;
+	private String mimeType;
 	private Date lastModified;
 	private InputStream inputStream;
 	
 	private boolean consumed;
 
-	public InputStreamResourceInfo(InputStream inputStream, long contentLength, String contentType, Date lastModified) {
+	public InputStreamResourceInfo(InputStream inputStream, long contentLength, 
+			String mimeType, Date lastModified) {
 		this.contentLength = contentLength;
-		this.contentType = contentType;
+		this.mimeType = mimeType;
 		this.lastModified = lastModified;
 		this.inputStream = inputStream;
 		
@@ -33,12 +34,12 @@ public class InputStreamResourceInfo implements ResourceInfo {
 	}
 
 	@Override
-	public String getContentType() {
-		return contentType;
+	public String getMimeType() {
+		return mimeType;
 	}
 
 	@Override
-	public InputStream getInputStream() throws IOException {
+	public InputStream getContent() throws IOException {
 		if (consumed){
 			throw new IOException("The content has already consumed.");
 		}
@@ -48,7 +49,7 @@ public class InputStreamResourceInfo implements ResourceInfo {
 	}
 
 	@Override
-	public InputStream getInputStream(long start, long length) throws IOException {
+	public InputStream getContent(long start, long length) throws IOException {
 		throw new UnsupportedOperationException("Does not supported.");
 	}
 

@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import javax.inject.Named;
-import org.archboy.clobaframe.io.ContentTypeDetector;
+import org.archboy.clobaframe.io.MimeTypeDetector;
 import org.archboy.clobaframe.webresource.ResourceLocationGenerator;
 import org.archboy.clobaframe.webresource.ResourceRepository;
 import org.archboy.clobaframe.webresource.UniqueNameGenerator;
@@ -33,7 +33,7 @@ public class LocalWebResourceRepository implements ResourceRepository{
 	private ResourceLoader resourceLoader;
 
 	@Inject
-	private ContentTypeDetector contentTypeAnalyzer;
+	private MimeTypeDetector mimeTypeDetector;
 
 	@Value("${webresource.local.path}")
 	private String localPath;
@@ -133,10 +133,10 @@ public class LocalWebResourceRepository implements ResourceRepository{
 				} else {
 					String name = getResourceName(resourceDir, file);
 					//String uniqueName = getUniqueName(resourceDir, file);
-					String contentType = getContentType(file);
+					String mimeType = getMimeType(file);
 
 					DefaultWebResourceInfo webResourceInfo = new DefaultWebResourceInfo(
-							file, name, contentType);
+							file, name, mimeType);
 					
 					String uniqueName = uniqueNameGenerator.getUniqueName(webResourceInfo);
 					webResourceInfo.setUniqueName(uniqueName);
@@ -144,11 +144,11 @@ public class LocalWebResourceRepository implements ResourceRepository{
 					webResourcesInfos.add(webResourceInfo);
 
 					logger.debug(
-							"Web static resource: [{}] , unique name: [{}], content type: [{}].",
+							"Web static resource: [{}] , unique name: [{}], mime type: [{}].",
 							new Object[]{
 							webResourceInfo.getName(),
 							webResourceInfo.getUniqueName(),
-							webResourceInfo.getContentType()}
+							webResourceInfo.getMimeType()}
 							);
 				}
 			}
@@ -202,7 +202,7 @@ public class LocalWebResourceRepository implements ResourceRepository{
 			}
 			
 			CombineWebResourceInfo resourceInfo = new CombineWebResourceInfo(
-					selected, (String)combineName, selected.get(0).getContentType());
+					selected, (String)combineName, selected.get(0).getMimeType());
 			
 			String uniqueName = uniqueNameGenerator.getUniqueName(resourceInfo);
 			resourceInfo.setUniqueName(uniqueName);
@@ -213,9 +213,9 @@ public class LocalWebResourceRepository implements ResourceRepository{
 		return combineWebResourceInfos;
 	}
 	
-	private String getContentType(File file){
+	private String getMimeType(File file){
 		String fileName = file.getName();
-		return contentTypeAnalyzer.getByExtensionName(fileName);
+		return mimeTypeDetector.getByExtensionName(fileName);
 	}
 
 	

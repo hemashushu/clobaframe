@@ -13,7 +13,6 @@ import org.archboy.clobaframe.io.ResourceInfoFactory;
 import org.archboy.clobaframe.io.TemporaryResources;
 import org.archboy.clobaframe.io.impl.DefaultTemporaryResources;
 import org.junit.After;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,6 +20,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import static org.junit.Assert.*;
 
 /**
  *
@@ -64,16 +64,16 @@ public class FileBaseResourceInfoFactoryTest {
 		assertNotNull(resourceInfo);
 		
 		assertEquals(data.length, resourceInfo.getContentLength());
-		assertEquals("text/plain", resourceInfo.getContentType());
+		assertEquals("text/plain", resourceInfo.getMimeType());
 		assertDateEquals(new Date(file.lastModified()), resourceInfo.getLastModified());
 		assertTrue(resourceInfo.isSeekable());
 		assertEquals(file, resourceInfo.getFile());
 		
-		InputStream in1 = resourceInfo.getInputStream();
+		InputStream in1 = resourceInfo.getContent();
 		assertArrayEquals(data, IOUtils.toByteArray(in1));
 		in1.close();
 		
-		InputStream in2 = resourceInfo.getInputStream(1, 3);
+		InputStream in2 = resourceInfo.getContent(1, 3);
 		assertArrayEquals(new byte[]{0x31,0x32,0x33}, IOUtils.toByteArray(in2));
 		in2.close();
 		
@@ -82,12 +82,12 @@ public class FileBaseResourceInfoFactoryTest {
 	@Test
 	public void testWrap() throws IOException{
 		
-		String contentType = "application/octet-stream";
+		String mimeType = "application/octet-stream";
 		byte[] data = new byte[]{0,1,2,3,4,5};
 		InputStream in = new ByteArrayInputStream(data);
 		Date now = new Date();
 		
-		ResourceInfo resourceInfo = resourceInfoFactory.make(in, data.length, contentType, now);
+		ResourceInfo resourceInfo = resourceInfoFactory.make(in, data.length, mimeType, now);
 		
 		TemporaryResources temporaryResources = new DefaultTemporaryResources();
 		FileBaseResourceInfo fileBaseResourceInfo =
@@ -98,15 +98,15 @@ public class FileBaseResourceInfoFactoryTest {
 		assertNotNull(file);
 		
 		assertEquals(resourceInfo.getContentLength(), fileBaseResourceInfo.getContentLength());
-		assertEquals(resourceInfo.getContentType(), fileBaseResourceInfo.getContentType());
+		assertEquals(resourceInfo.getMimeType(), fileBaseResourceInfo.getMimeType());
 		assertDateEquals(resourceInfo.getLastModified(), fileBaseResourceInfo.getLastModified());
 		assertTrue(fileBaseResourceInfo.isSeekable());
 		
-		InputStream in1 = fileBaseResourceInfo.getInputStream();
+		InputStream in1 = fileBaseResourceInfo.getContent();
 		assertArrayEquals(data, IOUtils.toByteArray(in1));
 		in1.close();
 		
-		InputStream in2 = fileBaseResourceInfo.getInputStream(1, 3);
+		InputStream in2 = fileBaseResourceInfo.getContent(1, 3);
 		assertArrayEquals(new byte[]{1,2,3}, IOUtils.toByteArray(in2));
 		in2.close();
 		

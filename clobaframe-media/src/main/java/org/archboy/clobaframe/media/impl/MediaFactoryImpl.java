@@ -55,23 +55,23 @@ public class MediaFactoryImpl implements MediaFactory{
 //	}
 	
 	@Override
-	public Media make(byte[] data, String contentType, Date lastModified, TemporaryResources temporaryResources) throws IOException {
+	public Media make(byte[] data, String mimeType, Date lastModified, TemporaryResources temporaryResources) throws IOException {
 		Assert.notNull(data);
-		Assert.hasText(contentType);
+		Assert.hasText(mimeType);
 		Assert.notNull(temporaryResources);
 		
 		if (lastModified == null) {
 			lastModified = new Date();
 		}
 		
-		ResourceInfo resourceInfo = resourceInfoFactory.make(data, contentType, lastModified);
+		ResourceInfo resourceInfo = resourceInfoFactory.make(data, mimeType, lastModified);
 		return make(resourceInfo, temporaryResources);
 	}
 
 	@Override
-	public Media make(InputStream inputStream, String contentType, Date lastModified, TemporaryResources temporaryResources) throws IOException {
+	public Media make(InputStream inputStream, String mimeType, Date lastModified, TemporaryResources temporaryResources) throws IOException {
 		Assert.notNull(inputStream);
-		Assert.hasText(contentType);
+		Assert.hasText(mimeType);
 		Assert.notNull(temporaryResources);
 		
 		if (lastModified == null) {
@@ -80,7 +80,7 @@ public class MediaFactoryImpl implements MediaFactory{
 		
 		try{
 			byte[] data = toByteArrayWithSizeLimit(inputStream);
-			ResourceInfo resourceInfo = resourceInfoFactory.make(data, contentType, lastModified);
+			ResourceInfo resourceInfo = resourceInfoFactory.make(data, mimeType, lastModified);
 			return make(resourceInfo, temporaryResources);
 		} finally {
 			IOUtils.closeQuietly(inputStream);
@@ -103,7 +103,7 @@ public class MediaFactoryImpl implements MediaFactory{
 		
 		HttpURLConnection connection = (HttpURLConnection)url.openConnection();
 		
-		String contentType = connection.getContentType();
+		String mimeType = connection.getContentType();
 		Date lastModified = null;
 		
 		long lastModifiedLong = connection.getLastModified();
@@ -117,7 +117,7 @@ public class MediaFactoryImpl implements MediaFactory{
 		try {
 			in = connection.getInputStream();
 			byte[] data = toByteArrayWithSizeLimit(in);
-			ResourceInfo resourceInfo = resourceInfoFactory.make(data, contentType, lastModified);
+			ResourceInfo resourceInfo = resourceInfoFactory.make(data, mimeType, lastModified);
 			return make(resourceInfo, temporaryResources);
 			
 		} finally {
@@ -146,7 +146,7 @@ public class MediaFactoryImpl implements MediaFactory{
 		Media media = null;
 
 		for (MediaLoader mediaLoader : mediaLoaders){
-			if (mediaLoader.support(resourceInfo.getContentType())){
+			if (mediaLoader.support(resourceInfo.getMimeType())){
 				media = mediaLoader.load(fileBaseResourceInfo);
 				break;
 			}
@@ -154,8 +154,8 @@ public class MediaFactoryImpl implements MediaFactory{
 
 		if (media == null){
 			throw new UnsupportedMediaException(
-					String.format("Does not support content type %s.", 
-							resourceInfo.getContentType()));
+					String.format("Does not support resource with mime type %s.", 
+							resourceInfo.getMimeType()));
 		}
 
 //		if (media instanceof AbstractMedia){

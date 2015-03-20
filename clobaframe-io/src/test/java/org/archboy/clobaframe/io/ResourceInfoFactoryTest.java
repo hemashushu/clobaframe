@@ -38,43 +38,43 @@ public class ResourceInfoFactoryTest {
 	@Test
 	public void testMakeByFileByteArray() throws IOException{
 		
-		String contentType = "application/octet-stream";
+		String mimeType = "application/octet-stream";
 		byte[] data = new byte[]{0,1,2,3,4,5};
 		Date now = new Date();
 		
-		ResourceInfo resourceInfo = resourceInfoFactory.make(data, contentType, now);
+		ResourceInfo resourceInfo = resourceInfoFactory.make(data, mimeType, now);
 		assertNotNull(resourceInfo);
 		
 		assertEquals(6, resourceInfo.getContentLength());
-		assertEquals(contentType, resourceInfo.getContentType());
+		assertEquals(mimeType, resourceInfo.getMimeType());
 		assertDateEquals(now, resourceInfo.getLastModified());
 		assertTrue(resourceInfo.isSeekable());
 		
-		InputStream in1 = resourceInfo.getInputStream();
+		InputStream in1 = resourceInfo.getContent();
 		assertArrayEquals(data, IOUtils.toByteArray(in1));
 		in1.close();
 		
-		InputStream in2 = resourceInfo.getInputStream(1, 3);
+		InputStream in2 = resourceInfo.getContent(1, 3);
 		assertArrayEquals(new byte[]{1,2,3}, IOUtils.toByteArray(in2));
 		in2.close();
 	}
 	
 	@Test
 	public void testMakeByInputStream() throws IOException{
-		String contentType = "application/octet-stream";
+		String mimeType = "application/octet-stream";
 		byte[] data = new byte[]{0,1,2,3,4,5};
 		InputStream in = new ByteArrayInputStream(data);
 		Date now = new Date();
 		
-		ResourceInfo resourceInfo = resourceInfoFactory.make(in, data.length, contentType, now);
+		ResourceInfo resourceInfo = resourceInfoFactory.make(in, data.length, mimeType, now);
 		assertNotNull(resourceInfo);
 		
 		assertEquals(6, resourceInfo.getContentLength());
-		assertEquals(contentType, resourceInfo.getContentType());
+		assertEquals(mimeType, resourceInfo.getMimeType());
 		assertDateEquals(now, resourceInfo.getLastModified());
 		assertFalse(resourceInfo.isSeekable());
 		
-		InputStream in1 = resourceInfo.getInputStream();
+		InputStream in1 = resourceInfo.getContent();
 		assertArrayEquals(data, IOUtils.toByteArray(in1));
 		in1.close();
 		

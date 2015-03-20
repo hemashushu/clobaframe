@@ -10,15 +10,15 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import org.springframework.beans.factory.annotation.Value;
 import javax.inject.Named;
-import org.archboy.clobaframe.cache.Cache.SetPolicy;
-import org.archboy.clobaframe.cache.impl.CacheClientAdapter;
-import org.archboy.clobaframe.cache.Expiration;
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.ConnectionFactoryBuilder;
 import net.spy.memcached.ConnectionFactoryBuilder.Protocol;
 import net.spy.memcached.MemcachedClient;
+import org.archboy.clobaframe.cache.AbstractCache;
+import org.archboy.clobaframe.cache.Cache;
+import org.archboy.clobaframe.cache.Expiration;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * Memcached implementation.
@@ -27,7 +27,7 @@ import net.spy.memcached.MemcachedClient;
  *
  */
 @Named
-public class MemcachedCacheClientAdapter implements CacheClientAdapter, Closeable {
+public class MemcachedCache extends AbstractCache implements Closeable {
 
 	private MemcachedClient client;
 
@@ -37,10 +37,10 @@ public class MemcachedCacheClientAdapter implements CacheClientAdapter, Closeabl
 
 	private String spymemcachedLogger = DEFAULT_SPY_MEMCACHED_LOGGER;
 
-	@Value("${cache.memcached.protocol}")
+	@Value("${clobaframe.cache.memcached.protocol}")
 	private Protocol protocol = DEFAULT_PROTOCOL;
 
-	@Value("${cache.memcached.servers}")
+	@Value("${clobaframe.cache.memcached.servers}")
 	private String servers = DEFAULT_SERVERS;
 
 	@PostConstruct
@@ -108,7 +108,7 @@ public class MemcachedCacheClientAdapter implements CacheClientAdapter, Closeabl
 
 	@Override
 	public boolean put(String key, Object value, Expiration expires,
-			SetPolicy policy) {
+			Policy policy) {
 		int expireSecond = 0;
 		if (expires != null) {
 			expireSecond = expires.getSeconds();
@@ -140,7 +140,7 @@ public class MemcachedCacheClientAdapter implements CacheClientAdapter, Closeabl
 
 	@Override
 	public Set<String> putAll(Map<String, ? extends Object> values,
-			Expiration expires, SetPolicy policy) {
+			Expiration expires, Policy policy) {
 		Set<String> items = new HashSet<String>();
 		for (String key : values.keySet()) {
 			boolean created = put(key, values.get(key), expires, policy);
@@ -149,5 +149,15 @@ public class MemcachedCacheClientAdapter implements CacheClientAdapter, Closeabl
 			}
 		}
 		return items;
+	}
+
+	@Override
+	public boolean put(String key, Object value) {
+		return put(key, value, null, Policy.SET_ALWAYS);
+	}
+
+	@Override
+	public boolean put(String key, Object value, Expiration expiration) {
+		return put(key, value, expiration, Cache.Policy.SET_ALWAYS);
 	}
 }

@@ -23,13 +23,13 @@ public class ComparatorFactory {
 			@SuppressWarnings("unchecked")
 			@Override
 			public int compare(T o1, T o2) {
-				Object value1 = QuerySupport.getPropertyValue(o1, key);
-				Object value2 = QuerySupport.getPropertyValue(o2, key);
+				Object value1 = Support.getPropertyValue(o1, key);
+				Object value2 = Support.getPropertyValue(o2, key);
 				int result = 0;
 				if (value1 == null){
 					result = (value2 == null ? 0 : -1);
 				}else{
-					result = (value2 == null ? 1 : QuerySupport.compareValue(value1, value2));
+					result = (value2 == null ? 1 : Support.compareValue(value1, value2));
 				}
 				return (ascOrder ? result : -result);
 			}
@@ -52,7 +52,7 @@ public class ComparatorFactory {
 	 * 
 	 * @param <T>
 	 * @param comparators
-	 * @param level to mark the steps of the self-call.
+	 * @param level level of recursive.
 	 * @return 
 	 */
 	private static <T> Comparator<T> combine(

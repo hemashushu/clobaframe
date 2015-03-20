@@ -9,16 +9,16 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.archboy.clobaframe.io.MimeTypeDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import javax.inject.Inject;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import javax.inject.Named;
-import org.archboy.clobaframe.io.ContentTypeDetector;
 import org.springframework.util.Assert;
 
 /**
@@ -26,25 +26,34 @@ import org.springframework.util.Assert;
  * @author yang
  */
 @Named
-public class ExtensionNameContentTypeDetector implements ContentTypeDetector {
+public class ExtensionNameMimeTypeDetector implements MimeTypeDetector {
 
 	private Map<String, String> mimeTypes = new HashMap<String, String>();
 	
 	private static final String UNKNOWN_MIME_TYPE = "application/octet-stream";
+	
+	// the default mime type list file is from Apache httpd
 	private static final String mimeTypeListFile = "classpath:org/archboy/clobaframe/io/mime.types";
+	
+	// the custom mime type list
+	private static final String extraMimeTypeListFile = "classpath:org/archboy/clobaframe/io/extra.mime.types";
 	
 	@Inject
 	private ResourceLoader resourceLoader;
 	
-	private final Logger logger = LoggerFactory.getLogger(ExtensionNameContentTypeDetector.class);
+	private final Logger logger = LoggerFactory.getLogger(ExtensionNameMimeTypeDetector.class);
 	
 	@PostConstruct
 	public void init() throws IOException {
-		
-		Resource resource = resourceLoader.getResource(mimeTypeListFile);
+		loadMimeTypesList(mimeTypeListFile);
+		loadMimeTypesList(extraMimeTypeListFile);
+	}
+	
+	private void loadMimeTypesList(String resourceName) throws IOException {
+		Resource resource = resourceLoader.getResource(resourceName);
 		if (!resource.exists()) {
-			logger.error("Can not load the mime type list file.");
-			throw new FileNotFoundException();
+			//logger.error("Can not find the mime type list file.");
+			throw new FileNotFoundException("Can not find the mime type list file.");
 		}
 		
 		InputStream in = null;
@@ -62,7 +71,7 @@ public class ExtensionNameContentTypeDetector implements ContentTypeDetector {
 				}
 				
 				int pos = line.indexOf('\t');
-				String name = line.substring(0, pos);
+				String name = line.substring(0, pos).trim();
 				String list = line.substring(pos).trim();
 				
 				if (StringUtils.isBlank(list)) {
@@ -71,9 +80,9 @@ public class ExtensionNameContentTypeDetector implements ContentTypeDetector {
 				
 				String[] extensions = list.split("\\s");
 				for(String e:extensions){
-					if (!mimeTypes.containsKey(e)){
-						mimeTypes.put(e, name);
-					}
+					//if (!mimeTypes.containsKey(e)){
+					mimeTypes.put(e, name);
+					//}
 				}
 			}
 		}finally{
@@ -87,7 +96,7 @@ public class ExtensionNameContentTypeDetector implements ContentTypeDetector {
 		
 		String extension = FilenameUtils.getExtension(file.getName());
 		String name = mimeTypes.get(extension);
-		return (name == null?UNKNOWN_MIME_TYPE:name);
+		return (name == null ? UNKNOWN_MIME_TYPE : name);
 	}
 
 	@Override
@@ -96,7 +105,7 @@ public class ExtensionNameContentTypeDetector implements ContentTypeDetector {
 		
 		String extension = FilenameUtils.getExtension(filename);
 		String name = mimeTypes.get(extension);
-		return (name == null?UNKNOWN_MIME_TYPE:name);
+		return (name == null ? UNKNOWN_MIME_TYPE : name);
 	}
 
 	@Override

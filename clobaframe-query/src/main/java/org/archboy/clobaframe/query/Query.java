@@ -6,10 +6,7 @@ import java.util.Map;
 import org.apache.commons.collections.Predicate;
 
 /**
- * A simple interface for selecting or sorting objects from collection.
- * <p>
- *     Currently the SimpleQuery implements this interface.
- * </p>
+ * An utility for selecting and sorting objects.
  *
  * @author yang
  * @param <T>
@@ -18,9 +15,8 @@ public interface Query<T> {
 
 	/**
 	 * Add a predicate to query.
-	 * <p>
-	 *     Multiple predicates runs with 'AND' logic.
-	 * </p>
+	 * 
+	 * Multiple predicates process the "AND" logic.
 	 *
 	 * @param predicate
 	 * @return
@@ -76,6 +72,9 @@ public interface Query<T> {
 	Query<T> whereLessThanOrEqual(String key, Object value);
 
 	/**
+	 * Sort the items by a specify key.
+	 * 
+	 * Multiple comparators process the "order by... then by... then by" logic.
 	 * 
 	 * @param key
 	 * @return 
@@ -97,21 +96,22 @@ public interface Query<T> {
 	Query<T> orderBy(Comparator<T> comparator);
 
 	/**
-	 * Limit the result list items.
+	 * Limit the result items.
+	 * 
 	 * @param size
 	 * @return 
 	 */
 	Query<T> limit(int size);
 	
 	/**
-	 * Return a result list.
+	 * Return the result.
 	 *
 	 * @return
 	 */
 	List<T> list();
 
 	/**
-	 * Return the first item of the result list.
+	 * Return the first item of the result.
 	 *
 	 * @return Return null if there is no result.
 	 */
@@ -119,8 +119,20 @@ public interface Query<T> {
 
 	/**
 	 * Return the map object with specify keys.
-	 * For example: {id:'123', name:'foo', checked:'true'} with
-	 * select ['id','checked'] result the {id:'123', checked:'true'}.
+	 * 
+	 * Example: 
+	 * [
+	 * {id:'123', name:'foo', checked:true},
+	 * {id:..., name:..., checked:...},
+	 * {id:..., name:..., checked:...},
+	 * ...]
+	 * 
+	 * with select:
+	 * ['id','checked']
+	 * 
+	 * will return:
+	 * 
+	 * [{id:'123', checked:true},...]
 	 *
 	 * @param keys
 	 * @return

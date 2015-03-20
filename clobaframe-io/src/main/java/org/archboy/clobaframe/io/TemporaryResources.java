@@ -5,10 +5,9 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Utility class for tracking and ultimately closing or otherwise disposing a
- * collection of temporary resources.
- * <p>
- * Note that this class is not thread-safe. It's from Apache Tika.
+ * An utility for tracking temporary resource to make sure ultimately closing.
+ * 
+ * Note: that this class is not thread-safe, come from Apache Tika.
  */
 public interface TemporaryResources extends Closeable {
 
@@ -51,7 +50,7 @@ public interface TemporaryResources extends Closeable {
 	/**
 	 * Closes all tracked resources. The resources are closed in reverse order
 	 * from how they were added.
-	 * <p>
+	 * 
 	 * Any thrown exceptions from managed resources are collected and then
 	 * re-thrown only once all the resources have been closed.
 	 *

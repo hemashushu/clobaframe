@@ -62,13 +62,20 @@ public class DefaultTemporaryResources implements TemporaryResources {
 	@Override
     public void close() throws IOException {
         // Release all resources.
+		IOException ex = null;
+		
         for (Closeable resource : resources) {
             try {
                 resource.close();
             } catch (IOException e) {
+				ex = e;
                 logger.error("Can not close the resource.", e);
             }
         }
         resources.clear();
+		
+		if (ex != null) {
+			throw new IOException("Some temporary resource can't be closed.", ex);
+		}
     }
 }

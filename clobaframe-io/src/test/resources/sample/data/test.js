@@ -1,2572 +1,2114 @@
-/*
- * common.js
+/*!
+ * Bootstrap v3.2.0 (http://getbootstrap.com)
+ * Copyright 2011-2014 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
 
-/**
- *  Page scripts initial pattern:
- *  define:
- *    $.pages.pageName = {
- *			init:function(){...},
- *			otherMethod:function(){...}
- *			};
- *  invoke:
- *    $.pages.pageName.init();
- *
- *  Page options, i.e. some values from backend to script:
- *	  $.pages.options = {
- *			"hideLauncherTitle":false,
- *			"authenticated":true
- *		};
- */
-jQuery.pages = {};
-
-var i18nMessageDefault= {};
-var i18nMessageLocal = {};
-
-/**
- * Addition functions
- */
-(function($){
-	String.prototype.escapeHtml = function(){
-			var content = this.replace(/&/g, '&amp;');
-			content = content.replace(/>/g, '&gt;');
-			content = content.replace(/</g, '&lt;');
-			content = content.replace(/"/g, '&quot;');
-			content = content.replace(/\n/g, '<br/>');
-			return content;
-		};
-
-	String.prototype.unescapeHtml = function(){
-			var content = this.replace(/<br\/>/ig, '\n');
-			content = content.replace(/<br>/ig, '\n');
-			content = content.replace(/&lt;/g, '<');
-			content = content.replace(/&gt;/g, '>');
-			content = content.replace(/&quot;/g, '"');
-			content = content.replace(/&amp;/g, '&');
-			return content;
-		};
-
-	/*
-	 * ie-fix (6,7,8 add Date.toISOString() function to 'Date' prototype)
-	 * Output as 'YYYY-MM-DDTHH:mm:ss.sssZ'
-	 */
-	var padZero = function(number){
-		var r = String(number);
-		if ( r.length === 1 ) {
-			r = '0' + r;
-		}
-		return r;
-	};
-
-	if (typeof Date.prototype.toISOString == 'undefined'){
-		Date.prototype.toISOString = function(){
-			var date = this;
-			return date.getUTCFullYear()+'-'
-				+ padZero(date.getUTCMonth()+1)+'-'
-				+ padZero(date.getUTCDate())+'T'
-				+ padZero(date.getUTCHours())+':'
-				+ padZero(date.getUTCMinutes())+':'
-				+ padZero(date.getUTCSeconds())+'Z';
-		};
-	};
-
-	// add 'isie6' and 'isie8' to jQuery.browser
-	$.browser.isie6 = function(){
-		return ($.browser.msie && $.browser.version < 7) ? true:false;
-	};
-
-	$.browser.isie8 = function(){
-		return ($.browser.msie && $.browser.version == 8) ? true:false;
-	};
-
-	/**
-	 * check the DOM object equals.
-	 *
-	 * var left = $('div.one');
-	 * var right = $('div.two');
-	 * var result = $.jqEquals(left, right);
-	 *
-	 * null & null = true.
-	 * null & element(s) = false.
-	 * same element(s) = true.
-	 * more elements & less elements = false.
-	 * no element & no element = false.
-	 *
-	 */
-	var jqEquals = function(left, right) {
-		if (left == null && right == null) {
-			return true;
-		}
-
-		if (left == null || right == null) {
-			return false;
-		}
-
-		if (left.length != right.length) {
-			return false;
-		}
-
-		if (left.length == 0){
-			return false;
-		}
-
-		for (var idx=0; idx < left.length; idx++) {
-			if (left[idx] != right[idx]) {
-				return false;
-			}
-		}
-
-		return true;
-	};
-
-	$.jqEquals = jqEquals;
-
-	/**
-	 * jQuery object set.
-	 *
-	 * Add none-duplicated object:
-	 *
-	 * var s = new $.jqSet();
-	 * var object = $('#someElements');
-	 * s.add(object);
-	 *
-	 * Get all items:
-	 * var objects = s.getAll();
-	 *
-	 * Get item by index:
-	 * var object = s.getByIndex(0);
-	 *
-	 */
-	var jqSet = function () {
-		var objects = [];
-
-		this.size = function() {
-			return objects.length;
-		};
-
-		this.getAll = function() {
-			return objects;
-		};
-
-		this.getByIndex = function(idx) {
-			return objects[idx];
-		};
-
-		this.add = function(jqObject){
-			if (jqObject.length == 0){
-				return;
-			}
-
-			if (!this.contains(jqObject)){
-				objects.push(jqObject);
-			}
-		};
-
-		this.remove = function(jqObject){
-			var idx = this.indexOf(jqObject);
-			if (idx >=0){
-				objects.splice(idx, 1);
-			}
-		};
-
-		this.indexOf = function(jqObject){
-			for(var idx in objects){
-				if ($.jqEquals(objects[idx], jqObject)){
-					return idx;
-				}
-			}
-			return -1;
-		};
-
-		this.contains = function(jqObject){
-			return (this.indexOf(jqObject) != -1);
-		};
-
-		this.clear = function(){
-			objects.splice(0, objects.length);
-		};
-	};
-
-	$.jqSet = jqSet;
-
-	/*
-	 * A map that using jQuery object as key.
-	 *
-	 * var s = new $.jqMap();
-	 * var object = $('#someElements');
-	 * s.put(object, 'value1');
-	 *
-	 * Replace the value of the same key.
-	 * s.put(object, 'value2');
-	 *
-	 * Get all items:
-	 * var objects = s.getAll();
-	 *
-	 * Get item value by jQuery object:
-	 * var value = s.get(object);
-	 *
-	 */
-	var jqMap = function () {
-		// objects contains a set of items: {key:jQueryObject, value:'itemValue'}
-		var objects = [];
-
-		this.size = function() {
-			return objects.length;
-		};
-
-		this.getAll = function() {
-			return objects;
-		};
-
-		this.get = function(jqObject) {
-			var idx = this.indexOf(jqObject);
-			if (idx >=0){
-				return objects[idx].value;
-			}else{
-				return null;
-			}
-		};
-
-		/*
-		 * If the key (jqObject) has already exists, the new value will replace
-		 * the old one.
-		 *
-		 */
-		this.put = function(jqObject, value){
-			if (jqObject.length == 0){
-				return;
-			}
-
-			var idx = this.indexOf(jqObject);
-			if (idx >= 0){
-				// replace the old value.
-				var oldItem = objects[idx];
-				oldItem.value = value;
-			}else{
-				var item = {key:jqObject, value:value};
-				objects.push(item);
-			}
-		};
-
-		this.remove = function(jqObject){
-			var idx = this.indexOf(jqObject);
-			if (idx >=0){
-				objects.splice(idx, 1);
-			}
-		};
-
-		this.indexOf = function(jqObject){
-			for(var idx in objects){
-				var item = objects[idx];
-				if ($.jqEquals(item.key, jqObject)){
-					return idx;
-				}
-			}
-			return -1;
-		};
-
-		this.contains = function(jqObject){
-			return (this.indexOf(jqObject) != -1);
-		};
-
-		this.clear = function(){
-			objects.splice(0, objects.length);
-		};
-	};
-
-	$.jqMap = jqMap;
-
-	/**
-	 * Simple object collection query.
-	 *
-	 * Considers this:
-	 * var array = [{id:1, name:'hello', pass:true},
-	 *				{id:2, name:'world'},
-	 *				{id:3, name:'foobar', pass:false}];
-	 *
-	 * // list:
-	 * var r1 = new $.simpleQuery(array).list();
-	 *
-	 * // get first one:
-	 * var r2 = new $.simpleQuery(array).first();
-	 *
-	 * // select names [id,name]':
-	 * var r3 = new $.simpleQuery(array).select(['id','name']);
-	 *
-	 * // select items where 'name' equals 'world':
-	 * var r4 = new $.simpleQuery(array).whereEquals('name', 'world').list();
-	 *
-	 */
-	var simpleQuery = function(array){
-
-		if(!$.isArray(array)) {
-			$.error('The params must be a function.');
-		}
-
-		var items = array;
-
-		var where = function(func) {
-			if (typeof func != 'function'){
-				$.error('The func option must be a function.');
-			}
-
-			var selected = [];
-			for (var idx=0; idx<items.length; idx++){
-				if (func(items[idx], idx)){
-					selected.push(items[idx]);
-				}
-			}
-
-			return new simpleQuery(selected);
-		};
-
-		this.where = where;
-
-		this.whereEquals = function(name, val){
-			return where(function(e){
-				return (e[name] == val);
-			});
-		};
-
-		this.first = function(){
-			return ((items.length > 0)?items[0]:null);
-		};
-
-		this.list = function() {
-			return items;
-		};
-
-		this.select = function(names){
-			if (!$.isArray(names)) {
-				$.error('The params must be a function.');
-			}
-
-			var selected = [];
-			for (var idx=0; idx<items.length; idx++) {
-				var item = items[idx];
-				var obj = {};
-				for (var sub=0; sub<names.length; sub++){
-					var name = names[sub];
-					obj[name] = item[name];
-				}
-				selected.push(obj);
-			}
-			return selected;
-		};
-	};
-
-	$.simpleQuery = simpleQuery;
-
-})(jQuery);
-
-/**
- * I18n message resolver.
- *
- * The global variable 'i18nMessageDefault' and 'i18nMessageLocal' defines
- * all messages text.
- *
- * Set source first:
- * $.message.setSource(defaultSourceObject, localSourceObject);
- *
- * Get text by code and params:
- * var text = $.message('test.text1');
- *
- * For example , the content of code 'test.text2' is 'hello {0}, now is {1}.',
- * and then put params ['Dude', new Date()].
- *
- * var text = $.message('test.text2',['Dude', new Date()]);
- *
- */
-(function($){
-	var messages = null;
-	var messagesLocal = null;
-
-	var methods = {
-		setSource:function(defaults, local){
-			messages = defaults;
-			messagesLocal = local;
-		},
-
-		get:function(code, params){
-			var content = null;
-			if (messagesLocal == null){
-				content = messages[code];
-			}else{
-				content = messagesLocal[code];
-				if (content == null){
-					content = messages[code];
-				}
-			}
-
-			if (content == null){
-				return 'CODE_NOT_DEFINED [' + code + ']';
-			}
-
-			// replace placeholders
-			for(var idx in params){
-				var regexp = new RegExp('\\{' + idx + '(,\\w+)*\\}','g');
-				content = content.replace(regexp, params[idx]);
-			}
-
-			return content;
-		}
-	};
-
-	$(function(){
-		if (typeof i18nMessageDefault == 'undefined'){
-			$.error('No default i18n message defined.');
-		}else if (typeof i18nMessageLocal == 'undefined'){
-			methods.setSource(i18nMessageDefault, null);
-		}else{
-			methods.setSource(i18nMessageDefault, i18nMessageLocal);
-		}
-	});
-
-	// expose the 'get()' method to jQuery.message().
-	$.message = methods.get;
-
-})(jQuery);
-
-
-
-/**
- * Flash message panel.
- * Commonly show the submit result or the error message.
- *
- * $('#someButton').flashMessage({
- *		content:'message.code',
- *		type:'info',
- *		hide:'normal',
- *		actions:[
- *			{title:'title.code', id:'action-id', params:'some-value-pass-to-callback'}
- *			]
- *		});
- *
- * $.flashMessage.hide();
- * $.flashMessage.addActionListener('actionId',function(params){});
- *
- */
-(function($){
-	//var isShowing = false; // indicates the showing state.
-	var hideTimer = null; // the timer to hide message.
-
-	var delayNormal = 6000; // automatically hiding delay
-	var delayFast = 3000;
-	var delaySlow = 9000;
-
-//	var minWidth = 300; // the min-width of notification panel.
-//	var maxWidth = 640;
-
-	var defaults = {
-		content:'', // the content message code
-		type:'info', // 'info', 'warn'
-		hide:'normal', // 'fast', 'normal', 'slow', 'off'.
-
-		/*
-		 * The showing position.
-		 * 'right', 'bottom' is relate to the target.
-		 * 'topmost' is float on the top side of page.
-		 */
-		position:'right', // 'right','bottom','topmost'
-		offset:0, // the offset between the message panel and the target.
-
-		/*
-		 *actions list, such as:
-		 * [
-		 *   {title:'action-title(message-code)',id:'action-id', params:'param-value'},
-		 *   {title:'Yes',id:'id-yes'}
-		 * ]
-		 */
-		actions:null
-	};
-
-	// action handlers
-	var actions = {};
-
-	var methods = {
-
-		buildElements:function(){
-			var body = $('body');
-			var exists = body.find('.flashMessagePanel');
-			if (exists.length > 0){
-				return exists;
-			}
-
-			var panel = $('<div class="flashMessagePanel">' +
-				' <div class="content">' +
-				'  <a class="close" href="#" title="Close">x</a>' +
-				'  <span class="text"></span>' +
-				'  <span class="action"></span>' +
-				' </div>' +
-				'</div>');
-
-			body.append(panel);
-
-			var closeButton = panel.find('a.close');
-			closeButton.click(function(event){
-				event.preventDefault();
-				methods.hide();
-			});
-
-			return panel;
-		},
-
-//		show:function(content, type, hide, actions){
-//			var message = {content:content, type:type, hide:hide, actions:actions};
-//			methods.showByObject(message);
-//		},
-
-		init:function(options){
-			return this.each(function(){
-				var target = $(this);
-				var settings = $.extend({}, defaults, options);
-				methods.show(target, settings);
-			});
-		},
-
-		show:function(target, settings){
-			var panel = methods.buildElements();
-			var contentPanel = panel.find('.content');
-
-			// reset style
-			panel.removeClass('flashMessagePanelTopMost');
-			panel.removeClass('flashMessagePanelBottom');
-			if (settings.position == 'topmost'){
-				// show on the top side of page
-				panel.addClass('flashMessagePanelTopMost');
-			}else if (settings.position == 'bottom') {
-				panel.addClass('flashMessagePanelBottom');
-			}
-
-			// reset content
-			if (settings.messageType == 'info'){
-				contentPanel.removeClass('warn');
-				contentPanel.addClass('info');
-			}else{
-				contentPanel.removeClass('info');
-				contentPanel.addClass('warn');
-			}
-
-			var textSpan = contentPanel.find('span.text');
-			textSpan.text($.message(settings.content));
-
-			var actionSpan = contentPanel.find('span.action');
-
-			// remove old actions
-			actionSpan.find('a').remove();
-
-			if (settings.actions != null){
-				for(var idx in settings.actions){
-					var actionObj = settings.actions[idx];
-					var title = $.message(actionObj.title);
-					var action = $('<a href="#"></a>');
-					action.text(title);
-					action.data('id', actionObj.id);
-					action.data('params', actionObj.params);
-
-					// add click event handler
-					action.click(function(event){
-						event.preventDefault();
-						var target = $(this);
-						methods.onActionsClick(target);
-					});
-
-					actionSpan.append(action);
-				}
-			}
-
-//			// calculate width.
-//			// set max width first, let all content load.
-//			panel.width(maxWidth);
-//
-			// load the layout to calculate the width and height, otherwise the values will be zero.
-			panel.css('visibility', 'hidden');
-			panel.css('display', 'block');
-//
-//			var width = textSpan.width() + 12 + actionSpan.width() + 26 * 2 + 10;
-//
-//			// the min and the max width
-//			if (width < minWidth){
-//				width = minWidth;
-//			}else if (width > maxWidth){
-//				width = maxWidth;
-//			}
-//
-//			panel.width(width);
-//			panel.css('margin-left', -width/2);
-
-			var width = panel.width();
-			var height = panel.height();
-
-			panel.css('display', 'none');
-			panel.css('visibility', 'visible');
-
-			// set position
-			if (settings.position == 'topmost'){
-				// show on the top side of page
-				panel.css('margin-left', -width/2);
-				panel.css('left','50%');
-				panel.css('top',5);
-			}else{
-				panel.css('margin-left', 0);
-
-				var offset = target.offset();
-				if (settings.position == 'bottom') {
-					// bottom to the target
-					panel.css('left', offset.left + target.outerWidth() - width); // right align.
-					panel.css('top', offset.top + target.outerHeight() + 16 + settings.offset);
-				}else{
-					// default is right to the target
-					panel.css('left', offset.left + target.outerWidth() + 22 + settings.offset);
-					panel.css('top', offset.top + (target.outerHeight() - height) /2);
-				}
-			}
-
-			window.clearTimeout(hideTimer);
-
-			panel.fadeIn('fast');
-			//isShowing = true;
-
-			// set auto hide
-			if (settings.hide != 'off') {
-				var delay = delayNormal;
-				if (settings.hide == 'fast'){
-					delay = delayFast;
-				}else if(settings.hide == 'slow'){
-					delay = delaySlow;
-				}
-
-				hideTimer = window.setTimeout(
-					function(){methods.hide();},
-					delay);
-			}
-		},
-
-		hide:function(){
-			window.clearTimeout(hideTimer);
-
-			//if (isShowing){
-			var panel = methods.buildElements();
-			if (panel.is(':visible')){
-				panel.fadeOut('fast');
-			}
-			//	isShowing = false;
-			//}
-		},
-
-		/**
-		 * Add notify-action click handler register.
-		 * The func param should be: function(params){...}.
-		 */
-		addActionListener:function(id, func){
-			if (typeof func != 'function'){
-				$.error('The func option must be a function.');
-			}
-
-			actions[id] = func;
-			return methods;
-		},
-
-		onActionsClick:function(target){
-			methods.hide();
-
-			var id = target.data('id');
-			var params = target.data('params');
-			var func = actions[id];
-			if(func != null){
-				func(params);
-			}
-		},
-
-		/**
-		 * A short-cut to show the common server error message.
-		 *
-		 * $('#submitButton').flashMessage('SERVER_ERROR');
-		 */
-		SERVER_ERROR:function(position){
-			var options = {
-				content:'common.serverError',
-				position: position
-			}
-
-			return this.each(function(){
-				var target = $(this);
-				var settings = $.extend({}, defaults, options);
-				methods.show(target, settings);
-			});
-		}
-	};
-
-	$.fn.flashMessage = function(method){
-		if (methods[method]) {
-			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-		} else if (typeof method === 'object' || ! method) {
-			return methods.init.apply(this, arguments);
-		} else {
-			$.error('Method ' + method + ' does not exist on jQuery.flashMessage');
-		}
-	};
-
-	// expose to jQuery
-	$.flashMessage = {
-		hide:methods.hide,
-		addActionListener:methods.addActionListener,
-
-		/**
-		 * Show flash message on the top side of page.
-		 */
-		show:function(options){
-			options.position = 'topmost';
-			$(window).flashMessage(options);
-		},
-
-		/**
-		 * Show the common server error message on the top side of page.
-		 */
-		showServerError:function(){
-			$(window).flashMessage({
-				content:'common.serverError',
-				position:'topmost'
-			});
-		}
-	}
-
-})(jQuery);
-
-/**
- * Add loading icon in the anchor(link) button.
- *
- * $('#button').showLoading();
- * $('#button').showLoading({
- *		withDelay:true
- *		delay:500,
- *		withText:true
- * });
- * $('#button').showLoading('hide');
- *
- */
-(function($){
-	var PLUGIN_NAME = 'showLoading';
-
-	var delayNormal = 300;
-
-	var defaults = {
-		className:'loadingAnimation', // the class name of target (button/link) while showing loading icon.
-		delay:delayNormal, // this value will be ignore if 'withDelay'=false.
-		withDelay:false,
-		withText:false
-	};
-
-	var methods = {
-		buildElements:function(container){
-			var exists = container.find('span.loadingIcon');
-			if (exists.length > 0){
-				return exists;
-			}
-
-			var icon = $('<span class="loadingIcon"></span>');
-			container.append(icon);
-
-			return icon;
-		},
-
-		init:function(options){
-			return this.each(function(){
-				var target = $(this);
-				if (target.data(PLUGIN_NAME + '.settings') == null){
-					var settings = $.extend({}, defaults, options);
-
-					settings.delayTimer = null;
-
-					if (settings.withDelay) {
-						settings.delayTimer = window.setTimeout(
-							function(){
-								methods.show(target, settings);
-								}, settings.delay);
-					}else{
-						methods.show(target, settings);
-					}
-
-					// store the settings to the target.
-					target.data(PLUGIN_NAME + '.settings', settings);
-				}
-			});
-		},
-
-		show:function(target, settings) {
-			target.addClass(settings.className);
-
-			var icon = methods.buildElements(target);
-			if (settings.withText) {
-				icon.addClass('withText');
-				icon.text($.message('common.loading'));
-			}else{
-				icon.removeClass('withText');
-				icon.text('');
-			}
-
-			icon.show();
-		},
-
-		hideLoading:function(target, settings) {
-			var icon = methods.buildElements(target);
-			icon.hide();
-
-			if (settings.delayTimer) {
-				window.clearTimeout(settings.delayTimer);
-				settings.delayTimer = null;
-			}
-
-			target.removeClass(settings.className);
-		},
-
-		/**
-		 * This method shoud be invoked by this way:
-		 * $('#button').showLoading('hide');
-		 */
-		hide:function(){
-			var target = this;
-			var settings = target.data(PLUGIN_NAME + '.settings');
-
-			if (settings != null){
-				methods.hideLoading(target, settings);
-				target.removeData(PLUGIN_NAME + '.settings');
-			}
-		}
-	};
-
-	$.fn.showLoading = function(method){
-		if (methods[method]) {
-			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-		} else if (typeof method === 'object' || ! method) {
-			return methods.init.apply(this, arguments);
-		} else {
-			$.error('Method ' + method + ' does not exist on jQuery.showLoading');
-		}
-	};
-})(jQuery);
-
-/**
- * Once request.
- * To prevent duplicate click/submit.
- *
- * $('#button').onceRequest({
- *   busyClassName:'busying',
- *   onCheck:function(target){ return 'false' to cancel submitting. },
- *   onSubmit:function(target, args){},
- *   onRelease:function(target){}
- * });
- *
- *   args.release() // release the locking.
- *
- */
-(function($){
-	var PLUGIN_NAME = 'onceRequest';
-
-	var defaults = {
-		busyClassName:null, // the css style name to be added to the trigger(link/button)
-		onCheck:function(target){}, // return 'false' to cancel submitting.
-		onSubmit:function(target, args){},
-		onRelease:function(target){}
-	};
-
-	var methods = {
-		init:function(options){
-			return this.each(function(){
-				var target = $(this);
-				if (target.data(PLUGIN_NAME + '.settings') == null){
-
-					var settings = $.extend({}, defaults, options);
-
-					if (typeof settings.onCheck != 'function'){
-						$.error('The onCheck option must be a function.');
-					}
-
-					if (typeof settings.onSubmit != 'function'){
-						$.error('The onSubmit option must be a function.');
-					}
-
-					if (typeof settings.onRelease != 'function'){
-						$.error('The onRelease option must be a function.');
-					}
-
-					// set default state
-					settings.busying = false;
-
-					target.bind('click.' + PLUGIN_NAME, settings, function(event){
-						event.preventDefault();
-						var targetObj = $(this);
-						methods.onClick(targetObj, event.data);
-					});
-
-					// store settings and prevent bind twice
-					target.data(PLUGIN_NAME + '.settings', settings);
-				}
-			});
-		},
-
-		onClick:function(target, settings){
-			if (settings.busying){
-				return;
-			}
-
-			if (settings.onCheck(target) == false){
-				return;
-			}
-
-			var args = {
-				release:function(){
-					methods.release(target, settings);
-				}
-			};
-
-			settings.busying = true;
-			settings.onSubmit(target, args);
-
-			if (settings.busyClassName != null){
-				target.addClass(settings.busyClassName);
-			}
-		},
-
-		release:function(target, settings){
-			settings.busying = false;
-			settings.onRelease(target);
-
-			if (settings.busyClassName != null){
-				target.removeClass(settings.busyClassName);
-			}
-		}
-	};
-
-	$.fn.onceRequest = function(method){
-		if (methods[method]) {
-			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-		} else if (typeof method === 'object' || ! method) {
-			return methods.init.apply(this, arguments);
-		} else {
-			$.error('Method ' + method + ' does not exist on jQuery.onceRequest');
-		}
-	};
-})(jQuery);
-
-/**
- * Form input hints label.
- * Show a label on the above of the input box and hide when
- * there is content in the box or got focus.
- *
- * $('#txtSearch').inputHints();
- * $('#txtSearch').inputHints({
- *    label:$('#txtSearch').siblings('label:first')
- *    });
- *
- */
-(function($){
-	var PLUGIN_NAME = 'inputHints';
-
-	var defaults = {
-		label:null // the hints label.
-	};
-
-	var methods = {
-		init:function(options){
-			return this.each(function(){
-				var target = $(this);
-				if (target.data(PLUGIN_NAME + '.settings') == null){
-
-					var settings = $.extend({}, defaults, options);
-
-					if (settings.label == null){
-						settings.label = target.siblings('label:first');
-					}
-
-					// set default state, the input field maybe fill with content,
-					// or some browser (like Firefox) will fill content automaticaly after refresh page.
-					if (target.val() != ''){
-						settings.label.hide();
-					}
-
-					target.bind('focus.' + PLUGIN_NAME, settings, function(event){
-						var label = event.data.label;
-						//label.css('opacity', '.4');
-
-						event.data.timer = window.setInterval(function(){
-							if (target.val() == '') {
-								label.show();
-							}else {
-								label.hide();
-							}
-						}, 100);
-					});
-
-					target.bind('blur.' + PLUGIN_NAME, settings, function(event){
-						var label = event.data.label;
-						//label.css('opacity', '1.0');
-
-						window.clearInterval(event.data.timer);
-					});
-
-					// prevent bind twice
-					target.data(PLUGIN_NAME + '.settings', settings);
-				}
-			});
-		}
-	};
-
-	$.fn.inputHints = function(method){
-		if (methods[method]) {
-			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-		} else if (typeof method === 'object' || ! method) {
-			return methods.init.apply(this, arguments);
-		} else {
-			$.error('Method ' + method + ' does not exist on jQuery.inputHints');
-		}
-	};
-})(jQuery);
-
-/**
- * Highlight effect.
- * Add highlight background color and set focus to the specify object.
- *
- * $('#txtPassword').highlight();
- * $('#txtPassword').highlight({
- *     className:'highlight',
- *     delay:1000,
- *     focus:false,
- *     ensureVisible:true
- * });
- */
-(function($){
-	var PLUGIN_NAME = 'highlight';
-
-	var delayNormal = 3000; // the default delay milliseconds.
-
-	var defaults = {
-		className:'highlight', // the highlight class name.
-		focus:false,
-		ensureVisible:false,
-		delay:delayNormal
-	};
-
-	var methods = {
-		init:function(options){
-			return this.each(function(){
-				var target = $(this);
-
-				var lastSettings = target.data(PLUGIN_NAME + '.settings');
-				if (lastSettings != null){
-					window.clearTimeout(lastSettings.timer);
-				}
-
-				var settings = $.extend({}, defaults, options);
-
-				if (settings.ensureVisible){
-					target.ensureVisible();
-				}
-
-				target.addClass(settings.className);
-
-				settings.timer = window.setTimeout(
-					function(){
-						methods.hideHighlight(target, settings);
-					}, settings.delay);
-
-				if (settings.focus){
-					target.focus();
-				}
-
-				// store settings into target
-				target.data(PLUGIN_NAME + '.settings', settings);
-			});
-		},
-
-		hideHighlight:function(target, settings){
-			target.removeClass(settings.className);
-			target.removeData(PLUGIN_NAME + '.settings');
-		}
-	};
-
-	$.fn.highlight = function(method){
-		if (methods[method]) {
-			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-		} else if (typeof method === 'object' || ! method) {
-			return methods.init.apply(this, arguments);
-		} else {
-			$.error('Method ' + method + ' does not exist on jQuery.highlight');
-		}
-	};
-})(jQuery);
-
-
-/**
- * Scroll to the specify element for ensuring visible.
- *
- * If the target in the visible area
- *	just keep current position.
- * Else if the target in the window viewport region
- *	scroll page to the top.
- * Else if the target out of the window viewport region
- *	scroll the target (up or down) to visible.
- *
- * $('#txtPassword').ensureVisible();
- */
-(function($){
-	var methods = {
-		init:function(options){
-			return this.each(function(){
-				var target = $(this);
-
-				var scrollTop = $(document).scrollTop();
-				var offsetTop = target.offset().top;
-				var windowHeight = $(window).height();
-				var top = offsetTop - scrollTop;
-
-				if (top > 0 && top < windowHeight) {
-					// do nothing.
-				}else if (offsetTop < windowHeight) {
-					$(document).scrollTop(0);
-				}else {
-					target.get(0).scrollIntoView();
-				}
-			});
-		}
-	};
-
-	$.fn.ensureVisible = function(method){
-		if (methods[method]) {
-			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-		} else if (typeof method === 'object' || ! method) {
-			return methods.init.apply(this, arguments);
-		} else {
-			$.error('Method ' + method + ' does not exist on jQuery.ensureVisible');
-		}
-	};
-})(jQuery);
-
-/**
- * Shake effect.
- *
- * $('#box').shake({
- *   times:3,
- *   delay:30,
- *   onComplete:function(){...}
- * });
- *
- */
-(function($){
-	var defaultSteps = [15,30,15,0,-15,-30,-15,0];
-	var delayNormal = 20; // the default delay milliseconds.
-
-	var defaults = {
-		times: 3,
-		delay:delayNormal,
-		onComplete:function(){}
-	};
-
-	var methods = {
-		init:function(options){
-			return this.each(function(){
-				var target = $(this);
-
-				var settings = $.extend({}, defaults, options);
-
-				if (typeof settings.onComplete != 'function'){
-					$.error('The onComplete option must be a function.');
-				}
-
-				var steps = [];
-				for (var idx=0; idx < settings.times; idx++){
-					steps = steps.concat(defaultSteps);
-				}
-
-				target.css('position', 'relative');
-				methods.move(target, steps, settings);
-			});
-		},
-
-		move:function(target, steps, settings){
-			var step = steps.shift();
-			target.css('left', step);
-
-			if (steps.length > 0){
-				window.setTimeout(function(){
-					methods.move(target, steps, settings);},
-					settings.delay);
-			}else{
-				settings.onComplete();
-			}
-		}
-	};
-
-	$.fn.shake = function(method){
-		if (methods[method]) {
-			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-		} else if (typeof method === 'object' || ! method) {
-			return methods.init.apply(this, arguments);
-		} else {
-			$.error('Method ' + method + ' does not exist on jQuery.shake');
-		}
-	};
-})(jQuery);
-
-/**
- * Drop-down menu.
- * Show a drop-down menu when the specify trigger(link) clicked.
- * Only one drop-down menu can be shown at the same time.
- *
- * $('#button').dropDownMenu({
- *     menu:$('#somemenu')
- * });
- *
- * $('#button').dropDownMenu({
- *     menu:$('#somemenu'),
- * });
- *
- * $('#button').dropDownMenu({
- *     menu:$('#somemenu')
- *     menuName:'justAnotherDropDownMenu',
- *     onPosition:function(){
- *       return {left:10, top:40, offset:32}
- *       }
- * });
- *
- */
-(function($){
-	var PLUGIN_NAME = 'dropDownMenu';
-
-	var lastShowingTarget = null; // the last showing menu's triger object.
-	var isRegisterDocumentClick = false; // the flag to indicates binded document click event.
-
-	var defaults = {
-		menu:null, // the drop-down menu.
-
-		dropDownClassName:null, // the style of target while menu showing.
-
-		/*
-		 * before onPosition() and onShow().
-		 */
-		onLoad:function(target, menu){},
-
-		/* return position that relate to
-		 * trigger, and the arrow direction and offset.
-		 * such as {left:0, top:20, offset:32, arrow:'top'}
-		 */
-		onPosition:function(target, menu){},
-
-		onShow:function(target, menu){},
-
-		onHide:function(target, menu){}
-	};
-
-	var defaultPosition = {
-
-		// the direction of the arrow, it can be 'left'/'right'/'top'/'bottom'
-		arrow:'top',
-
-		/*
-		 *  the arrow position offset, it will be the top or left value, depends on
-		 *  the arrow type (left/right or top/bottom).
-		 */
-		offset:32,
-
-		//default menu position
-		left:0,
-		top:40
-	};
-
-	var methods = {
-		registerDocumentClick:function(){
-			// only bind document click event once.
-			if (isRegisterDocumentClick){
-				return;
-			}
-
-			isRegisterDocumentClick = true;
-			$(document).bind('click.' + PLUGIN_NAME, methods.onDocumentClick);
-		},
-
-		init:function(options){
-
-			methods.registerDocumentClick();
-
-			return this.each(function(){
-				var target = $(this);
-				if (target.data(PLUGIN_NAME + '.settings') == null){
-
-					var settings = $.extend({}, defaults, options);
-
-					if (typeof settings.onLoad != 'function'){
-						$.error('The onLoad option must be a function.');
-					}
-
-					if (typeof settings.onPosition != 'function'){
-						$.error('The onPosition option must be a function.');
-					}
-
-					if (typeof settings.onShow != 'function'){
-						$.error('The onShow option must be a function.');
-					}
-
-					if (typeof settings.onHide != 'function'){
-						$.error('The onHide option must be a function.');
-					}
-
-					if (settings.menu == null){
-						$.error('The menu option must be spcified.');
-					}
-
-					// set the default state
-					settings.showing = false;
-
-					target.bind('click.' + PLUGIN_NAME, settings, function(event){
-						event.preventDefault();
-
-						var targetObj = $(this);
-						if (event.data.showing){
-							methods.hide(targetObj);
-						}else{
-							methods.show(targetObj, event.data);
-						}
-					});
-
-					// store settings on target and prevent bind twice.
-					target.data(PLUGIN_NAME + '.settings', settings);
-				}
-			});
-		},
-
-		onDocumentClick:function(event){
-			var target = $(event.target);
-
-			if (lastShowingTarget == null){
-				return;
-			}
-
-			// exclude the target and the menu button
-			var settings = target.data(PLUGIN_NAME + '.settings')
-			if (settings == null){
-				target = target.parent();
-				settings = target.data(PLUGIN_NAME + '.settings')
-			}
-
-			// exclude the menu
-			var lastSettings = lastShowingTarget.data(PLUGIN_NAME + '.settings');
-			var lastMenu = lastSettings.menu;
-
-			if (settings == null &&
-				!$.jqEquals(lastMenu, target) &&
-				!$.jqEquals(lastMenu, target.parent())){
-				methods.hide(lastShowingTarget);
-			}
-		},
-
-		show:function(target, settings){
-			// hide the previous menus
-			if (lastShowingTarget != null){
-				methods.hide(lastShowingTarget);
-			}
-
-			var menu = settings.menu;
-
-			// raise onLoad event.
-			settings.onLoad(target, menu);
-
-			// set the menu position
-			var position = settings.onPosition(target, menu);
-			if (position != null){
-				var pos = $.extend({}, defaultPosition, position);
-
-				menu.css('left', pos.left);
-				menu.css('top', pos.top);
-
-				// set the arrow offset
-				var arrow = menu.find('span.arrow');
-
-				if (pos.arrow == 'left'){
-					arrow.addClass('arrowLeft');
-					arrow.removeClass('arrowRight');
-					arrow.removeClass('arrowBottom');
-				}else if(pos.arrow == 'right'){
-					arrow.addClass('arrowRight');
-					arrow.removeClass('arrowLeft');
-					arrow.removeClass('arrowBottom');
-				}else if(pos.arrow == 'buttom'){
-					arrow.addClass('arrowButtom');
-					arrow.removeClass('arrowLeft');
-					arrow.removeClass('arrowRight');
-				}
-
-				if (arrow.hasClass('arrowLeft') || arrow.hasClass('arrowRight')){
-					arrow.css('top', pos.offset);
-					arrow.css('left', '');
-				}else{
-					arrow.css('top', '');
-					arrow.css('left', pos.offset);
-				}
-			}
-
-			if (settings.dropDownClassName != null){
-				target.addClass(settings.dropDownClassName);
-			}
-
-			menu.show();
-			settings.showing = true;
-
-			lastShowingTarget = target;
-
-			settings.onShow(target, menu);
-		},
-
-		hide:function(target){
-			var settings = target.data(PLUGIN_NAME + '.settings');
-
-			if (settings.showing){
-				if (settings.dropDownClassName != null){
-					target.removeClass(settings.dropDownClassName);
-				}
-
-				var menu = settings.menu;
-				menu.hide();
-
-				settings.showing = false;
-				lastShowingTarget = null;
-
-				settings.onHide(target, menu);
-			}
-		}
-	};
-
-	$.fn.dropDownMenu = function(method){
-		if (methods[method]) {
-			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-		} else if (typeof method === 'object' || ! method) {
-			return methods.init.apply(this, arguments);
-		} else {
-			$.error('Method ' + method + ' does not exist on jQuery.dropDownMenu');
-		}
-	};
-})(jQuery);
-
-
-/**
- * Popup box.
- * Many popup boxies showing on a page is allow.
- *
- * $('#boxContainer').popupBox({
- *     left:200,
- *     content: 'hello world'
- * });
- *
- * Hide only the box right on the target
- * $('#boxContainer').popupBox('hide');
- *
- * Hide all popup boxies.
- * $.popupBox.hideAll();
- *
- * $.popupBox.addActionListener('actionId',function(params){});
- *
- */
-(function($){
-	var defaults = {
-
-		// box width
-		width: 220,
-
-		// the direction of the arrow, it can be 'left'/'right'/'top'/'bottom'
-		arrow:'left',
-
-		// the text content, HTML will be display as text.
-		content:'',
-
-		// the i18n text content's paramters.
-		// for example, the content text is 'hello {0}, this is {1}.', and put params:
-		// ['John', 'cat'].
-		contentParams:null,
-
-		/* actions list, such [{title:'action-title',id:'action-id', params:''},
-		 * {title:'Yes',id:'id-yes', params:''}]
-		 */
-		actions:null,
-
-		/* the arrow position offset, it will be the top or left value, depends on
-		 * the arrow type (left/right or top/bottom).
-		 */
-		offset:6,
-
-		//default box position
-		left:0,
-		top:0
-	};
-
-	// action handlers.
-	var actions = {};
-
-	// the targets of all the showing popup box.
-	var showingTargets = new $.jqSet();
-
-	var methods = {
-
-		buildElements:function(container){
-			var exists = container.find('.popupBox');
-			if (exists.length >0){
-				return exists;
-			}
-
-			var box = $(
-				'<div class="arrowBox popupBox hidden">' +
-				' <div class="content">' +
-				'  <div class="text"></div>' +
-				'  <div class="action"></div>' +
-				' </div>' +
-				' <span class="arrow"></span>' +
-				'</div>');
-
-			container.append(box);
-
-			return box;
-		},
-
-		init:function(options){
-			return this.each(function(){
-				var container = $(this);
-
-				var settings = $.extend({}, defaults, options);
-
-				var box = methods.buildElements(container);
-				methods.show(container, settings, box);
-			});
-		},
-
-		show:function(target, settings, box){
-			// set width
-			box.width(settings.width);
-
-			box.css('left', settings.left);
-			box.css('top', settings.top);
-
-			// set the arrow offset
-			var arrow = box.find('span.arrow');
-
-			if (settings.arrow == 'left'){
-				arrow.addClass('arrowLeft');
-				arrow.removeClass('arrowRight');
-				arrow.removeClass('arrowBottom');
-			}else if(settings.arrow == 'right'){
-				arrow.addClass('arrowRight');
-				arrow.removeClass('arrowLeft');
-				arrow.removeClass('arrowBottom');
-			}else if(settings.arrow == 'buttom'){
-				arrow.addClass('arrowButtom');
-				arrow.removeClass('arrowLeft');
-				arrow.removeClass('arrowRight');
-			}
-
-			if (settings.arrow == 'left' || settings.arrow == 'right'){
-				arrow.css('top', settings.offset);
-				arrow.css('left', '');
-			}else{
-				arrow.css('top', '');
-				arrow.css('left', settings.offset);
-			}
-
-			var textPanel = box.find('.content .text');
-			textPanel.text($.message(settings.content, settings.contentParams));
-
-			var actionPanel = box.find('.content .action');
-
-			// remove old actions.
-			actionPanel.find('a').remove();
-
-			if (settings.actions != null){
-				for(var idx in settings.actions){
-					var actionObject = settings.actions[idx];
-
-					var title = $.message(actionObject.title);
-					var action = $('<a href="#"></a>');
-					action.text(title);
-					action.data('id', actionObject.id);
-					action.data('params', actionObject.params);
-
-					// add click event handler
-					action.click(function(event){
-						event.preventDefault();
-						var target = $(this);
-						methods.onActionsClick(target);
-					});
-
-					actionPanel.append(action);
-				}
-			}
-
-			box.show();
-			showingTargets.add(target);
-		},
-
-		/**
-		 * This method should be invoked by this way:
-		 * $('#boxContainer').popupBox('hide');
-		 */
-		hide:function(){
-			var target = this;
-			if (showingTargets.contains(target)){
-				var box = methods.buildElements(target);
-				box.hide();
-
-				showingTargets.remove(target);
-			}
-		},
-
-		hideAll:function(){
-			for(var idx in showingTargets.getAll()){
-				var target = showingTargets.get(idx);
-				var box = methods.buildElements(target);
-				box.hide();
-			}
-
-			showingTargets.clear();
-		},
-
-		/**
-		 * Add notify-action click handler register.
-		 * The func param should be: function(params){...}
-		 */
-		addActionListener:function(id, func){
-			if (typeof func != 'function'){
-				$.error('The func option must be a function.');
-			}
-
-			actions[id] = func;
-			return methods;
-		},
-
-		onActionsClick:function(target){
-			var id = target.data('id');
-			var params = target.data('params');
-			var func = actions[id];
-			if(func != null){
-				func(params);
-			}
-		}
-	};
-
-	// Expose to jQuery
-	$.popupBox = {
-		hideAll:methods.hideAll,
-		addActionListener:methods.addActionListener
-	}
-
-	$.fn.popupBox = function(method){
-		if (methods[method]) {
-			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-		} else if (typeof method === 'object' || ! method) {
-			return methods.init.apply(this, arguments);
-		} else {
-			$.error('Method ' + method + ' does not exist on jQuery.popupBox');
-		}
-	};
-})(jQuery);
-
-
-/**
- * A mini inline dialog.
- *
- * It's extend from the dropDownMenu plugin.
- *
- * $('.deleteButton').popupDialog({
- * 		onLoad:function(target, dialog){
- * 			return {
- * 				content:'Are you sure delete this message?',
- * 				contentParams:[],
- * 				actions:[
- * 					{title:'Yes, delete it.', listener:function(target){
- * 						//
- * 					}},
- * 					{title:'Cancel', listener:function(target){
- * 						//
- * 					}}
- * 				]
- * 			}
- * 		}
- * 	});
- *
- */
-(function($){
-	var PLUGIN_NAME = 'popupDialog';
-
-	var defaults = {
-		/*
-		 * Return the dialog content and the action list:
-		 *
-		 */
-		onLoad:function(target, dialog){}
-	};
-
-	var defaultAction = {
-		title:null,
-		listener:function(target){}
-	};
-
-	var methods = {
-		buildElements:function(target){
-			var exists = target.siblings('.popupDialog');
-			if (exists.length >0){
-				return exists;
-			}
-
-			var dialog = $(
-				'<div class="arrowBox popupDialog hidden">' +
-				' <div class="content">' +
-				'  <div class="text"></div>' +
-				'  <div class="action"></div>' +
-				' </div>' +
-				' <span class="arrow"></span>' +
-				'</div>');
-
-			dialog.insertAfter(target);
-			return dialog;
-		},
-
-		init:function(options){
-			return this.each(function(){
-				var target = $(this);
-				if (target.data(PLUGIN_NAME + '.settings') == null){
-					var settings = $.extend({}, defaults, options);
-
-					if (typeof settings.onLoad != 'function'){
-						$.error('The onLoad option must be a function.');
-					}
-
-					var dialog = methods.buildElements(target);
-
-					target.dropDownMenu({
-						menu:dialog,
-						onLoad:function(target, menu){
-							methods.onLoad(target, menu, settings)
-						}
-					});
-
-					// store settings on target and prevent bind twice.
-					target.data(PLUGIN_NAME + '.settings', settings);
-				}
-			});
-		},
-
-		onLoad:function(target, dialog, settings){
-			var returnObject = settings.onLoad(target, dialog);
-
-			var textPanel = dialog.find('.content .text');
-			textPanel.text($.message(returnObject.content, returnObject.contentParams));
-
-			var actionPanel = dialog.find('.content .action');
-			actionPanel.find('a').remove();
-
-			if (returnObject.actions != null) {
-				for(var idx in returnObject.actions) {
-					var actionObject = $.extend({}, defaultAction, returnObject.actions[idx]);
-					var action = $('<a href="#"></a>');
-
-					var title = $.message(actionObject.title);
-					action.text(title);
-					action.bind('click.' + PLUGIN_NAME, actionObject, function(event){
-						event.preventDefault();
-						methods.onActionsClick(target, event.data.listener);
-					});
-
-					actionPanel.append(action);
-				}
-			}
-		},
-
-		onActionsClick:function(target, func){
-			func(target);
-		}
-	};
-
-
-	$.fn.popupDialog = function(method){
-		if (methods[method]) {
-			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-		} else if (typeof method === 'object' || ! method) {
-			return methods.init.apply(this, arguments);
-		} else {
-			$.error('Method ' + method + ' does not exist on jQuery.popupDialog');
-		}
-	};
-})(jQuery);
-
-/**
- * TODO:: to be improved. #####
- *
- * Checkable form field checker
- *
- * Add checking field:
- * $('#textField').fieldCheck({
- *				name:'fieldName',
- *				statusBox:$('#statuxBoxObject'),
- * 				onChange:function(target, value){
- * 					return "message.code";
- * 				}
- * 			});
- *
- * $('#checkboxField').fieldCheck({
- * 				onChange:function(target, value, initValue, groupValue, isChecked){
- * 					return "message.code";
- * 				}
- * 			});
- *
- * Check all fields:
- * var result = $('#form').fieldCheck('checkFields');
- * if (result) {
- *     //submit
- * }
- *
- * Pre-check after document loaded:
- * $('#form').fieldCheck('preCheck');
- *
- * Force update field message:
- * $('#form').fieldCheck('forceUpdateField', fieldName, status, message, actions);
- *
- */
-(function($){
-
-	var PLUGIN_NAME = 'fieldCheck';
-
-	var defaults = {
-
-		/**
-		 * 'groupValue': optional, only available on check box and radio box.
-		 * 'isChecked': optional, only available on check box.
-		 *
-		 * This function should return:
-		 *	True: indicates check pass.
-		 *	String: a message code string indicates check failed and return a message.
-		 *	Object: {
-		 *				status: 'checking|checked|failed',
-		 *				message: 'message code',
-		 *				actions: ['action list, see popupBox actions'],
-		 *				delayCheck: function(updateCallback){
-		 *								// call callback when async checking complete.
-		 *								// the result object can be TRUE/String/Object/Function.
-		 *								updateCallback(result);
-		 *							};
-		 *			}.
-		 *
-		 */
-		onChange:function(target, name, value, initValue, groupValue, isChecked){}
-
-	};
-
-	/*
-	 * form fields, each item contains:
-	 * {
-	 *  name: the field name,
-	 *  target: input box object,
-	 *  type: the input box type,
-	 *  initValue: the inital value of the field, this plugin use the
-	 *				value of 'data-init-value' attribute of the input box.
-	 *  statusBox: the checking status box object,
-	 *  status: 'uncheck(default)|checking|pass|failed',
-	 *  message: the message code,
-	 *  actions: []
-	 *  }
-	 */
-	var fields = [];
-
-	var methods = {
-		init:function(options){
-			return this.each(function(){
-				var target = $(this);
-				if (target.data(PLUGIN_NAME + '.settings') == null){
-
-					var settings = $.extend({}, defaults, options);
-
-					if (typeof settings.onChange != 'function'){
-						$.error('The onChange option must be a function.');
-					}
-
-					settings.target = target;
-					settings.status = 'uncheck';
-					settings.message = null;
-					settings.actions = null;
-
-					if (settings.name == null) {
-						settings.name = target.attr('name');
-					}
-
-					if (settings.statusBox == null) {
-						settings.statusBox = target.parent().find('span.statusBox');
-					}
-
-					if (settings.initValue == null) {
-						settings.initValue = target.data('init-value');
-					}
-
-					if (target.is('input')){
-						settings.type = target.attr('type');
-					}else if (target.is('select')){
-						settings.type = 'select';
-					}else if (target.is('textarea')){
-						settings.type = 'textarea';
-					}
-
-					target.focus(function(){
-						methods.updateField(settings);
-					});
-
-					target.change(function(){
-						methods.checkField(settings);
-					});
-
-					// add to collection.
-					fields.push(settings);
-
-					// store settings on target and prevent bind twice.
-					target.data(PLUGIN_NAME + '.settings', settings);
-				}
-			});
-		},
-
-		checkField:function(settings){
-
-			var target = settings.target;
-			var name = settings.name;
-			var value = target.val();
-			var initValue = settings.initValue;
-			var result = null;
-
-			if (settings.type == 'checkbox'){
-				result = settings.onChange(target, name, value, initValue,
-					methods.getCheckboxGroupValue(name),
-					target.is(':checked'));
-
-			}else if (settings.type == 'radio'){
-				result = settings.onChange(target, name, value, initValue,
-					methods.getRadioGroupValue(name));
-
-			}else{
-				result = settings.onChange(target, name, value, initValue);
-			}
-
-			methods.updateFieldByResult(settings, result);
-		},
-
-		/**
-		 * Return empty string if none checked
-		 */
-		getCheckboxGroupValue:function(name){
-			var checkedValues = [];
-			for(var idx in fields){
-				if (fields[idx].name == name &&
-					fields[idx].target.is(':checked')){
-					checkedValues.push(fields[idx].target.val());
-				}
-			}
-			return checkedValues.join(',');
-		},
-
-		/**
-		 * Return empty string if none checked
-		 */
-		getRadioGroupValue:function(name){
-			var groupValue = '';
-			for(var idx in fields){
-				if (fields[idx].name == name &&
-					fields[idx].target.is(':checked')){
-					groupValue = fields[idx].target.val();
-					break;
-				}
-			}
-			return groupValue;
-		},
-
-		updateFieldByResult:function(settings, result){
-			var resultType = typeof result;
-
-			if (resultType == 'boolean' && result == true) {
-				settings.status = 'pass';
-				settings.message = null;
-				settings.actions = null;
-
-			}else if (resultType == 'string') {
-				settings.status = 'failed';
-				settings.message = result;
-				settings.actions = null;
-
-			}else if (resultType == 'object') {
-				settings.status = result.status;
-				settings.message = result.message;
-				settings.actions = result.actions;
-
-				if (result.delayCheck != null && typeof result.delayCheck == 'function') {
-					var delayUpdate = function(r){
-						methods.updateFieldByResult(settings, r);
-					}
-					result.delayCheck(delayUpdate);
-				}
-			}else {
-				$.error('Illegal result.');
-			}
-
-			methods.updateField(settings);
-		},
-
-		updateField:function(settings){
-			var statusBox = settings.statusBox;
-			var container = statusBox.parent();
-
-			if (settings.status == 'checking'){
-				statusBox.removeClass('pass');
-				statusBox.removeClass('failed');
-				statusBox.addClass('checking');
-
-				container.popupBox('hide');
-
-			}else if (settings.status == 'pass'){
-				statusBox.removeClass('checking');
-				statusBox.removeClass('failed');
-				statusBox.addClass('pass');
-
-				container.popupBox('hide');
-
-			}else if (settings.status == 'failed'){
-				statusBox.removeClass('checking');
-				statusBox.removeClass('pass');
-				statusBox.addClass('failed');
-
-				methods.showMessage(settings);
-			}else {
-				// reset to uncheck
-				statusBox.removeClass('checking');
-				statusBox.removeClass('failed');
-				statusBox.removeClass('pass');
-
-				container.popupBox('hide');
-			}
-		},
-
-		showMessage:function(settings){
-			// hide other popup box
-			$.popupBox.hideAll();
-
-			var statusBox = settings.statusBox;
-			var container = statusBox.parent();
-			var position = statusBox.position();
-
-			container.popupBox({
-				left: position.left + 38,
-				top: -4,
-				content: settings.message,
-				actions: settings.actions
-			});
-		},
-
-		/**
-		 * Return true if all field pass, invoked this method
-		 * before submit form.
-		 */
-		checkFields:function(){
-			for(var idx in fields){
-				var settings = fields[idx];
-
-				// check the uncheck item first.
-				if (settings.status == 'uncheck') {
-					methods.checkField(settings);
-				}
-
-				// scroll to the checking item.
-				if (settings.status == 'checking'){
-					settings.target.ensureVisible();
-					methods.showMessage(settings);
-					return false;
-				}
-
-				if(settings.status == 'failed'){
-					settings.target.highlight({
-						focus:true,
-						ensureVisible:true});
-					return false;
-				}
-			}
-
-			return true;
-		},
-
-		/**
-		 * Some fields maybe filled with values after document ready, such as
-		 * refresh page after input some content in Firefox, so check
-		 * these fields first with this method.
-		 * This method should only apply to the form with all field preset blank.
-		 */
-		preCheck:function(){
-			for(var idx=fields.length -1; idx >=0; idx--){
-				var settings = fields[idx];
-				var value = null;
-
-				if (settings.type == 'checkbox' || settings.type == 'radio'){
-					value = settings.target.is(':checked');
-				}else{
-					value = settings.target.val();
-				}
-
-				if (value && value != settings.initValue){
-					methods.checkField(settings);
-				}
-			}
-		},
-
-		/**
-		 * Specify message by caller.
-		 * Commonly be invoked after server return a fail message, such as
-		 * some front checking pass but server checking failed.
-		 */
-		forceUpdateField:function(name, status, message, actions, focus) {
-			var settings = methods.findField(name);
-			if (settings) {
-				settings.status = status;
-				settings.message = message;
-				settings.actions = actions;
-
-				methods.updateField(settings);
-
-				// set focus to field
-				if (focus) {
-					settings.target.highlight({
-						focus:true,
-						ensureVisible:true});
-				}
-			}
-		},
-
-		resetField:function(name){
-			var settings = methods.findField(name);
-			if (settings) {
-				settings.status = 'uncheck';
-				settings.message = null;
-				settings.actions = null;
-
-				methods.updateField(settings);
-			}
-		},
-
-		findField:function(name) {
-			var field = null;
-			for(var idx in fields){
-				var settings = fields[idx];
-				if (settings.name == name) {
-					field = settings;
-					break;
-				}
-			}
-
-			return field;
-		}
-	};
-
-	$.fn.fieldCheck = function(method){
-		if (methods[method]) {
-			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-		} else if (typeof method === 'object' || ! method) {
-			return methods.init.apply(this, arguments);
-		} else {
-			$.error('Method ' + method + ' does not exist on jQuery.fieldCheck');
-		}
-	};
-})(jQuery);
-
-/**
- * Toolbar edit/done button.
- *
- * $('#editButton').editDone({
- *
- * });
- *
- */
-(function($){
-	var PLUGIN_NAME = 'editDone';
-
-	var defaults = {
-		doneButton:null,
-		onEdit:function(){},
-		onDone:function(){}
-	};
-
-	var methods = {
-		init:function(options){
-			return this.each(function(){
-				var target = $(this);
-				if (target.data(PLUGIN_NAME + '.settings') == null){
-
-					var settings = $.extend({}, defaults, options);
-
-					if (typeof settings.onEdit != 'function'){
-						$.error('The onEdit option must be a function.');
-					}
-
-					if (typeof settings.onDone != 'function'){
-						$.error('The onDone option must be a function.');
-					}
-
-					if (settings.doneButton == null){
-						settings.doneButton = target.parent().next().find('.done');
-					}
-
-					if (settings.doneButton == null){
-						$.error('The doneButton option must be spcified.');
-					}
-
-					settings.editButton = target;
-
-					target.bind('click.' + PLUGIN_NAME, settings, function(event){
-						event.preventDefault();
-						$(this).addClass('hidden');
-
-						var settingsObject = event.data;
-						settingsObject.doneButton.removeClass('hidden');
-						settingsObject.onEdit();
-					});
-
-					settings.doneButton.bind('click.' + PLUGIN_NAME, settings, function(event){
-						event.preventDefault();
-						$(this).addClass('hidden');
-
-						var settingsObject = event.data;
-						settingsObject.editButton.removeClass('hidden');
-						settingsObject.onDone();
-					});
-
-					// prevent bind twice
-					target.data(PLUGIN_NAME + '.settings', settings);
-				}
-			});
-		}
-	};
-
-	$.fn.editDone = function(method){
-		if (methods[method]) {
-			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-		} else if (typeof method === 'object' || ! method) {
-			return methods.init.apply(this, arguments);
-		} else {
-			$.error('Method ' + method + ' does not exist on jQuery.editDone');
-		}
-	};
-})(jQuery);
-
-/**
- * Launcher bar
- */
-(function($){
-	var PLUGIN_NAME = 'launcher';
-
-	var loader = null; // ajax object
-
-	var methods = {
-		init:function(){
-			var moreList = $('.mainSidebar .launcher ul.more');
-
-			$('.mainSidebar .launcher .toggle').click(function(event){
-				event.preventDefault();
-				var target = $(this);
-				if (target.hasClass('loading')){
-					// cancel loader
-					if (loader){
-						loader.abort();
-						target.removeClass('loading');
-					}
-				}else{
-					// toggle the more-launcher list
-					if (moreList.is(':visible')){
-						moreList.slideUp('fast');
-						var title = target.find('.title');
-						title.text($.message('launcher.more'));
-					}else{
-						methods.showMore(target, moreList);
-					}
-				}
-			});
-
-			$(window).bind('resize.' + PLUGIN_NAME, function(){
-				methods.adjustWindowWidth();
-			});
-
-			methods.adjustWindowWidth();
-		},
-
-		adjustWindowWidth:function(){
-			if(!$.pages.options.hideLauncherTitle){
-				if ($(document).width() <= 800){
-					$('.pageBody').addClass('hideLauncherTitle');
-				}else{
-					$('.pageBody').removeClass('hideLauncherTitle');
-				}
-			}
-		},
-
-		isMoreLauncherLoaded:function(moreList) {
-			return (moreList.hasClass('loaded'));
-		},
-
-		showMore:function(target, moreList){
-			if (methods.isMoreLauncherLoaded(moreList)){
-				moreList.slideDown('fast');
-				var title = target.find('.title');
-				title.text($.message('launcher.less'));
-				return;
-			}
-
-			target.addClass('loading');
-
-			// load more app launcher list
-			loader = $.ajax({
-				type:'POST',
-				url:'/home/launcher/more'
-			}).done(function(data){
-				var afterItem = moreList.find('li.placeholder');
-
-				// add launchers
-				for (var idx in data){
-					var launcher = data[idx];
-					afterItem = methods.add(afterItem, launcher);
-				}
-
-				target.find('.title').text('Less');
-				moreList.addClass('loaded');
-				moreList.slideDown('fast');
-
-			}).fail(function(jqXHR, textStatus, errorThrown){
-				if (textStatus != 'abort'){
-					$.flashMessage.showServerError();
-				}
-			}).always(function(){
-				target.removeClass('loading');
-			});
-		},
-
-		/**
-		 * Launcher object:
-		 *	{href, title, photoLocation, appId}
-		 */
-		add:function(afterItem, launcher) {
-			var itemString = '<li class="app">' +
-				'<a class="item" href="' + launcher.href + '" title="' + launcher.title + '">' +
-					'<img class="icon" alt="' + launcher.title + '" src="' + launcher.photoLocation + '"/>' +
-					'<div class="title">' + launcher.title + '</div>' +
-				'</a>' +
-				'</li>';
-			var item = $(itemString);
-			item.data('id', launcher.appId);
-			item.insertAfter(afterItem);
-			return item;
-		},
-
-		/**
-		 * Launcher object:
-		 *	{href, title, photoLocation, appId}
-		 *
-		 * listName: 'default','more'
-		 * moveAfterAppId: the target position application id or the 'top' string.
-		 */
-		move:function(launcher, listName, moveAfterAppId){
-			if (listName=='more'){
-				methods.moveToMoreList(launcher, moveAfterAppId);
-			}else{
-				methods.moveToDefaultList(launcher, moveAfterAppId);
-			}
-		},
-
-		moveToMoreList:function(launcher, moveAfterAppId){
-			var moreList = $('.mainSidebar .launcher ul.more');
-			var item = methods.find(launcher.appId);
-			var moveAfterItem = null;
-			if (methods.isMoreLauncherLoaded(moreList)){
-				if (moveAfterAppId == 'top'){
-					moveAfterItem = moreList.find('li.placeholder');
-				}else{
-					moveAfterItem = methods.find(moveAfterAppId);
-				}
-				item.insertAfter(moveAfterItem);
-			}else{
-				if (item){
-					item.remove();
-				}
-			}
-		},
-
-		moveToDefaultList:function(launcher, moveAfterAppId){
-			var defaultList = $('.mainSidebar .launcher ul:first');
-			var item = methods.find(launcher.appId);
-			var moveAfterItem = null;
-			if (moveAfterAppId == 'top') {
-				moveAfterItem = defaultList.find('li.placeholder');
-			}else{
-				moveAfterItem = methods.find(moveAfterAppId);
-			}
-
-			if (item) {
-				item.insertAfter(moveAfterItem);
-			}else{
-				methods.add(moveAfterItem, launcher);
-			}
-		},
-
-		find:function(appId){
-			var selected = null;
-
-			$('.mainSidebar .launcher li.app').each(function(){
-				var app = $(this);
-				if (app.data('id') == appId){
-					selected = app;
-					return false; // break each function;
-				}
-			});
-
-			return selected;
-		},
-
-		remove:function(appId) {
-			var item = methods.find(appId);
-			if (item) {
-				item.fadeOut('slow', function(){
-					item.remove();
-				});
-			}
-		}
-	};
-
-	$.pages.launcher = methods;
-
-})(jQuery);
-
-/**
- * header, footer and frame
- */
-(function($){
-	var searchBoxTimer = null;
-
-	var methods = {
-		init:function(){
-			// launcher bar
-			if ($.pages.options.authenticated) {
-				$.pages.launcher.init();
-			}
-
-			// page header - search
-			var searchBox = $('.pageHeader .search .box input');
-			var searchBoxIcon = searchBox.siblings('.loadingIcon');
-			var searchResultBox = $('.pageHeader .search .list');
-
-			var lastText = null;
-			var lastSearchText = null;
-
-			searchBox.inputHints();
-
-			searchBox.focus(function(){
-				if (searchResultBox.data('result')){
-					searchResultBox.show(); // show the last result.
-				}
-
-				searchBoxTimer = window.setInterval(function(){
-					var text = searchBox.val();
-					if(text == lastText){
-						if (text != lastSearchText){
-							lastSearchText = text;
-							methods.onSearchBoxTextChange(text, searchBox, searchBoxIcon, searchResultBox);
-						}
-					}
-					lastText = text;
-				}, 500);
-			});
-
-			searchBox.blur(function(){
-				// indicates searching canceled.
-				searchBoxIcon.hide();
-				window.clearInterval(searchBoxTimer);
-
-				// cancel searching request.
-				// TODO::
-			});
-
-			searchBox.keypress(function(event){
-				if (event.which == 13){
-					$.flashMessage.show({
-						content:'common.todo'
-					});
-				}
-			});
-
-			$(document).bind('click.headerSearch', function(event){
-				var target = $(event.target);
-				if ($.jqEquals(target, searchBox)){
-					// ignore
-				}else{
-					searchBoxIcon.hide();
-					window.clearInterval(searchBoxTimer);
-
-					searchResultBox.hide();
-
-					// cancel searching request
-					// TODO::
-				}
-			});
-
-			// page header - profile
-			$('.pageHeader .profile .icon').dropDownMenu({
-				menu:$('.pageHeader .profile .list')
-			});
-
-			// page header - notification
-			$('.pageHeader .notify .number').dropDownMenu({
-				menu:$('.pageHeader .notify .list')
-			});
-
-			// page footer - language select menu
-			$('.pageFooter .locale .dropDownButton').dropDownMenu({
-				menu:$('.pageFooter .locale .dropDownMenu')
-			});
-
-			// TODO:: FOR TESTING STATE
-			methods.disableTodoLink();
-		},
-
-		onSearchBoxTextChange:function(text, searchBox, searchBoxIcon, resultBox){
-
-			if (text == ''){
-				// set the state
-				resultBox.data('result', false);
-
-				searchBoxIcon.hide();
-				resultBox.hide();
-				return false;
-			}
-
-			searchBoxIcon.show();
-
-			// start searching
-			window.setTimeout(function(){
-
-				// indicates searching canceled.
-				if (!searchBox.is(':focus')){
-					return;
-				}
-
-				searchBoxIcon.hide();
-				resultBox.show();
-
-				// set the state
-				resultBox.data('result', true);
-
-			}, 1000);
-		},
-
-		disableTodoLink:function(){
-			$('a.todo').click(function(event){
-				event.preventDefault();
-				$.flashMessage.show({
-					content:'common.todo'
-				});
-			});
-		}
-	};
-
-	$.pages.commons = methods;
-
-})(jQuery);
+if (typeof jQuery === 'undefined') { throw new Error('Bootstrap\'s JavaScript requires jQuery') }
+
+/* ========================================================================
+ * Bootstrap: transition.js v3.2.0
+ * http://getbootstrap.com/javascript/#transitions
+ * ========================================================================
+ * Copyright 2011-2014 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+  'use strict';
+
+  // CSS TRANSITION SUPPORT (Shoutout: http://www.modernizr.com/)
+  // ============================================================
+
+  function transitionEnd() {
+    var el = document.createElement('bootstrap')
+
+    var transEndEventNames = {
+      WebkitTransition : 'webkitTransitionEnd',
+      MozTransition    : 'transitionend',
+      OTransition      : 'oTransitionEnd otransitionend',
+      transition       : 'transitionend'
+    }
+
+    for (var name in transEndEventNames) {
+      if (el.style[name] !== undefined) {
+        return { end: transEndEventNames[name] }
+      }
+    }
+
+    return false // explicit for ie8 (  ._.)
+  }
+
+  // http://blog.alexmaccaw.com/css-transitions
+  $.fn.emulateTransitionEnd = function (duration) {
+    var called = false
+    var $el = this
+    $(this).one('bsTransitionEnd', function () { called = true })
+    var callback = function () { if (!called) $($el).trigger($.support.transition.end) }
+    setTimeout(callback, duration)
+    return this
+  }
+
+  $(function () {
+    $.support.transition = transitionEnd()
+
+    if (!$.support.transition) return
+
+    $.event.special.bsTransitionEnd = {
+      bindType: $.support.transition.end,
+      delegateType: $.support.transition.end,
+      handle: function (e) {
+        if ($(e.target).is(this)) return e.handleObj.handler.apply(this, arguments)
+      }
+    }
+  })
+
+}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: alert.js v3.2.0
+ * http://getbootstrap.com/javascript/#alerts
+ * ========================================================================
+ * Copyright 2011-2014 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+  'use strict';
+
+  // ALERT CLASS DEFINITION
+  // ======================
+
+  var dismiss = '[data-dismiss="alert"]'
+  var Alert   = function (el) {
+    $(el).on('click', dismiss, this.close)
+  }
+
+  Alert.VERSION = '3.2.0'
+
+  Alert.prototype.close = function (e) {
+    var $this    = $(this)
+    var selector = $this.attr('data-target')
+
+    if (!selector) {
+      selector = $this.attr('href')
+      selector = selector && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
+    }
+
+    var $parent = $(selector)
+
+    if (e) e.preventDefault()
+
+    if (!$parent.length) {
+      $parent = $this.hasClass('alert') ? $this : $this.parent()
+    }
+
+    $parent.trigger(e = $.Event('close.bs.alert'))
+
+    if (e.isDefaultPrevented()) return
+
+    $parent.removeClass('in')
+
+    function removeElement() {
+      // detach from parent, fire event then clean up data
+      $parent.detach().trigger('closed.bs.alert').remove()
+    }
+
+    $.support.transition && $parent.hasClass('fade') ?
+      $parent
+        .one('bsTransitionEnd', removeElement)
+        .emulateTransitionEnd(150) :
+      removeElement()
+  }
+
+
+  // ALERT PLUGIN DEFINITION
+  // =======================
+
+  function Plugin(option) {
+    return this.each(function () {
+      var $this = $(this)
+      var data  = $this.data('bs.alert')
+
+      if (!data) $this.data('bs.alert', (data = new Alert(this)))
+      if (typeof option == 'string') data[option].call($this)
+    })
+  }
+
+  var old = $.fn.alert
+
+  $.fn.alert             = Plugin
+  $.fn.alert.Constructor = Alert
+
+
+  // ALERT NO CONFLICT
+  // =================
+
+  $.fn.alert.noConflict = function () {
+    $.fn.alert = old
+    return this
+  }
+
+
+  // ALERT DATA-API
+  // ==============
+
+  $(document).on('click.bs.alert.data-api', dismiss, Alert.prototype.close)
+
+}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: button.js v3.2.0
+ * http://getbootstrap.com/javascript/#buttons
+ * ========================================================================
+ * Copyright 2011-2014 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+  'use strict';
+
+  // BUTTON PUBLIC CLASS DEFINITION
+  // ==============================
+
+  var Button = function (element, options) {
+    this.$element  = $(element)
+    this.options   = $.extend({}, Button.DEFAULTS, options)
+    this.isLoading = false
+  }
+
+  Button.VERSION  = '3.2.0'
+
+  Button.DEFAULTS = {
+    loadingText: 'loading...'
+  }
+
+  Button.prototype.setState = function (state) {
+    var d    = 'disabled'
+    var $el  = this.$element
+    var val  = $el.is('input') ? 'val' : 'html'
+    var data = $el.data()
+
+    state = state + 'Text'
+
+    if (data.resetText == null) $el.data('resetText', $el[val]())
+
+    $el[val](data[state] == null ? this.options[state] : data[state])
+
+    // push to event loop to allow forms to submit
+    setTimeout($.proxy(function () {
+      if (state == 'loadingText') {
+        this.isLoading = true
+        $el.addClass(d).attr(d, d)
+      } else if (this.isLoading) {
+        this.isLoading = false
+        $el.removeClass(d).removeAttr(d)
+      }
+    }, this), 0)
+  }
+
+  Button.prototype.toggle = function () {
+    var changed = true
+    var $parent = this.$element.closest('[data-toggle="buttons"]')
+
+    if ($parent.length) {
+      var $input = this.$element.find('input')
+      if ($input.prop('type') == 'radio') {
+        if ($input.prop('checked') && this.$element.hasClass('active')) changed = false
+        else $parent.find('.active').removeClass('active')
+      }
+      if (changed) $input.prop('checked', !this.$element.hasClass('active')).trigger('change')
+    }
+
+    if (changed) this.$element.toggleClass('active')
+  }
+
+
+  // BUTTON PLUGIN DEFINITION
+  // ========================
+
+  function Plugin(option) {
+    return this.each(function () {
+      var $this   = $(this)
+      var data    = $this.data('bs.button')
+      var options = typeof option == 'object' && option
+
+      if (!data) $this.data('bs.button', (data = new Button(this, options)))
+
+      if (option == 'toggle') data.toggle()
+      else if (option) data.setState(option)
+    })
+  }
+
+  var old = $.fn.button
+
+  $.fn.button             = Plugin
+  $.fn.button.Constructor = Button
+
+
+  // BUTTON NO CONFLICT
+  // ==================
+
+  $.fn.button.noConflict = function () {
+    $.fn.button = old
+    return this
+  }
+
+
+  // BUTTON DATA-API
+  // ===============
+
+  $(document).on('click.bs.button.data-api', '[data-toggle^="button"]', function (e) {
+    var $btn = $(e.target)
+    if (!$btn.hasClass('btn')) $btn = $btn.closest('.btn')
+    Plugin.call($btn, 'toggle')
+    e.preventDefault()
+  })
+
+}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: carousel.js v3.2.0
+ * http://getbootstrap.com/javascript/#carousel
+ * ========================================================================
+ * Copyright 2011-2014 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+  'use strict';
+
+  // CAROUSEL CLASS DEFINITION
+  // =========================
+
+  var Carousel = function (element, options) {
+    this.$element    = $(element).on('keydown.bs.carousel', $.proxy(this.keydown, this))
+    this.$indicators = this.$element.find('.carousel-indicators')
+    this.options     = options
+    this.paused      =
+    this.sliding     =
+    this.interval    =
+    this.$active     =
+    this.$items      = null
+
+    this.options.pause == 'hover' && this.$element
+      .on('mouseenter.bs.carousel', $.proxy(this.pause, this))
+      .on('mouseleave.bs.carousel', $.proxy(this.cycle, this))
+  }
+
+  Carousel.VERSION  = '3.2.0'
+
+  Carousel.DEFAULTS = {
+    interval: 5000,
+    pause: 'hover',
+    wrap: true
+  }
+
+  Carousel.prototype.keydown = function (e) {
+    switch (e.which) {
+      case 37: this.prev(); break
+      case 39: this.next(); break
+      default: return
+    }
+
+    e.preventDefault()
+  }
+
+  Carousel.prototype.cycle = function (e) {
+    e || (this.paused = false)
+
+    this.interval && clearInterval(this.interval)
+
+    this.options.interval
+      && !this.paused
+      && (this.interval = setInterval($.proxy(this.next, this), this.options.interval))
+
+    return this
+  }
+
+  Carousel.prototype.getItemIndex = function (item) {
+    this.$items = item.parent().children('.item')
+    return this.$items.index(item || this.$active)
+  }
+
+  Carousel.prototype.to = function (pos) {
+    var that        = this
+    var activeIndex = this.getItemIndex(this.$active = this.$element.find('.item.active'))
+
+    if (pos > (this.$items.length - 1) || pos < 0) return
+
+    if (this.sliding)       return this.$element.one('slid.bs.carousel', function () { that.to(pos) }) // yes, "slid"
+    if (activeIndex == pos) return this.pause().cycle()
+
+    return this.slide(pos > activeIndex ? 'next' : 'prev', $(this.$items[pos]))
+  }
+
+  Carousel.prototype.pause = function (e) {
+    e || (this.paused = true)
+
+    if (this.$element.find('.next, .prev').length && $.support.transition) {
+      this.$element.trigger($.support.transition.end)
+      this.cycle(true)
+    }
+
+    this.interval = clearInterval(this.interval)
+
+    return this
+  }
+
+  Carousel.prototype.next = function () {
+    if (this.sliding) return
+    return this.slide('next')
+  }
+
+  Carousel.prototype.prev = function () {
+    if (this.sliding) return
+    return this.slide('prev')
+  }
+
+  Carousel.prototype.slide = function (type, next) {
+    var $active   = this.$element.find('.item.active')
+    var $next     = next || $active[type]()
+    var isCycling = this.interval
+    var direction = type == 'next' ? 'left' : 'right'
+    var fallback  = type == 'next' ? 'first' : 'last'
+    var that      = this
+
+    if (!$next.length) {
+      if (!this.options.wrap) return
+      $next = this.$element.find('.item')[fallback]()
+    }
+
+    if ($next.hasClass('active')) return (this.sliding = false)
+
+    var relatedTarget = $next[0]
+    var slideEvent = $.Event('slide.bs.carousel', {
+      relatedTarget: relatedTarget,
+      direction: direction
+    })
+    this.$element.trigger(slideEvent)
+    if (slideEvent.isDefaultPrevented()) return
+
+    this.sliding = true
+
+    isCycling && this.pause()
+
+    if (this.$indicators.length) {
+      this.$indicators.find('.active').removeClass('active')
+      var $nextIndicator = $(this.$indicators.children()[this.getItemIndex($next)])
+      $nextIndicator && $nextIndicator.addClass('active')
+    }
+
+    var slidEvent = $.Event('slid.bs.carousel', { relatedTarget: relatedTarget, direction: direction }) // yes, "slid"
+    if ($.support.transition && this.$element.hasClass('slide')) {
+      $next.addClass(type)
+      $next[0].offsetWidth // force reflow
+      $active.addClass(direction)
+      $next.addClass(direction)
+      $active
+        .one('bsTransitionEnd', function () {
+          $next.removeClass([type, direction].join(' ')).addClass('active')
+          $active.removeClass(['active', direction].join(' '))
+          that.sliding = false
+          setTimeout(function () {
+            that.$element.trigger(slidEvent)
+          }, 0)
+        })
+        .emulateTransitionEnd($active.css('transition-duration').slice(0, -1) * 1000)
+    } else {
+      $active.removeClass('active')
+      $next.addClass('active')
+      this.sliding = false
+      this.$element.trigger(slidEvent)
+    }
+
+    isCycling && this.cycle()
+
+    return this
+  }
+
+
+  // CAROUSEL PLUGIN DEFINITION
+  // ==========================
+
+  function Plugin(option) {
+    return this.each(function () {
+      var $this   = $(this)
+      var data    = $this.data('bs.carousel')
+      var options = $.extend({}, Carousel.DEFAULTS, $this.data(), typeof option == 'object' && option)
+      var action  = typeof option == 'string' ? option : options.slide
+
+      if (!data) $this.data('bs.carousel', (data = new Carousel(this, options)))
+      if (typeof option == 'number') data.to(option)
+      else if (action) data[action]()
+      else if (options.interval) data.pause().cycle()
+    })
+  }
+
+  var old = $.fn.carousel
+
+  $.fn.carousel             = Plugin
+  $.fn.carousel.Constructor = Carousel
+
+
+  // CAROUSEL NO CONFLICT
+  // ====================
+
+  $.fn.carousel.noConflict = function () {
+    $.fn.carousel = old
+    return this
+  }
+
+
+  // CAROUSEL DATA-API
+  // =================
+
+  $(document).on('click.bs.carousel.data-api', '[data-slide], [data-slide-to]', function (e) {
+    var href
+    var $this   = $(this)
+    var $target = $($this.attr('data-target') || (href = $this.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '')) // strip for ie7
+    if (!$target.hasClass('carousel')) return
+    var options = $.extend({}, $target.data(), $this.data())
+    var slideIndex = $this.attr('data-slide-to')
+    if (slideIndex) options.interval = false
+
+    Plugin.call($target, options)
+
+    if (slideIndex) {
+      $target.data('bs.carousel').to(slideIndex)
+    }
+
+    e.preventDefault()
+  })
+
+  $(window).on('load', function () {
+    $('[data-ride="carousel"]').each(function () {
+      var $carousel = $(this)
+      Plugin.call($carousel, $carousel.data())
+    })
+  })
+
+}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: collapse.js v3.2.0
+ * http://getbootstrap.com/javascript/#collapse
+ * ========================================================================
+ * Copyright 2011-2014 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+  'use strict';
+
+  // COLLAPSE PUBLIC CLASS DEFINITION
+  // ================================
+
+  var Collapse = function (element, options) {
+    this.$element      = $(element)
+    this.options       = $.extend({}, Collapse.DEFAULTS, options)
+    this.transitioning = null
+
+    if (this.options.parent) this.$parent = $(this.options.parent)
+    if (this.options.toggle) this.toggle()
+  }
+
+  Collapse.VERSION  = '3.2.0'
+
+  Collapse.DEFAULTS = {
+    toggle: true
+  }
+
+  Collapse.prototype.dimension = function () {
+    var hasWidth = this.$element.hasClass('width')
+    return hasWidth ? 'width' : 'height'
+  }
+
+  Collapse.prototype.show = function () {
+    if (this.transitioning || this.$element.hasClass('in')) return
+
+    var startEvent = $.Event('show.bs.collapse')
+    this.$element.trigger(startEvent)
+    if (startEvent.isDefaultPrevented()) return
+
+    var actives = this.$parent && this.$parent.find('> .panel > .in')
+
+    if (actives && actives.length) {
+      var hasData = actives.data('bs.collapse')
+      if (hasData && hasData.transitioning) return
+      Plugin.call(actives, 'hide')
+      hasData || actives.data('bs.collapse', null)
+    }
+
+    var dimension = this.dimension()
+
+    this.$element
+      .removeClass('collapse')
+      .addClass('collapsing')[dimension](0)
+
+    this.transitioning = 1
+
+    var complete = function () {
+      this.$element
+        .removeClass('collapsing')
+        .addClass('collapse in')[dimension]('')
+      this.transitioning = 0
+      this.$element
+        .trigger('shown.bs.collapse')
+    }
+
+    if (!$.support.transition) return complete.call(this)
+
+    var scrollSize = $.camelCase(['scroll', dimension].join('-'))
+
+    this.$element
+      .one('bsTransitionEnd', $.proxy(complete, this))
+      .emulateTransitionEnd(350)[dimension](this.$element[0][scrollSize])
+  }
+
+  Collapse.prototype.hide = function () {
+    if (this.transitioning || !this.$element.hasClass('in')) return
+
+    var startEvent = $.Event('hide.bs.collapse')
+    this.$element.trigger(startEvent)
+    if (startEvent.isDefaultPrevented()) return
+
+    var dimension = this.dimension()
+
+    this.$element[dimension](this.$element[dimension]())[0].offsetHeight
+
+    this.$element
+      .addClass('collapsing')
+      .removeClass('collapse')
+      .removeClass('in')
+
+    this.transitioning = 1
+
+    var complete = function () {
+      this.transitioning = 0
+      this.$element
+        .trigger('hidden.bs.collapse')
+        .removeClass('collapsing')
+        .addClass('collapse')
+    }
+
+    if (!$.support.transition) return complete.call(this)
+
+    this.$element
+      [dimension](0)
+      .one('bsTransitionEnd', $.proxy(complete, this))
+      .emulateTransitionEnd(350)
+  }
+
+  Collapse.prototype.toggle = function () {
+    this[this.$element.hasClass('in') ? 'hide' : 'show']()
+  }
+
+
+  // COLLAPSE PLUGIN DEFINITION
+  // ==========================
+
+  function Plugin(option) {
+    return this.each(function () {
+      var $this   = $(this)
+      var data    = $this.data('bs.collapse')
+      var options = $.extend({}, Collapse.DEFAULTS, $this.data(), typeof option == 'object' && option)
+
+      if (!data && options.toggle && option == 'show') option = !option
+      if (!data) $this.data('bs.collapse', (data = new Collapse(this, options)))
+      if (typeof option == 'string') data[option]()
+    })
+  }
+
+  var old = $.fn.collapse
+
+  $.fn.collapse             = Plugin
+  $.fn.collapse.Constructor = Collapse
+
+
+  // COLLAPSE NO CONFLICT
+  // ====================
+
+  $.fn.collapse.noConflict = function () {
+    $.fn.collapse = old
+    return this
+  }
+
+
+  // COLLAPSE DATA-API
+  // =================
+
+  $(document).on('click.bs.collapse.data-api', '[data-toggle="collapse"]', function (e) {
+    var href
+    var $this   = $(this)
+    var target  = $this.attr('data-target')
+        || e.preventDefault()
+        || (href = $this.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '') // strip for ie7
+    var $target = $(target)
+    var data    = $target.data('bs.collapse')
+    var option  = data ? 'toggle' : $this.data()
+    var parent  = $this.attr('data-parent')
+    var $parent = parent && $(parent)
+
+    if (!data || !data.transitioning) {
+      if ($parent) $parent.find('[data-toggle="collapse"][data-parent="' + parent + '"]').not($this).addClass('collapsed')
+      $this[$target.hasClass('in') ? 'addClass' : 'removeClass']('collapsed')
+    }
+
+    Plugin.call($target, option)
+  })
+
+}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: dropdown.js v3.2.0
+ * http://getbootstrap.com/javascript/#dropdowns
+ * ========================================================================
+ * Copyright 2011-2014 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+  'use strict';
+
+  // DROPDOWN CLASS DEFINITION
+  // =========================
+
+  var backdrop = '.dropdown-backdrop'
+  var toggle   = '[data-toggle="dropdown"]'
+  var Dropdown = function (element) {
+    $(element).on('click.bs.dropdown', this.toggle)
+  }
+
+  Dropdown.VERSION = '3.2.0'
+
+  Dropdown.prototype.toggle = function (e) {
+    var $this = $(this)
+
+    if ($this.is('.disabled, :disabled')) return
+
+    var $parent  = getParent($this)
+    var isActive = $parent.hasClass('open')
+
+    clearMenus()
+
+    if (!isActive) {
+      if ('ontouchstart' in document.documentElement && !$parent.closest('.navbar-nav').length) {
+        // if mobile we use a backdrop because click events don't delegate
+        $('<div class="dropdown-backdrop"/>').insertAfter($(this)).on('click', clearMenus)
+      }
+
+      var relatedTarget = { relatedTarget: this }
+      $parent.trigger(e = $.Event('show.bs.dropdown', relatedTarget))
+
+      if (e.isDefaultPrevented()) return
+
+      $this.trigger('focus')
+
+      $parent
+        .toggleClass('open')
+        .trigger('shown.bs.dropdown', relatedTarget)
+    }
+
+    return false
+  }
+
+  Dropdown.prototype.keydown = function (e) {
+    if (!/(38|40|27)/.test(e.keyCode)) return
+
+    var $this = $(this)
+
+    e.preventDefault()
+    e.stopPropagation()
+
+    if ($this.is('.disabled, :disabled')) return
+
+    var $parent  = getParent($this)
+    var isActive = $parent.hasClass('open')
+
+    if (!isActive || (isActive && e.keyCode == 27)) {
+      if (e.which == 27) $parent.find(toggle).trigger('focus')
+      return $this.trigger('click')
+    }
+
+    var desc = ' li:not(.divider):visible a'
+    var $items = $parent.find('[role="menu"]' + desc + ', [role="listbox"]' + desc)
+
+    if (!$items.length) return
+
+    var index = $items.index($items.filter(':focus'))
+
+    if (e.keyCode == 38 && index > 0)                 index--                        // up
+    if (e.keyCode == 40 && index < $items.length - 1) index++                        // down
+    if (!~index)                                      index = 0
+
+    $items.eq(index).trigger('focus')
+  }
+
+  function clearMenus(e) {
+    if (e && e.which === 3) return
+    $(backdrop).remove()
+    $(toggle).each(function () {
+      var $parent = getParent($(this))
+      var relatedTarget = { relatedTarget: this }
+      if (!$parent.hasClass('open')) return
+      $parent.trigger(e = $.Event('hide.bs.dropdown', relatedTarget))
+      if (e.isDefaultPrevented()) return
+      $parent.removeClass('open').trigger('hidden.bs.dropdown', relatedTarget)
+    })
+  }
+
+  function getParent($this) {
+    var selector = $this.attr('data-target')
+
+    if (!selector) {
+      selector = $this.attr('href')
+      selector = selector && /#[A-Za-z]/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
+    }
+
+    var $parent = selector && $(selector)
+
+    return $parent && $parent.length ? $parent : $this.parent()
+  }
+
+
+  // DROPDOWN PLUGIN DEFINITION
+  // ==========================
+
+  function Plugin(option) {
+    return this.each(function () {
+      var $this = $(this)
+      var data  = $this.data('bs.dropdown')
+
+      if (!data) $this.data('bs.dropdown', (data = new Dropdown(this)))
+      if (typeof option == 'string') data[option].call($this)
+    })
+  }
+
+  var old = $.fn.dropdown
+
+  $.fn.dropdown             = Plugin
+  $.fn.dropdown.Constructor = Dropdown
+
+
+  // DROPDOWN NO CONFLICT
+  // ====================
+
+  $.fn.dropdown.noConflict = function () {
+    $.fn.dropdown = old
+    return this
+  }
+
+
+  // APPLY TO STANDARD DROPDOWN ELEMENTS
+  // ===================================
+
+  $(document)
+    .on('click.bs.dropdown.data-api', clearMenus)
+    .on('click.bs.dropdown.data-api', '.dropdown form', function (e) { e.stopPropagation() })
+    .on('click.bs.dropdown.data-api', toggle, Dropdown.prototype.toggle)
+    .on('keydown.bs.dropdown.data-api', toggle + ', [role="menu"], [role="listbox"]', Dropdown.prototype.keydown)
+
+}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: modal.js v3.2.0
+ * http://getbootstrap.com/javascript/#modals
+ * ========================================================================
+ * Copyright 2011-2014 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+  'use strict';
+
+  // MODAL CLASS DEFINITION
+  // ======================
+
+  var Modal = function (element, options) {
+    this.options        = options
+    this.$body          = $(document.body)
+    this.$element       = $(element)
+    this.$backdrop      =
+    this.isShown        = null
+    this.scrollbarWidth = 0
+
+    if (this.options.remote) {
+      this.$element
+        .find('.modal-content')
+        .load(this.options.remote, $.proxy(function () {
+          this.$element.trigger('loaded.bs.modal')
+        }, this))
+    }
+  }
+
+  Modal.VERSION  = '3.2.0'
+
+  Modal.DEFAULTS = {
+    backdrop: true,
+    keyboard: true,
+    show: true
+  }
+
+  Modal.prototype.toggle = function (_relatedTarget) {
+    return this.isShown ? this.hide() : this.show(_relatedTarget)
+  }
+
+  Modal.prototype.show = function (_relatedTarget) {
+    var that = this
+    var e    = $.Event('show.bs.modal', { relatedTarget: _relatedTarget })
+
+    this.$element.trigger(e)
+
+    if (this.isShown || e.isDefaultPrevented()) return
+
+    this.isShown = true
+
+    this.checkScrollbar()
+    this.$body.addClass('modal-open')
+
+    this.setScrollbar()
+    this.escape()
+
+    this.$element.on('click.dismiss.bs.modal', '[data-dismiss="modal"]', $.proxy(this.hide, this))
+
+    this.backdrop(function () {
+      var transition = $.support.transition && that.$element.hasClass('fade')
+
+      if (!that.$element.parent().length) {
+        that.$element.appendTo(that.$body) // don't move modals dom position
+      }
+
+      that.$element
+        .show()
+        .scrollTop(0)
+
+      if (transition) {
+        that.$element[0].offsetWidth // force reflow
+      }
+
+      that.$element
+        .addClass('in')
+        .attr('aria-hidden', false)
+
+      that.enforceFocus()
+
+      var e = $.Event('shown.bs.modal', { relatedTarget: _relatedTarget })
+
+      transition ?
+        that.$element.find('.modal-dialog') // wait for modal to slide in
+          .one('bsTransitionEnd', function () {
+            that.$element.trigger('focus').trigger(e)
+          })
+          .emulateTransitionEnd(300) :
+        that.$element.trigger('focus').trigger(e)
+    })
+  }
+
+  Modal.prototype.hide = function (e) {
+    if (e) e.preventDefault()
+
+    e = $.Event('hide.bs.modal')
+
+    this.$element.trigger(e)
+
+    if (!this.isShown || e.isDefaultPrevented()) return
+
+    this.isShown = false
+
+    this.$body.removeClass('modal-open')
+
+    this.resetScrollbar()
+    this.escape()
+
+    $(document).off('focusin.bs.modal')
+
+    this.$element
+      .removeClass('in')
+      .attr('aria-hidden', true)
+      .off('click.dismiss.bs.modal')
+
+    $.support.transition && this.$element.hasClass('fade') ?
+      this.$element
+        .one('bsTransitionEnd', $.proxy(this.hideModal, this))
+        .emulateTransitionEnd(300) :
+      this.hideModal()
+  }
+
+  Modal.prototype.enforceFocus = function () {
+    $(document)
+      .off('focusin.bs.modal') // guard against infinite focus loop
+      .on('focusin.bs.modal', $.proxy(function (e) {
+        if (this.$element[0] !== e.target && !this.$element.has(e.target).length) {
+          this.$element.trigger('focus')
+        }
+      }, this))
+  }
+
+  Modal.prototype.escape = function () {
+    if (this.isShown && this.options.keyboard) {
+      this.$element.on('keyup.dismiss.bs.modal', $.proxy(function (e) {
+        e.which == 27 && this.hide()
+      }, this))
+    } else if (!this.isShown) {
+      this.$element.off('keyup.dismiss.bs.modal')
+    }
+  }
+
+  Modal.prototype.hideModal = function () {
+    var that = this
+    this.$element.hide()
+    this.backdrop(function () {
+      that.$element.trigger('hidden.bs.modal')
+    })
+  }
+
+  Modal.prototype.removeBackdrop = function () {
+    this.$backdrop && this.$backdrop.remove()
+    this.$backdrop = null
+  }
+
+  Modal.prototype.backdrop = function (callback) {
+    var that = this
+    var animate = this.$element.hasClass('fade') ? 'fade' : ''
+
+    if (this.isShown && this.options.backdrop) {
+      var doAnimate = $.support.transition && animate
+
+      this.$backdrop = $('<div class="modal-backdrop ' + animate + '" />')
+        .appendTo(this.$body)
+
+      this.$element.on('click.dismiss.bs.modal', $.proxy(function (e) {
+        if (e.target !== e.currentTarget) return
+        this.options.backdrop == 'static'
+          ? this.$element[0].focus.call(this.$element[0])
+          : this.hide.call(this)
+      }, this))
+
+      if (doAnimate) this.$backdrop[0].offsetWidth // force reflow
+
+      this.$backdrop.addClass('in')
+
+      if (!callback) return
+
+      doAnimate ?
+        this.$backdrop
+          .one('bsTransitionEnd', callback)
+          .emulateTransitionEnd(150) :
+        callback()
+
+    } else if (!this.isShown && this.$backdrop) {
+      this.$backdrop.removeClass('in')
+
+      var callbackRemove = function () {
+        that.removeBackdrop()
+        callback && callback()
+      }
+      $.support.transition && this.$element.hasClass('fade') ?
+        this.$backdrop
+          .one('bsTransitionEnd', callbackRemove)
+          .emulateTransitionEnd(150) :
+        callbackRemove()
+
+    } else if (callback) {
+      callback()
+    }
+  }
+
+  Modal.prototype.checkScrollbar = function () {
+    if (document.body.clientWidth >= window.innerWidth) return
+    this.scrollbarWidth = this.scrollbarWidth || this.measureScrollbar()
+  }
+
+  Modal.prototype.setScrollbar = function () {
+    var bodyPad = parseInt((this.$body.css('padding-right') || 0), 10)
+    if (this.scrollbarWidth) this.$body.css('padding-right', bodyPad + this.scrollbarWidth)
+  }
+
+  Modal.prototype.resetScrollbar = function () {
+    this.$body.css('padding-right', '')
+  }
+
+  Modal.prototype.measureScrollbar = function () { // thx walsh
+    var scrollDiv = document.createElement('div')
+    scrollDiv.className = 'modal-scrollbar-measure'
+    this.$body.append(scrollDiv)
+    var scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth
+    this.$body[0].removeChild(scrollDiv)
+    return scrollbarWidth
+  }
+
+
+  // MODAL PLUGIN DEFINITION
+  // =======================
+
+  function Plugin(option, _relatedTarget) {
+    return this.each(function () {
+      var $this   = $(this)
+      var data    = $this.data('bs.modal')
+      var options = $.extend({}, Modal.DEFAULTS, $this.data(), typeof option == 'object' && option)
+
+      if (!data) $this.data('bs.modal', (data = new Modal(this, options)))
+      if (typeof option == 'string') data[option](_relatedTarget)
+      else if (options.show) data.show(_relatedTarget)
+    })
+  }
+
+  var old = $.fn.modal
+
+  $.fn.modal             = Plugin
+  $.fn.modal.Constructor = Modal
+
+
+  // MODAL NO CONFLICT
+  // =================
+
+  $.fn.modal.noConflict = function () {
+    $.fn.modal = old
+    return this
+  }
+
+
+  // MODAL DATA-API
+  // ==============
+
+  $(document).on('click.bs.modal.data-api', '[data-toggle="modal"]', function (e) {
+    var $this   = $(this)
+    var href    = $this.attr('href')
+    var $target = $($this.attr('data-target') || (href && href.replace(/.*(?=#[^\s]+$)/, ''))) // strip for ie7
+    var option  = $target.data('bs.modal') ? 'toggle' : $.extend({ remote: !/#/.test(href) && href }, $target.data(), $this.data())
+
+    if ($this.is('a')) e.preventDefault()
+
+    $target.one('show.bs.modal', function (showEvent) {
+      if (showEvent.isDefaultPrevented()) return // only register focus restorer if modal will actually get shown
+      $target.one('hidden.bs.modal', function () {
+        $this.is(':visible') && $this.trigger('focus')
+      })
+    })
+    Plugin.call($target, option, this)
+  })
+
+}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: tooltip.js v3.2.0
+ * http://getbootstrap.com/javascript/#tooltip
+ * Inspired by the original jQuery.tipsy by Jason Frame
+ * ========================================================================
+ * Copyright 2011-2014 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+  'use strict';
+
+  // TOOLTIP PUBLIC CLASS DEFINITION
+  // ===============================
+
+  var Tooltip = function (element, options) {
+    this.type       =
+    this.options    =
+    this.enabled    =
+    this.timeout    =
+    this.hoverState =
+    this.$element   = null
+
+    this.init('tooltip', element, options)
+  }
+
+  Tooltip.VERSION  = '3.2.0'
+
+  Tooltip.DEFAULTS = {
+    animation: true,
+    placement: 'top',
+    selector: false,
+    template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>',
+    trigger: 'hover focus',
+    title: '',
+    delay: 0,
+    html: false,
+    container: false,
+    viewport: {
+      selector: 'body',
+      padding: 0
+    }
+  }
+
+  Tooltip.prototype.init = function (type, element, options) {
+    this.enabled   = true
+    this.type      = type
+    this.$element  = $(element)
+    this.options   = this.getOptions(options)
+    this.$viewport = this.options.viewport && $(this.options.viewport.selector || this.options.viewport)
+
+    var triggers = this.options.trigger.split(' ')
+
+    for (var i = triggers.length; i--;) {
+      var trigger = triggers[i]
+
+      if (trigger == 'click') {
+        this.$element.on('click.' + this.type, this.options.selector, $.proxy(this.toggle, this))
+      } else if (trigger != 'manual') {
+        var eventIn  = trigger == 'hover' ? 'mouseenter' : 'focusin'
+        var eventOut = trigger == 'hover' ? 'mouseleave' : 'focusout'
+
+        this.$element.on(eventIn  + '.' + this.type, this.options.selector, $.proxy(this.enter, this))
+        this.$element.on(eventOut + '.' + this.type, this.options.selector, $.proxy(this.leave, this))
+      }
+    }
+
+    this.options.selector ?
+      (this._options = $.extend({}, this.options, { trigger: 'manual', selector: '' })) :
+      this.fixTitle()
+  }
+
+  Tooltip.prototype.getDefaults = function () {
+    return Tooltip.DEFAULTS
+  }
+
+  Tooltip.prototype.getOptions = function (options) {
+    options = $.extend({}, this.getDefaults(), this.$element.data(), options)
+
+    if (options.delay && typeof options.delay == 'number') {
+      options.delay = {
+        show: options.delay,
+        hide: options.delay
+      }
+    }
+
+    return options
+  }
+
+  Tooltip.prototype.getDelegateOptions = function () {
+    var options  = {}
+    var defaults = this.getDefaults()
+
+    this._options && $.each(this._options, function (key, value) {
+      if (defaults[key] != value) options[key] = value
+    })
+
+    return options
+  }
+
+  Tooltip.prototype.enter = function (obj) {
+    var self = obj instanceof this.constructor ?
+      obj : $(obj.currentTarget).data('bs.' + this.type)
+
+    if (!self) {
+      self = new this.constructor(obj.currentTarget, this.getDelegateOptions())
+      $(obj.currentTarget).data('bs.' + this.type, self)
+    }
+
+    clearTimeout(self.timeout)
+
+    self.hoverState = 'in'
+
+    if (!self.options.delay || !self.options.delay.show) return self.show()
+
+    self.timeout = setTimeout(function () {
+      if (self.hoverState == 'in') self.show()
+    }, self.options.delay.show)
+  }
+
+  Tooltip.prototype.leave = function (obj) {
+    var self = obj instanceof this.constructor ?
+      obj : $(obj.currentTarget).data('bs.' + this.type)
+
+    if (!self) {
+      self = new this.constructor(obj.currentTarget, this.getDelegateOptions())
+      $(obj.currentTarget).data('bs.' + this.type, self)
+    }
+
+    clearTimeout(self.timeout)
+
+    self.hoverState = 'out'
+
+    if (!self.options.delay || !self.options.delay.hide) return self.hide()
+
+    self.timeout = setTimeout(function () {
+      if (self.hoverState == 'out') self.hide()
+    }, self.options.delay.hide)
+  }
+
+  Tooltip.prototype.show = function () {
+    var e = $.Event('show.bs.' + this.type)
+
+    if (this.hasContent() && this.enabled) {
+      this.$element.trigger(e)
+
+      var inDom = $.contains(document.documentElement, this.$element[0])
+      if (e.isDefaultPrevented() || !inDom) return
+      var that = this
+
+      var $tip = this.tip()
+
+      var tipId = this.getUID(this.type)
+
+      this.setContent()
+      $tip.attr('id', tipId)
+      this.$element.attr('aria-describedby', tipId)
+
+      if (this.options.animation) $tip.addClass('fade')
+
+      var placement = typeof this.options.placement == 'function' ?
+        this.options.placement.call(this, $tip[0], this.$element[0]) :
+        this.options.placement
+
+      var autoToken = /\s?auto?\s?/i
+      var autoPlace = autoToken.test(placement)
+      if (autoPlace) placement = placement.replace(autoToken, '') || 'top'
+
+      $tip
+        .detach()
+        .css({ top: 0, left: 0, display: 'block' })
+        .addClass(placement)
+        .data('bs.' + this.type, this)
+
+      this.options.container ? $tip.appendTo(this.options.container) : $tip.insertAfter(this.$element)
+
+      var pos          = this.getPosition()
+      var actualWidth  = $tip[0].offsetWidth
+      var actualHeight = $tip[0].offsetHeight
+
+      if (autoPlace) {
+        var orgPlacement = placement
+        var $parent      = this.$element.parent()
+        var parentDim    = this.getPosition($parent)
+
+        placement = placement == 'bottom' && pos.top   + pos.height       + actualHeight - parentDim.scroll > parentDim.height ? 'top'    :
+                    placement == 'top'    && pos.top   - parentDim.scroll - actualHeight < 0                                   ? 'bottom' :
+                    placement == 'right'  && pos.right + actualWidth      > parentDim.width                                    ? 'left'   :
+                    placement == 'left'   && pos.left  - actualWidth      < parentDim.left                                     ? 'right'  :
+                    placement
+
+        $tip
+          .removeClass(orgPlacement)
+          .addClass(placement)
+      }
+
+      var calculatedOffset = this.getCalculatedOffset(placement, pos, actualWidth, actualHeight)
+
+      this.applyPlacement(calculatedOffset, placement)
+
+      var complete = function () {
+        that.$element.trigger('shown.bs.' + that.type)
+        that.hoverState = null
+      }
+
+      $.support.transition && this.$tip.hasClass('fade') ?
+        $tip
+          .one('bsTransitionEnd', complete)
+          .emulateTransitionEnd(150) :
+        complete()
+    }
+  }
+
+  Tooltip.prototype.applyPlacement = function (offset, placement) {
+    var $tip   = this.tip()
+    var width  = $tip[0].offsetWidth
+    var height = $tip[0].offsetHeight
+
+    // manually read margins because getBoundingClientRect includes difference
+    var marginTop = parseInt($tip.css('margin-top'), 10)
+    var marginLeft = parseInt($tip.css('margin-left'), 10)
+
+    // we must check for NaN for ie 8/9
+    if (isNaN(marginTop))  marginTop  = 0
+    if (isNaN(marginLeft)) marginLeft = 0
+
+    offset.top  = offset.top  + marginTop
+    offset.left = offset.left + marginLeft
+
+    // $.fn.offset doesn't round pixel values
+    // so we use setOffset directly with our own function B-0
+    $.offset.setOffset($tip[0], $.extend({
+      using: function (props) {
+        $tip.css({
+          top: Math.round(props.top),
+          left: Math.round(props.left)
+        })
+      }
+    }, offset), 0)
+
+    $tip.addClass('in')
+
+    // check to see if placing tip in new offset caused the tip to resize itself
+    var actualWidth  = $tip[0].offsetWidth
+    var actualHeight = $tip[0].offsetHeight
+
+    if (placement == 'top' && actualHeight != height) {
+      offset.top = offset.top + height - actualHeight
+    }
+
+    var delta = this.getViewportAdjustedDelta(placement, offset, actualWidth, actualHeight)
+
+    if (delta.left) offset.left += delta.left
+    else offset.top += delta.top
+
+    var arrowDelta          = delta.left ? delta.left * 2 - width + actualWidth : delta.top * 2 - height + actualHeight
+    var arrowPosition       = delta.left ? 'left'        : 'top'
+    var arrowOffsetPosition = delta.left ? 'offsetWidth' : 'offsetHeight'
+
+    $tip.offset(offset)
+    this.replaceArrow(arrowDelta, $tip[0][arrowOffsetPosition], arrowPosition)
+  }
+
+  Tooltip.prototype.replaceArrow = function (delta, dimension, position) {
+    this.arrow().css(position, delta ? (50 * (1 - delta / dimension) + '%') : '')
+  }
+
+  Tooltip.prototype.setContent = function () {
+    var $tip  = this.tip()
+    var title = this.getTitle()
+
+    $tip.find('.tooltip-inner')[this.options.html ? 'html' : 'text'](title)
+    $tip.removeClass('fade in top bottom left right')
+  }
+
+  Tooltip.prototype.hide = function () {
+    var that = this
+    var $tip = this.tip()
+    var e    = $.Event('hide.bs.' + this.type)
+
+    this.$element.removeAttr('aria-describedby')
+
+    function complete() {
+      if (that.hoverState != 'in') $tip.detach()
+      that.$element.trigger('hidden.bs.' + that.type)
+    }
+
+    this.$element.trigger(e)
+
+    if (e.isDefaultPrevented()) return
+
+    $tip.removeClass('in')
+
+    $.support.transition && this.$tip.hasClass('fade') ?
+      $tip
+        .one('bsTransitionEnd', complete)
+        .emulateTransitionEnd(150) :
+      complete()
+
+    this.hoverState = null
+
+    return this
+  }
+
+  Tooltip.prototype.fixTitle = function () {
+    var $e = this.$element
+    if ($e.attr('title') || typeof ($e.attr('data-original-title')) != 'string') {
+      $e.attr('data-original-title', $e.attr('title') || '').attr('title', '')
+    }
+  }
+
+  Tooltip.prototype.hasContent = function () {
+    return this.getTitle()
+  }
+
+  Tooltip.prototype.getPosition = function ($element) {
+    $element   = $element || this.$element
+    var el     = $element[0]
+    var isBody = el.tagName == 'BODY'
+    return $.extend({}, (typeof el.getBoundingClientRect == 'function') ? el.getBoundingClientRect() : null, {
+      scroll: isBody ? document.documentElement.scrollTop || document.body.scrollTop : $element.scrollTop(),
+      width:  isBody ? $(window).width()  : $element.outerWidth(),
+      height: isBody ? $(window).height() : $element.outerHeight()
+    }, isBody ? { top: 0, left: 0 } : $element.offset())
+  }
+
+  Tooltip.prototype.getCalculatedOffset = function (placement, pos, actualWidth, actualHeight) {
+    return placement == 'bottom' ? { top: pos.top + pos.height,   left: pos.left + pos.width / 2 - actualWidth / 2  } :
+           placement == 'top'    ? { top: pos.top - actualHeight, left: pos.left + pos.width / 2 - actualWidth / 2  } :
+           placement == 'left'   ? { top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left - actualWidth } :
+        /* placement == 'right' */ { top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width   }
+
+  }
+
+  Tooltip.prototype.getViewportAdjustedDelta = function (placement, pos, actualWidth, actualHeight) {
+    var delta = { top: 0, left: 0 }
+    if (!this.$viewport) return delta
+
+    var viewportPadding = this.options.viewport && this.options.viewport.padding || 0
+    var viewportDimensions = this.getPosition(this.$viewport)
+
+    if (/right|left/.test(placement)) {
+      var topEdgeOffset    = pos.top - viewportPadding - viewportDimensions.scroll
+      var bottomEdgeOffset = pos.top + viewportPadding - viewportDimensions.scroll + actualHeight
+      if (topEdgeOffset < viewportDimensions.top) { // top overflow
+        delta.top = viewportDimensions.top - topEdgeOffset
+      } else if (bottomEdgeOffset > viewportDimensions.top + viewportDimensions.height) { // bottom overflow
+        delta.top = viewportDimensions.top + viewportDimensions.height - bottomEdgeOffset
+      }
+    } else {
+      var leftEdgeOffset  = pos.left - viewportPadding
+      var rightEdgeOffset = pos.left + viewportPadding + actualWidth
+      if (leftEdgeOffset < viewportDimensions.left) { // left overflow
+        delta.left = viewportDimensions.left - leftEdgeOffset
+      } else if (rightEdgeOffset > viewportDimensions.width) { // right overflow
+        delta.left = viewportDimensions.left + viewportDimensions.width - rightEdgeOffset
+      }
+    }
+
+    return delta
+  }
+
+  Tooltip.prototype.getTitle = function () {
+    var title
+    var $e = this.$element
+    var o  = this.options
+
+    title = $e.attr('data-original-title')
+      || (typeof o.title == 'function' ? o.title.call($e[0]) :  o.title)
+
+    return title
+  }
+
+  Tooltip.prototype.getUID = function (prefix) {
+    do prefix += ~~(Math.random() * 1000000)
+    while (document.getElementById(prefix))
+    return prefix
+  }
+
+  Tooltip.prototype.tip = function () {
+    return (this.$tip = this.$tip || $(this.options.template))
+  }
+
+  Tooltip.prototype.arrow = function () {
+    return (this.$arrow = this.$arrow || this.tip().find('.tooltip-arrow'))
+  }
+
+  Tooltip.prototype.validate = function () {
+    if (!this.$element[0].parentNode) {
+      this.hide()
+      this.$element = null
+      this.options  = null
+    }
+  }
+
+  Tooltip.prototype.enable = function () {
+    this.enabled = true
+  }
+
+  Tooltip.prototype.disable = function () {
+    this.enabled = false
+  }
+
+  Tooltip.prototype.toggleEnabled = function () {
+    this.enabled = !this.enabled
+  }
+
+  Tooltip.prototype.toggle = function (e) {
+    var self = this
+    if (e) {
+      self = $(e.currentTarget).data('bs.' + this.type)
+      if (!self) {
+        self = new this.constructor(e.currentTarget, this.getDelegateOptions())
+        $(e.currentTarget).data('bs.' + this.type, self)
+      }
+    }
+
+    self.tip().hasClass('in') ? self.leave(self) : self.enter(self)
+  }
+
+  Tooltip.prototype.destroy = function () {
+    clearTimeout(this.timeout)
+    this.hide().$element.off('.' + this.type).removeData('bs.' + this.type)
+  }
+
+
+  // TOOLTIP PLUGIN DEFINITION
+  // =========================
+
+  function Plugin(option) {
+    return this.each(function () {
+      var $this   = $(this)
+      var data    = $this.data('bs.tooltip')
+      var options = typeof option == 'object' && option
+
+      if (!data && option == 'destroy') return
+      if (!data) $this.data('bs.tooltip', (data = new Tooltip(this, options)))
+      if (typeof option == 'string') data[option]()
+    })
+  }
+
+  var old = $.fn.tooltip
+
+  $.fn.tooltip             = Plugin
+  $.fn.tooltip.Constructor = Tooltip
+
+
+  // TOOLTIP NO CONFLICT
+  // ===================
+
+  $.fn.tooltip.noConflict = function () {
+    $.fn.tooltip = old
+    return this
+  }
+
+}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: popover.js v3.2.0
+ * http://getbootstrap.com/javascript/#popovers
+ * ========================================================================
+ * Copyright 2011-2014 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+  'use strict';
+
+  // POPOVER PUBLIC CLASS DEFINITION
+  // ===============================
+
+  var Popover = function (element, options) {
+    this.init('popover', element, options)
+  }
+
+  if (!$.fn.tooltip) throw new Error('Popover requires tooltip.js')
+
+  Popover.VERSION  = '3.2.0'
+
+  Popover.DEFAULTS = $.extend({}, $.fn.tooltip.Constructor.DEFAULTS, {
+    placement: 'right',
+    trigger: 'click',
+    content: '',
+    template: '<div class="popover" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>'
+  })
+
+
+  // NOTE: POPOVER EXTENDS tooltip.js
+  // ================================
+
+  Popover.prototype = $.extend({}, $.fn.tooltip.Constructor.prototype)
+
+  Popover.prototype.constructor = Popover
+
+  Popover.prototype.getDefaults = function () {
+    return Popover.DEFAULTS
+  }
+
+  Popover.prototype.setContent = function () {
+    var $tip    = this.tip()
+    var title   = this.getTitle()
+    var content = this.getContent()
+
+    $tip.find('.popover-title')[this.options.html ? 'html' : 'text'](title)
+    $tip.find('.popover-content').empty()[ // we use append for html objects to maintain js events
+      this.options.html ? (typeof content == 'string' ? 'html' : 'append') : 'text'
+    ](content)
+
+    $tip.removeClass('fade top bottom left right in')
+
+    // IE8 doesn't accept hiding via the `:empty` pseudo selector, we have to do
+    // this manually by checking the contents.
+    if (!$tip.find('.popover-title').html()) $tip.find('.popover-title').hide()
+  }
+
+  Popover.prototype.hasContent = function () {
+    return this.getTitle() || this.getContent()
+  }
+
+  Popover.prototype.getContent = function () {
+    var $e = this.$element
+    var o  = this.options
+
+    return $e.attr('data-content')
+      || (typeof o.content == 'function' ?
+            o.content.call($e[0]) :
+            o.content)
+  }
+
+  Popover.prototype.arrow = function () {
+    return (this.$arrow = this.$arrow || this.tip().find('.arrow'))
+  }
+
+  Popover.prototype.tip = function () {
+    if (!this.$tip) this.$tip = $(this.options.template)
+    return this.$tip
+  }
+
+
+  // POPOVER PLUGIN DEFINITION
+  // =========================
+
+  function Plugin(option) {
+    return this.each(function () {
+      var $this   = $(this)
+      var data    = $this.data('bs.popover')
+      var options = typeof option == 'object' && option
+
+      if (!data && option == 'destroy') return
+      if (!data) $this.data('bs.popover', (data = new Popover(this, options)))
+      if (typeof option == 'string') data[option]()
+    })
+  }
+
+  var old = $.fn.popover
+
+  $.fn.popover             = Plugin
+  $.fn.popover.Constructor = Popover
+
+
+  // POPOVER NO CONFLICT
+  // ===================
+
+  $.fn.popover.noConflict = function () {
+    $.fn.popover = old
+    return this
+  }
+
+}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: scrollspy.js v3.2.0
+ * http://getbootstrap.com/javascript/#scrollspy
+ * ========================================================================
+ * Copyright 2011-2014 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+  'use strict';
+
+  // SCROLLSPY CLASS DEFINITION
+  // ==========================
+
+  function ScrollSpy(element, options) {
+    var process  = $.proxy(this.process, this)
+
+    this.$body          = $('body')
+    this.$scrollElement = $(element).is('body') ? $(window) : $(element)
+    this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+    this.selector       = (this.options.target || '') + ' .nav li > a'
+    this.offsets        = []
+    this.targets        = []
+    this.activeTarget   = null
+    this.scrollHeight   = 0
+
+    this.$scrollElement.on('scroll.bs.scrollspy', process)
+    this.refresh()
+    this.process()
+  }
+
+  ScrollSpy.VERSION  = '3.2.0'
+
+  ScrollSpy.DEFAULTS = {
+    offset: 10
+  }
+
+  ScrollSpy.prototype.getScrollHeight = function () {
+    return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+  }
+
+  ScrollSpy.prototype.refresh = function () {
+    var offsetMethod = 'offset'
+    var offsetBase   = 0
+
+    if (!$.isWindow(this.$scrollElement[0])) {
+      offsetMethod = 'position'
+      offsetBase   = this.$scrollElement.scrollTop()
+    }
+
+    this.offsets = []
+    this.targets = []
+    this.scrollHeight = this.getScrollHeight()
+
+    var self     = this
+
+    this.$body
+      .find(this.selector)
+      .map(function () {
+        var $el   = $(this)
+        var href  = $el.data('target') || $el.attr('href')
+        var $href = /^#./.test(href) && $(href)
+
+        return ($href
+          && $href.length
+          && $href.is(':visible')
+          && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+      })
+      .sort(function (a, b) { return a[0] - b[0] })
+      .each(function () {
+        self.offsets.push(this[0])
+        self.targets.push(this[1])
+      })
+  }
+
+  ScrollSpy.prototype.process = function () {
+    var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+    var scrollHeight = this.getScrollHeight()
+    var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+    var offsets      = this.offsets
+    var targets      = this.targets
+    var activeTarget = this.activeTarget
+    var i
+
+    if (this.scrollHeight != scrollHeight) {
+      this.refresh()
+    }
+
+    if (scrollTop >= maxScroll) {
+      return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+    }
+
+    if (activeTarget && scrollTop <= offsets[0]) {
+      return activeTarget != (i = targets[0]) && this.activate(i)
+    }
+
+    for (i = offsets.length; i--;) {
+      activeTarget != targets[i]
+        && scrollTop >= offsets[i]
+        && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+        && this.activate(targets[i])
+    }
+  }
+
+  ScrollSpy.prototype.activate = function (target) {
+    this.activeTarget = target
+
+    $(this.selector)
+      .parentsUntil(this.options.target, '.active')
+      .removeClass('active')
+
+    var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+    var active = $(selector)
+      .parents('li')
+      .addClass('active')
+
+    if (active.parent('.dropdown-menu').length) {
+      active = active
+        .closest('li.dropdown')
+        .addClass('active')
+    }
+
+    active.trigger('activate.bs.scrollspy')
+  }
+
+
+  // SCROLLSPY PLUGIN DEFINITION
+  // ===========================
+
+  function Plugin(option) {
+    return this.each(function () {
+      var $this   = $(this)
+      var data    = $this.data('bs.scrollspy')
+      var options = typeof option == 'object' && option
+
+      if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+      if (typeof option == 'string') data[option]()
+    })
+  }
+
+  var old = $.fn.scrollspy
+
+  $.fn.scrollspy             = Plugin
+  $.fn.scrollspy.Constructor = ScrollSpy
+
+
+  // SCROLLSPY NO CONFLICT
+  // =====================
+
+  $.fn.scrollspy.noConflict = function () {
+    $.fn.scrollspy = old
+    return this
+  }
+
+
+  // SCROLLSPY DATA-API
+  // ==================
+
+  $(window).on('load.bs.scrollspy.data-api', function () {
+    $('[data-spy="scroll"]').each(function () {
+      var $spy = $(this)
+      Plugin.call($spy, $spy.data())
+    })
+  })
+
+}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: tab.js v3.2.0
+ * http://getbootstrap.com/javascript/#tabs
+ * ========================================================================
+ * Copyright 2011-2014 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+  'use strict';
+
+  // TAB CLASS DEFINITION
+  // ====================
+
+  var Tab = function (element) {
+    this.element = $(element)
+  }
+
+  Tab.VERSION = '3.2.0'
+
+  Tab.prototype.show = function () {
+    var $this    = this.element
+    var $ul      = $this.closest('ul:not(.dropdown-menu)')
+    var selector = $this.data('target')
+
+    if (!selector) {
+      selector = $this.attr('href')
+      selector = selector && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
+    }
+
+    if ($this.parent('li').hasClass('active')) return
+
+    var previous = $ul.find('.active:last a')[0]
+    var e        = $.Event('show.bs.tab', {
+      relatedTarget: previous
+    })
+
+    $this.trigger(e)
+
+    if (e.isDefaultPrevented()) return
+
+    var $target = $(selector)
+
+    this.activate($this.closest('li'), $ul)
+    this.activate($target, $target.parent(), function () {
+      $this.trigger({
+        type: 'shown.bs.tab',
+        relatedTarget: previous
+      })
+    })
+  }
+
+  Tab.prototype.activate = function (element, container, callback) {
+    var $active    = container.find('> .active')
+    var transition = callback
+      && $.support.transition
+      && $active.hasClass('fade')
+
+    function next() {
+      $active
+        .removeClass('active')
+        .find('> .dropdown-menu > .active')
+        .removeClass('active')
+
+      element.addClass('active')
+
+      if (transition) {
+        element[0].offsetWidth // reflow for transition
+        element.addClass('in')
+      } else {
+        element.removeClass('fade')
+      }
+
+      if (element.parent('.dropdown-menu')) {
+        element.closest('li.dropdown').addClass('active')
+      }
+
+      callback && callback()
+    }
+
+    transition ?
+      $active
+        .one('bsTransitionEnd', next)
+        .emulateTransitionEnd(150) :
+      next()
+
+    $active.removeClass('in')
+  }
+
+
+  // TAB PLUGIN DEFINITION
+  // =====================
+
+  function Plugin(option) {
+    return this.each(function () {
+      var $this = $(this)
+      var data  = $this.data('bs.tab')
+
+      if (!data) $this.data('bs.tab', (data = new Tab(this)))
+      if (typeof option == 'string') data[option]()
+    })
+  }
+
+  var old = $.fn.tab
+
+  $.fn.tab             = Plugin
+  $.fn.tab.Constructor = Tab
+
+
+  // TAB NO CONFLICT
+  // ===============
+
+  $.fn.tab.noConflict = function () {
+    $.fn.tab = old
+    return this
+  }
+
+
+  // TAB DATA-API
+  // ============
+
+  $(document).on('click.bs.tab.data-api', '[data-toggle="tab"], [data-toggle="pill"]', function (e) {
+    e.preventDefault()
+    Plugin.call($(this), 'show')
+  })
+
+}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: affix.js v3.2.0
+ * http://getbootstrap.com/javascript/#affix
+ * ========================================================================
+ * Copyright 2011-2014 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+  'use strict';
+
+  // AFFIX CLASS DEFINITION
+  // ======================
+
+  var Affix = function (element, options) {
+    this.options = $.extend({}, Affix.DEFAULTS, options)
+
+    this.$target = $(this.options.target)
+      .on('scroll.bs.affix.data-api', $.proxy(this.checkPosition, this))
+      .on('click.bs.affix.data-api',  $.proxy(this.checkPositionWithEventLoop, this))
+
+    this.$element     = $(element)
+    this.affixed      =
+    this.unpin        =
+    this.pinnedOffset = null
+
+    this.checkPosition()
+  }
+
+  Affix.VERSION  = '3.2.0'
+
+  Affix.RESET    = 'affix affix-top affix-bottom'
+
+  Affix.DEFAULTS = {
+    offset: 0,
+    target: window
+  }
+
+  Affix.prototype.getPinnedOffset = function () {
+    if (this.pinnedOffset) return this.pinnedOffset
+    this.$element.removeClass(Affix.RESET).addClass('affix')
+    var scrollTop = this.$target.scrollTop()
+    var position  = this.$element.offset()
+    return (this.pinnedOffset = position.top - scrollTop)
+  }
+
+  Affix.prototype.checkPositionWithEventLoop = function () {
+    setTimeout($.proxy(this.checkPosition, this), 1)
+  }
+
+  Affix.prototype.checkPosition = function () {
+    if (!this.$element.is(':visible')) return
+
+    var scrollHeight = $(document).height()
+    var scrollTop    = this.$target.scrollTop()
+    var position     = this.$element.offset()
+    var offset       = this.options.offset
+    var offsetTop    = offset.top
+    var offsetBottom = offset.bottom
+
+    if (typeof offset != 'object')         offsetBottom = offsetTop = offset
+    if (typeof offsetTop == 'function')    offsetTop    = offset.top(this.$element)
+    if (typeof offsetBottom == 'function') offsetBottom = offset.bottom(this.$element)
+
+    var affix = this.unpin   != null && (scrollTop + this.unpin <= position.top) ? false :
+                offsetBottom != null && (position.top + this.$element.height() >= scrollHeight - offsetBottom) ? 'bottom' :
+                offsetTop    != null && (scrollTop <= offsetTop) ? 'top' : false
+
+    if (this.affixed === affix) return
+    if (this.unpin != null) this.$element.css('top', '')
+
+    var affixType = 'affix' + (affix ? '-' + affix : '')
+    var e         = $.Event(affixType + '.bs.affix')
+
+    this.$element.trigger(e)
+
+    if (e.isDefaultPrevented()) return
+
+    this.affixed = affix
+    this.unpin = affix == 'bottom' ? this.getPinnedOffset() : null
+
+    this.$element
+      .removeClass(Affix.RESET)
+      .addClass(affixType)
+      .trigger($.Event(affixType.replace('affix', 'affixed')))
+
+    if (affix == 'bottom') {
+      this.$element.offset({
+        top: scrollHeight - this.$element.height() - offsetBottom
+      })
+    }
+  }
+
+
+  // AFFIX PLUGIN DEFINITION
+  // =======================
+
+  function Plugin(option) {
+    return this.each(function () {
+      var $this   = $(this)
+      var data    = $this.data('bs.affix')
+      var options = typeof option == 'object' && option
+
+      if (!data) $this.data('bs.affix', (data = new Affix(this, options)))
+      if (typeof option == 'string') data[option]()
+    })
+  }
+
+  var old = $.fn.affix
+
+  $.fn.affix             = Plugin
+  $.fn.affix.Constructor = Affix
+
+
+  // AFFIX NO CONFLICT
+  // =================
+
+  $.fn.affix.noConflict = function () {
+    $.fn.affix = old
+    return this
+  }
+
+
+  // AFFIX DATA-API
+  // ==============
+
+  $(window).on('load', function () {
+    $('[data-spy="affix"]').each(function () {
+      var $spy = $(this)
+      var data = $spy.data()
+
+      data.offset = data.offset || {}
+
+      if (data.offsetBottom) data.offset.bottom = data.offsetBottom
+      if (data.offsetTop)    data.offset.top    = data.offsetTop
+
+      Plugin.call($spy, data)
+    })
+  })
+
+}(jQuery);

@@ -10,30 +10,31 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import javax.inject.Named;
-import org.archboy.clobaframe.cache.impl.CacheClientAdapter;
-import org.archboy.clobaframe.cache.Expiration;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+import org.archboy.clobaframe.cache.AbstractCache;
+import org.archboy.clobaframe.cache.Cache.Policy;
+import org.archboy.clobaframe.cache.Expiration;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 
 /**
  *
  * @author yang
  */
 @Named
-public class EhcacheCacheClientAdapter implements CacheClientAdapter, Closeable {
+public class EhcacheCache extends AbstractCache implements Closeable {
 
 	private static final String DEFAULT_CACHE_REGION_NAME = "common";
 	private static final String DEFAULT_CACHE_CONFIGURATION_FILE = "ehcache.xml";
 
-	@Value("${cache.ehcache.region}")
+	@Value("${clobaframe.cache.ehcache.region}")
 	private String cacheRegionName = DEFAULT_CACHE_REGION_NAME;
 
-	@Value("${cache.ehcache.configuration}")
+	@Value("${clobaframe.cache.ehcache.configuration}")
 	private String cacheConfigurationFile = DEFAULT_CACHE_CONFIGURATION_FILE;
 
 	@Inject
@@ -101,7 +102,7 @@ public class EhcacheCacheClientAdapter implements CacheClientAdapter, Closeable 
 
 	@Override
 	public boolean put(String key, Object value, Expiration expires,
-		org.archboy.clobaframe.cache.Cache.SetPolicy policy) {
+		Policy policy) {
 
 		int expireSecond = 0;
 		if (expires != null) {
@@ -131,8 +132,18 @@ public class EhcacheCacheClientAdapter implements CacheClientAdapter, Closeable 
 	}
 
 	@Override
-	public Set<String> putAll(Map<String, ? extends Object> values, Expiration expires,
-		org.archboy.clobaframe.cache.Cache.SetPolicy policy) {
+	public boolean put(String key, Object value) {
+		return put(key, value, null, Policy.SET_ALWAYS);
+	}
+
+	@Override
+	public boolean put(String key, Object value, Expiration expiration) {
+		return put(key, value, expiration, Policy.SET_ALWAYS);
+	}
+	
+	@Override
+	public Set<String> putAll(Map<String, ? extends Object> values, 
+			Expiration expires, Policy policy) {
 
 		Set<String> items = new HashSet<String>();
 		for (String key : values.keySet()) {

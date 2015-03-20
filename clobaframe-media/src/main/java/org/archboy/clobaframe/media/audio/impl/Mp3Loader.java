@@ -21,11 +21,11 @@ import org.springframework.util.Assert;
 @Named
 public class Mp3Loader implements MediaLoader {
 
-	public static final String CONTENT_TYPE_AUDIO_MPEG = "audio/mpeg";
+	public static final String MIME_TYPE_AUDIO_MPEG = "audio/mpeg";
 	
 	@Override
-	public boolean support(String contentType) {
-		return (CONTENT_TYPE_AUDIO_MPEG.equals(contentType));
+	public boolean support(String mimeType) {
+		return (MIME_TYPE_AUDIO_MPEG.equals(mimeType));
 	}
 
 	@Override

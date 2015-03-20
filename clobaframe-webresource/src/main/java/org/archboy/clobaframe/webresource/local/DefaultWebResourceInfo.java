@@ -17,13 +17,13 @@ public class DefaultWebResourceInfo implements WebResourceInfo, FileBaseResource
 
 	private String name;
 	private String uniqueName;
-	private String contentType;
+	private String mimeType;
 
 	public DefaultWebResourceInfo(
-			File file, String name, String contentType) {
+			File file, String name, String mimeType) {
 		this.file = file;
 		this.name = name;
-		this.contentType = contentType;
+		this.mimeType = mimeType;
 	}
 
 	@Override
@@ -31,7 +31,7 @@ public class DefaultWebResourceInfo implements WebResourceInfo, FileBaseResource
 		String hash = null;
 		InputStream in = null;
 		try {
-			in = getInputStream();
+			in = getContent();
 			hash = DigestUtils.sha256Hex(in);
 		}catch(IOException e){
 			// ignore
@@ -57,17 +57,17 @@ public class DefaultWebResourceInfo implements WebResourceInfo, FileBaseResource
 	}
 
 	@Override
-	public String getContentType() {
-		return contentType;
+	public String getMimeType() {
+		return mimeType;
 	}
 
 	@Override
-	public InputStream getInputStream() throws IOException {
+	public InputStream getContent() throws IOException {
 		return new FileInputStream(file);
 	}
 
 	@Override
-	public InputStream getInputStream(long start, long length) throws IOException {
+	public InputStream getContent(long start, long length) throws IOException {
 		return new PartialFileInputStream(file, start, length);
 	}
 

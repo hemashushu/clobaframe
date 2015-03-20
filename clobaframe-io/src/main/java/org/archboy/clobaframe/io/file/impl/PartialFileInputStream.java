@@ -9,8 +9,6 @@ import java.io.RandomAccessFile;
 import org.apache.commons.io.IOUtils;
 import org.springframework.util.Assert;
 
-
-
 /**
  * Add seeking ability to {@link FileInputStream}.
  *
@@ -20,7 +18,6 @@ import org.springframework.util.Assert;
 public class PartialFileInputStream extends InputStream {
 
 	private RandomAccessFile in;
-	//private long length;
 	private long endPosition; // the last exclude byte.
 
 	private static final int MAX_AVAILABLE_BYTES = 256 * 1024;
@@ -37,7 +34,6 @@ public class PartialFileInputStream extends InputStream {
 			throw new IllegalArgumentException("length");
 		}
 
-		//this.length = length;
 		this.endPosition = start + length;
 	}
 

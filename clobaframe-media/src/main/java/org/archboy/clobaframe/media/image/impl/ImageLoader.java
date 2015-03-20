@@ -25,21 +25,20 @@ import org.springframework.util.Assert;
 @Named
 public class ImageLoader implements MediaLoader {
 
-	public static final String CONTENT_TYPE_IMAGE_JPEG = "image/jpeg";
-	public static final String CONTENT_TYPE_IMAGE_PNG = "image/png";
-	public static final String CONTENT_TYPE_IMAGE_BMP = "image/bmp";
-	public static final String CONTENT_TYPE_IMAGE_GIF = "image/gif";
+	public static final String MIME_TYPE_IMAGE_JPEG = "image/jpeg";
+	public static final String MIME_TYPE_IMAGE_PNG = "image/png";
+	public static final String MIME_TYPE_IMAGE_BMP = "image/bmp";
+	public static final String MIME_TYPE_IMAGE_GIF = "image/gif";
 	
-	private List<String> supportContentTypes = Arrays.asList(
-			CONTENT_TYPE_IMAGE_JPEG, 
-			CONTENT_TYPE_IMAGE_PNG,
-			CONTENT_TYPE_IMAGE_GIF, 
-			CONTENT_TYPE_IMAGE_BMP);
+	private List<String> supportMimeTypes = Arrays.asList(MIME_TYPE_IMAGE_JPEG, 
+			MIME_TYPE_IMAGE_PNG,
+			MIME_TYPE_IMAGE_GIF, 
+			MIME_TYPE_IMAGE_BMP);
 	
 	@Override
-	public boolean support(String contentType) {
-		for (String supportContentType : supportContentTypes){
-			if (supportContentType.equals(contentType)){
+	public boolean support(String mimeType) {
+		for (String supportMimeType : supportMimeTypes){
+			if (supportMimeType.equals(mimeType)){
 				return true;
 			}
 		}
