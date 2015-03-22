@@ -24,7 +24,8 @@ public interface ResourceSender {
 	 * @throws IOException
 	 */
 	void send(ResourceInfo resourceInfo, 
-			Map<String, String> extraHeaders,
+			Map<String, Object> extraHeaders,
 			HttpServletRequest request,
 			HttpServletResponse response) throws IOException;
+
 }

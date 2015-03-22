@@ -24,7 +24,7 @@ public class DefaultResourceSender implements ResourceSender {
 	
 	@Override
 	public void send(
-			ResourceInfo resourceInfo, Map<String, String> extraHeaders, 
+			ResourceInfo resourceInfo, Map<String, Object> extraHeaders, 
 			HttpServletRequest request, HttpServletResponse response) throws IOException {
 		
 		Assert.hasText(resourceInfo.getMimeType(), "Mime type should not empty.");
@@ -96,14 +96,21 @@ public class DefaultResourceSender implements ResourceSender {
 
 	private void addExtraHeaders(
 			HttpServletResponse response,
-			Map<String, String> extraHeaders) {
+			Map<String, Object> extraHeaders) {
 		
 		if (extraHeaders == null) {
 			return;
 		}
 
 		for (String name : extraHeaders.keySet()) {
-			response.addHeader(name, extraHeaders.get(name));
+			Object value = extraHeaders.get(name);
+			if (value instanceof Date) {
+				response.addDateHeader(name, ((Date)value).getTime());
+			}else if (value instanceof Integer){
+				response.addIntHeader(name, (Integer)value);
+			}else{
+				response.addHeader(name, value.toString());
+			}
 		}
 	}
 	

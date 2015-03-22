@@ -25,7 +25,7 @@ public class LastModifiedCheckingResourceSender implements ResourceSender {
 	}
 
 	@Override
-	public void send(ResourceInfo resourceInfo, Map<String, String> extraHeaders, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public void send(ResourceInfo resourceInfo, Map<String, Object> extraHeaders, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		
 		long lastModifiedTime = 0;
 

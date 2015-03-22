@@ -27,7 +27,7 @@ public class PartialResourceSender implements ResourceSender {
 	}
 	
 	@Override
-	public void send(ResourceInfo resourceInfo, Map<String, String> extraHeaders, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public void send(ResourceInfo resourceInfo, Map<String, Object> extraHeaders, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		
 		String range = request.getHeader("Range");
 		if (StringUtils.isNotEmpty(range) && resourceInfo.isSeekable()) {
@@ -39,7 +39,7 @@ public class PartialResourceSender implements ResourceSender {
 	}
 
 	private void sendWithPartial(
-			ResourceInfo resourceInfo, Map<String, String> extraHeaders, HttpServletRequest request, HttpServletResponse response,
+			ResourceInfo resourceInfo, Map<String, Object> extraHeaders, HttpServletRequest request, HttpServletResponse response,
 			String range) throws IOException {
 
 		long originalContentLength = resourceInfo.getContentLength();

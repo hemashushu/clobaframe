@@ -54,7 +54,7 @@ public class GZipResourceSender implements ResourceSender {
 	}
 	
 	@Override
-	public void send(ResourceInfo resourceInfo, Map<String, String> extraHeaders, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public void send(ResourceInfo resourceInfo, Map<String, Object> extraHeaders, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String acceptEncoding = request.getHeader("Accept-Encoding");
 		
 		if (StringUtils.isNotEmpty(acceptEncoding) && acceptEncoding.contains("gzip")){
@@ -74,7 +74,7 @@ public class GZipResourceSender implements ResourceSender {
 		resourceSender.send(resourceInfo, extraHeaders, request, response);
 	}
 
-	private void sendWithGZip(ResourceInfo resourceInfo, Map<String, String> extraHeaders, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	private void sendWithGZip(ResourceInfo resourceInfo, Map<String, Object> extraHeaders, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		// compress data
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		GZIPOutputStream gzip = new GZIPOutputStream(out);
