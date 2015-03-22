@@ -22,13 +22,20 @@ public class ResourceSenderImpl	implements ResourceSender {
 	@Value("${clobaframe.io.http.gzip}")
 	private boolean enableGzip = DEFAULT_ENABLE_GZIP;
 
+	// only the content length large than this value would be compress
+	private static final int DEFAULT_MIN_COMPRESS_SIZE = 1024;
+	
+	@Value("${clobaframe.io.http.gzip.minCompressSize}")
+	private int minCompressSize = DEFAULT_MIN_COMPRESS_SIZE;
+			
+			
 	@Override
 	public void send(ResourceInfo resourceInfo, Map<String, String> extraHeaders, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		
 		ResourceSender resourceSender = new DefaultResourceSender();
 		
 		if (enableGzip) {
-			resourceSender = new GZipResourceSender(resourceSender);
+			resourceSender = new GZipResourceSender(resourceSender, minCompressSize);
 		}
 		
 		resourceSender = new PartialResourceSender(resourceSender);

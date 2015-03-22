@@ -1,25 +1,26 @@
 package org.archboy.clobaframe.dynamodel;
 
-import org.archboy.clobaframe.dynamodel.impl.DefaultDynaModel;
-import org.archboy.clobaframe.dynamodel.impl.WrapDynaModel;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
-
+import java.util.TreeSet;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.archboy.clobaframe.dynamodel.impl.DefaultViewModel;
 import org.junit.After;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  *
  * @author yang
  */
-public class DynaModelTest {
+public class ViewModelTest {
 
 	@Before
 	public void setUp() {
@@ -30,10 +31,10 @@ public class DynaModelTest {
 	}
 
 	@Test
-	public void testDefaultDynaModel() {
-		Date now = new Date(); // Calendar.getInstance().getTime();
+	public void testCreate() {
+		Date now = new Date();
 
-		DynaModel model = new DefaultDynaModel();
+		ViewModel model = new DefaultViewModel();
 
 		// add properties
 		model.add("id", "123")
@@ -71,74 +72,92 @@ public class DynaModelTest {
 		assertFalse(keys.contains("none"));
 
 		// test child model
-//		DynaModel childModel = new DefaultDynaModel();
-//		childModel.add("width", 2).add("height", 3);
 
-		model.add("child", new DefaultDynaModel()
+		model.addChild("child")
 				.add("width", 2)
-				.add("height", 3));
+				.add("height", 3)
+				.parent()
+			.add("lock", true)
+			.add("lastModified", now);
 
-		DynaModel childModel = (DynaModel)model.get("child");
+		ViewModel childModel = (ViewModel)model.get("child");
 		assertNotNull(childModel);
 		assertEquals(2, childModel.get("width"));
 		assertEquals(3, childModel.get("height"));
+		
+		assertEquals(Boolean.TRUE, model.get("lock"));
+		assertEquals(now, model.get("lastModified"));
 	}
 
 	@Test
-	public void testWrapDynaModel() {
+	public void testWrapModel() {
 		Date now = new Date();// Calendar.getInstance().getTime();
 
-		Bean bean = new Bean();
-		bean.setId("123");
-		bean.setScore(456);
-		bean.setCreation(now);
+		Member member = new Member();
+		member.setId("123");
+		member.setScore(456);
+		member.setCreation(now);
 
 		// wrap bean into WebModel
-		DynaModel model = new WrapDynaModel(bean);
-
-
-		assertEquals("123", model.get("id"));
-		assertEquals(456, model.get("score"));
-		assertNull(model.get("name"));
-		assertEquals(now, model.get("creation"));
-
-		assertNull(model.get("none"));
+		ViewModel model1 = DefaultViewModel.Wrap(member);
+		assertEquals("123", model1.get("id"));
+		assertEquals(456, model1.get("score"));
+		assertNull(model1.get("name")); // the name property has not set.
+		assertEquals(now, model1.get("creation"));
+		assertNull(model1.get("none"));
 
 		// add new property and update old value
-		model.add("enable", Boolean.TRUE);
-		model.add("count", 100);
-		// update value
-		model.add("score", 999);
+		model1.add("enable", Boolean.TRUE);
+		model1.add("count", 100);
+		model1.add("score", 999); // update value
 
-		assertEquals(999, model.get("score"));
-		assertEquals(Boolean.TRUE, model.get("enable"));
-		assertEquals(100, model.get("count"));
+		assertEquals(999, model1.get("score"));
+		assertEquals(Boolean.TRUE, model1.get("enable"));
+		assertEquals(100, model1.get("count"));
 
 		// iterate property names
-		Set<String> keys = model.keySet();
+		Set<String> keys1 = model1.keySet();
 
-		assertEquals(6, keys.size());
-		assertTrue(keys.contains("id"));
-		assertTrue(keys.contains("score"));
-		assertTrue(keys.contains("name"));
-		assertTrue(keys.contains("creation"));
-		assertTrue(keys.contains("count"));
-		assertTrue(keys.contains("enable"));
-		assertFalse(keys.contains("none"));
+		assertEquals(6, keys1.size());
+		assertTrue(keys1.contains("id"));
+		assertTrue(keys1.contains("score"));
+		assertTrue(keys1.contains("name"));
+		assertTrue(keys1.contains("creation"));
+		assertTrue(keys1.contains("count"));
+		assertTrue(keys1.contains("enable"));
+		assertFalse(keys1.contains("none"));
+		
+		// test wrap with specify properties
+		Set<String> names = new TreeSet<String>();
+		names.add("id");
+		names.add("score");
+		
+		ViewModel model2 = DefaultViewModel.Wrap(member, names);
+		
+		assertEquals("123", model2.get("id"));
+		assertEquals(456, model2.get("score"));
+		
+		Set<String> keys2 = model2.keySet();
+		assertEquals(2, keys2.size());
+		assertTrue(keys2.contains("id"));
+		assertTrue(keys2.contains("score"));
+		assertFalse(keys2.contains("name"));
+		assertFalse(keys2.contains("creation"));
+
 	}
 
-	public class Bean{
+	public class Member{
 
 		private String id;
 		private String name;
 		private int score;
 		private Date creation;
 
-		public Bean() {
+		public Member() {
 			//
 		}
 
-		public Bean(String id, String name, int score, Date creation) {
+		public Member(String id, String name, int score, Date creation) {
 			this.id = id;
 			this.name = name;
 			this.score = score;
@@ -189,8 +208,8 @@ public class DynaModelTest {
 			if (this == obj) {
 				return true;
 			}
-			if (obj instanceof Bean) {
-				Bean other = (Bean) obj;
+			if (obj instanceof Member) {
+				Member other = (Member) obj;
 				return new EqualsBuilder()
 						.append(getId(), other.getId())
 						.isEquals();

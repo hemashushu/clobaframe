@@ -17,6 +17,12 @@ import org.archboy.clobaframe.io.http.ResourceSender;
 import org.archboy.clobaframe.io.impl.DefaultResourceInfoFactory;
 
 /**
+ * Http compress.
+ * http://en.wikipedia.org/wiki/HTTP_compression
+ * 
+ * It can be enable by the web server (such Apache Http, Tomcat and Jetty ...) either.
+ * http://betterexplained.com/articles/how-to-optimize-your-site-with-gzip-compression/
+ * 
  * Gzip Rules.
  * 
  * See also Jetty Gzip filter: http://eclipse.org/jetty/documentation/current/gzip-filter.html
@@ -30,10 +36,7 @@ import org.archboy.clobaframe.io.impl.DefaultResourceInfoFactory;
  */
 public class GZipResourceSender implements ResourceSender {
 
-	// only the content lenth more than this value would be compress
-	private static final int DEFAULT_MIN_COMPRESS_SIZE = 1024;
-	private int minCompressSize = DEFAULT_MIN_COMPRESS_SIZE;
-	
+	private int minCompressSize;
 	private ResourceSender resourceSender;
 	
 	private List<String> mimeTypes = Arrays.asList(
@@ -44,9 +47,10 @@ public class GZipResourceSender implements ResourceSender {
 			"text/css",
 			"application/javascript",
 			"image/svg+xml");
-	
-	public GZipResourceSender(ResourceSender resourceSender) {
+
+	public GZipResourceSender(ResourceSender resourceSender, int minCompressSize) {
 		this.resourceSender = resourceSender;
+		this.minCompressSize = minCompressSize;
 	}
 	
 	@Override

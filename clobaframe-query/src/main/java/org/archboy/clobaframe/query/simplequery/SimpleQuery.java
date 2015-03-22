@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
+import org.archboy.clobaframe.query.DefaultViewModel;
 import org.archboy.clobaframe.query.Query;
+import org.archboy.clobaframe.query.ViewModel;
 import org.springframework.util.Assert;
 
 /**
@@ -191,19 +193,18 @@ public class SimpleQuery<T> implements Query<T>{
 	}
 
 	@Override
-	public List<Map<String, Object>> select(String... keys) {
+	public List<ViewModel> select(String... keys) {
 		Assert.notNull(keys);
 		
-		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+		List<ViewModel> result = new ArrayList<ViewModel>();
 		Collection<T> items = list();
 
+		Set<String> names = new TreeSet<String>();
+		Collections.addAll(names, keys);
+		
 		for (T item : items) {
-			Map<String, Object> obj = new HashMap<String, Object>();
-			for (String key : keys) {
-				obj.put(key, Support.getPropertyValue(item, key));
-			}
-
-			result.add(obj);
+			ViewModel viewModel = DefaultViewModel.Wrap(item, names);
+			result.add(viewModel);
 		}
 
 		return result;

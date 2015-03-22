@@ -1,4 +1,4 @@
-package org.archboy.clobaframe.query.simplequery;
+package org.archboy.clobaframe.query;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -16,8 +16,8 @@ import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.archboy.clobaframe.query.Query;
-import org.archboy.clobaframe.query.QueryException;
+import org.archboy.clobaframe.query.simplequery.PredicateFactory;
+import org.archboy.clobaframe.query.simplequery.SimpleQuery;
 import org.junit.After;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -218,7 +218,7 @@ public class QueryTest {
 		*/
 
 		// test key set 1
-		List<Map<String, Object>> result1 = SimpleQuery.from(members).select("id");
+		List<ViewModel> result1 = SimpleQuery.from(members).select("id");
 		assertEquals(5, result1.size());
 
 		Map<String, Object> o1 = result1.iterator().next();
@@ -227,7 +227,7 @@ public class QueryTest {
 		assertEquals(member1.getId(), o1.get("id"));
 
 		// test key set 2
-		List<Map<String, Object>> result2 = SimpleQuery.from(members).select("id", "creation", "score");
+		List<ViewModel> result2 = SimpleQuery.from(members).select("id", "creation", "score");
 
 		Map<String, Object> o2 = result2.iterator().next();
 		assertEquals(3, o2.keySet().size());
@@ -265,7 +265,7 @@ public class QueryTest {
 		assertEquals(member1, result2.get(1));
 		
 		// test limit with select
-		List<Map<String, Object>> result3 = SimpleQuery.from(members)
+		List<ViewModel> result3 = SimpleQuery.from(members)
 				.orderBy("name")
 				.limit(2)
 				.select("name");

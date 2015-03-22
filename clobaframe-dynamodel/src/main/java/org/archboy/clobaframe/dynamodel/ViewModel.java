@@ -12,7 +12,7 @@ import java.util.Map;
  *
  * @author yang
  */
-public interface DynaModel extends Map<String, Object> {
+public interface ViewModel extends Map<String, Object> {
 
 	/**
 	 * Add/update a new property.
@@ -21,15 +21,22 @@ public interface DynaModel extends Map<String, Object> {
 	 * @param value
 	 * @return Return model itself.
 	 */
-	DynaModel add(String key, Object value);
+	ViewModel add(String key, Object value);
 
 	/**
-	 * Add a child model.
+	 * Create and add a child model.
 	 *
 	 * @param name
-	 * @param model
 	 *
-	 * @return Return model itself.
+	 * @return Return the child model.
 	 */
-	//DynaModel addModel(String name, DynaModel model);
+	ViewModel addChild(String name);
+	
+	/**
+	 * Return the parent model (if exists).
+	 * 
+	 * @return 
+	 */
+	ViewModel parent();
+	
 }
