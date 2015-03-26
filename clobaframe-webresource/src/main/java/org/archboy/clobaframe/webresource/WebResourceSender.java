@@ -14,10 +14,6 @@ public interface WebResourceSender {
 
 	/**
 	 * Send resource by resource name.
-	 * <p>
-	 *     Resource name excludes path name, so the web resource file name
-	 *     can not duplicate, event if they are place in different folders.
-	 * </p>
 	 *
 	 * @param resourceName
 	 * @param request
@@ -27,16 +23,17 @@ public interface WebResourceSender {
 	void send(String resourceName, 
 			HttpServletRequest request,
 			HttpServletResponse response) throws IOException;
-
+	
 	/**
-	 * Send resource by unique name.
+	 * Send resource by version name.
 	 *
-	 * @param resourceUniqueName
+	 * @param versionName
 	 * @param request
 	 * @param response
 	 * @throws IOException The exception occurs while the specify resource not found.
 	 */
-	void sendByUniqueName(String resourceUniqueName,
+	void sendByVersionName(String versionName,
 			HttpServletRequest request,
 			HttpServletResponse response) throws IOException;
+
 }

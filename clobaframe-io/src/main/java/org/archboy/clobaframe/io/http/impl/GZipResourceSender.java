@@ -63,7 +63,6 @@ public class GZipResourceSender implements ResourceSender {
 					if (response.getHeader("Content-Encoding") == null &&
 							(extraHeaders == null || !extraHeaders.containsKey("Content-Encoding"))){
 						
-						System.out.println("send gzip");
 						sendWithGZip(resourceInfo, extraHeaders, request, response);
 						return;
 					}

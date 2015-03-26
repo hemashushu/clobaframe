@@ -113,7 +113,7 @@ public class BlobstoreWebResourceSynchronizer{
 				// compare the resources with hash
 
 				//String remoteHash = remoteResources.get(key).getMetadata().get("sha256");
-				//String localHash = localResources.get(key).getHash();
+				//String localHash = localResources.get(key).getContentHash();
 				//if (localHash.equals(remoteHash)){
 					unmodifiedKeys.add(key);
 				//}
@@ -191,7 +191,7 @@ public class BlobstoreWebResourceSynchronizer{
 				in,
 				webResourceInfo.getContentLength());
 
-		// blobInfo.addMetadata("sha256", webResourceInfo.getHash());
+		// blobInfo.addMetadata("sha256", webResourceInfo.getContentHash());
 
 		try{
 			blobstore.put(blobResourceInfo, true, Blobstore.DEFAULT_STORE_PRIOTITY);

@@ -11,15 +11,16 @@ import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
 import org.archboy.clobaframe.io.file.impl.PartialFileInputStream;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 
-public class DefaultWebResourceInfo implements WebResourceInfo, FileBaseResourceInfo {
+public class LocalWebResourceInfo implements WebResourceInfo, FileBaseResourceInfo {
 
 	private File file;
-
 	private String name;
-	private String uniqueName;
 	private String mimeType;
+	
+	private long lastModified;
+	private String contentHash;
 
-	public DefaultWebResourceInfo(
+	public LocalWebResourceInfo(
 			File file, String name, String mimeType) {
 		this.file = file;
 		this.name = name;
@@ -27,7 +28,16 @@ public class DefaultWebResourceInfo implements WebResourceInfo, FileBaseResource
 	}
 
 	@Override
-	public String getHash() {
+	public String getContentHash() {
+		// only re-compute content hash when the File.lastModified changed.
+		if (contentHash == null || lastModified != file.lastModified()) {
+			return computeContentHash();
+		}else{
+			return contentHash;
+		}
+	}
+	
+	private String computeContentHash(){
 		String hash = null;
 		InputStream in = null;
 		try {
@@ -39,15 +49,6 @@ public class DefaultWebResourceInfo implements WebResourceInfo, FileBaseResource
 			IOUtils.closeQuietly(in);
 		}
 		return hash;
-	}
-
-	@Override
-	public String getUniqueName() {
-		return uniqueName;
-	}
-
-	public void setUniqueName(String uniqueName) {
-		this.uniqueName = uniqueName;
 	}
 	
 	@Override

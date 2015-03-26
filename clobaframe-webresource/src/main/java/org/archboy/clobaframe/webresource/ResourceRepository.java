@@ -1,21 +1,16 @@
 package org.archboy.clobaframe.webresource;
 
-import java.util.List;
-
 /**
  *
  * @author yang
  */
 public interface ResourceRepository {
-
-	/**
-	 * The repository implements name.
-	 * 
-	 * @return 
-	 */
-	String getName();
 	
-	List<WebResourceInfo> findAll();
+	/**
+	 * 
+	 * @param name Resource name includes the relative path, e.g. "css/main.css".
+	 * @return NULL if can not find the specify resource.
+	 */
+	WebResourceInfo getByName(String name);
 
-	ResourceLocationGenerator getResourceLocationGenerator();
 }

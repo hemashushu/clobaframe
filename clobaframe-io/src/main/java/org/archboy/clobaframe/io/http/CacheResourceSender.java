@@ -10,9 +10,11 @@ import org.archboy.clobaframe.io.ResourceInfo;
  *
  * @author yang
  */
-public interface CacheResourceSender {
+public interface CacheResourceSender extends ResourceSender {
 	
 	public static final int ONE_YEAR_SECONDS = 31536000;
+	public static final int ONE_MONTH_SECONDS = 2592000;
+	
 	public static final String CACHE_CONTROL_PUBLIC = "public";
 	public static final String CACHE_CONTROL_PRIVATE = "private";
 	public static final String CACHE_CONTROL_NO_CACHE = "no-cache";

@@ -44,7 +44,7 @@ public class BlobstoreResourceRepository implements ResourceRepository{
 	@PostConstruct
 	public void init(){
 		locationGenerator = new BlobstoreLocationGenerator(keyNamePrefix, location);
-		webResourceInfos = localResourceRepository.findAll();
+		webResourceInfos = localResourceRepository.getAll();
 		
 		try{
 			resourceSynchronizer.update(webResourceInfos);
@@ -64,7 +64,7 @@ public class BlobstoreResourceRepository implements ResourceRepository{
 	}
 
 	@Override
-	public List<WebResourceInfo> findAll() {
+	public List<WebResourceInfo> getAll() {
 		return webResourceInfos;
 	}
 

@@ -1,64 +1,53 @@
-package org.archboy.clobaframe.webresource.local;
+package org.archboy.clobaframe.webresource.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
-import org.archboy.clobaframe.io.file.impl.PartialFileInputStream;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 
 /**
  *
  * @author yang
  */
-public class CombineWebResourceInfo implements WebResourceInfo {
+public class CompositeWebResourceInfo implements WebResourceInfo {
 
-	private List<WebResourceInfo> resourceInfos;
+	private List<WebResourceInfo> webResourceInfos;
 	private String name;
-	private String uniqueName;
 	private String mimeType;
 
-	public CombineWebResourceInfo(
-			List<WebResourceInfo> resourceInfos, String name, String mimeType) {
-		this.resourceInfos = resourceInfos;
+	public CompositeWebResourceInfo(
+			List<WebResourceInfo> resourceInfos, String name) {
+		this.webResourceInfos = resourceInfos;
 		this.name = name;
-		this.mimeType = mimeType;
+		
+		// get the first resource mime type as the composite resource mime type.
+		this.mimeType = resourceInfos.get(0).getMimeType();
 	}
 
 	@Override
-	public String getHash() {
-		try{
-			byte[] data = getCombineData();
-			return DigestUtils.sha256Hex(data);
-		}catch(IOException e){
-			return null;
+	public String getContentHash() {
+		// only hash all source hash values
+		StringBuilder builder = new StringBuilder(webResourceInfos.size());
+		for (WebResourceInfo webResourceInfo : webResourceInfos) {
+			builder.append(webResourceInfo.getContentHash());
 		}
-	}
 
-	@Override
-	public String getUniqueName() {
-		return uniqueName;
-	}
-
-	public void setUniqueName(String uniqueName) {
-		this.uniqueName = uniqueName;
+		return DigestUtils.sha256Hex(builder.toString());
 	}
 
 	@Override
 	public long getContentLength() {
-		// get the length just in time.
 		long length = 0;
-		for(WebResourceInfo resourceInfo : resourceInfos){
+		for(WebResourceInfo resourceInfo : webResourceInfos){
 			length += resourceInfo.getContentLength();
 		}
 		
-		return length + resourceInfos.size() - 1; // add the '\n' symbol between each resource.
+		return length + webResourceInfos.size() - 1; // because of adding the '\n' symbol between each resource.
 	}
 
 	@Override
@@ -68,13 +57,13 @@ public class CombineWebResourceInfo implements WebResourceInfo {
 
 	@Override
 	public InputStream getContent() throws IOException {
-		byte[] data = getCombineData();
+		byte[] data = getCompositeData();
 		return new ByteArrayInputStream(data);
 	}
 
 	@Override
 	public InputStream getContent(long start, long length) throws IOException {
-		byte[] data = getCombineData();
+		byte[] data = getCompositeData();
 		return new ByteArrayInputStream(data, (int)start, (int)length);
 	}
 
@@ -90,10 +79,10 @@ public class CombineWebResourceInfo implements WebResourceInfo {
 
 	@Override
 	public Date getLastModified() {
-		// get the last modified time just in time.
+		// get the last modified time of all resources.
 		long lastModified = 0;
 		
-		for(WebResourceInfo resourceInfo : resourceInfos){
+		for(WebResourceInfo resourceInfo : webResourceInfos){
 			Date date = resourceInfo.getLastModified();
 			long time = date.getTime();
 			if (time > lastModified) {
@@ -103,18 +92,18 @@ public class CombineWebResourceInfo implements WebResourceInfo {
 		return new Date(lastModified);
 	}
 
-	private byte[] getCombineData() throws IOException {
+	private byte[] getCompositeData() throws IOException {
 		
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		
-		for(int idx=0; idx<resourceInfos.size(); idx++){
-			WebResourceInfo resourceInfo = resourceInfos.get(idx);
+		for(int idx=0; idx<webResourceInfos.size(); idx++){
+			WebResourceInfo resourceInfo = webResourceInfos.get(idx);
 			InputStream in = resourceInfo.getContent();
 			IOUtils.copy(in, out);
 			in.close();
 			
-			// append new line between two resource.
-			if (idx < resourceInfos.size() -1){
+			// append new line between resources.
+			if (idx < webResourceInfos.size() -1){
 				out.write('\n');
 			}
 		}

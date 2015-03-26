@@ -34,16 +34,21 @@ public class CacheResourceSenderImpl implements CacheResourceSender {
 			cacheControl += ", max-age=" + cacheSeconds;
 		}
 
-		Calendar now = Calendar.getInstance();
-		now.add(Calendar.SECOND, cacheSeconds);
+		Calendar expires = Calendar.getInstance();
+		expires.add(Calendar.SECOND, cacheSeconds);
 
 		if (extraHeaders == null) {
 			extraHeaders = new HashMap<String, Object>();
 		}
 
 		extraHeaders.put("Cache-Control", cacheControl);
-		extraHeaders.put("Expires", now.getTime());
+		extraHeaders.put("Expires", expires.getTime());
 
+		resourceSender.send(resourceInfo, extraHeaders, request, response);
+	}
+
+	@Override
+	public void send(ResourceInfo resourceInfo, Map<String, Object> extraHeaders, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		resourceSender.send(resourceInfo, extraHeaders, request, response);
 	}
 

@@ -1,31 +1,24 @@
 package org.archboy.clobaframe.webresource.impl;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 import javax.annotation.PostConstruct;
-import org.archboy.clobaframe.webresource.ResourceLocationGenerator;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.apache.commons.io.IOUtils;
-import org.springframework.util.Assert;
-import org.archboy.clobaframe.webresource.ResourceRepository;
-import org.archboy.clobaframe.webresource.UniqueNameGenerator;
+import org.archboy.clobaframe.webresource.AbstractVersionStrategy;
+import org.archboy.clobaframe.webresource.CacheableResource;
+import org.archboy.clobaframe.webresource.CacheableResourceUpdateListener;
+import org.archboy.clobaframe.webresource.CompositeResourceRepository;
+import org.archboy.clobaframe.webresource.ResourceCollection;
+import org.archboy.clobaframe.webresource.VersionStrategy;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 
 /**
  *
@@ -33,185 +26,321 @@ import org.springframework.core.io.ResourceLoader;
  *
  */
 @Named
-public class WebResourceManagerImpl implements WebResourceManager {
+public class WebResourceManagerImpl implements WebResourceManager, CacheableResourceUpdateListener {
 
-	private Map<String, WebResourceInfo> webResources = new HashMap<String, WebResourceInfo>();
-	private Map<String, String> uniqueNames = new HashMap<String, String>(); // the unique name to resource mapper.
+	@Value("${clobaframe.webresource.versionStrategy}")
+	private String versionStrategyName;
+		
+	@Inject
+	private List<AbstractVersionStrategy> versionStrategys;
 
-	@Value("${webresource.strategy}")
-	private String strategyName;
+	// fields
+	
+	private VersionStrategy versionStrategy;
 
 	@Inject
-	private List<ResourceRepository> resourceRepositories;
+	private ResourceCollection resourceCollection;
 	
-	// the default resource repository
-	private ResourceRepository resourceRepository;
-
-	// the default location generator
-	private ResourceLocationGenerator locationGenerator;
+	@Inject
+	private CompositeResourceRepository compositeResourceRepository;
 	
-	// the content types that can be location replaced.
-	private List<String> mimeTypes = Arrays.asList(
-			"text/javascript",
-			"text/css",
-			"application/x-javascript");
 
-	/**
-	 * cache millisecond:
-	 * 	less than 0 = cache always.
-	 * 	equals 0 = no cache
-	 */
-	@Value("${webresource.cacheSeconds}")
-	private int cacheSeconds;
-
-	@Value("${webresource.autoConvertCssUrl}")
-	private boolean autoConvertCssUrl;
 	
-	// cache the file that less than 1MiB.
-	private static final int MAX_CACHE_FILE_SIZE = 1024 * 1024;
-	private int maxCacheFileSize = MAX_CACHE_FILE_SIZE;
+//	// the default resource repository
+//	private ResourceRepository resourceRepository;
+//
+//	// the default location generator
+//	private ResourceLocationGenerator locationGenerator;
+	
+	private String MIME_TYPE_STYLE_SHEET = "text/css";
+	
+	// the content types that can be compressed.
+	private List<String> textWebResourceMimeTypes = Arrays.asList(
+			"text/css", // style sheet
+			"text/javascript", // javascript, IE
+			"application/x-javascript", // javascript, obsolete, but widely used
+			"application/javascript" // javascript, standard 
+	);
+
+	@Value("${clobaframe.webresource.minify}")
+	private boolean canMinify;
+	
+	@Value("${clobaframe.webresource.compress}")
+	private boolean canCompress;
+		
+	@Value("${clobaframe.webresource.cache}")
+	private boolean canCache;
+
+	@Value("${clobaframe.webresource.baseLocation}")
+	private String baseLocation;
+	
+//	@Value("${webresource.autoConvertCssUrl}")
+//	private boolean autoConvertCssUrl;
+//	
+//	// cache the file that less than 1MiB.
+//	private static final int MAX_CACHE_FILE_SIZE = 1024 * 1024;
+//	private int maxCacheFileSize = MAX_CACHE_FILE_SIZE;
+	
+	private static final int DEFAULT_CACHE_SECONDS = 60;
+	private int cacheSeconds = DEFAULT_CACHE_SECONDS;
 	
 	private final Logger logger = LoggerFactory.getLogger(WebResourceManagerImpl.class);
 
 	@PostConstruct
 	public void init(){
 		// get the config resource repository
-		resourceRepository = getResourceRepository(strategyName);
-		locationGenerator = resourceRepository.getResourceLocationGenerator();
-		logger.info("Using [{}] web resource repository as the default.", strategyName);
+//		resourceRepository = getResourceRepository(strategyName);
+//		locationGenerator = resourceRepository.getResourceLocationGenerator();
 		
-		List<WebResourceInfo> webResourceInfos = resourceRepository.findAll();
-		if (webResourceInfos.isEmpty()){
-			// no web resource present
-			return;
-		}
-
-		webResourceInfos = postHandle(webResourceInfos);
-
-		// get all resource name and unique names
-		for (WebResourceInfo webResourceInfo : webResourceInfos) {
-			webResources.put(webResourceInfo.getName(), webResourceInfo);
-			uniqueNames.put(webResourceInfo.getUniqueName(), webResourceInfo.getName());
-		}
-	}
-
-	public List<ResourceRepository> getResourceRepositories() {
-		return resourceRepositories;
-	}
-
-	public ResourceRepository getResourceRepository(String name) {
-		Assert.hasText(name);
+//		List<WebResourceInfo> webResourceInfos = resourceRepository.getAll();
+//		if (webResourceInfos.isEmpty()){
+//			// no web resource present
+//			return;
+//		}
+//
+//		webResourceInfos = postHandle(webResourceInfos);
+//
+//		// get all resource name and unique names
+//		for (WebResourceInfo webResourceInfo : webResourceInfos) {
+//			webResources.put(webResourceInfo.getName(), webResourceInfo);
+//			uniqueNames.put(webResourceInfo.getUniqueName(), webResourceInfo.getName());
+//		}
 		
-		for(ResourceRepository repository : resourceRepositories){
-			if (repository.getName().equals(name)){
-				return repository;
+		for(AbstractVersionStrategy strategy : versionStrategys) {
+			if (strategy.getName().equals(versionStrategyName)) {
+				this.versionStrategy = strategy;
+				break;
 			}
 		}
-
-		throw new IllegalArgumentException(
-				String.format("The specify web resource repository [%s] not found.", name));
-	}
-
-	@Override
-	public String getLocation(String name) throws FileNotFoundException {
-		Assert.hasText(name, "Name should not empty.");
 		
-		WebResourceInfo webResourceInfo = webResources.get(name);
-		if (webResourceInfo == null) {
-			throw new FileNotFoundException(name);
+		if (versionStrategy == null) {
+			throw new IllegalArgumentException(String.format(
+					"Can not find the version strategy [%s]", versionStrategyName));
 		}
-		return getLocation(webResourceInfo);
-	}
-
-	@Override
-	public String getLocation(WebResourceInfo webResourceInfo) {
-		Assert.notNull(webResourceInfo);
 		
-		return locationGenerator.getLocation(webResourceInfo);
+		logger.info("Using [{}] web resource version name strategy.", versionStrategyName);
+		
+		//loadFunctionWrapper = new CompositeResourceRepositoryImpl.DefaultWebResourceLoadFunctionWrapper(this);
 	}
+//
+//	public List<ResourceRepository> getResourceRepositories() {
+//		return resourceRepositories;
+//	}
+//
+//	public ResourceRepository getResourceRepository(String name) {
+//		Assert.hasText(name);
+//		
+//		for(ResourceRepository repository : resourceRepositories){
+//			if (repository.getName().equals(name)){
+//				return repository;
+//			}
+//		}
+//
+//		throw new IllegalArgumentException(
+//				String.format("The specify web resource repository [%s] not found.", name));
+//	}
+//
+//	@Override
+//	public String getLocation(String name) throws FileNotFoundException {
+//		Assert.hasText(name, "Name should not empty.");
+//		
+//		WebResourceInfo webResourceInfo = webResources.get(name);
+//		if (webResourceInfo == null) {
+//			throw new FileNotFoundException(name);
+//		}
+//		return getLocation(webResourceInfo);
+//	}
+//
+//	@Override
+//	public String getLocation(WebResourceInfo webResourceInfo) {
+//		Assert.notNull(webResourceInfo);
+//		
+//		return locationGenerator.getLocation(webResourceInfo);
+//	}
+//
+//	@Override
+//	public WebResourceInfo getResource(String name) throws FileNotFoundException {
+//		Assert.hasText(name, "Resource name should not empty.");
+//		
+//		WebResourceInfo info = webResources.get(name);
+//		if (info == null) {
+//			throw new FileNotFoundException(name);
+//		}
+//		return info;
+//	}
+//
+//	@Override
+//	public WebResourceInfo getResourceByUniqueName(String uniqueName) throws FileNotFoundException {
+//		Assert.hasText(uniqueName, "Resource unique name should not empty.");
+//		
+//		String name = uniqueNames.get(uniqueName);
+//		if (name == null) {
+//			throw new FileNotFoundException(name);
+//		}
+//		return getResource(name);
+//	}
+//
+//	@Override
+//	public Collection<WebResourceInfo> getAllResources() {
+//		return webResources.values();
+//	}
+//	
+//	/**
+//	 * Add buffer and location replacement features.
+//	 *
+//	 * @param webResourceInfos
+//	 * @return
+//	 */
+//	protected List<WebResourceInfo> postHandle(List<WebResourceInfo> webResourceInfos){
+//		webResourceInfos =  handleLocationReplacing(webResourceInfos);
+//		webResourceInfos = handleBuffer(webResourceInfos);
+//		return webResourceInfos;
+//	}
+//
+//	protected List<WebResourceInfo> handleLocationReplacing(List<WebResourceInfo> webResourceInfos) {
+//		Map<String, String> locations = new HashMap<String, String>();
+//		
+//		// get all resource locations
+//		for (WebResourceInfo webResourceInfo : webResourceInfos) {
+//			locations.put(
+//					webResourceInfo.getName(),
+//					locationGenerator.getLocation(webResourceInfo));
+//		}
+//
+//		List<WebResourceInfo> result = new ArrayList<WebResourceInfo>();
+//
+//		// select web resources that can be location replaced.
+//		for (WebResourceInfo webResourceInfo : webResourceInfos) {
+//			// convert into location-replacing resource
+//			if (mimeTypes.contains(webResourceInfo.getMimeType())) {
+//				webResourceInfo = new LocationReplacingWebResourceInfo(
+//						webResourceInfo, locations, autoConvertCssUrl);
+//			}
+//			result.add(webResourceInfo);
+//		}
+//
+//		return result;
+//	}
+//	
+//	protected List<WebResourceInfo> handleBuffer(List<WebResourceInfo> webResourceInfos) {
+//		if (cacheSeconds == 0) {
+//			return webResourceInfos;
+//		}
+//		
+//		List<WebResourceInfo> result = new ArrayList<WebResourceInfo>();
+//		for (WebResourceInfo webResourceInfo : webResourceInfos) {
+//
+//			// convert info buffered web resource
+//			if (webResourceInfo.getContentLength() < maxCacheFileSize){
+//				webResourceInfo = new BufferedWebResourceInfo(
+//						webResourceInfo, cacheSeconds);
+//			}
+//
+//			result.add(webResourceInfo);
+//		}
+//
+//		return result;
+//	}
 
+	private WebResourceInfo getResourceInternal(String name) throws IOException {
+		
+		// load from collection first
+		WebResourceInfo resourceInfo = resourceCollection.getByName(name);
+		if (resourceInfo != null) {
+			return resourceInfo;
+		}
+		
+		// then load from composites and repository
+		resourceInfo = compositeResourceRepository.getByName(name);
+		
+		if (resourceInfo == null) {
+			return null;
+		}
+		
+		// wrap resource
+		
+		// transform url location
+		if (resourceInfo.getMimeType().equals(MIME_TYPE_STYLE_SHEET)) {
+			resourceInfo = new LocationTransformWebResourceInfo(this, resourceInfo);
+		}
+		
+		// minify
+		if (canMinify && textWebResourceMimeTypes.contains(resourceInfo.getMimeType())) {
+			// resourceInfo = new Mini
+		}
+		
+		// compress
+		if (canCompress && textWebResourceMimeTypes.contains(resourceInfo.getMimeType())) {
+			resourceInfo = new CompressWebResourceInfo(resourceInfo);
+		}
+		
+		// cache
+		if (canCache) {
+			resourceInfo = new CacheWebResourceInfo(resourceInfo, cacheSeconds);
+		}
+		
+		resourceCollection.add(resourceInfo);
+		
+		return resourceInfo;
+	}
+	
 	@Override
 	public WebResourceInfo getResource(String name) throws FileNotFoundException {
-		Assert.hasText(name, "Resource name should not empty.");
+		WebResourceInfo resource = null;
 		
-		WebResourceInfo info = webResources.get(name);
-		if (info == null) {
-			throw new FileNotFoundException(name);
+		try{
+			resource = getResourceInternal(name);
+		}catch(IOException e){
+			throw new FileNotFoundException(String.format(
+					"There is error in the web resource [%s], cause: %s", 
+					name, 
+					e.getMessage()));
 		}
-		return info;
+		
+		if (resource == null) {
+			throw new FileNotFoundException(String.format("Can not found the web resource [%s]", name));
+		}
+		
+		return resource;
 	}
-
+	
 	@Override
-	public WebResourceInfo getResourceByUniqueName(String uniqueName) throws FileNotFoundException {
-		Assert.hasText(uniqueName, "Resource unique name should not empty.");
-		
-		String name = uniqueNames.get(uniqueName);
-		if (name == null) {
-			throw new FileNotFoundException(name);
-		}
+	public WebResourceInfo getResourceByVersionName(String versionName) throws FileNotFoundException {
+		String name = versionStrategy.revert(versionName);
 		return getResource(name);
 	}
 
 	@Override
-	public Collection<WebResourceInfo> getAllResources() {
-		return webResources.values();
+	public String getLocation(WebResourceInfo webResourceInfo) {
+		String versionName = versionStrategy.getVersionName(webResourceInfo);
+		return baseLocation + versionName;
+	}
+
+	@Override
+	public String getLocation(String name) throws FileNotFoundException {
+		WebResourceInfo resource = getResource(name);
+		return getLocation(resource);
+	}
+
+	@Override
+	public void refresh(String name) {
+		try{
+			WebResourceInfo resource = getResourceInternal(name);
+			if (resource != null) {
+				if (resource instanceof CacheableResource) {
+					((CacheableResource)resource).refresh();
+				}
+			}
+		}catch(IOException e) {
+			// ignore
+		}
+	}
+
+	@Override
+	public void onUpdate(String resourceName, Collection<String> referenceResourceNames) {
+		for(String name : referenceResourceNames) {
+			refresh(name);
+		}
 	}
 	
-	/**
-	 * Add buffer and location replacement features.
-	 *
-	 * @param webResourceInfos
-	 * @return
-	 */
-	protected List<WebResourceInfo> postHandle(List<WebResourceInfo> webResourceInfos){
-		webResourceInfos =  handleLocationReplacing(webResourceInfos);
-		webResourceInfos = handleBuffer(webResourceInfos);
-		return webResourceInfos;
-	}
-
-	protected List<WebResourceInfo> handleLocationReplacing(List<WebResourceInfo> webResourceInfos) {
-		Map<String, String> locations = new HashMap<String, String>();
-		
-		// get all resource locations
-		for (WebResourceInfo webResourceInfo : webResourceInfos) {
-			locations.put(
-					webResourceInfo.getName(),
-					locationGenerator.getLocation(webResourceInfo));
-		}
-
-		List<WebResourceInfo> result = new ArrayList<WebResourceInfo>();
-
-		// select web resources that can be location replaced.
-		for (WebResourceInfo webResourceInfo : webResourceInfos) {
-			// convert into location-replacing resource
-			if (mimeTypes.contains(webResourceInfo.getMimeType())) {
-				webResourceInfo = new LocationReplacingWebResourceInfo(
-						webResourceInfo, locations, autoConvertCssUrl);
-			}
-			result.add(webResourceInfo);
-		}
-
-		return result;
-	}
-	
-	protected List<WebResourceInfo> handleBuffer(List<WebResourceInfo> webResourceInfos) {
-		if (cacheSeconds == 0) {
-			return webResourceInfos;
-		}
-		
-		List<WebResourceInfo> result = new ArrayList<WebResourceInfo>();
-		for (WebResourceInfo webResourceInfo : webResourceInfos) {
-
-			// convert info buffered web resource
-			if (webResourceInfo.getContentLength() < maxCacheFileSize){
-				webResourceInfo = new BufferedWebResourceInfo(
-						webResourceInfo, cacheSeconds);
-			}
-
-			result.add(webResourceInfo);
-		}
-
-		return result;
-	}
-
 }

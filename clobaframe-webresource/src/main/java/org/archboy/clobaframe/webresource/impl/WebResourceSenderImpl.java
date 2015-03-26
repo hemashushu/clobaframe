@@ -2,21 +2,24 @@ package org.archboy.clobaframe.webresource.impl;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.archboy.clobaframe.io.http.CacheResourceSender;
 import org.archboy.clobaframe.io.http.ResourceSender;
+import org.archboy.clobaframe.webresource.AbstractWebResourceInfo;
+import org.archboy.clobaframe.webresource.CompressableResource;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceSender;
 import org.archboy.clobaframe.webresource.WebResourceManager;
 import org.springframework.util.Assert;
 
 /**
- * Send the web static resources.
- * Such as '/robots.txt', '/favicon.ico' and java-script/css files.
  *
  * @author yang
  *
@@ -25,19 +28,11 @@ import org.springframework.util.Assert;
 public class WebResourceSenderImpl implements WebResourceSender{
 
 	@Inject
-	private ResourceSender resourceSender ;
+	private CacheResourceSender cacheResourceSender;
 
 	@Inject
 	private WebResourceManager webResourceService;
 
-	/**
-	 * Send web resource.
-	 *
-	 * @param resourceName
-	 * @param request
-	 * @param response
-	 * @throws IOException
-	 */
 	@Override
 	public void send(String resourceName, HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
@@ -46,48 +41,44 @@ public class WebResourceSenderImpl implements WebResourceSender{
 		Assert.notNull(request);
 		Assert.notNull(response);
 		
-		// get resource
-		WebResourceInfo webResourceInfo = null;
-
 		try{
-			webResourceInfo = webResourceService.getResource(resourceName);
+			WebResourceInfo webResourceInfo = webResourceService.getResource(resourceName);
+			send(webResourceInfo, request, response);
 		}catch(FileNotFoundException e){
 			response.sendError(HttpServletResponse.SC_NOT_FOUND,
 					"Resource not found");
-			return;
 		}
-
-		resourceSender.send(webResourceInfo, request, response);
 	}
 
-	/**
-	 * Send web resource by unique name.
-	 *
-	 * @param resourceUniqueName
-	 * @param request
-	 * @param response
-	 * @throws IOException
-	 */
+	private void send(WebResourceInfo webResourceInfo, HttpServletRequest request, HttpServletResponse response) throws IOException {
+		Map<String, Object> headers = new HashMap<String, Object>();
+		
+		if (webResourceInfo instanceof AbstractWebResourceInfo) {
+			if (((AbstractWebResourceInfo)webResourceInfo).getUnderlayWebResourceInfoNames()
+					.contains("CompressableResource")){
+				headers.put("Content-Encoding", "gzip");
+			}
+		}
+		
+		cacheResourceSender.send(webResourceInfo,
+				CacheResourceSender.CACHE_CONTROL_PUBLIC,
+				CacheResourceSender.ONE_MONTH_SECONDS, headers, request, response);
+	}
+
 	@Override
-	public void sendByUniqueName(String resourceUniqueName, HttpServletRequest request,
+	public void sendByVersionName(String versionName, HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 
-		Assert.hasText(resourceUniqueName, "Resource unique name should not empty.");
+		Assert.hasText(versionName, "Resource name should not empty.");
 		Assert.notNull(request);
 		Assert.notNull(response);
 		
-		// get resource
-		WebResourceInfo webResourceInfo = null;
-
 		try{
-			webResourceInfo = webResourceService.getResourceByUniqueName(
-				resourceUniqueName);
+			WebResourceInfo webResourceInfo = webResourceService.getResourceByVersionName(versionName);
+			send(webResourceInfo, request, response);
 		}catch(FileNotFoundException e){
 			response.sendError(HttpServletResponse.SC_NOT_FOUND,
 					"Resource not found");
-			return;
 		}
-
-		resourceSender.send(webResourceInfo, request, response);
 	}
 }

@@ -1,80 +1,100 @@
 package org.archboy.clobaframe.webresource.impl;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.archboy.clobaframe.webresource.AbstractWebResourceInfo;
+import org.archboy.clobaframe.webresource.LocationTransformResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
+import org.archboy.clobaframe.webresource.WebResourceManager;
 import org.springframework.util.Assert;
 
 /**
- * Replace "[[RESOURCE_NAME]]" in the script or style sheet with the
+ * Replace "url('...')" in the style sheet with the
  * actually resource location.
  *
  * @author yang
  */
-public class LocationReplacingWebResourceInfo implements WebResourceInfo{
+public class LocationTransformWebResourceInfo extends AbstractWebResourceInfo implements LocationTransformResource {
 
-	private final Logger logger = LoggerFactory.getLogger(LocationReplacingWebResourceInfo.class);
+	private final Logger logger = LoggerFactory.getLogger(LocationTransformWebResourceInfo.class);
 
+	private WebResourceManager webResourceManager;
 	private WebResourceInfo webResourceInfo;
-	private Map<String, String> locations;
-
-	private Date lastModified;
+	//private Map<String, String> locations;
+	
+	private String lastContentHash; // the underlay content hash
+	
+	//private long lastModified;
 	private byte[] content;
-	private String hash;
+	private String contentHash;
 
+	private Collection<String> referenceResourceNames;
+	
 	private static final String resourceNameRegex = "([\\/\\w\\.-]+)([^'\"\\)]*)";
 
-	private static final String placeHoldRegex = "\\[\\[" + resourceNameRegex + "\\]\\]";
-	private static final Pattern placeHoldPattern = Pattern.compile(placeHoldRegex);
+	//private static final String placeHoldRegex = "\\[\\[" + resourceNameRegex + "\\]\\]";
+	//private static final Pattern placeHoldPattern = Pattern.compile(placeHoldRegex);
 
-	private static final String cssUrlRegex = "url\\(['|\"]?" + resourceNameRegex + "['|\"]?\\)";
-	private static final Pattern cssUrlPattern = Pattern.compile(cssUrlRegex);
+	private static final String urlRegex = "url\\(['|\"]?" + resourceNameRegex + "['|\"]?\\)";
+	private static final Pattern urlPattern = Pattern.compile(urlRegex);
 
-	private boolean autoConvertCssUrl;
+	//private boolean autoConvertCssUrl;
 
-	public LocationReplacingWebResourceInfo(
-			WebResourceInfo webResourceInfo,
-			Map<String, String> locations, boolean autoConvertCssUrl) {
+	public LocationTransformWebResourceInfo(
+			WebResourceManager webResourceManager,
+			WebResourceInfo webResourceInfo) throws IOException{ //,
+			//Map<String, String> locations, boolean autoConvertCssUrl) {
 
+		Assert.notNull(webResourceManager);
 		Assert.notNull(webResourceInfo);
-		Assert.notNull(locations);
-
+		
+		this.webResourceManager = webResourceManager;
 		this.webResourceInfo = webResourceInfo;
-		this.locations = locations;
-		this.autoConvertCssUrl = autoConvertCssUrl;
-		buildSnapshot();
+//		this.locations = locations;
+//		this.autoConvertCssUrl = autoConvertCssUrl;
+		
+		addUnderlayWebResource(webResourceInfo);
+		
+		rebuild();
 	}
 
 	@Override
-	public String getHash() {
-		refresh();
-		return hash;
+	public String getContentHash() {
+		try{
+			rebuild();
+		}catch(IOException e){
+			// ignore
+		}
+		return contentHash;
 	}
 
 	@Override
 	public long getContentLength() {
-		refresh();
+		try{
+			rebuild();
+		}catch(IOException e){
+			// ignore
+		}
 		return content.length;
 	}
 
-	@Override
-	public String getUniqueName() {
-		return webResourceInfo.getUniqueName();
-	}
+//	@Override
+//	public String getUniqueName() {
+//		return webResourceInfo.getUniqueName();
+//	}
 
 	@Override
 	public String getMimeType() {
@@ -93,13 +113,13 @@ public class LocationReplacingWebResourceInfo implements WebResourceInfo{
 
 	@Override
 	public InputStream getContent() throws IOException {
-		refresh();
+		rebuild();
 		return new ByteArrayInputStream(content);
 	}
 
 	@Override
 	public InputStream getContent(long start, long length) throws IOException {
-		refresh();
+		rebuild();
 		return new ByteArrayInputStream(
 				content, (int)start, (int)length);
 	}
@@ -109,20 +129,21 @@ public class LocationReplacingWebResourceInfo implements WebResourceInfo{
 		return true;
 	}
 
-	private void refresh(){
-		buildSnapshot();
-	}
+//	private void refresh(){
+//		buildSnapshot();
+//	}
 
-	private void buildSnapshot(){
+	private void rebuild() throws IOException {
 
-		if (lastModified != null &&
-				webResourceInfo.getLastModified().getTime() - lastModified.getTime() <= 0){
-			// resource not changed
+		if (webResourceInfo.getContentHash().equals(lastContentHash)){
+			// resource does not changed
 			return;
 		}
 
-		this.lastModified = webResourceInfo.getLastModified();
+		lastContentHash = webResourceInfo.getContentHash();
 
+		referenceResourceNames = new ArrayList<String>();
+		
 		String text = null;
 		//ResourceContent resourceContent = null;
 		InputStream in = null;
@@ -136,51 +157,50 @@ public class LocationReplacingWebResourceInfo implements WebResourceInfo{
 			text = IOUtils.toString(reader);
 
 			// replace the css 'url' location.
-			if (autoConvertCssUrl) {
-				text = replaceLocation(cssUrlPattern, text);
-			}
+//			if (autoConvertCssUrl) {
+//				text = replaceLocation(urlPattern, text);
+//			}
 
 			// replace the location placehold.
-			text = replaceLocation(placeHoldPattern, text);
-
-		} catch (IOException e) {
-			logger.error("Fail to load web resource [{}].", webResourceInfo.getName());
+			text = replaceLocation(text);
 		} finally{
 			IOUtils.closeQuietly(in);
 		}
 
 		// convert text into input stream
-		this.content = text == null ? new byte[0]: text.getBytes(Charset.forName("utf-8"));
-		this.hash = DigestUtils.sha256Hex(content);
+		content = text.getBytes(Charset.forName("utf-8"));
+		contentHash = DigestUtils.sha256Hex(content);
 	}
 
 	/**
-	 * convert replacing locations
+	 * transform "url(...)" locations
 	 * @param text
 	 * @return
 	 */
-	private String replaceLocation(Pattern pattern, String text) throws FileNotFoundException {
+	private String replaceLocation(String text) throws FileNotFoundException {
 		StringBuffer builder = new StringBuffer();
-		Matcher matcher = pattern.matcher(text);
+		Matcher matcher = urlPattern.matcher(text);
 		while(matcher.find()){
 			String name = matcher.group(1);
 			String canonicalName = getCanonicalName(name);
 
-			String location = locations.get(canonicalName);
-			if (location != null){
+			referenceResourceNames.add(canonicalName);
+			
+			String location = webResourceManager.getLocation(canonicalName);
+			//if (location != null){
 
-				if (pattern == cssUrlPattern) {
+//				if (pattern == urlPattern) {
 					String group = matcher.group();
 					String result= group.replace(name, location);
 
 					matcher.appendReplacement(builder, result);
-				}else{
-					matcher.appendReplacement(builder, location);
-				}
-			}else{
-				// the specify resource can not be found.
-				matcher.appendReplacement(builder, matcher.group());
-			}
+//				}else{
+//					matcher.appendReplacement(builder, location);
+//				}
+//			}else{
+//				// the specify resource can not be found.
+//				matcher.appendReplacement(builder, matcher.group());
+//			}
 		}
 
 		matcher.appendTail(builder);
@@ -190,15 +210,18 @@ public class LocationReplacingWebResourceInfo implements WebResourceInfo{
 	}
 
 	/**
-	 * Remove the ./ ../ and /
-	 * @param pathName
+	 * Remove the "/", "./" and "../"
+	 * @param pathName the target path name
 	 * @return
 	 */
 	private String getCanonicalName(String pathName) throws FileNotFoundException {
+		
+		// remove "/"
 		if (pathName.startsWith("/")){
 			pathName = pathName.substring(1);
 		}
 
+		// remove "./"
 		if (pathName.startsWith("./")){
 			pathName = pathName.substring(2);
 		}
@@ -207,8 +230,10 @@ public class LocationReplacingWebResourceInfo implements WebResourceInfo{
 		int pathIdx = currentName.lastIndexOf('/');
 		String currentPath = pathIdx < 0 ? "":currentName.substring(0, pathIdx);
 
+		// remove "../" and back-forward the current path.
 		while(pathName.startsWith("../")){
 			if (currentPath.equals("")){
+				// has already reach the top of current path
 				throw new FileNotFoundException(pathName);
 			}
 
@@ -219,6 +244,11 @@ public class LocationReplacingWebResourceInfo implements WebResourceInfo{
 
 		return currentPath.equals("") ? pathName : currentPath + "/" + pathName;
 
+	}
+
+	@Override
+	public Collection<String> getReferenceResourceNames() {
+		return referenceResourceNames;
 	}
 
 }
