@@ -8,25 +8,30 @@ import java.util.Date;
 import java.util.List;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
+import org.archboy.clobaframe.webresource.AbstractWebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 
 /**
  *
  * @author yang
  */
-public class CompositeWebResourceInfo implements WebResourceInfo {
+public class ConcatenateWebResourceInfo extends AbstractWebResourceInfo {
 
 	private List<WebResourceInfo> webResourceInfos;
 	private String name;
 	private String mimeType;
 
-	public CompositeWebResourceInfo(
-			List<WebResourceInfo> resourceInfos, String name) {
-		this.webResourceInfos = resourceInfos;
+	public ConcatenateWebResourceInfo(
+			List<WebResourceInfo> webResourceInfos, String name) {
+		this.webResourceInfos = webResourceInfos;
 		this.name = name;
 		
 		// get the first resource mime type as the composite resource mime type.
-		this.mimeType = resourceInfos.get(0).getMimeType();
+		this.mimeType = webResourceInfos.get(0).getMimeType();
+		
+		for(WebResourceInfo info : webResourceInfos) {
+			addUnderlayWebResource(info);
+		}
 	}
 
 	@Override
@@ -57,13 +62,13 @@ public class CompositeWebResourceInfo implements WebResourceInfo {
 
 	@Override
 	public InputStream getContent() throws IOException {
-		byte[] data = getCompositeData();
+		byte[] data = getConcatenateData();
 		return new ByteArrayInputStream(data);
 	}
 
 	@Override
 	public InputStream getContent(long start, long length) throws IOException {
-		byte[] data = getCompositeData();
+		byte[] data = getConcatenateData();
 		return new ByteArrayInputStream(data, (int)start, (int)length);
 	}
 
@@ -92,7 +97,7 @@ public class CompositeWebResourceInfo implements WebResourceInfo {
 		return new Date(lastModified);
 	}
 
-	private byte[] getCompositeData() throws IOException {
+	private byte[] getConcatenateData() throws IOException {
 		
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		

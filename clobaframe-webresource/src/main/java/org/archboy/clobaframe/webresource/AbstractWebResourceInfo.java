@@ -1,8 +1,7 @@
 package org.archboy.clobaframe.webresource;
 
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -10,13 +9,13 @@ import java.util.List;
  */
 public abstract class AbstractWebResourceInfo implements WebResourceInfo {
 	
-	private List<String> underlayWebResourceInfoNames = new ArrayList<String>();
+	private Set<String> underlayWebResourceInfoNames = new HashSet<String>();
 	
 	protected void addUnderlayWebResource(WebResourceInfo webResourceInfo) {
 		underlayWebResourceInfoNames.add(webResourceInfo.getClass().getSimpleName());
 	}
 
-	public List<String> getUnderlayWebResourceInfoNames() {
+	public Set<String> getUnderlayWebResourceInfoNames() {
 		return underlayWebResourceInfoNames;
 	}
 	

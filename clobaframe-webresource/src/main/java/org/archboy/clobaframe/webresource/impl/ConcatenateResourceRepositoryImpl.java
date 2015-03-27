@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import org.archboy.clobaframe.webresource.*;
 import java.util.HashMap;
@@ -30,38 +31,30 @@ import org.springframework.util.CollectionUtils;
  * @author yang
  */
 @Named
-public class CompositeResourceRepositoryImpl implements CompositeResourceRepository {
+public class ConcatenateResourceRepositoryImpl implements ConcatenateResourceRepository {
 
-	private static final String ENV_KEY_COMPOSITE_CONFIG = "clobaframe.webresource.compositeConfig";
+	//private static final String ENV_KEY_CONCATENATE_WEB_RESOURCE_CONFIG = "clobaframe.webresource.concatenateConfig";
 	
-	//@Value("${clobaframe.webresource.compositeConfig}")
-	//private String compositeConfig;
+	@Value("${clobaframe.webresource.concatenateConfig}")
+	private String concatenateConfig;
 	
 	@Inject
 	private ResourceLoader resourceLoader;
 		
 	@Inject
-	private Environment environment;
-	
-	@Inject
 	private List<ResourceRepository> resourceRepositories;
 	
-	private Map<String, List<String>> composites = new HashMap<String, List<String>>();
+	private Map<String, List<String>> concatenates = new HashMap<String, List<String>>();
 
 	@PostConstruct
 	public void init() throws IOException {
-
-		if (!environment.containsProperty(ENV_KEY_COMPOSITE_CONFIG)){
-			return;
-		}
 		
-		String compositeConfig = environment.getProperty(ENV_KEY_COMPOSITE_CONFIG);
-		Resource resource = resourceLoader.getResource(compositeConfig);
+		Resource resource = resourceLoader.getResource(concatenateConfig);
 		File rootDir = resource.getFile();
 		if (!rootDir.exists()){
 			throw new FileNotFoundException(String.format(
 					"Can not find the composite config file [%s].",
-					compositeConfig));
+					concatenateConfig));
 		}
 
 //		logger.debug("Scan web resource folder [{}].", rootDir.getAbsolutePath());
@@ -84,24 +77,51 @@ public class CompositeResourceRepositoryImpl implements CompositeResourceReposit
 		for(Object keyObj : properties.keySet()){
 			String key = keyObj.toString();
 			String values = properties.getProperty(key);
-			composites.put(key, Arrays.asList(values.split(",")));
+			concatenates.put(key, Arrays.asList(values.split(",")));
 		}
 		
 	}
 
 	@Override
 	public WebResourceInfo getByName(String name) {
-		if (composites.containsKey(name)){
-			List<String> names = composites.get(name);
-			List<WebResourceInfo> webResourceInfos = new ArrayList<WebResourceInfo>(names.size());
-			for(String n : names){
-				webResourceInfos.add(getResourceFromRepositories(n));
-			}
-			return new CompositeWebResourceInfo(webResourceInfos, name);
+		if (concatenates.containsKey(name)){
+			return getConcatenateWebResourceInfo(name);
 		}else{
 			return getResourceFromRepositories(name);
 		}
 	}
+
+	private WebResourceInfo getConcatenateWebResourceInfo(String name) {
+		List<String> names = concatenates.get(name);
+		List<WebResourceInfo> webResourceInfos = new ArrayList<WebResourceInfo>(names.size());
+		for(String n : names){
+			webResourceInfos.add(getResourceFromRepositories(n));
+		}
+		return new ConcatenateWebResourceInfo(webResourceInfos, name);
+	}
+
+	private List<WebResourceInfo> getAllConcatenates() {
+		List<WebResourceInfo> webResourceInfos = new ArrayList<WebResourceInfo>();
+		for(String name : concatenates.keySet()) {
+			webResourceInfos.add(getConcatenateWebResourceInfo(name));
+		}
+		return webResourceInfos;
+	}
+
+	
+	@Override
+	public Collection<WebResourceInfo> getAll() {
+		List<WebResourceInfo> webResourceInfos = new ArrayList<WebResourceInfo>();
+		
+		for (ResourceRepository resourceRepository : resourceRepositories){
+			webResourceInfos.addAll(resourceRepository.getAll());
+		}
+			
+		webResourceInfos.addAll(getAllConcatenates());
+		
+		return webResourceInfos;
+	}
+	
 	
 	private WebResourceInfo getResourceFromRepositories(String name){
 		WebResourceInfo webResourceInfo = null;

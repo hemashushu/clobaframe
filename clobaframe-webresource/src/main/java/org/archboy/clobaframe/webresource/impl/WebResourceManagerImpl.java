@@ -2,6 +2,7 @@ package org.archboy.clobaframe.webresource.impl;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -11,7 +12,7 @@ import javax.inject.Named;
 import org.archboy.clobaframe.webresource.AbstractVersionStrategy;
 import org.archboy.clobaframe.webresource.CacheableResource;
 import org.archboy.clobaframe.webresource.CacheableResourceUpdateListener;
-import org.archboy.clobaframe.webresource.CompositeResourceRepository;
+import org.archboy.clobaframe.webresource.ConcatenateResourceRepository;
 import org.archboy.clobaframe.webresource.ResourceCollection;
 import org.archboy.clobaframe.webresource.VersionStrategy;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
@@ -42,7 +43,7 @@ public class WebResourceManagerImpl implements WebResourceManager, CacheableReso
 	private ResourceCollection resourceCollection;
 	
 	@Inject
-	private CompositeResourceRepository compositeResourceRepository;
+	private ConcatenateResourceRepository concatenateResourceRepository;
 	
 
 	
@@ -52,15 +53,10 @@ public class WebResourceManagerImpl implements WebResourceManager, CacheableReso
 //	// the default location generator
 //	private ResourceLocationGenerator locationGenerator;
 	
-	private String MIME_TYPE_STYLE_SHEET = "text/css";
-	
-	// the content types that can be compressed.
-	private List<String> textWebResourceMimeTypes = Arrays.asList(
-			"text/css", // style sheet
-			"text/javascript", // javascript, IE
-			"application/x-javascript", // javascript, obsolete, but widely used
-			"application/javascript" // javascript, standard 
-	);
+	// the content types that can be compressed and minify.
+	private List<String> textWebResourceMimeTypes; // = Arrays.asList(
+//		MIME_TYPE_JAVA_SCRIPT, MIME_TYPE_STYLE_SHEET
+//	);
 
 	@Value("${clobaframe.webresource.minify}")
 	private boolean canMinify;
@@ -119,6 +115,10 @@ public class WebResourceManagerImpl implements WebResourceManager, CacheableReso
 		}
 		
 		logger.info("Using [{}] web resource version name strategy.", versionStrategyName);
+		
+		textWebResourceMimeTypes = new ArrayList<String>();
+		textWebResourceMimeTypes.add(MIME_TYPE_STYLE_SHEET);
+		textWebResourceMimeTypes.addAll(MIME_TYPE_JAVA_SCRIPT);
 		
 		//loadFunctionWrapper = new CompositeResourceRepositoryImpl.DefaultWebResourceLoadFunctionWrapper(this);
 	}
@@ -251,7 +251,7 @@ public class WebResourceManagerImpl implements WebResourceManager, CacheableReso
 		}
 		
 		// then load from composites and repository
-		resourceInfo = compositeResourceRepository.getByName(name);
+		resourceInfo = concatenateResourceRepository.getByName(name);
 		
 		if (resourceInfo == null) {
 			return null;
@@ -266,7 +266,7 @@ public class WebResourceManagerImpl implements WebResourceManager, CacheableReso
 		
 		// minify
 		if (canMinify && textWebResourceMimeTypes.contains(resourceInfo.getMimeType())) {
-			// resourceInfo = new Mini
+			resourceInfo = new MinifyWebResourceInfo(resourceInfo);
 		}
 		
 		// compress

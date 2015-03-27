@@ -1,6 +1,7 @@
 package org.archboy.clobaframe.webresource.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import org.archboy.clobaframe.webresource.*;
 import java.util.List;
 import javax.inject.Inject;
@@ -39,5 +40,10 @@ public class VirtualResourceRepositoryImpl extends AbstractResourceRepository im
 	@Override
 	public void addProvider(VirtualResourceProvider provider) {
 		virtualResourceProviders.add(provider);
+	}
+
+	@Override
+	public Collection<WebResourceInfo> getAll() {
+		return new ArrayList<WebResourceInfo>();
 	}
 }

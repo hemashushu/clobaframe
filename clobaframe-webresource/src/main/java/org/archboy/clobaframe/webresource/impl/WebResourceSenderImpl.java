@@ -4,19 +4,16 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.archboy.clobaframe.io.http.CacheResourceSender;
-import org.archboy.clobaframe.io.http.ResourceSender;
 import org.archboy.clobaframe.webresource.AbstractWebResourceInfo;
 import org.archboy.clobaframe.webresource.CompressableResource;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
-import org.archboy.clobaframe.webresource.WebResourceSender;
 import org.archboy.clobaframe.webresource.WebResourceManager;
+import org.archboy.clobaframe.webresource.WebResourceSender;
 import org.springframework.util.Assert;
 
 /**
@@ -53,11 +50,12 @@ public class WebResourceSenderImpl implements WebResourceSender{
 	private void send(WebResourceInfo webResourceInfo, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Map<String, Object> headers = new HashMap<String, Object>();
 		
-		if (webResourceInfo instanceof AbstractWebResourceInfo) {
-			if (((AbstractWebResourceInfo)webResourceInfo).getUnderlayWebResourceInfoNames()
-					.contains("CompressableResource")){
-				headers.put("Content-Encoding", "gzip");
-			}
+		if (webResourceInfo instanceof CompressableResource ||
+			(webResourceInfo instanceof AbstractWebResourceInfo &&
+				((AbstractWebResourceInfo)webResourceInfo).getUnderlayWebResourceInfoNames()
+					.contains("CompressableResource"))){
+			
+			headers.put("Content-Encoding", "gzip");
 		}
 		
 		cacheResourceSender.send(webResourceInfo,

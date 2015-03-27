@@ -5,22 +5,22 @@
 }
 
 .info {
-	background: url('image/info-32.png') no-repeat 0px 0px;
+	background: url('image/info-32.png') no-repeat 0px 0px; /* url with path */
 }
 
 .success {
-	background: url(image/success-16.png) no-repeat 0px 0px;
+	background: url(image/success-16.png) no-repeat 0px 0px; /* url without single/double quote mark */
 }
 
 .warn {
-	background: url("image/warn-16.png") no-repeat 0px 0px;
+	background: url("image/warn-16.png") no-repeat 0px 0px; /* url with double quote mark */
 }
 
 @font-face {
   font-family: 'FontAwesome';
-  src: url('../fonts/fontawesome-webfont.eot?v=4.2.0'); /* IE9 Compat Modes */
-  src: url('../fonts/fontawesome-webfont.eot?#iefix&v=4.2.0') format('embedded-opentype'), /* IE6-IE8, with url bug (in IE) fix*/
-	  url('../fonts/fontawesome-webfont.woff?v=4.2.0') format('woff'), /* Modern Browsers */
-	  url('../fonts/fontawesome-webfont.ttf?v=4.2.0') format('truetype'),  /* Safari, Android, iOS */
-	  url('../fonts/fontawesome-webfont.svg?v=4.2.0#fontawesomeregular') format('svg'); /* Legacy iOS */
+  src: url('fonts/fontawesome-webfont.eot?v=4.2.0'); /* IE9 Compat Modes */
+  src: url('fonts/fontawesome-webfont.eot?#iefix&v=4.2.0') format('embedded-opentype'), /* IE6-IE8, with url bug (in IE) fix*/
+	  url('fonts/fontawesome-webfont.woff?v=4.2.0') format('woff'), /* Modern Browsers */
+	  url('/fonts/fontawesome-webfont.ttf?v=4.2.0') format('truetype'),  /* Safari, Android, iOS */
+	  url('./fonts/fontawesome-webfont.svg?v=4.2.0#fontawesomeregular') format('svg'); /* Legacy iOS */
 }

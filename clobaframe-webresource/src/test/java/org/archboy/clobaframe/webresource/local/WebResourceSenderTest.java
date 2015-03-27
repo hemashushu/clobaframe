@@ -55,12 +55,8 @@ public class WebResourceSenderTest {
 		server.setHandler(context);
 
 		ServletHolder servletHolder1 = new ServletHolder(
-				new WebResourceSenderServlet(resourceSender, false));
-		context.addServlet(servletHolder1,"/get");
-
-		ServletHolder servletHolder2 = new ServletHolder(
-				new WebResourceSenderServlet(resourceSender, true));
-		context.addServlet(servletHolder2,"/getByUniqueName");
+				new WebResourceSenderServlet(resourceSender));
+		context.addServlet(servletHolder1,"/resource/*");
 
 		server.start();
 	}
@@ -75,12 +71,11 @@ public class WebResourceSenderTest {
 	public void testSend() throws FileNotFoundException {
 
 		WebResourceInfo webResource1 = resourceManager.getResource("test.png");
-		//WebResourceInfo webResource1 = resourceService.getResource("test.css");
 
 		CloseableHttpClient client = HttpClients.createDefault();
 
 		// test get by resource name
-		HttpGet method1 = new HttpGet("http://localhost:18080/get?name=" + webResource1.getName());
+		HttpGet method1 = new HttpGet("http://localhost:18080/resource/test.png");
 
 		try {
 			assertResponseContentEquals(client, method1, webResource1);
@@ -88,23 +83,15 @@ public class WebResourceSenderTest {
 			fail(e.getMessage());
 		}
 
-//		// test get by resource unique name
-//		HttpGet method2 = new HttpGet("http://localhost:18080/getByUniqueName?name=" + webResource1.getUniqueName());
-//		try {
-//			assertResponseContentEquals(client, method2, webResource1);
-//		} catch (IOException e) {
-//			fail(e.getMessage());
-//		}
-
 		// test none exists resource
-		HttpGet method3 = new HttpGet("http://localhost:18080/get?name=noneExists");
+		HttpGet method3 = new HttpGet("http://localhost:18080/resource/none-exists");
 		try {
 			assertStatusCodeEquals(client, method3, HttpStatus.SC_NOT_FOUND);
 		} catch (IOException e) {
 			fail(e.getMessage());
 		}
 		
-		// test get by resource location
+		// test get by resource name with version number
 		String location1 = resourceManager.getLocation(webResource1);
 		HttpGet method4 = new HttpGet("http://localhost:18080" + location1);
 		try {
@@ -113,28 +100,22 @@ public class WebResourceSenderTest {
 			fail(e.getMessage());
 		}
 		
-		
 		IOUtils.closeQuietly(client);
 	}
 
-	public void testSendByUniqueName() {
+	public void testSendByVersionName() {
 		//
 	}
 
 	private void assertResponseContentEquals(CloseableHttpClient client, HttpGet method, byte[] data)
 			throws IllegalStateException, IOException {
 		CloseableHttpResponse response = client.execute(method);
-		//int statusCode = response.getStatusLine().getStatusCode();
-		//assertEquals(HttpStatus.SC_PARTIAL_CONTENT, statusCode);
-		//assertEquals(2, response.getEntity().getContentLength());
 		assertArrayEquals(data, EntityUtils.toByteArray(response.getEntity()));
-		
 		response.close();
 	}
 
 	private void assertResponseContentEquals(CloseableHttpClient client, HttpGet method, WebResourceInfo resourceInfo) throws IOException {
-		//ResourceContent resourceContent = resourceInfo.getContentSnapshot();
-		InputStream in = resourceInfo.getContent(); // resourceContent.getInputStream();
+		InputStream in = resourceInfo.getContent();
 		byte[] content = IOUtils.toByteArray(in);
 		in.close();
 
@@ -159,22 +140,19 @@ public class WebResourceSenderTest {
 		private static final long serialVersionUID = 1L;
 
 		private WebResourceSender webResourceSender;
-		private boolean byUniqueName;
 
-		public WebResourceSenderServlet(WebResourceSender webResourceSender, boolean byUniqueName) {
+		public WebResourceSenderServlet(WebResourceSender webResourceSender) {
 			this.webResourceSender = webResourceSender;
-			this.byUniqueName = byUniqueName;
 		}
 
 		@Override
 		protected void doGet(HttpServletRequest request, HttpServletResponse response)
 				throws ServletException, IOException {
-			String name = request.getParameter("name");
-			if (byUniqueName) {
-				webResourceSender.sendByVersionName(name, request, response);
-			}else{
-				webResourceSender.send(name, request, response);
-			}
+			String name = request.getPathInfo();
+			String version = request.getQueryString();
+			String versionName = (version == null ? name : name + "?" + version);
+			
+			webResourceSender.sendByVersionName(versionName, request, response);
 		}
 	}
 }

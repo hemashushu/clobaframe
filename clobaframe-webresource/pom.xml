@@ -173,5 +173,20 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- javascript and style sheet minify -->
+		<dependency>            
+			<groupId>com.yahoo.platform.yui</groupId>
+			<artifactId>yuicompressor</artifactId>
+			<version>2.4.8</version>
+		</dependency>
+		
+		<!-- javascript optimizer -->
+		<!--
+		<dependency>
+			<groupId>com.google.javascript</groupId>
+			<artifactId>closure-compiler</artifactId>
+			<version>v20150315</version>
+		</dependency>
+		-->
 	</dependencies>
 </project>

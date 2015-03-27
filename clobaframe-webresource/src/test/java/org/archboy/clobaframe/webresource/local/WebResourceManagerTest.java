@@ -9,22 +9,21 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.apache.commons.io.IOUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import javax.inject.Inject;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceManager;
-import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  *
@@ -51,120 +50,104 @@ public class WebResourceManagerTest {
 
 	}
 
-//	@Test
-//	public void testGetAllResources() {
-//		// test get all resources
-//
-//		// note: can not assume/assert the collection items count because
-//		// it may be exists web resource files before test.
-//		Collection<WebResourceInfo> webResources = resourceManager.getAllResources();
-//
-//		List<String> names = new ArrayList<String>();
-//		for(WebResourceInfo webResource : webResources){
-//			names.add(webResource.getName());
-//		}
-//
-//		assertTrue(names.contains("test.css"));
-//		assertTrue(names.contains("test.js"));
-//		assertTrue(names.contains("test.png"));
-//		assertTrue(names.contains("test.txt"));
-//		assertTrue(names.contains("image/info-32.png"));
-//
-//		// check combine web resource
-//		assertTrue(names.contains("css/cob-t3-t4.css"));
-//		assertTrue(names.contains("css/cob-t3-t4-t5.css"));
-//	}
+	@Test
+	public void testGetAllResources() throws FileNotFoundException {
+		// test get all resources
 
-//	@Test
-//	public void testGetResource() throws IOException {
-//		// test get a resource
-//		WebResourceInfo webResource1 = resourceManager.getResource("test.css");
-//		WebResourceInfo webResource2 = resourceManager.getResource("test.png");
-//		WebResourceInfo webResource3 = resourceManager.getResource("image/info-32.png");
-//		WebResourceInfo webResource4 = resourceManager.getResource("image/success-16.png");
-//		WebResourceInfo webResource5 = resourceManager.getResource("fonts/glyphicons-halflings-regular.ttf");
-//		WebResourceInfo webResource6 = resourceManager.getResource("fonts/glyphicons-halflings-regular.svg");
-//		WebResourceInfo webResource7 = resourceManager.getResource("fonts/glyphicons-halflings-regular.eot");
-//
-//		assertNotNull(webResource1.getUniqueName());
-//		assertNotNull(resourceManager.getLocation(webResource1));
-//		assertEquals("text/css", webResource1.getMimeType());
-//		
-//		// test get location by name
-//		String location1 = resourceManager.getLocation("test.css");
-//		assertEquals(resourceManager.getLocation(webResource1), location1);
-//
-//		// test the content
-//		assertResourceContentEquals(webResource2, "sample/web/test.png");
-//		assertResourceContentEquals(webResource3, "sample/web/image/info-32.png");
-//
-//		// test get a content-replacing resource, this test is optional
-//		InputStream in1 = webResource1.getInputStream();
-//		String text1 = IOUtils.toString(in1);
-//
-//		assertTrue(text1.indexOf(resourceManager.getLocation(webResource2)) > 0);
-//		assertTrue(text1.indexOf(resourceManager.getLocation(webResource3)) > 0);
-//		assertTrue(text1.indexOf(resourceManager.getLocation(webResource4)) > 0);
-//		assertTrue(text1.indexOf(resourceManager.getLocation(webResource5)) > 0);
-//		assertTrue(text1.indexOf(resourceManager.getLocation(webResource6)) > 0);
-//		assertTrue(text1.indexOf(resourceManager.getLocation(webResource7)) > 0);
-//		in1.close();
-//
-//		// test get a content-replacing resource with relate folder url.
-//		WebResourceInfo webResource11 = resourceManager.getResource("css/test2.css");
-//		WebResourceInfo webResource12 = resourceManager.getResource("css/test3.css");
-//
-//		// test get a content-replacing resource with relate folder url. this test is optional
-//		InputStream in11 = webResource11.getInputStream();
-//		String text11 = IOUtils.toString(in11);
-//		assertTrue(text11.indexOf(resourceManager.getLocation(webResource12)) > 0);
-//		assertTrue(text11.indexOf(resourceManager.getLocation(webResource3)) > 0);
-//		in11.close();
-//
-//		// test get none exists
-//		try{
-//			resourceManager.getResource("noneExists.png");
-//			fail();
-//		}catch(FileNotFoundException e){
-//			// pass
-//		}
-//	}
-//
-//	@Test
-//	public void testGetCompositeResource() throws IOException {
-//		WebResourceInfo webResource1 = resourceManager.getResource("css/cob-t3-t4.css");
-//		WebResourceInfo webResource2 = resourceManager.getResource("css/cob-t3-t4-t5.css");
-//
-//		// test the content
-//		assertTextResourceContentEquals(webResource1, "/* test3.css */\n/* test4.css */");
-//		assertTextResourceContentEquals(webResource2, "/* test3.css */\n/* test4.css */\n/* test5.css */");
-//	}
-//
-//	@Test
-//	public void testGetResourceByVersionName() throws FileNotFoundException {
-//		// test get by unique name
-//		WebResourceInfo webResource1 = resourceManager.getResource("test.png");
-//		String uniqueName1 = webResource1.getUniqueName();
-//
-//		WebResourceInfo webResource2 = resourceManager.getResourceByUniqueName(uniqueName1);
-//
-//		assertEquals(webResource1.getName(), webResource2.getName());
-//		assertEquals(uniqueName1, webResource2.getUniqueName());
-//
-//		// test get none exists
-//		try{
-//			resourceManager.getResourceByUniqueName("noneExists");
-//			fail();
-//		}catch(FileNotFoundException e){
-//			// pass
-//		}
-//	}
+		String[] names = new String[]{
+			"test.css", "test.js", "test.png",
+			"css/test2.css", "css/test3.css", "css/test4.css", "css/test5.css",
+			"fonts/fontawesome-webfont.eot","fonts/fontawesome-webfont.svg","fonts/fontawesome-webfont.ttf","fonts/fontawesome-webfont.woff",
+			"image/info-32.png", "image/success-16.png", "image/warn-16.png",
+			"css/concat-34.css", "css/concat-345.css"
+		};
+		
+		List<WebResourceInfo> infos = new ArrayList<WebResourceInfo>();
+		for (String name : names) {
+			WebResourceInfo webResourceInfo = webResourceManager.getResource(name);
+			assertTrue(webResourceInfo.getContentLength() > 0);
+		}
+		
+	}
+
+	@Test
+	public void testGetResource() throws IOException {
+		// test get a resource
+		WebResourceInfo webResource1 = webResourceManager.getResource("test.css");
+		WebResourceInfo webResource2 = webResourceManager.getResource("test.png");
+
+		assertNotNull(webResource1.getContentHash());
+		assertTrue(webResource1.getContentLength() > 0);
+		assertNotNull(webResource1.getLastModified());
+		assertEquals("text/css", webResource1.getMimeType());
+		assertEquals("test.css", webResource1.getName());
+		
+		// test get location
+		String location1 = webResourceManager.getLocation(webResource1);
+		assertEquals("/resource/test.css", location1.substring(0, location1.indexOf('?')));
+		assertEquals(location1, webResourceManager.getLocation("test.css"));
+	
+		// test get by version name
+		String versionName1 =location1.substring(location1.lastIndexOf('/') + 1);
+		WebResourceInfo webResourceByVersionName1 = webResourceManager.getResourceByVersionName(versionName1);
+		assertEquals(webResource1, webResourceByVersionName1);
+		
+		// test the content
+		assertResourceContentEquals(webResource2, "sample/web/test.png");
+
+		// test location transform
+		InputStream in1 = webResource1.getContent();
+		String text1 = IOUtils.toString(in1);
+		in1.close();
+		
+		String[] linkNames1 = new String[]{"test.png",
+		"image/info-32.png", "image/success-16.png","image/warn-16.png", 
+		"fonts/fontawesome-webfont.eot", "fonts/fontawesome-webfont.woff", "fonts/fontawesome-webfont.ttf", "fonts/fontawesome-webfont.svg"};
+
+		for(String name : linkNames1){
+			assertTrue(text1.indexOf(webResourceManager.getLocation(name)) > 0);
+		}
+
+		// test location transform, with relative path
+		WebResourceInfo webResource3 = webResourceManager.getResource("css/test2.css");
+		InputStream in2 = webResource3.getContent();
+		String text2 = IOUtils.toString(in2);
+		in2.close();
+		
+		String[] linkNames2 = new String[]{"css/test3.css","image/info-32.png"};
+		
+		for(String name : linkNames2){
+			assertTrue(text2.indexOf(webResourceManager.getLocation(name)) > 0);
+		}
+
+		// test get none-exists resource
+		try{
+			webResourceManager.getResource("none-exists");
+			fail();
+		}catch(FileNotFoundException e){
+			// pass
+		}
+	}
+
+	@Test
+	public void testGetConcatenateResource() throws IOException {
+		WebResourceInfo webResource1 = webResourceManager.getResource("css/concat-34.css");
+		WebResourceInfo webResource2 = webResourceManager.getResource("css/concat-345.css");
+
+		String text1 = IOUtils.toString( webResourceManager.getResource("css/test3.css").getContent());
+		String text2 = IOUtils.toString( webResourceManager.getResource("css/test4.css").getContent());
+		String text3 = IOUtils.toString( webResourceManager.getResource("css/test5.css").getContent());
+		
+		// test the content
+		assertTextResourceContentEquals(webResource1, text1 + "\n" + text2);
+		assertTextResourceContentEquals(webResource2, text1 + "\n" + text2 + "\n" + text3);
+	}
 
 	public void testGetLocation(){
 		//
 	}
 
-	public void testGetLocationWithObject(){
+	public void testGetLocationWithWebResourceInfoObject(){
 		//
 	}
 
@@ -179,8 +162,7 @@ public class WebResourceManagerTest {
 	}
 
 	private void assertResourceContentEquals(WebResourceInfo resourceInfo, byte[] data) throws IOException {
-		//ResourceContent resourceContent = resourceInfo.getContentSnapshot();
-		InputStream in = resourceInfo.getContent(); // resourceContent.getInputStream();
+		InputStream in = resourceInfo.getContent();
 		byte[] content = IOUtils.toByteArray(in);
 		in.close();
 
@@ -214,4 +196,3 @@ public class WebResourceManagerTest {
 	}	
 
 }
-

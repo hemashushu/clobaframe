@@ -56,15 +56,15 @@ public class DefaultVersionStrategyTest {
 		WebResourceInfo webResourceInfo4 = new TestWebResourceInfo("webfont.eof?#iefix&v=4.2.0");
 		WebResourceInfo webResourceInfo5 = new TestWebResourceInfo("webfont.eof?v=4.2.0#iefix");
 		
-		assertEquals("webfont.eof?01234567", 
+		assertEquals("webfont.eof?v01234567", 
 				versionStrategy.getVersionName(webResourceInfo1));
-		assertEquals("webfont.eof?01234567&v=4.2.0", 
+		assertEquals("webfont.eof?v01234567&v=4.2.0", 
 				versionStrategy.getVersionName(webResourceInfo2));
-		assertEquals("webfont.eof?01234567#iefix", 
+		assertEquals("webfont.eof?v01234567#iefix", 
 				versionStrategy.getVersionName(webResourceInfo3));
-		assertEquals("webfont.eof?01234567#iefix&v=4.2.0", 
+		assertEquals("webfont.eof?v01234567#iefix&v=4.2.0", 
 				versionStrategy.getVersionName(webResourceInfo4));
-		assertEquals("webfont.eof?01234567&v=4.2.0#iefix", 
+		assertEquals("webfont.eof?v01234567&v=4.2.0#iefix", 
 				versionStrategy.getVersionName(webResourceInfo5));
 	}
 	

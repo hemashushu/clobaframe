@@ -1,30 +1,39 @@
 package org.archboy.clobaframe.webresource.impl;
 
+import com.yahoo.platform.yui.compressor.CssCompressor;
+import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.zip.GZIPOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.webresource.AbstractWebResourceInfo;
 import org.archboy.clobaframe.webresource.CompressableResource;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
+import org.archboy.clobaframe.webresource.WebResourceManager;
 import org.springframework.util.Assert;
 
 /**
- * Compressed resource.
+ * Minify resource.
  *
  * @author yang
  */
-public class CompressWebResourceInfo extends AbstractWebResourceInfo implements CompressableResource {
+public class MinifyWebResourceInfo extends AbstractWebResourceInfo {
 
 	private WebResourceInfo webResourceInfo;
 	private String lastContentHash;
 	private byte[] content;
 
 
-	public CompressWebResourceInfo(WebResourceInfo webResourceInfo) throws IOException{
+	public MinifyWebResourceInfo(WebResourceInfo webResourceInfo) throws IOException{
 		Assert.notNull(webResourceInfo);
 		this.webResourceInfo = webResourceInfo;
 		addUnderlayWebResource(webResourceInfo);
@@ -94,20 +103,33 @@ public class CompressWebResourceInfo extends AbstractWebResourceInfo implements 
 		try{
 			in = webResourceInfo.getContent();
 			out = new ByteArrayOutputStream();
-			GZIPOutputStream gzipOut = new GZIPOutputStream(out);
-			IOUtils.copy(in, gzipOut);
-			gzipOut.close();
+			Reader reader = new InputStreamReader(in, Charset.forName("UTF-8"));
+			Writer writer = new OutputStreamWriter(out, Charset.forName("UTF-8"));
+					
+			if (webResourceInfo.getMimeType().equals(WebResourceManager.MIME_TYPE_STYLE_SHEET)){
+				// style sheet
+				CssCompressor compressor = new CssCompressor(reader);
+				compressor.compress(writer, 1024);
+			}else if(WebResourceManager.MIME_TYPE_JAVA_SCRIPT.contains(webResourceInfo.getMimeType())){
+				// javascript
+				JavaScriptCompressor compressor = new JavaScriptCompressor(reader, null);
+				compressor.compress(writer, 1024, true, false, false, true);
+				
+			}else{
+				throw new IllegalArgumentException(
+						String.format(
+								"Can not minify this mime type [%s]", 
+								webResourceInfo.getMimeType()));
+			}
+			
+			writer.flush();
+			
 		} finally{
 			IOUtils.closeQuietly(in);
 			IOUtils.closeQuietly(out);
 		}
 
 		this.content = out.toByteArray();
-	}
-
-	@Override
-	public String getCompressAlgorithm() {
-		return "gzip";
 	}
 
 }

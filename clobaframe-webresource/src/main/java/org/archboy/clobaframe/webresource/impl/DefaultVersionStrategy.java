@@ -1,8 +1,10 @@
 package org.archboy.clobaframe.webresource.impl;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Named;
 import org.archboy.clobaframe.webresource.AbstractVersionStrategy;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  *
@@ -11,16 +13,29 @@ import org.archboy.clobaframe.webresource.WebResourceInfo;
 @Named
 public class DefaultVersionStrategy extends AbstractVersionStrategy {
 
+	@Value("${clobaframe.webresource.baseLocation}")
+	private String baseLocation;
+	
+	private String concatMark = "?";
+	
 	@Override
 	public String getName() {
 		return "default";
+	}
+	
+	@PostConstruct
+	public void init(){
+		// the base location already has the query mark.
+		if (baseLocation.indexOf('?') > 0) {
+			concatMark = "&";
+		}
 	}
 
 	@Override
 	public String getVersionName(WebResourceInfo webResourceInfo) {
 		String name = webResourceInfo.getName();
 		String contentHash = webResourceInfo.getContentHash();
-		String shortContentHash = contentHash.substring(0, 8); // take the first 8 characters
+		String shortContentHash = "v" + contentHash.substring(0, 8); // take the first 8 characters
 		
 		/**
 		 * The name maybe includes the query and url hash.
@@ -38,22 +53,25 @@ public class DefaultVersionStrategy extends AbstractVersionStrategy {
 		if (queryPos == -1) {
 			//name += "?" + shortHash;
 			builder.append(name);
-			builder.append("?");
+			builder.append(concatMark);
 			builder.append(shortContentHash);
 		}else{
 			if (queryPos == name.length() - 1){
 				//name += shortHash;
-				builder.append(name);
+				builder.append(name.substring(0, queryPos));
+				builder.append(concatMark);
 				builder.append(shortContentHash);
 			}else{
 				if (name.charAt(queryPos + 1) == '#') {
 					//name = name.substring(0, queryPos + 1) + shortHash + name.substring(queryPos + 1);
-					builder.append(name.substring(0, queryPos + 1));
+					builder.append(name.substring(0, queryPos));
+					builder.append(concatMark);
 					builder.append(shortContentHash);
 					builder.append(name.substring(queryPos + 1));
 				}else{
 					//name = name.substring(0, queryPos + 1) + shortHash + "&" + name.substring(queryPos + 1);
-					builder.append(name.substring(0, queryPos + 1));
+					builder.append(name.substring(0, queryPos));
+					builder.append(concatMark);
 					builder.append(shortContentHash);
 					builder.append("&");
 					builder.append(name.substring(queryPos + 1));
@@ -66,7 +84,7 @@ public class DefaultVersionStrategy extends AbstractVersionStrategy {
 
 	@Override
 	public String revert(String versionName) {
-		int queryPos = versionName.indexOf('?');
-		return versionName.substring(0, queryPos);
+		int queryPos = versionName.lastIndexOf('?');
+		return (queryPos > 0 ? versionName.substring(0, queryPos) : versionName);
 	}
 }
