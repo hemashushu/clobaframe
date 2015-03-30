@@ -177,7 +177,8 @@
 		<dependency>            
 			<groupId>com.yahoo.platform.yui</groupId>
 			<artifactId>yuicompressor</artifactId>
-			<version>2.4.8</version>
+			<version>2.4.7</version>
+			<!-- 2.4.8 has an error while the javascript file is empty (only comments or new-line symbols) -->
 		</dependency>
 		
 		<!-- javascript optimizer -->

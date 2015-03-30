@@ -15,7 +15,7 @@ public interface VersionStrategy {
 	String getVersionName(WebResourceInfo webResourceInfo);
 	
 	/**
-	 * Revert version name to resource name.
+	 * Revert version name into resource name.
 	 * 
 	 * @param versionName
 	 * @return 

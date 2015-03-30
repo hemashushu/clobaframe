@@ -30,13 +30,13 @@ public class ConcatenateWebResourceInfo extends AbstractWebResourceInfo {
 		this.mimeType = webResourceInfos.get(0).getMimeType();
 		
 		for(WebResourceInfo info : webResourceInfos) {
-			addUnderlayWebResource(info);
+			addUnderlayWebResourceType(info);
 		}
 	}
 
 	@Override
 	public String getContentHash() {
-		// only hash all source hash values
+		// only hash all source hash values, not hash the source content itself, to increase compute speed.
 		StringBuilder builder = new StringBuilder(webResourceInfos.size());
 		for (WebResourceInfo webResourceInfo : webResourceInfos) {
 			builder.append(webResourceInfo.getContentHash());
@@ -52,7 +52,8 @@ public class ConcatenateWebResourceInfo extends AbstractWebResourceInfo {
 			length += resourceInfo.getContentLength();
 		}
 		
-		return length + webResourceInfos.size() - 1; // because of adding the '\n' symbol between each resource.
+		// because of adding the '\n' symbol between each resource, so add the (size - 1).
+		return length + webResourceInfos.size() - 1; 
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package org.archboy.clobaframe.webresource.local;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -8,9 +9,14 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
+import org.archboy.clobaframe.webresource.AbstractWebResourceInfo;
+import org.archboy.clobaframe.webresource.VirtualResourceProvider;
+import org.archboy.clobaframe.webresource.VirtualResourceRepository;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceManager;
 import org.junit.After;
@@ -35,6 +41,9 @@ public class WebResourceManagerTest {
 
 	@Inject
 	private WebResourceManager webResourceManager;
+	
+	@Inject
+	private VirtualResourceRepository virtualResourceRepository;
 	
 	@Inject
 	private ResourceLoader resourceLoader;
@@ -62,7 +71,7 @@ public class WebResourceManagerTest {
 			"css/concat-34.css", "css/concat-345.css"
 		};
 		
-		List<WebResourceInfo> infos = new ArrayList<WebResourceInfo>();
+		//List<WebResourceInfo> infos = new ArrayList<WebResourceInfo>();
 		for (String name : names) {
 			WebResourceInfo webResourceInfo = webResourceManager.getResource(name);
 			assertTrue(webResourceInfo.getContentLength() > 0);
@@ -130,6 +139,86 @@ public class WebResourceManagerTest {
 	}
 
 	@Test
+	public void testGetVirtualResource() throws IOException {
+		VirtualResourceProvider provider = new VirtualResourceProvider() {
+			@Override
+			public WebResourceInfo lookup(String name) {
+				if (name.equals("one.css")){
+					return new TextWebResourceInfo("one.css", "body {}");
+				}else{
+					return null;
+				}
+			}
+		};
+				
+		virtualResourceRepository.addProvider(provider);
+		
+		WebResourceInfo webResourceInfo1 = webResourceManager.getResource("one.css");
+		assertTextResourceContentEquals(webResourceInfo1, "body {}");
+	}
+	
+	@Test
+	public void testGetChainUpdate() throws IOException {
+		final TextWebResourceInfo info1 = new TextWebResourceInfo("l1.css", "p {}");
+		final TextWebResourceInfo info2 = new TextWebResourceInfo("l2a.css", "@import url('l1.css') \n h1 {}");
+		
+		VirtualResourceProvider provider = new VirtualResourceProvider() {
+			@Override
+			public WebResourceInfo lookup(String name) {
+				if (name.equals("l3.css")){
+					return new TextWebResourceInfo("l3.css", "@import url('l2a.css') \n body {}");
+				}else if (name.equals("l2a.css")){
+					return info2;
+				}else if (name.equals("l2b.css")){
+					return new TextWebResourceInfo("l2b.css", "h2 {}");
+				}else if (name.equals("l1.css")){
+					return info1;
+				}else{
+					return null;
+				}
+			}
+		};
+				
+		virtualResourceRepository.addProvider(provider);
+		
+		String location1 = webResourceManager.getLocation("l3.css");
+		String location2 = webResourceManager.getLocation("l2a.css");
+		String location3 = webResourceManager.getLocation("l2b.css");
+		String location4 = webResourceManager.getLocation("l1.css");
+		
+		// update l2a.css
+		info2.update("@import url('l1.css') \n h1,h3 {}");
+		
+		assertEquals(location1, webResourceManager.getLocation("l3.css"));
+		assertEquals(location2, webResourceManager.getLocation("l2a.css"));
+		
+		webResourceManager.refresh("l2a.css");
+		
+		String location5 = webResourceManager.getLocation("l3.css");
+		String location6 = webResourceManager.getLocation("l2a.css");
+		
+		assertFalse(location5.equals(location1));
+		assertFalse(location6.equals(location2));
+		assertEquals(location3, webResourceManager.getLocation("l2b.css"));
+		assertEquals(location4, webResourceManager.getLocation("l1.css"));
+		
+		// update l1.css
+		info1.update("div {}");
+		
+		webResourceManager.refresh("l1.css");
+		
+		String location7 = webResourceManager.getLocation("l3.css");
+		String location8 = webResourceManager.getLocation("l2a.css");
+		String location9 = webResourceManager.getLocation("l1.css");
+		
+		assertFalse(location7.equals(location5));
+		assertFalse(location8.equals(location6));
+		assertEquals(location3, webResourceManager.getLocation("l2b.css"));
+		assertFalse(location9.equals(location4));
+		
+	}
+	
+	@Test
 	public void testGetConcatenateResource() throws IOException {
 		WebResourceInfo webResource1 = webResourceManager.getResource("css/concat-34.css");
 		WebResourceInfo webResource2 = webResourceManager.getResource("css/concat-345.css");
@@ -195,4 +284,61 @@ public class WebResourceManagerTest {
 		return resource.getFile();
 	}	
 
+	private static class TextWebResourceInfo extends AbstractWebResourceInfo {
+		
+		private String name;
+		private byte[] content;
+		private Date lastModified;
+
+		public TextWebResourceInfo(String name, String text) {
+			this.name = name;
+			this.content = text.getBytes();
+			this.lastModified = new Date();
+		}
+		
+		@Override
+		public String getName() {
+			return name;
+		}
+
+		@Override
+		public String getContentHash() {
+			return DigestUtils.sha256Hex(content);
+		}
+
+		@Override
+		public long getContentLength() {
+			return content.length;
+		}
+
+		@Override
+		public String getMimeType() {
+			return "text/css";
+		}
+
+		@Override
+		public InputStream getContent() throws IOException {
+			return new ByteArrayInputStream(content);
+		}
+
+		@Override
+		public InputStream getContent(long start, long length) throws IOException {
+			return new ByteArrayInputStream(content, (int)start, (int)length);
+		}
+
+		@Override
+		public boolean isSeekable() {
+			return true;
+		}
+
+		@Override
+		public Date getLastModified() {
+			return lastModified;
+		}
+		
+		public void update(String text){
+			this.content = text.getBytes();
+			this.lastModified = new Date();
+		}
+	}
 }

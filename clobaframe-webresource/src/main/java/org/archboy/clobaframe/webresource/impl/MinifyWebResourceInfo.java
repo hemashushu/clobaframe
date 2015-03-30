@@ -2,7 +2,6 @@ package org.archboy.clobaframe.webresource.impl;
 
 import com.yahoo.platform.yui.compressor.CssCompressor;
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,12 +12,14 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.Date;
-import java.util.zip.GZIPOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.webresource.AbstractWebResourceInfo;
-import org.archboy.clobaframe.webresource.CompressableResource;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceManager;
+import org.mozilla.javascript.ErrorReporter;
+import org.mozilla.javascript.EvaluatorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 /**
@@ -32,11 +33,15 @@ public class MinifyWebResourceInfo extends AbstractWebResourceInfo {
 	private String lastContentHash;
 	private byte[] content;
 
+	// see http://yui.github.io/yuicompressor/
+	private static final int maxColumnsPerLine = 4096; // "0" means break each line.
 
-	public MinifyWebResourceInfo(WebResourceInfo webResourceInfo) throws IOException{
+	private final Logger logger = LoggerFactory.getLogger(MinifyWebResourceInfo.class);
+	
+	public MinifyWebResourceInfo(WebResourceInfo webResourceInfo) {
 		Assert.notNull(webResourceInfo);
 		this.webResourceInfo = webResourceInfo;
-		addUnderlayWebResource(webResourceInfo);
+		addUnderlayWebResourceType(webResourceInfo);
 		rebuild();
 	}
 
@@ -47,11 +52,7 @@ public class MinifyWebResourceInfo extends AbstractWebResourceInfo {
 
 	@Override
 	public long getContentLength() {
-		try{
-			rebuild();
-		}catch(IOException e){
-			// ignore
-		}
+		rebuild();
 		return content.length;
 	}
 
@@ -88,8 +89,7 @@ public class MinifyWebResourceInfo extends AbstractWebResourceInfo {
 		return true;
 	}
 
-	private void rebuild() throws IOException {
-
+	private void rebuild() {
 		if (webResourceInfo.getContentHash().equals(lastContentHash)){
 			// resource does not changed
 			return;
@@ -107,29 +107,60 @@ public class MinifyWebResourceInfo extends AbstractWebResourceInfo {
 			Writer writer = new OutputStreamWriter(out, Charset.forName("UTF-8"));
 					
 			if (webResourceInfo.getMimeType().equals(WebResourceManager.MIME_TYPE_STYLE_SHEET)){
-				// style sheet
-				CssCompressor compressor = new CssCompressor(reader);
-				compressor.compress(writer, 1024);
+				minifyStyleSheet(reader, writer);
 			}else if(WebResourceManager.MIME_TYPE_JAVA_SCRIPT.contains(webResourceInfo.getMimeType())){
-				// javascript
-				JavaScriptCompressor compressor = new JavaScriptCompressor(reader, null);
-				compressor.compress(writer, 1024, true, false, false, true);
-				
-			}else{
-				throw new IllegalArgumentException(
-						String.format(
-								"Can not minify this mime type [%s]", 
-								webResourceInfo.getMimeType()));
+				try{
+					minifyJavaScript(reader, writer);
+				}catch(EvaluatorException e) {
+					// can not minify the javascript, so just copy the source to target.
+					InputStream copyIn = webResourceInfo.getContent();
+					this.content = IOUtils.toByteArray(copyIn);
+					copyIn.close();
+					return;
+				}
 			}
 			
 			writer.flush();
+			this.content = out.toByteArray();
 			
+		} catch(IOException e){
+			// ignore
 		} finally{
 			IOUtils.closeQuietly(in);
 			IOUtils.closeQuietly(out);
 		}
+		
+	}
 
-		this.content = out.toByteArray();
+	private void minifyJavaScript(Reader reader, Writer writer) throws IOException {
+		// javascript
+		JavaScriptCompressor compressor = new JavaScriptCompressor(reader, new ErrorReporter() {
+
+			@Override
+			public void warning(String message, String sourceName, int line, String lineSource, int lineOffset) {
+				logger.info("Minify javascript warning, message: {}, source name: {}, line: {}",
+						message, sourceName, line);
+			}
+
+			@Override
+			public void error(String message, String sourceName, int line, String lineSource, int lineOffset) {
+				logger.info("Minify javascript error, message: {}, source name: {}, line: {}",
+						message, sourceName, line);
+			}
+
+			@Override
+			public EvaluatorException runtimeError(String message, String sourceName, int line, String lineSource, int lineOffset) {
+				return new EvaluatorException(message, sourceName, lineOffset, lineSource, line);
+			}
+		});
+
+		compressor.compress(writer, maxColumnsPerLine, false, false, false, false);
+	}
+
+	private void minifyStyleSheet(Reader reader, Writer writer) throws IOException {
+		// style sheet
+		CssCompressor compressor = new CssCompressor(reader);
+		compressor.compress(writer, maxColumnsPerLine);
 	}
 
 }

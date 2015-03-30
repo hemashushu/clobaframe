@@ -14,6 +14,7 @@ public interface CacheResourceSender extends ResourceSender {
 	
 	public static final int ONE_YEAR_SECONDS = 31536000;
 	public static final int ONE_MONTH_SECONDS = 2592000;
+	public static final int THREE_MONTH_SECONDS = 7776000;
 	
 	public static final String CACHE_CONTROL_PUBLIC = "public";
 	public static final String CACHE_CONTROL_PRIVATE = "private";

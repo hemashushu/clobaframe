@@ -6,8 +6,6 @@ package org.archboy.clobaframe.webresource;
  */
 public interface VirtualResourceProvider {
 	
-	void register(VirtualResourceRepository repository);
-	
 	/**
 	 * Lookup the virtual resource by name.
 	 * 

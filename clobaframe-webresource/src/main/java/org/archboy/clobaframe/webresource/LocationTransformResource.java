@@ -8,5 +8,5 @@ import java.util.Collection;
  */
 public interface LocationTransformResource {
 	
-	Collection<String> getReferenceResourceNames();
+	Collection<String> getChildResourceNames();
 }

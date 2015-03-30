@@ -58,9 +58,11 @@ public interface WebResourceManager {
 	String getLocation(String name) throws FileNotFoundException;
 
 	/**
-	 * Force refresh a resource.
+	 * Force refresh a specify resource.
 	 * 
 	 * @param name 
 	 */
 	void refresh(String name);
+	
+	void setLocationGenerator(LocationGenerator locationGenerator);
 }

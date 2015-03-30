@@ -7,8 +7,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import org.archboy.clobaframe.webresource.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,14 +15,12 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.commons.io.IOUtils;
+import org.archboy.clobaframe.webresource.ConcatenateResourceRepository;
 import org.archboy.clobaframe.webresource.ResourceRepository;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.util.CollectionUtils;
 
 /**
  *
@@ -33,8 +29,6 @@ import org.springframework.util.CollectionUtils;
 @Named
 public class ConcatenateResourceRepositoryImpl implements ConcatenateResourceRepository {
 
-	//private static final String ENV_KEY_CONCATENATE_WEB_RESOURCE_CONFIG = "clobaframe.webresource.concatenateConfig";
-	
 	@Value("${clobaframe.webresource.concatenateConfig}")
 	private String concatenateConfig;
 	
@@ -57,13 +51,6 @@ public class ConcatenateResourceRepositoryImpl implements ConcatenateResourceRep
 					concatenateConfig));
 		}
 
-//		logger.debug("Scan web resource folder [{}].", rootDir.getAbsolutePath());
-//		
-//		webResourceInfos = getLocalWebResources(rootDir);
-//		webResourceInfos.addAll(getCombineResources(webResourceInfos));
-//		
-//		resourceLocationGenerator = new LocalResourceLocationGenerator(localLocationPrefix);
-		
 		Properties properties = new Properties();
 		InputStream in = null;
 		

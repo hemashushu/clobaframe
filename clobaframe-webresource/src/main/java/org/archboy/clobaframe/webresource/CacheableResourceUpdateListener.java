@@ -1,18 +1,22 @@
 package org.archboy.clobaframe.webresource;
 
-import java.util.Collection;
-
 /**
- *
+ * By using the listener pattern to perform the chain update.
+ * 
+ * The update listener commonly is the parent resource.
+ * 
+ * E.g. "common.css" import the "main.css" by the "@import url('main.css')", 
+ * then the "common.css" resource is the parent resource / update listener, 
+ * and the "main.css" is the child resource
+ * 
  * @author yang
  */
 public interface CacheableResourceUpdateListener {
 	
 	/**
-	 * Occur while the specify resource has modified.
+	 * Occur while the child resource has been modified.
 	 * 
-	 * @param resourceName 
-	 * @param referenceResourceNames 
+	 * @param childResourceName 
 	 */
-	void onUpdate(String resourceName, Collection<String> referenceResourceNames);
+	void onUpdate(String childResourceName);
 }

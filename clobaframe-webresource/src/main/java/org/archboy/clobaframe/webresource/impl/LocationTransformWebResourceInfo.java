@@ -13,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.archboy.clobaframe.webresource.AbstractWebResourceInfo;
 import org.archboy.clobaframe.webresource.LocationTransformResource;
 import org.slf4j.Logger;
@@ -33,68 +34,45 @@ public class LocationTransformWebResourceInfo extends AbstractWebResourceInfo im
 
 	private WebResourceManager webResourceManager;
 	private WebResourceInfo webResourceInfo;
-	//private Map<String, String> locations;
 	
-	private String lastContentHash; // the underlay content hash
+	//private String lastContentHash; // the underlay content hash
 	
-	//private long lastModified;
 	private byte[] content;
 	private String contentHash;
 
-	private Collection<String> referenceResourceNames;
+	private Collection<String> childResourceNames;
 	
 	private static final String resourceNameRegex = "([\\/\\w\\.-]+)([^'\"\\)]*)";
-
-	//private static final String placeHoldRegex = "\\[\\[" + resourceNameRegex + "\\]\\]";
-	//private static final Pattern placeHoldPattern = Pattern.compile(placeHoldRegex);
 
 	private static final String urlRegex = "url\\(['|\"]?" + resourceNameRegex + "['|\"]?\\)";
 	private static final Pattern urlPattern = Pattern.compile(urlRegex);
 
-	//private boolean autoConvertCssUrl;
-
 	public LocationTransformWebResourceInfo(
 			WebResourceManager webResourceManager,
-			WebResourceInfo webResourceInfo) throws IOException{ //,
-			//Map<String, String> locations, boolean autoConvertCssUrl) {
+			WebResourceInfo webResourceInfo) {
 
 		Assert.notNull(webResourceManager);
 		Assert.notNull(webResourceInfo);
 		
 		this.webResourceManager = webResourceManager;
 		this.webResourceInfo = webResourceInfo;
-//		this.locations = locations;
-//		this.autoConvertCssUrl = autoConvertCssUrl;
 		
-		addUnderlayWebResource(webResourceInfo);
+		addUnderlayWebResourceType(webResourceInfo);
 		
 		rebuild();
 	}
 
 	@Override
 	public String getContentHash() {
-		try{
-			rebuild();
-		}catch(IOException e){
-			// ignore
-		}
+		rebuild();
 		return contentHash;
 	}
 
 	@Override
 	public long getContentLength() {
-		try{
-			rebuild();
-		}catch(IOException e){
-			// ignore
-		}
+		rebuild();
 		return content.length;
 	}
-
-//	@Override
-//	public String getUniqueName() {
-//		return webResourceInfo.getUniqueName();
-//	}
 
 	@Override
 	public String getMimeType() {
@@ -129,78 +107,72 @@ public class LocationTransformWebResourceInfo extends AbstractWebResourceInfo im
 		return true;
 	}
 
-//	private void refresh(){
-//		buildSnapshot();
-//	}
+	private void rebuild() {
 
-	private void rebuild() throws IOException {
+//		if (webResourceInfo.getContentHash().equals(lastContentHash)){
+//			// resource does not changed
+//			return;
+//		}
+//
+//		lastContentHash = webResourceInfo.getContentHash();
 
-		if (webResourceInfo.getContentHash().equals(lastContentHash)){
-			// resource does not changed
-			return;
-		}
-
-		lastContentHash = webResourceInfo.getContentHash();
-
-		referenceResourceNames = new ArrayList<String>();
+		childResourceNames = new ArrayList<String>();
 		
 		String text = null;
 		//ResourceContent resourceContent = null;
 		InputStream in = null;
 
 		try{
-//			resourceContent = webResourceInfo.getContentSnapshot();
-//			InputStream in = resourceContent.getContent();
 			in = webResourceInfo.getContent();
 
 			InputStreamReader reader = new InputStreamReader(in, "utf-8");
 			text = IOUtils.toString(reader);
-
-			// replace the css 'url' location.
-//			if (autoConvertCssUrl) {
-//				text = replaceLocation(urlPattern, text);
-//			}
-
-			// replace the location placehold.
 			text = replaceLocation(text);
+			
+			// convert text into input stream
+			content = text.getBytes(Charset.forName("utf-8"));
+			contentHash = DigestUtils.sha256Hex(content);
+		
+		}catch(IOException e){
+			// ignore
 		} finally{
 			IOUtils.closeQuietly(in);
 		}
-
-		// convert text into input stream
-		content = text.getBytes(Charset.forName("utf-8"));
-		contentHash = DigestUtils.sha256Hex(content);
 	}
 
 	/**
 	 * transform "url(...)" locations
+	 * 
 	 * @param text
 	 * @return
 	 */
-	private String replaceLocation(String text) throws FileNotFoundException {
+	private String replaceLocation(String text) {
 		StringBuffer builder = new StringBuffer();
 		Matcher matcher = urlPattern.matcher(text);
 		while(matcher.find()){
 			String name = matcher.group(1);
-			String canonicalName = getCanonicalName(name);
-
-			referenceResourceNames.add(canonicalName);
+			String result = null;
 			
-			String location = webResourceManager.getLocation(canonicalName);
-			//if (location != null){
-
-//				if (pattern == urlPattern) {
-					String group = matcher.group();
-					String result= group.replace(name, location);
-
-					matcher.appendReplacement(builder, result);
-//				}else{
-//					matcher.appendReplacement(builder, location);
-//				}
-//			}else{
-//				// the specify resource can not be found.
-//				matcher.appendReplacement(builder, matcher.group());
-//			}
+			try{
+				String canonicalName = getCanonicalName(name);
+				String location = webResourceManager.getLocation(canonicalName);
+				
+				if (StringUtils.isNotEmpty(matcher.group(2))){
+					location = combineVersionName(location, matcher.group(2));
+				}
+				
+//				String group = matcher.group();
+//				result= group.replace(name, location);
+				
+				result = String.format("url('%s')", location);
+				
+				childResourceNames.add(canonicalName);
+			}catch(FileNotFoundException e){
+				// ignore
+				result = name;
+			}
+			
+			matcher.appendReplacement(builder, result);
 		}
 
 		matcher.appendTail(builder);
@@ -209,6 +181,56 @@ public class LocationTransformWebResourceInfo extends AbstractWebResourceInfo im
 		return replacedText;
 	}
 
+	private String combineVersionName(String location, String query) {
+		
+		/**
+		 * The name maybe includes the query and url hash.
+		 * E.g.
+		 * 
+		 * webfont.eot?v=4.2.0
+		 * webfont.eot?#iefix
+		 * webfont.eot?#iefix&v=4.2.0
+		 * webfont.eot?v=4.2.0#iefix
+		 * 
+		 */
+		
+		if (query.charAt(0) == '?'){
+			return location + "&" + query.substring(1);
+		}else{
+			return location + query;
+		}
+		
+//		StringBuilder builder = new StringBuilder();
+//	
+//		int queryPos = name.lastIndexOf('?');
+//		if (queryPos == -1) {
+//			//name += "?" + shortHash;
+//			builder.append(name);
+//			builder.append(concatMark);
+//			builder.append(shortContentHash);
+//		}else{
+//			if (queryPos == name.length() - 1){
+//				builder.append(name.substring(0, queryPos));
+//				builder.append(concatMark);
+//				builder.append(shortContentHash);
+//			}else{
+//				if (name.charAt(queryPos + 1) == '#') { // for css font-family ie-fix, e.g. "webfont.eot?#iefix"
+//					builder.append(name.substring(0, queryPos));
+//					builder.append(concatMark);
+//					builder.append(shortContentHash);
+//					builder.append(name.substring(queryPos + 1));
+//				}else{
+//					builder.append(name.substring(0, queryPos));
+//					builder.append(concatMark);
+//					builder.append(shortContentHash);
+//					builder.append("&");
+//					builder.append(name.substring(queryPos + 1));
+//				}
+//			}
+//		}
+//		return builder.toString();
+	}
+	
 	/**
 	 * Remove the "/", "./" and "../"
 	 * @param pathName the target path name
@@ -247,8 +269,8 @@ public class LocationTransformWebResourceInfo extends AbstractWebResourceInfo im
 	}
 
 	@Override
-	public Collection<String> getReferenceResourceNames() {
-		return referenceResourceNames;
+	public Collection<String> getChildResourceNames() {
+		return childResourceNames;
 	}
 
 }

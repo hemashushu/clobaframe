@@ -20,14 +20,14 @@ import org.springframework.util.Assert;
 public class CompressWebResourceInfo extends AbstractWebResourceInfo implements CompressableResource {
 
 	private WebResourceInfo webResourceInfo;
-	private String lastContentHash;
+	//private String lastContentHash;
 	private byte[] content;
 
 
-	public CompressWebResourceInfo(WebResourceInfo webResourceInfo) throws IOException{
+	public CompressWebResourceInfo(WebResourceInfo webResourceInfo) {
 		Assert.notNull(webResourceInfo);
 		this.webResourceInfo = webResourceInfo;
-		addUnderlayWebResource(webResourceInfo);
+		addUnderlayWebResourceType(webResourceInfo);
 		rebuild();
 	}
 
@@ -38,11 +38,7 @@ public class CompressWebResourceInfo extends AbstractWebResourceInfo implements 
 
 	@Override
 	public long getContentLength() {
-		try{
-			rebuild();
-		}catch(IOException e){
-			// ignore
-		}
+		rebuild();
 		return content.length;
 	}
 
@@ -79,14 +75,13 @@ public class CompressWebResourceInfo extends AbstractWebResourceInfo implements 
 		return true;
 	}
 
-	private void rebuild() throws IOException {
-
-		if (webResourceInfo.getContentHash().equals(lastContentHash)){
-			// resource does not changed
-			return;
-		}
-
-		this.lastContentHash = webResourceInfo.getContentHash();
+	private void rebuild() {
+//		if (webResourceInfo.getContentHash().equals(lastContentHash)){
+//			// resource does not changed
+//			return;
+//		}
+//
+//		this.lastContentHash = webResourceInfo.getContentHash();
 
 		InputStream in = null;
 		ByteArrayOutputStream out = null;
@@ -97,6 +92,8 @@ public class CompressWebResourceInfo extends AbstractWebResourceInfo implements 
 			GZIPOutputStream gzipOut = new GZIPOutputStream(out);
 			IOUtils.copy(in, gzipOut);
 			gzipOut.close();
+		} catch (IOException ex) {
+			// ignore
 		} finally{
 			IOUtils.closeQuietly(in);
 			IOUtils.closeQuietly(out);

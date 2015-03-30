@@ -22,9 +22,10 @@ public interface WebResourceInfo extends ResourceInfo{
 
 	/**
 	 * Content hash.
+	 * 
 	 * Commonly uses the MD5/SHA256 algorithm.
 	 * It doesn't have to be the hash value for the current content, 
-	 * or it may be the underlying content hash values
+	 * it can be the underlying content hash values
 	 *
 	 * @return
 	 */

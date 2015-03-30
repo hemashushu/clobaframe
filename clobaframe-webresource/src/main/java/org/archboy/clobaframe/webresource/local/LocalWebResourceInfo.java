@@ -17,8 +17,8 @@ public class LocalWebResourceInfo implements WebResourceInfo, FileBaseResourceIn
 	private String name;
 	private String mimeType;
 	
-	private long lastModified;
-	private String contentHash;
+	//private long lastModified;
+	//private String contentHash;
 
 	public LocalWebResourceInfo(
 			File file, String name, String mimeType) {
@@ -30,14 +30,15 @@ public class LocalWebResourceInfo implements WebResourceInfo, FileBaseResourceIn
 	@Override
 	public String getContentHash() {
 		// only re-compute content hash when the File.lastModified changed.
-		if (contentHash == null || lastModified != file.lastModified()) {
-			return computeContentHash();
-		}else{
-			return contentHash;
-		}
-	}
-	
-	private String computeContentHash(){
+		//if (contentHash == null || lastModified != file.lastModified()) {
+		//	return computeContentHash();
+		//}else{
+		//	return contentHash;
+		//}
+	//}
+	//
+	//private String computeContentHash(){
+		
 		String hash = null;
 		InputStream in = null;
 		try {

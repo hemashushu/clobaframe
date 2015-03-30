@@ -1,7 +1,5 @@
 package org.archboy.clobaframe.webresource;
 
-import java.util.Collection;
-
 /**
  *
  * @author yang
@@ -9,16 +7,16 @@ import java.util.Collection;
 public interface CacheableResource {
 	
 	/**
-	 * Add the reference web resource.
-	 * E.g. "common.css" import the "custom.css" by the "@import" command, then
-	 * the "common.css" resource is the update listener, and the "custom.css" is the
-	 * cacheable resource
 	 * 
 	 * @param resourceUpdateListener 
 	 */
 	void addUpdateListener(CacheableResourceUpdateListener resourceUpdateListener);
 	
-	void setReferenceResourceNames(Collection<String> names);
-	
+	/**
+	 * Force refresh by outside invoker.
+	 * 
+	 * E.g. a user has modified a custom style-sheet and want to take effect immediately.
+	 * 
+	 */
 	void refresh();
 }

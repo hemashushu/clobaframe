@@ -9,14 +9,14 @@ import java.util.Set;
  */
 public abstract class AbstractWebResourceInfo implements WebResourceInfo {
 	
-	private Set<String> underlayWebResourceInfoNames = new HashSet<String>();
+	private Set<Class<?>> underlayWebResourceInfoTypes = new HashSet<Class<?>>();
 	
-	protected void addUnderlayWebResource(WebResourceInfo webResourceInfo) {
-		underlayWebResourceInfoNames.add(webResourceInfo.getClass().getSimpleName());
+	protected void addUnderlayWebResourceType(WebResourceInfo webResourceInfo) {
+		underlayWebResourceInfoTypes.add(webResourceInfo.getClass());
 	}
 
-	public Set<String> getUnderlayWebResourceInfoNames() {
-		return underlayWebResourceInfoNames;
+	public Set<Class<?>> getUnderlayWebResourceInfoTypes() {
+		return underlayWebResourceInfoTypes;
 	}
 	
 }
