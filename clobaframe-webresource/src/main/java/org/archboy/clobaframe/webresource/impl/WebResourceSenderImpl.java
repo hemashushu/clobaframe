@@ -60,7 +60,7 @@ public class WebResourceSenderImpl implements WebResourceSender{
 		
 		cacheResourceSender.send(webResourceInfo,
 				CacheResourceSender.CACHE_CONTROL_PUBLIC,
-				CacheResourceSender.ONE_MONTH_SECONDS, headers, request, response);
+				CacheResourceSender.THREE_MONTH_SECONDS, headers, request, response);
 	}
 
 	@Override

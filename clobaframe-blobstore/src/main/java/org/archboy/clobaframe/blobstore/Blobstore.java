@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Storing or fetching the large binary objects (i.e. file data, imaging data, long text etc.)
+ * Storing or fetching the large binary objects (i.e. user file, image, long text etc.)
  *
  * @author yang
  *
@@ -15,7 +15,7 @@ public interface Blobstore {
 	public static final int DEFAULT_STORE_PRIOTITY = 5;
 	
 	/**
-	 * Check whether a bucket is exists or not.
+	 * Check whether a bucket exists.
 	 *
 	 * A bucket is the collection of blob objects, just like the folder to the file.
 	 *
@@ -26,9 +26,7 @@ public interface Blobstore {
 
 	/**
 	 * Create a bucket by name.
-	 * <p>
-	 *     Duplicate name will just do nothing.
-	 * </p>
+	 * Duplicate name will be ignored.
 	 *
 	 * @param name
 	 * @throws IOException
@@ -37,23 +35,19 @@ public interface Blobstore {
 
 	/**
 	 * Delete a bucket.
-	 * <p>
-	 *     This function can only delete an empty bucket.
-	 *     Delete non-exists bucket will not raise exception.
-	 * </p>
+	 * This function can only delete an empty bucket.
+	 * If the specified store does not exist will not generate an exception.
 	 *
 	 * @param name
-	 * @throws IOException
+	 * @throws IOException Delete failed.
 	 */
 	void deleteBucket(String name) throws IOException;
 
 	/**
 	 * Store the blob object into repository.
-	 *<p>
-	 *     Object will be overwrite if the key duplicate,
-	 *     and the {@link InputStream} of {@link BlobResourceInfo} will be close
-	 *     automatically.
-	 *</p>
+	 * Object will be overwrite if the key duplicate.
+	 * The {@link InputStream} of {@link BlobResourceInfo} will be close
+	 * automatically.
 	 *
 	 * @param blobResourceInfo
 	 * @throws java.io.IOException
@@ -66,11 +60,9 @@ public interface Blobstore {
 	 * @param blobResourceInfo
 	 * @param publicReadable This blob object can be public read.
 	 * @param priority
-	 * <p>
 	 *     0~9, smaller indicates this object is less important, and storing into a
 	 *     minor repository (if possible). "Minor repository" means
 	 *     reduced redundancy storing.
-	 * </p>
 	 * @throws java.io.IOException
 	 */
 	void put(BlobResourceInfo blobResourceInfo, 
@@ -88,12 +80,10 @@ public interface Blobstore {
 
 	/**
 	 * Remove object by key.
-	 * <p>
-	 *     No exception will be occur if the specify key does not exists.
-	 * </p>
+	 * If the specified object does not exist will not generate an exception.
 	 *
 	 * @param blobKey
-	 * @throws java.io.IOException
+	 * @throws java.io.IOException Delete failed.
 	 */
 	void delete(BlobKey blobKey) throws IOException;
 
@@ -101,15 +91,13 @@ public interface Blobstore {
 	 * List objects by the prefix key.
 	 *
 	 * @param prefix
-	 * <p>
 	 *     The key name of {@link BlobKey} can assigns a prefix, such as
 	 *     'image-', then all objects with 'image-' prefix name will
 	 *     be selected. or keep key name as null for return all items in the
 	 *     specify bucket.
-	 * </p>
 	 * @return
 	 */
-	BlobResourceInfoPartialCollection list(BlobKey prefix);
+	PartialCollection<BlobResourceInfo> list(); //BlobKey prefix);
 
 	/**
 	 * List the remain objects by the previous result.
@@ -117,5 +105,5 @@ public interface Blobstore {
 	 * @param collection
 	 * @return
 	 */
-	BlobResourceInfoPartialCollection listNext(BlobResourceInfoPartialCollection collection);
+	PartialCollection<BlobResourceInfo> listNext(PartialCollection<BlobResourceInfo> collection);
 }

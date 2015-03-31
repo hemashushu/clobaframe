@@ -15,7 +15,7 @@ import net.spy.memcached.AddrUtil;
 import net.spy.memcached.ConnectionFactoryBuilder;
 import net.spy.memcached.ConnectionFactoryBuilder.Protocol;
 import net.spy.memcached.MemcachedClient;
-import org.archboy.clobaframe.cache.AbstractCache;
+import org.archboy.clobaframe.cache.impl.AbstractCache;
 import org.archboy.clobaframe.cache.Cache;
 import org.archboy.clobaframe.cache.Expiration;
 import org.springframework.beans.factory.annotation.Value;

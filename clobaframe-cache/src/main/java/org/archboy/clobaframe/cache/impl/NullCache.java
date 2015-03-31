@@ -1,6 +1,5 @@
 package org.archboy.clobaframe.cache.impl;
 
-import org.archboy.clobaframe.cache.AbstractCache;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;

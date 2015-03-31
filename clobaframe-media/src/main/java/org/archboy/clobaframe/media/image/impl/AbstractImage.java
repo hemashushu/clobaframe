@@ -45,7 +45,6 @@ public abstract class AbstractImage implements Image {
 		}
 
 		ImageWriter imageWriter = imageWriters.next();
-
 		ByteArrayOutputStream out = null;
 		ImageOutputStream imageOutputStream = null;
 
@@ -56,7 +55,7 @@ public abstract class AbstractImage implements Image {
 
 			if (outputSettings.getOutputEncoding().equals(
 					OutputSettings.OutputEncoding.JPEG)) {
-				ImageWriteParam params = new JPEGImageWriteParam(Locale.getDefault());
+				ImageWriteParam params = imageWriter.getDefaultWriteParam(); // new JPEGImageWriteParam(Locale.getDefault());
 				params.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
 
 				if (outputSettings.hasQuality()) {

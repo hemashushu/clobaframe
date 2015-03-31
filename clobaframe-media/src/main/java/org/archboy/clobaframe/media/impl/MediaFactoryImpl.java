@@ -24,6 +24,7 @@ import javax.inject.Named;
 import org.archboy.clobaframe.io.ResourceInfoFactory;
 import org.archboy.clobaframe.io.TemporaryResources;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
+import org.archboy.clobaframe.io.impl.DefaultResourceInfoFactory;
 import org.springframework.util.Assert;
 
 /**
@@ -36,13 +37,13 @@ public class MediaFactoryImpl implements MediaFactory{
 	// default 32 MB
 	private static final long DEFAULT_MAX_HANDLE_SIZE_BYTE = 32L * 1024 * 1024;
 	
-	@Value("${media.maxHandleSize}")
+	@Value("${clobaframe.media.maxHandleSize}")
 	private long maxHandleSizeByte = DEFAULT_MAX_HANDLE_SIZE_BYTE;
 
 	private final Logger logger = LoggerFactory.getLogger(MediaFactoryImpl.class);
 
-	@Inject
-	private ResourceInfoFactory resourceInfoFactory;
+//	@Inject
+	private ResourceInfoFactory resourceInfoFactory = new DefaultResourceInfoFactory();
 	
 	@Inject
 	private FileBaseResourceInfoFactory fileBaseResourceInfoFactory;

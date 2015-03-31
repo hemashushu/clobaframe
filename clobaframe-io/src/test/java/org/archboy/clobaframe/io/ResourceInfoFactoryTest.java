@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.Date;
 import javax.inject.Inject;
 import org.apache.commons.io.IOUtils;
+import org.archboy.clobaframe.io.impl.DefaultResourceInfoFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,8 +23,8 @@ import static org.junit.Assert.*;
 @ContextConfiguration(locations = { "/applicationContext.xml" })
 public class ResourceInfoFactoryTest {
 
-	@Inject
-	private ResourceInfoFactory resourceInfoFactory;
+//	@Inject
+	private ResourceInfoFactory resourceInfoFactory = new DefaultResourceInfoFactory();
 	
 	@Before
 	public void setUp() throws Exception {

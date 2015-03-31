@@ -14,26 +14,26 @@ public interface BlobResourceInfoFactory {
 	 *
 	 * @param blobKey
 	 * @param size
-	 * @param contentType
+	 * @param mimeType
 	 * @param content
 	 * @return
 	 */
 	BlobResourceInfo make(
 			BlobKey blobKey,
-			String contentType,
+			String mimeType,
 			InputStream content, long size);
 
 	/**
 	 * Create the blob object by byte array.
 	 *
 	 * @param blobKey
-	 * @param contentType
+	 * @param mimeType
 	 * @param content
 	 * @return
 	 */
 	BlobResourceInfo make(
 			BlobKey blobKey,
-			String contentType,
+			String mimeType,
 			byte[] content);
 
 }

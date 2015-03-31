@@ -11,6 +11,7 @@ import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.ResourceInfoFactory;
 import org.archboy.clobaframe.io.TemporaryResources;
+import org.archboy.clobaframe.io.impl.DefaultResourceInfoFactory;
 import org.archboy.clobaframe.io.impl.DefaultTemporaryResources;
 import org.junit.After;
 import org.junit.Before;
@@ -39,8 +40,8 @@ public class FileBaseResourceInfoFactoryTest {
 	@Inject
 	private ResourceLoader resourceLoader;
 	
-	@Inject
-	private ResourceInfoFactory resourceInfoFactory;
+//	@Inject
+	private ResourceInfoFactory resourceInfoFactory = new DefaultResourceInfoFactory();
 	
 	@Inject
 	private FileBaseResourceInfoFactory fileBaseResourceInfoFactory;

@@ -131,6 +131,13 @@
 			<version>2.0.235</version>
 		</dependency>
 		
+		<!-- for supporting ICC jpeg -->
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-jpeg</artifactId>
+			<version>3.0.2</version>
+		</dependency>
+		
 		<!-- Image meta data -->
 		<!-- need by clobaframe-media -->
 		<dependency>

@@ -21,7 +21,8 @@ import org.archboy.clobaframe.io.impl.DefaultResourceInfoFactory;
 public class PartialResourceSender implements ResourceSender {
 
 	private ResourceSender resourceSender;
-
+	private ResourceInfoFactory resourceInfoFactory = new DefaultResourceInfoFactory();
+	
 	public PartialResourceSender(ResourceSender resourceSender) {
 		this.resourceSender = resourceSender;
 	}
@@ -63,9 +64,6 @@ public class PartialResourceSender implements ResourceSender {
 		
 		response.addHeader("Content-Range", contentRange);
 		response.addHeader("Accept-Ranges", "bytes");
-
-		
-		ResourceInfoFactory resourceInfoFactory = new DefaultResourceInfoFactory();
 		
 		InputStream in = resourceInfo.getContent(startPosition, length);
 		ResourceInfo partialResourceInfo = resourceInfoFactory.make(in, length, resourceInfo.getMimeType(), resourceInfo.getLastModified());

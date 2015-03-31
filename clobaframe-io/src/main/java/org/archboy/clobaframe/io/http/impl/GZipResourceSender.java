@@ -39,6 +39,8 @@ public class GZipResourceSender implements ResourceSender {
 	private int minCompressSize;
 	private ResourceSender resourceSender;
 	
+	private ResourceInfoFactory resourceInfoFactory = new DefaultResourceInfoFactory();
+	
 	private List<String> mimeTypes = Arrays.asList(
 			"text/html",
 			"text/plain",
@@ -88,7 +90,6 @@ public class GZipResourceSender implements ResourceSender {
 		
 		byte[] data = out.toByteArray();
 		
-		ResourceInfoFactory resourceInfoFactory = new DefaultResourceInfoFactory();
 		ResourceInfo gzipResourceInfo = resourceInfoFactory.make(data, resourceInfo.getMimeType(), resourceInfo.getLastModified());
 		resourceSender.send(gzipResourceInfo, extraHeaders, request, response);
 	}

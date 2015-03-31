@@ -14,7 +14,7 @@ import javax.inject.Named;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
-import org.archboy.clobaframe.cache.AbstractCache;
+import org.archboy.clobaframe.cache.impl.AbstractCache;
 import org.archboy.clobaframe.cache.Cache.Policy;
 import org.archboy.clobaframe.cache.Expiration;
 import org.springframework.beans.factory.annotation.Value;

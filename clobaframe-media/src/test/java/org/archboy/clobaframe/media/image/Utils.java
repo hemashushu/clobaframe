@@ -31,8 +31,28 @@ public class Utils {
 		
 		
 		ResourceInfo resourceInfo = image.getResourceInfo();
-		//ResourceContent resourceContent = resourceInfo.getContentSnapshot();
-		InputStream in = resourceInfo.getInputStream();
+		InputStream in = resourceInfo.getContent();
+		
+		FileOutputStream out = new FileOutputStream(file);
+		IOUtils.copy(in, out);
+		
+		out.close();
+		in.close();
+	}
+	
+	public static void saveImage(Image image, String filename, int jpegQuality) throws IOException{
+		String formatName = "jpg";
+		File tempDir = new File(System.getProperty("java.io.tmpdir"));
+		File workDir = new File(tempDir, "clobaframe/media/image");
+		if (!workDir.exists()) {
+			workDir.mkdirs();
+		}
+		File file = new File(workDir, filename + "." + formatName);
+		
+		
+		ResourceInfo resourceInfo = image.getResourceInfo(null, 
+					new OutputSettings(OutputSettings.OutputEncoding.JPEG, jpegQuality));
+		InputStream in = resourceInfo.getContent();
 		
 		FileOutputStream out = new FileOutputStream(file);
 		IOUtils.copy(in, out);

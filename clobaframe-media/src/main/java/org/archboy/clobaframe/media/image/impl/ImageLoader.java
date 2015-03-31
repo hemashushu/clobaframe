@@ -10,6 +10,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.inject.Named;
+import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.media.Media;
 import org.archboy.clobaframe.media.MediaLoader;
 import org.archboy.clobaframe.media.image.Image;
@@ -54,8 +55,8 @@ public class ImageLoader implements MediaLoader {
 		
 		//ResourceContent resourceContent = null;
 		//InputStream in = null;
-		ImageInputStream stream = null;
-		ImageReader reader = null;
+		ImageInputStream in = null;
+		ImageReader imageReader = null;
 		Image image = null;
 
 		try {
@@ -63,22 +64,34 @@ public class ImageLoader implements MediaLoader {
 			//in = resourceContent.getInputStream();
 			//in = resourceInfo.getInputStream();
 			File file = fileBaseResourceInfo.getFile();
-			stream = ImageIO.createImageInputStream(file);
+			in = ImageIO.createImageInputStream(file);
 
-			Iterator<ImageReader> readers = ImageIO.getImageReaders(stream);
+			Iterator<ImageReader> readers = ImageIO.getImageReaders(in);
 			if (!readers.hasNext()) {
 				throw new IOException("The image format is not supported.");
 			}
 
-			reader = readers.next();
-			Image.Format format = Image.Format.fromFormatName(reader.getFormatName());
+			imageReader = readers.next();
+			Image.Format format = Image.Format.fromFormatName(imageReader.getFormatName());
 
 			if (format == null) {
 				throw new IOException("The image format is not supported.");
 			}
 
-			reader.setInput(stream);
-			BufferedImage bufferedImage = reader.read(0);
+			imageReader.setInput(in);
+			
+			// Optionally, listen for read warnings, progress, etc.
+//        reader.addIIOReadWarningListener(...);
+//        reader.addIIOReadProgressListener(...);
+//
+//        ImageReadParam param = reader.getDefaultReadParam();
+
+        // Optionally, control read settings like sub sampling, source region or destination etc.
+//        param.setSourceSubsampling(...);
+//        param.setSourceRegion(...);
+//        param.setDestination(...);
+		
+			BufferedImage bufferedImage = imageReader.read(0);
 
 			image = new DefaultImageFromFactory(fileBaseResourceInfo, format, bufferedImage);
 
@@ -88,9 +101,9 @@ public class ImageLoader implements MediaLoader {
 			}
 			
 		} finally {
-			closeQuietly(reader);
-			//IOUtils.closeQuietly(stream); // for java 7
-			closeQuietly(stream);
+			closeQuietly(imageReader);
+			IOUtils.closeQuietly(in); // for java 7
+			//closeQuietly(stream); // for java 6
 			//IOUtils.closeQuietly(in);
 			//IOUtils.closeQuietly(resourceContent);
 		}
@@ -101,15 +114,15 @@ public class ImageLoader implements MediaLoader {
 	/*
 	 * java 6 ImageInputStream does not implement Closable interface
 	 */
-	private void closeQuietly(ImageInputStream stream) {
-		if (stream != null) {
-			try {
-				stream.close();
-			} catch (IOException e) {
-				// ignore
-			}
-		}
-	}
+//	private void closeQuietly(ImageInputStream stream) {
+//		if (stream != null) {
+//			try {
+//				stream.close();
+//			} catch (IOException e) {
+//				// ignore
+//			}
+//		}
+//	}
 
 	private void closeQuietly(ImageReader reader) {
 		if (reader != null) {

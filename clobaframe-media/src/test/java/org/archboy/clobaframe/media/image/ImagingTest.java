@@ -22,6 +22,7 @@ import org.junit.runner.RunWith;
 import javax.inject.Inject;
 import org.archboy.clobaframe.io.TemporaryResources;
 import org.archboy.clobaframe.io.impl.DefaultTemporaryResources;
+import org.archboy.clobaframe.media.MetaData;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ContextConfiguration;
@@ -132,6 +133,89 @@ public class ImagingTest {
 		Utils.saveImage(image3, "imaging-resize-200x200");
 	}
 
+	@Test
+	public void testResizeQuality() throws IOException {
+		File file = getFileByName("hd-test-1920x1200.jpg");
+		Image image = (Image)mediaFactory.make(file, temporaryResources);
+		
+		int jpegQuality = 90;
+		Image imageHandling = rotateImage(image);
+		Transform cropTransform = imaging.fixAspectRatioCrop(0.3D, 3.0D);
+		imageHandling = imaging.apply(imageHandling, cropTransform);
+			
+		Utils.saveImage(imageHandling, "hd-imaging-resize-original", jpegQuality);
+		
+		Transform transform1 = imaging.resizeWithFixWidth(1280);
+		Image image1280Handling = imaging.apply(imageHandling, transform1);
+		Utils.saveImage(image1280Handling, "hd-imaging-resize-1280", jpegQuality);	
+		
+		Transform transform2 = imaging.resizeWithFixWidth(720);
+		Image image720Handling = imaging.apply(image1280Handling, transform2); // base on 1280
+		Utils.saveImage(image720Handling, "hd-imaging-resize-720", jpegQuality);	
+
+		Transform transform3 = imaging.resizeWithFixWidth(320);
+		Image image320Handling = imaging.apply(image1280Handling, transform3); // base on 1280
+		Utils.saveImage(image320Handling, "hd-imaging-resize-320", jpegQuality);	
+		
+	}
+	
+	private Image rotateImage(Image image) throws IOException {
+		if (image.getFormat() == Image.Format.PNG) {
+			return image;
+		}
+
+		MetaData metadata = image.getMetaData(); // exifReader.getMetaData(image);
+		if (metadata == null){
+			return image;
+		}
+		
+		/**
+		 * Orientation:
+		 * Normal, // orientation = 1: "Top, left side (Horizontal / normal)"
+		 * MirrorHorizontal, // orientation = 2: "Top, right side (Mirror horizontal)"
+		 * Rotate180CW, // orientation = 3: "Bottom, right side (Rotate 180)"
+		 * MirrorVertical, // orientation = 4: "Bottom, left side (Mirror vertical)"
+		 * MirrorHorizontalAndRotate270CW, // orientation = 5: "Left side, top (Mirror horizontal and rotate 270 CW)"
+		 * Rotate90CW, // orientation = 6: "Right side, top (Rotate 90 CW)"
+		 * MirrorHorizontalAndRoate90CW, // orientation = 7: "Right side, bottom (Mirror horizontal and rotate 90 CW)"
+		 * Rotate270CW // orientation = 8: "Left side, bottom (Rotate 270 CW)"
+		*/
+		
+		Image.Orientation orientation = (Image.Orientation)metadata.get(Image.MetaName.Orientation);
+		if (orientation == null || orientation == Image.Orientation.Normal){
+			return image;
+		}
+		
+		Transform transform = null;
+		
+		switch(orientation){
+			case Rotate90CW:
+				transform = imaging.rotate(90);
+				break;
+			case Rotate180CW:
+				transform = imaging.rotate(180);
+				break;
+			case Rotate270CW:
+				transform = imaging.rotate(270);
+				break;
+		}
+		
+		if (transform == null){
+			return image;
+		}else{
+			Image appliedImage = imaging.apply(image, transform);
+			
+			// here use a trick to set the metadata back to the new image.
+			if (appliedImage instanceof DefaultImage){
+				// change the orientation value.
+				metadata.put(Image.MetaName.Orientation, Image.Orientation.Normal);
+				((DefaultImage)appliedImage).setMetaData(metadata);
+			}
+			
+			return appliedImage;
+		}
+	}
+	
 	@Test
 	public void testMakeRotate() throws IOException {
 		Image image0 = makeSampleImage();

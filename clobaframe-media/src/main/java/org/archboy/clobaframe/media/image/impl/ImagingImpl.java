@@ -15,6 +15,18 @@ import org.springframework.util.Assert;
  *
  * @author yang
  *
+ * For web application, add this listener:
+ * <web-app ...>
+ *     <listener>
+ *         <display-name>ImageIO service provider loader/unloader</display-name>
+ *         <listener-class>com.twelvemonkeys.servlet.image.IIOProviderContextListener</listener-class>
+ *     </listener>
+ * </web-app>
+ * 
+ * Or in console application:
+ * 
+ * ImageIO.scanForPlugins()
+ * 
  */
 @Named
 public class ImagingImpl implements Imaging{
