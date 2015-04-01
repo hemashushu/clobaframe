@@ -16,11 +16,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import javax.inject.Named;
 import org.archboy.clobaframe.io.MimeTypeDetector;
-import org.archboy.clobaframe.webresource.AbstractResourceRepository;
+import org.archboy.clobaframe.webresource.AbstractWebResourceRepository;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 
 @Named
-public class LocalWebResourceRepository extends AbstractResourceRepository{
+public class LocalWebResourceRepository extends AbstractWebResourceRepository{
 
 	@Inject
 	private ResourceLoader resourceLoader;

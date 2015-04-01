@@ -15,8 +15,8 @@ import javax.inject.Inject;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.webresource.AbstractWebResourceInfo;
-import org.archboy.clobaframe.webresource.VirtualResourceProvider;
-import org.archboy.clobaframe.webresource.VirtualResourceRepository;
+import org.archboy.clobaframe.webresource.VirtualWebResourceProvider;
+import org.archboy.clobaframe.webresource.VirtualWebResourceRepository;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceManager;
 import org.junit.After;
@@ -43,7 +43,7 @@ public class WebResourceManagerTest {
 	private WebResourceManager webResourceManager;
 	
 	@Inject
-	private VirtualResourceRepository virtualResourceRepository;
+	private VirtualWebResourceRepository virtualResourceRepository;
 	
 	@Inject
 	private ResourceLoader resourceLoader;
@@ -140,7 +140,7 @@ public class WebResourceManagerTest {
 
 	@Test
 	public void testGetVirtualResource() throws IOException {
-		VirtualResourceProvider provider = new VirtualResourceProvider() {
+		VirtualWebResourceProvider provider = new VirtualWebResourceProvider() {
 			@Override
 			public WebResourceInfo lookup(String name) {
 				if (name.equals("one.css")){
@@ -162,7 +162,7 @@ public class WebResourceManagerTest {
 		final TextWebResourceInfo info1 = new TextWebResourceInfo("l1.css", "p {}");
 		final TextWebResourceInfo info2 = new TextWebResourceInfo("l2a.css", "@import url('l1.css') \n h1 {}");
 		
-		VirtualResourceProvider provider = new VirtualResourceProvider() {
+		VirtualWebResourceProvider provider = new VirtualWebResourceProvider() {
 			@Override
 			public WebResourceInfo lookup(String name) {
 				if (name.equals("l3.css")){

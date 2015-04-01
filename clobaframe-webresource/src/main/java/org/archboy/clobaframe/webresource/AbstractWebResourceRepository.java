@@ -4,7 +4,7 @@ package org.archboy.clobaframe.webresource;
  *
  * @author yang
  */
-public abstract class AbstractResourceRepository implements ResourceRepository {
+public abstract class AbstractWebResourceRepository implements WebResourceRepository {
 	
 	/**
 	 * Get the implementation name.

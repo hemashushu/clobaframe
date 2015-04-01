@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.archboy.clobaframe.io.http.CacheResourceSender;
 import org.archboy.clobaframe.webresource.AbstractWebResourceInfo;
-import org.archboy.clobaframe.webresource.CompressableResource;
+import org.archboy.clobaframe.webresource.CompressableWebResource;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceManager;
 import org.archboy.clobaframe.webresource.WebResourceSender;
@@ -50,7 +50,7 @@ public class WebResourceSenderImpl implements WebResourceSender{
 	private void send(WebResourceInfo webResourceInfo, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Map<String, Object> headers = new HashMap<String, Object>();
 		
-		if (webResourceInfo instanceof CompressableResource ||
+		if (webResourceInfo instanceof CompressableWebResource ||
 			(webResourceInfo instanceof AbstractWebResourceInfo &&
 				((AbstractWebResourceInfo)webResourceInfo).getUnderlayWebResourceInfoTypes()
 					.contains(CompressWebResourceInfo.class))){

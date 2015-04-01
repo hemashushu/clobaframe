@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.zip.GZIPOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.webresource.AbstractWebResourceInfo;
-import org.archboy.clobaframe.webresource.CompressableResource;
+import org.archboy.clobaframe.webresource.CompressableWebResource;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.springframework.util.Assert;
 
@@ -17,7 +17,7 @@ import org.springframework.util.Assert;
  *
  * @author yang
  */
-public class CompressWebResourceInfo extends AbstractWebResourceInfo implements CompressableResource {
+public class CompressWebResourceInfo extends AbstractWebResourceInfo implements CompressableWebResource {
 
 	private WebResourceInfo webResourceInfo;
 	//private String lastContentHash;

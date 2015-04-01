@@ -9,11 +9,11 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.archboy.clobaframe.webresource.AbstractVersionStrategy;
-import org.archboy.clobaframe.webresource.CacheableResource;
-import org.archboy.clobaframe.webresource.CacheableResourceUpdateListener;
-import org.archboy.clobaframe.webresource.ConcatenateResourceRepository;
+import org.archboy.clobaframe.webresource.CacheableWebResource;
+import org.archboy.clobaframe.webresource.CacheableWebResourceUpdateListener;
+import org.archboy.clobaframe.webresource.ConcatenateWebResourceRepository;
 import org.archboy.clobaframe.webresource.LocationGenerator;
-import org.archboy.clobaframe.webresource.ResourceCollection;
+import org.archboy.clobaframe.webresource.WebResourceCache;
 import org.archboy.clobaframe.webresource.VersionStrategy;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceManager;
@@ -36,14 +36,12 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	private List<AbstractVersionStrategy> versionStrategys;
 
 	// fields
-	
 	private VersionStrategy versionStrategy;
 
-	@Inject
-	private ResourceCollection resourceCollection;
+	private WebResourceCache webResourceCache;
 	
 	@Inject
-	private ConcatenateResourceRepository concatenateResourceRepository;
+	private ConcatenateWebResourceRepository concatenateResourceRepository;
 	
 	private List<String> textWebResourceMimeTypes; 
 
@@ -87,6 +85,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 		logger.info("Using [{}] web resource version name strategy.", versionStrategyName);
 		
 		locationGenerator = new DefaultLocationGenerator(versionStrategy, baseLocation);
+		webResourceCache = new DefaultWebResourceCache();
 		
 		textWebResourceMimeTypes = new ArrayList<String>();
 		textWebResourceMimeTypes.add(MIME_TYPE_STYLE_SHEET);
@@ -101,7 +100,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	private WebResourceInfo getResourceInternal(String name) {
 		
 		// load from collection first
-		WebResourceInfo resourceInfo = resourceCollection.getByName(name);
+		WebResourceInfo resourceInfo = webResourceCache.getByName(name);
 		if (resourceInfo != null) {
 			return resourceInfo;
 		}
@@ -148,14 +147,14 @@ public class WebResourceManagerImpl implements WebResourceManager {
 			if (childResourceNames != null){
 				for(String n : childResourceNames) {
 					WebResourceInfo r = getResourceInternal(n);
-					if (r != null && r instanceof CacheableResource) {
-						((CacheableResource)r).addUpdateListener((CacheableResourceUpdateListener)resourceInfo);
+					if (r != null && r instanceof CacheableWebResource) {
+						((CacheableWebResource)r).addUpdateListener((CacheableWebResourceUpdateListener)resourceInfo);
 					}
 				}
 			}
 		}
 		
-		resourceCollection.add(resourceInfo);
+		webResourceCache.add(resourceInfo);
 		
 		buildingResourceNames.pop();
 		
@@ -195,8 +194,8 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	public void refresh(String name) {
 		WebResourceInfo resource = getResourceInternal(name);
 		if (resource != null) {
-			if (resource instanceof CacheableResource) {
-				((CacheableResource)resource).refresh();
+			if (resource instanceof CacheableWebResource) {
+				((CacheableWebResource)resource).refresh();
 			}
 		}
 	}
@@ -204,6 +203,11 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	@Override
 	public void setLocationGenerator(LocationGenerator locationGenerator) {
 		this.locationGenerator = locationGenerator;
+	}
+
+	@Override
+	public void setResourceCache(WebResourceCache webResourceCache) {
+		this.webResourceCache = webResourceCache;
 	}
 	
 }

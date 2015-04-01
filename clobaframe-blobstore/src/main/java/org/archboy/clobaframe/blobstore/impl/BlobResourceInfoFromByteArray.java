@@ -7,34 +7,38 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.archboy.clobaframe.blobstore.BlobResourceInfo;
-import org.archboy.clobaframe.blobstore.BlobKey;
 
 /**
  *
  * @author yang
  */
-public class BlobResourceInfoFromByteArray implements BlobResourceInfo{
+public class BlobResourceInfoFromByteArray extends AbstractBlobResourceInfo{
 
-	private BlobKey blobKey;
-
-	private String contentType;
-	private Date lastModified;
+	private String bucketName;
+	private String key;
 	private byte[] content;
+	private String mimeType;
+	private Date lastModified;
+	private Map<String, Object> metadata;
 
-	private Map<String, String> metadata;
-
-	public BlobResourceInfoFromByteArray(BlobKey blobKey, String contentType,
-			Date lastModified, byte[] content) {
-		this.blobKey = blobKey;
-		this.contentType = contentType;
-		this.lastModified = lastModified;
+	public BlobResourceInfoFromByteArray(String bucketName, String key,
+			byte[] content, String mimeType, Date lastModified, Map<String, Object> metadata) {
+		this.bucketName = bucketName;
+		this.key = key;
 		this.content = content;
-		this.metadata = new HashMap<String, String>();
+		this.mimeType = mimeType;
+		this.lastModified = lastModified;
+		this.metadata = metadata;
 	}
 
 	@Override
-	public BlobKey getBlobKey() {
-		return blobKey;
+	public String getBucketName() {
+		return bucketName;
+	}
+
+	@Override
+	public String getKey() {
+		return key;
 	}
 
 	@Override
@@ -43,8 +47,8 @@ public class BlobResourceInfoFromByteArray implements BlobResourceInfo{
 	}
 
 	@Override
-	public String getContentType() {
-		return contentType;
+	public String getMimeType() {
+		return mimeType;
 	}
 
 	@Override
@@ -53,12 +57,12 @@ public class BlobResourceInfoFromByteArray implements BlobResourceInfo{
 	}
 
 	@Override
-	public InputStream getInputStream() throws IOException{
+	public InputStream getContent() throws IOException{
 		return new ByteArrayInputStream(content);
 	}
 
 	@Override
-	public InputStream getInputStream(long start, long length) throws IOException {
+	public InputStream getContent(long start, long length) throws IOException {
 		return new ByteArrayInputStream(
 				content, (int)start, (int)length);
 	}
@@ -69,13 +73,7 @@ public class BlobResourceInfoFromByteArray implements BlobResourceInfo{
 	}
 
 	@Override
-	public Map<String, String> getMetadata() {
+	public Map<String, Object> getMetadata() {
 		return metadata;
 	}
-
-	@Override
-	public void addMetadata(String key, String value) {
-		metadata.put(key, value);
-	}
-
 }

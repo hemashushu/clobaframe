@@ -16,9 +16,9 @@ import javax.inject.Named;
  * @author yang
  */
 @Named
-public class VirtualResourceRepositoryImpl extends AbstractResourceRepository implements VirtualResourceRepository {
+public class VirtualWebResourceRepositoryImpl extends AbstractWebResourceRepository implements VirtualWebResourceRepository {
 
-	private List<VirtualResourceProvider> virtualResourceProviders = new ArrayList<VirtualResourceProvider>();
+	private List<VirtualWebResourceProvider> virtualResourceProviders = new ArrayList<VirtualWebResourceProvider>();
 	
 	@Override
 	public String getName() {
@@ -27,7 +27,7 @@ public class VirtualResourceRepositoryImpl extends AbstractResourceRepository im
 
 	@Override
 	public WebResourceInfo getByName(String name) {
-		for(VirtualResourceProvider virtualResourceProvider : virtualResourceProviders) {
+		for(VirtualWebResourceProvider virtualResourceProvider : virtualResourceProviders) {
 			WebResourceInfo webResourceInfo = virtualResourceProvider.lookup(name);
 			if (webResourceInfo != null) {
 				return webResourceInfo;
@@ -38,7 +38,7 @@ public class VirtualResourceRepositoryImpl extends AbstractResourceRepository im
 	}
 
 	@Override
-	public void addProvider(VirtualResourceProvider provider) {
+	public void addProvider(VirtualWebResourceProvider provider) {
 		virtualResourceProviders.add(provider);
 	}
 

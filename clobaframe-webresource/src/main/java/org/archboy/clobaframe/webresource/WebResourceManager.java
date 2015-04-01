@@ -65,4 +65,6 @@ public interface WebResourceManager {
 	void refresh(String name);
 	
 	void setLocationGenerator(LocationGenerator locationGenerator);
+	
+	void setResourceCache(WebResourceCache webResourceCache);
 }

@@ -1,45 +1,16 @@
-package org.archboy.clobaframe.blobstore;
+package org.archboy.clobaframe.blobstore.impl;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.archboy.clobaframe.blobstore.BlobResourceInfo;
 
 /**
- * The key of {@link BlobResourceInfo} object.
  *
  * @author yang
- *
  */
-public class BlobKey {
-
-	private String bucketName;
-	private String key;
-
-	public BlobKey() {
-		//
-	}
-
-	public BlobKey(String bucketName, String key) {
-		this.bucketName = bucketName;
-		this.key = key;
-	}
-
-	public String getBucketName() {
-		return bucketName;
-	}
-
-	public void setBucketName(String bucketName) {
-		this.bucketName = bucketName;
-	}
-
-	public String getKey() {
-		return key;
-	}
-
-	public void setKey(String key) {
-		this.key = key;
-	}
-
+public abstract class AbstractBlobResourceInfo implements BlobResourceInfo {
+	
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder()
@@ -54,11 +25,11 @@ public class BlobKey {
 			return true;
 		}
 
-		if (!(obj instanceof BlobKey)) {
+		if (!(obj instanceof BlobResourceInfo)) {
 			return false;
 		}
 
-		BlobKey other = (BlobKey) obj;
+		BlobResourceInfo other = (BlobResourceInfo) obj;
 		return new EqualsBuilder()
 				.append(getBucketName(), other.getBucketName())
 				.append(getKey(), other.getKey())
@@ -71,4 +42,5 @@ public class BlobKey {
 				.append("bucketName", getBucketName())
 				.append("key", getKey()).toString();
 	}
+	
 }

@@ -9,23 +9,31 @@ import org.archboy.clobaframe.io.ResourceInfo;
  */
 public interface BlobResourceInfo extends ResourceInfo {
 
+	String getBucketName();
+	
 	/**
 	 * The blob object key.
 	 *
 	 * @return
 	 */
-	BlobKey getBlobKey();
+	String getKey();
 
 	/**
 	 *
 	 * @return
 	 */
-	Map<String, String> getMetadata();
+	Map<String, Object> getMetadata();
 
+	/**
+	 * 
+	 * @param metadata 
+	 */
+	//void setMetadata(Map<String, Object> metadata);
+	
 	/**
 	 *
 	 * @param key
 	 * @param value
 	 */
-	void addMetadata(String key, String value);
+	//void addMetadata(String key, Object value);
 }

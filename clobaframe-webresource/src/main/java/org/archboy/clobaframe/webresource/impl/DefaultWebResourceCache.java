@@ -2,16 +2,15 @@ package org.archboy.clobaframe.webresource.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.inject.Named;
-import org.archboy.clobaframe.webresource.ResourceCollection;
+import org.archboy.clobaframe.webresource.WebResourceCache;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 
 /**
- *
+ * In-memory cache.
+ * 
  * @author yang
  */
-@Named
-public class InMemoryResourceCollection implements ResourceCollection {
+public class DefaultWebResourceCache implements WebResourceCache {
 
 	private Map<String, WebResourceInfo> resources = new HashMap<String, WebResourceInfo>();
 	

@@ -15,8 +15,8 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.commons.io.IOUtils;
-import org.archboy.clobaframe.webresource.ConcatenateResourceRepository;
-import org.archboy.clobaframe.webresource.ResourceRepository;
+import org.archboy.clobaframe.webresource.ConcatenateWebResourceRepository;
+import org.archboy.clobaframe.webresource.WebResourceRepository;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -27,7 +27,7 @@ import org.springframework.core.io.ResourceLoader;
  * @author yang
  */
 @Named
-public class ConcatenateResourceRepositoryImpl implements ConcatenateResourceRepository {
+public class ConcatenateWebResourceRepositoryImpl implements ConcatenateWebResourceRepository {
 
 	@Value("${clobaframe.webresource.concatenateConfig}")
 	private String concatenateConfig;
@@ -36,7 +36,7 @@ public class ConcatenateResourceRepositoryImpl implements ConcatenateResourceRep
 	private ResourceLoader resourceLoader;
 		
 	@Inject
-	private List<ResourceRepository> resourceRepositories;
+	private List<WebResourceRepository> resourceRepositories;
 	
 	private Map<String, List<String>> concatenates = new HashMap<String, List<String>>();
 
@@ -100,7 +100,7 @@ public class ConcatenateResourceRepositoryImpl implements ConcatenateResourceRep
 	public Collection<WebResourceInfo> getAll() {
 		List<WebResourceInfo> webResourceInfos = new ArrayList<WebResourceInfo>();
 		
-		for (ResourceRepository resourceRepository : resourceRepositories){
+		for (WebResourceRepository resourceRepository : resourceRepositories){
 			webResourceInfos.addAll(resourceRepository.getAll());
 		}
 			
@@ -113,7 +113,7 @@ public class ConcatenateResourceRepositoryImpl implements ConcatenateResourceRep
 	private WebResourceInfo getResourceFromRepositories(String name){
 		WebResourceInfo webResourceInfo = null;
 		
-		for (ResourceRepository resourceRepository : resourceRepositories){
+		for (WebResourceRepository resourceRepository : resourceRepositories){
 			webResourceInfo = resourceRepository.getByName(name);
 			if (webResourceInfo != null) {
 				break;

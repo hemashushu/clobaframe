@@ -11,8 +11,8 @@ import javax.inject.Named;
  * @author yang
  */
 @Named
-public interface VirtualResourceRepository extends ResourceRepository {
+public interface VirtualWebResourceRepository extends WebResourceRepository {
 
-	void addProvider(VirtualResourceProvider provider);
+	void addProvider(VirtualWebResourceProvider provider);
 	
 }

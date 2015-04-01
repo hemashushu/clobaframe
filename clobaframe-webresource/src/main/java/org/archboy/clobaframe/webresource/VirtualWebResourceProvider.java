@@ -4,7 +4,7 @@ package org.archboy.clobaframe.webresource;
  *
  * @author yang
  */
-public interface VirtualResourceProvider {
+public interface VirtualWebResourceProvider {
 	
 	/**
 	 * Lookup the virtual resource by name.

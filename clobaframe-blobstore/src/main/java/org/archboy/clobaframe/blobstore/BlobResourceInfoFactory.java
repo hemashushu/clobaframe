@@ -1,6 +1,8 @@
 package org.archboy.clobaframe.blobstore;
 
 import java.io.InputStream;
+import java.util.Date;
+import java.util.Map;
 
 /**
  * Generates the {@link BlobResourceInfo} object by {@link InputStream} or byte array.
@@ -12,28 +14,35 @@ public interface BlobResourceInfoFactory {
 	/**
 	 * Create the blob object by InputStream.
 	 *
-	 * @param blobKey
-	 * @param size
+	 * @param bucketName
+	 * @param key
+	 * @param inputStream
+	 * @param contentLength
 	 * @param mimeType
-	 * @param content
+	 * @param lastModified
+	 * @param metadata
 	 * @return
 	 */
 	BlobResourceInfo make(
-			BlobKey blobKey,
-			String mimeType,
-			InputStream content, long size);
+			String bucketName, String key,
+			InputStream inputStream, long contentLength,
+			String mimeType, Date lastModified,
+			Map<String, Object> metadata);
 
 	/**
 	 * Create the blob object by byte array.
 	 *
-	 * @param blobKey
-	 * @param mimeType
+	 * @param bucketName
+	 * @param key
 	 * @param content
+	 * @param mimeType
+	 * @param lastModified
+	 * @param metadata
 	 * @return
 	 */
 	BlobResourceInfo make(
-			BlobKey blobKey,
-			String mimeType,
-			byte[] content);
+			String bucketName, String key,
+			byte[] content, String mimeType, Date lastModified,
+			Map<String, Object> metadata);
 
 }

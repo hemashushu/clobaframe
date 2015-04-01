@@ -4,13 +4,13 @@ package org.archboy.clobaframe.webresource;
  *
  * @author yang
  */
-public interface CacheableResource {
+public interface CacheableWebResource {
 	
 	/**
 	 * 
 	 * @param resourceUpdateListener 
 	 */
-	void addUpdateListener(CacheableResourceUpdateListener resourceUpdateListener);
+	void addUpdateListener(CacheableWebResourceUpdateListener resourceUpdateListener);
 	
 	/**
 	 * Force refresh by outside invoker.

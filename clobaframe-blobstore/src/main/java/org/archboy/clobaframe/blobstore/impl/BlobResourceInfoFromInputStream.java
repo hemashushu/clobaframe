@@ -6,37 +6,46 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.archboy.clobaframe.blobstore.BlobResourceInfo;
-import org.archboy.clobaframe.blobstore.BlobKey;
 
 /**
  *
  * @author yang
  *
  */
-public class BlobResourceInfoFromInputStream implements BlobResourceInfo{
+public class BlobResourceInfoFromInputStream extends AbstractBlobResourceInfo {
 
-	private BlobKey blobKey;
+	private String bucketName;
+	private String key;
 	private long contentLength;
-	private String contentType;
+	private String mimeType;
 	private Date lastModified;
 	private InputStream inputStream;
-	private Map<String, String> metadata;
+	
+	private Map<String, Object> metadata;
 
 	private boolean consumed;
 
-	public BlobResourceInfoFromInputStream(BlobKey blobKey, long contentLength,
-			String contentType, Date lastModified, InputStream inputStream) {
-		this.blobKey = blobKey;
-		this.contentLength = contentLength;
-		this.contentType = contentType;
-		this.lastModified = lastModified;
+	public BlobResourceInfoFromInputStream(
+			String bucketName, String key,
+			InputStream inputStream, long contentLength,
+			String mimeType, Date lastModified, Map<String, Object> metadata) {
+		this.bucketName = bucketName;
+		this.key = key;
 		this.inputStream = inputStream;
-		this.metadata = new HashMap<String, String>();
+		this.contentLength = contentLength;
+		this.mimeType = mimeType;
+		this.lastModified = lastModified;
+		this.metadata = metadata;
 	}
 
 	@Override
-	public BlobKey getBlobKey() {
-		return blobKey;
+	public String getBucketName() {
+		return bucketName;
+	}
+
+	@Override
+	public String getKey() {
+		return key;
 	}
 
 	@Override
@@ -45,8 +54,8 @@ public class BlobResourceInfoFromInputStream implements BlobResourceInfo{
 	}
 
 	@Override
-	public String getContentType() {
-		return contentType;
+	public String getMimeType() {
+		return mimeType;
 	}
 
 	@Override
@@ -55,9 +64,9 @@ public class BlobResourceInfoFromInputStream implements BlobResourceInfo{
 	}
 
 	@Override
-	public InputStream getInputStream() throws IOException {
+	public InputStream getContent() throws IOException {
 		if (consumed){
-			throw new IOException("The content snapshot has already created.");
+			throw new IOException("The content has already consumed.");
 		}
 
 		consumed = true;
@@ -65,7 +74,7 @@ public class BlobResourceInfoFromInputStream implements BlobResourceInfo{
 	}
 
 	@Override
-	public InputStream getInputStream(long start, long length) throws IOException{
+	public InputStream getContent(long start, long length) throws IOException{
 		throw new UnsupportedOperationException("Does not supported.");
 	}
 
@@ -75,12 +84,21 @@ public class BlobResourceInfoFromInputStream implements BlobResourceInfo{
 	}
 
 	@Override
-	public Map<String, String> getMetadata() {
+	public Map<String, Object> getMetadata() {
 		return metadata;
 	}
 
-	@Override
-	public void addMetadata(String key, String value) {
-		metadata.put(key, value);
-	}
+//	@Override
+//	public void setMetadata(Map<String, Object> metadata) {
+//		this.metadata = metadata;
+//	}
+//	
+//	@Override
+//	public void addMetadata(String key, Object value) {
+//		if (metadata == null){
+//			metadata = new HashMap<String, Object>();
+//		}
+//		
+//		metadata.put(key, value);
+//	}
 }

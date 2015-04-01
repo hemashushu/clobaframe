@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.Map;
 import org.archboy.clobaframe.blobstore.BlobResourceInfo;
-import org.archboy.clobaframe.blobstore.BlobKey;
+import org.archboy.clobaframe.blobstore.impl.AbstractBlobResourceInfo;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
 import org.archboy.clobaframe.io.file.impl.PartialFileInputStream;
 
@@ -15,21 +15,34 @@ import org.archboy.clobaframe.io.file.impl.PartialFileInputStream;
  *
  * @author yang
  */
-public class LocalBlobResourceInfo implements BlobResourceInfo, FileBaseResourceInfo {
+public class LocalBlobResourceInfo extends AbstractBlobResourceInfo implements FileBaseResourceInfo {
 
-	private BlobKey blobKey;
+	private String bucketName;
+	private String key;
 	private File file;
-	private String contentType;
+	private String mimeType;
+	private Date lastModified;
+	private Map<String, Object> metadata;
 
-	public LocalBlobResourceInfo(BlobKey blobKey, File file, String contentType) {
-		this.blobKey = blobKey;
+	public LocalBlobResourceInfo(String bucketName, String key,
+			File file, String mimeType, 
+			Date lastModified, Map<String, Object> metadata) {
+		this.bucketName = bucketName;
+		this.key = key;
 		this.file = file;
-		this.contentType = contentType;
+		this.mimeType = mimeType;
+		this.lastModified = lastModified;
+		this.metadata = metadata;
+	}
+	
+	@Override
+	public String getBucketName() {
+		return bucketName;
 	}
 
 	@Override
-	public BlobKey getBlobKey() {
-		return blobKey;
+	public String getKey() {
+		return key;
 	}
 
 	@Override
@@ -38,33 +51,28 @@ public class LocalBlobResourceInfo implements BlobResourceInfo, FileBaseResource
 	}
 
 	@Override
-	public String getContentType() {
-		return contentType;
+	public String getMimeType() {
+		return mimeType;
 	}
 
 	@Override
 	public Date getLastModified() {
-		return new Date(file.lastModified());
+		return lastModified;
 	}
 
 	@Override
-	public InputStream getInputStream() throws IOException{
+	public InputStream getContent() throws IOException{
 		return new FileInputStream(file);
 	}
 
 	@Override
-	public InputStream getInputStream(long start, long length) throws IOException{
+	public InputStream getContent(long start, long length) throws IOException{
 		return new PartialFileInputStream(file, start, length);
 	}
 
 	@Override
-	public Map<String, String> getMetadata() {
-		throw new UnsupportedOperationException("Does not supported.");
-	}
-
-	@Override
-	public void addMetadata(String key, String value) {
-		throw new UnsupportedOperationException("Does not supported.");
+	public Map<String, Object> getMetadata() {
+		return metadata;
 	}
 
 	@Override

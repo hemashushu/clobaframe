@@ -8,12 +8,12 @@ import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.webresource.AbstractWebResourceInfo;
-import org.archboy.clobaframe.webresource.CacheableResource;
-import org.archboy.clobaframe.webresource.CacheableResourceUpdateListener;
+import org.archboy.clobaframe.webresource.CacheableWebResource;
+import org.archboy.clobaframe.webresource.CacheableWebResourceUpdateListener;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.springframework.util.Assert;
 
-public class CacheableWebResourceInfo extends AbstractWebResourceInfo implements CacheableResource, CacheableResourceUpdateListener {
+public class CacheableWebResourceInfo extends AbstractWebResourceInfo implements CacheableWebResource, CacheableWebResourceUpdateListener {
 
 	private long cacheMilliSeconds;
 	private long lastCheckingTime;
@@ -28,13 +28,13 @@ public class CacheableWebResourceInfo extends AbstractWebResourceInfo implements
 	// to prevent infinite loop
 	private boolean rebuilding;
 	
-	private Set<CacheableResourceUpdateListener> resourceUpdateListeners;
+	private Set<CacheableWebResourceUpdateListener> resourceUpdateListeners;
 
 	public CacheableWebResourceInfo(WebResourceInfo webResourceInfo, int cacheSeconds) {
 		Assert.notNull(webResourceInfo);
 		this.webResourceInfo = webResourceInfo;
 		this.cacheMilliSeconds = cacheSeconds * 1000;
-		this.resourceUpdateListeners = new HashSet<CacheableResourceUpdateListener>();
+		this.resourceUpdateListeners = new HashSet<CacheableWebResourceUpdateListener>();
 		
 		addUnderlayWebResourceType(webResourceInfo);
 		rebuild();
@@ -119,7 +119,7 @@ public class CacheableWebResourceInfo extends AbstractWebResourceInfo implements
 		}
 		
 		// notify update listeners
-		for(CacheableResourceUpdateListener listener : resourceUpdateListeners){
+		for(CacheableWebResourceUpdateListener listener : resourceUpdateListeners){
 			listener.onUpdate(webResourceInfo.getName());
 		}
 		
@@ -134,7 +134,7 @@ public class CacheableWebResourceInfo extends AbstractWebResourceInfo implements
 	}
 
 	@Override
-	public void addUpdateListener(CacheableResourceUpdateListener resourceUpdateListener) {
+	public void addUpdateListener(CacheableWebResourceUpdateListener resourceUpdateListener) {
 		resourceUpdateListeners.add(resourceUpdateListener);
 	}
 

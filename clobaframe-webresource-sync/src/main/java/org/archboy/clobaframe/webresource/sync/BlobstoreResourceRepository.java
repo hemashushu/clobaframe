@@ -10,7 +10,7 @@ import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Qualifier;
 import javax.inject.Named;
 import org.archboy.clobaframe.webresource.ResourceLocationGenerator;
-import org.archboy.clobaframe.webresource.ResourceRepository;
+import org.archboy.clobaframe.webresource.WebResourceRepository;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.local.LocalWebResourceRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
  * @author yang
  */
 @Named
-public class BlobstoreResourceRepository implements ResourceRepository{
+public class BlobstoreResourceRepository implements WebResourceRepository{
 
 	@Value("${webresource.blobstore.keyNamePrefix}")
 	private String keyNamePrefix;
@@ -30,7 +30,7 @@ public class BlobstoreResourceRepository implements ResourceRepository{
 
 	@Inject
 	@Qualifier("localWebResourceRepository")
-	private ResourceRepository localResourceRepository;
+	private WebResourceRepository localResourceRepository;
 	
 	private List<WebResourceInfo> webResourceInfos;
 	

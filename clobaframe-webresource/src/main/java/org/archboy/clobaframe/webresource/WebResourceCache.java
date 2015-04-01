@@ -8,7 +8,7 @@ package org.archboy.clobaframe.webresource;
  * 
  * @author yang
  */
-public interface ResourceCollection {
+public interface WebResourceCache {
 
 	/**
 	 * 
