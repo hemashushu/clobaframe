@@ -2,6 +2,7 @@ package org.archboy.clobaframe.webresource;
 
 import java.io.FileNotFoundException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -17,9 +18,22 @@ public interface WebResourceManager {
 	public static final String MIME_TYPE_STYLE_SHEET = "text/css";
 	
 	public static final List<String> MIME_TYPE_JAVA_SCRIPT = Arrays.asList(
+		"application/javascript", // javascript, standard 
 		"text/javascript", // javascript, IE
-		"application/x-javascript", // javascript, obsolete, but widely used
-		"application/javascript" // javascript, standard 
+		"application/x-javascript" // javascript, obsolete
+	);
+	
+	public static final List<String> MIME_TYPE_FONT = Arrays.asList(
+		"application/x-font-ttf", // ttf
+		"image/svg+xml", // svg
+		"application/vnd.ms-fontobject", // eot
+		"application/x-font-woff" // woff
+	);
+	
+	public static final List<String> MIME_TYPE_TEXT = Arrays.asList(
+		"text/plain",
+		"text/html",
+		"application/xml"
 	);
 	
 	/**
@@ -38,6 +52,8 @@ public interface WebResourceManager {
 	 */
 	WebResourceInfo getResourceByVersionName(String versionName) throws FileNotFoundException;
 
+	String getVersionName(WebResourceInfo webResourceInfo);
+	
 	/**
 	 * Get the location (URL) of the specify resource.
 	 *
@@ -64,7 +80,15 @@ public interface WebResourceManager {
 	 */
 	void refresh(String name);
 	
+	/**
+	 * 
+	 * @param locationGenerator 
+	 */
 	void setLocationGenerator(LocationGenerator locationGenerator);
 	
+	/**
+	 * 
+	 * @param webResourceCache 
+	 */
 	void setResourceCache(WebResourceCache webResourceCache);
 }

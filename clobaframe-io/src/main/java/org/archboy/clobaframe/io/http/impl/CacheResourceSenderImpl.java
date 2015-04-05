@@ -47,9 +47,4 @@ public class CacheResourceSenderImpl implements CacheResourceSender {
 		resourceSender.send(resourceInfo, extraHeaders, request, response);
 	}
 
-//	@Override
-//	public void send(ResourceInfo resourceInfo, Map<String, Object> extraHeaders, HttpServletRequest request, HttpServletResponse response) throws IOException {
-//		resourceSender.send(resourceInfo, extraHeaders, request, response);
-//	}
-
 }

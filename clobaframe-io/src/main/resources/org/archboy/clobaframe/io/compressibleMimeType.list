@@ -1,0 +1,8 @@
+# mime types that compressible
+text/plain
+text/html
+application/xml
+text/css
+application/javascript
+application/x-font-ttf
+image/svg+xml

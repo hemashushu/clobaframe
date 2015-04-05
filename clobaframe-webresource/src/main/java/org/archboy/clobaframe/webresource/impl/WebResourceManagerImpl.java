@@ -43,7 +43,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	@Inject
 	private ConcatenateWebResourceRepository concatenateResourceRepository;
 	
-	private List<String> textWebResourceMimeTypes; 
+	private List<String> compressibleWebResourceMimeTypes; 
 
 	@Value("${clobaframe.webresource.minify}")
 	private boolean canMinify;
@@ -60,6 +60,8 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	private LocationGenerator locationGenerator; 
 	
 	private static final int DEFAULT_CACHE_SECONDS = 5 * 60;
+	
+	@Value("${clobaframe.webresource.cacheSeconds}")
 	private int cacheSeconds = DEFAULT_CACHE_SECONDS;
 	
 	private final Logger logger = LoggerFactory.getLogger(WebResourceManagerImpl.class);
@@ -87,9 +89,12 @@ public class WebResourceManagerImpl implements WebResourceManager {
 		locationGenerator = new DefaultLocationGenerator(versionStrategy, baseLocation);
 		webResourceCache = new DefaultWebResourceCache();
 		
-		textWebResourceMimeTypes = new ArrayList<String>();
-		textWebResourceMimeTypes.add(MIME_TYPE_STYLE_SHEET);
-		textWebResourceMimeTypes.addAll(MIME_TYPE_JAVA_SCRIPT);
+		compressibleWebResourceMimeTypes = new ArrayList<String>();
+		compressibleWebResourceMimeTypes.add(MIME_TYPE_STYLE_SHEET);
+		compressibleWebResourceMimeTypes.addAll(MIME_TYPE_JAVA_SCRIPT);
+		compressibleWebResourceMimeTypes.addAll(MIME_TYPE_TEXT);
+		compressibleWebResourceMimeTypes.add("application/x-font-ttf"); // ttf
+		compressibleWebResourceMimeTypes.add("image/svg+xml"); // svg
 	}
 
 	/**
@@ -105,7 +110,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 			return resourceInfo;
 		}
 		
-		// then load from composites and repository
+		// then load from concatenate and repository
 		resourceInfo = concatenateResourceRepository.getByName(name);
 		
 		if (resourceInfo == null) {
@@ -130,13 +135,13 @@ public class WebResourceManagerImpl implements WebResourceManager {
 		}
 		
 		// minify
-		if (canMinify && textWebResourceMimeTypes.contains(resourceInfo.getMimeType())) {
+		if (canMinify && compressibleWebResourceMimeTypes.contains(resourceInfo.getMimeType())) {
 			resourceInfo = new MinifyWebResourceInfo(resourceInfo);
 		}
 		
 		// compress
-		if (canCompress && textWebResourceMimeTypes.contains(resourceInfo.getMimeType())) {
-			resourceInfo = new CompressWebResourceInfo(resourceInfo);
+		if (canCompress && compressibleWebResourceMimeTypes.contains(resourceInfo.getMimeType())) {
+			resourceInfo = new CompressibleWebResourceInfo(resourceInfo);
 		}
 		
 		// cache
@@ -180,6 +185,11 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	}
 
 	@Override
+	public String getVersionName(WebResourceInfo webResourceInfo) {
+		return versionStrategy.getVersionName(webResourceInfo);
+	}
+	
+	@Override
 	public String getLocation(WebResourceInfo webResourceInfo) {
 		return locationGenerator.getLocation(webResourceInfo);
 	}
@@ -199,7 +209,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 			}
 		}
 	}
-
+	
 	@Override
 	public void setLocationGenerator(LocationGenerator locationGenerator) {
 		this.locationGenerator = locationGenerator;

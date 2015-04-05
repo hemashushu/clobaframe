@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.archboy.clobaframe.io.http.CacheResourceSender;
 import org.archboy.clobaframe.webresource.AbstractWebResourceInfo;
-import org.archboy.clobaframe.webresource.CompressableWebResource;
+import org.archboy.clobaframe.webresource.CompressibleWebResource;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceManager;
 import org.archboy.clobaframe.webresource.WebResourceSender;
@@ -28,7 +28,7 @@ public class WebResourceSenderImpl implements WebResourceSender{
 	private CacheResourceSender cacheResourceSender;
 
 	@Inject
-	private WebResourceManager webResourceService;
+	private WebResourceManager webResourceManager;
 
 	@Override
 	public void send(String resourceName, HttpServletRequest request,
@@ -39,7 +39,7 @@ public class WebResourceSenderImpl implements WebResourceSender{
 		Assert.notNull(response);
 		
 		try{
-			WebResourceInfo webResourceInfo = webResourceService.getResource(resourceName);
+			WebResourceInfo webResourceInfo = webResourceManager.getResource(resourceName);
 			send(webResourceInfo, request, response);
 		}catch(FileNotFoundException e){
 			response.sendError(HttpServletResponse.SC_NOT_FOUND,
@@ -50,10 +50,10 @@ public class WebResourceSenderImpl implements WebResourceSender{
 	private void send(WebResourceInfo webResourceInfo, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Map<String, Object> headers = new HashMap<String, Object>();
 		
-		if (webResourceInfo instanceof CompressableWebResource ||
+		if (webResourceInfo instanceof CompressibleWebResource ||
 			(webResourceInfo instanceof AbstractWebResourceInfo &&
 				((AbstractWebResourceInfo)webResourceInfo).getUnderlayWebResourceInfoTypes()
-					.contains(CompressWebResourceInfo.class))){
+					.contains(CompressibleWebResourceInfo.class))){
 			
 			headers.put("Content-Encoding", "gzip");
 		}
@@ -72,7 +72,7 @@ public class WebResourceSenderImpl implements WebResourceSender{
 		Assert.notNull(response);
 		
 		try{
-			WebResourceInfo webResourceInfo = webResourceService.getResourceByVersionName(versionName);
+			WebResourceInfo webResourceInfo = webResourceManager.getResourceByVersionName(versionName);
 			send(webResourceInfo, request, response);
 		}catch(FileNotFoundException e){
 			response.sendError(HttpServletResponse.SC_NOT_FOUND,

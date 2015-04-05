@@ -34,7 +34,7 @@ public class WebResourceManagerTest {
 //	private Server server;
 	
 	@Inject
-	private WebResourceManager resourceManager;
+	private WebResourceManager webResourceManager;
 
 	@Inject
 	private ResourceLoader resourceLoader;
@@ -67,7 +67,7 @@ public class WebResourceManagerTest {
 	public void testGetAllResources() {
 		// test get all resources
 
-		Collection<WebResourceInfo> webResources = resourceManager.getAllResources();
+		Collection<WebResourceInfo> webResources = webResourceManager.getAllResources();
 		//assertEquals(5, webResources.size()); // should assume the items.
 
 		List<String> names = new ArrayList<String>();
@@ -86,8 +86,8 @@ public class WebResourceManagerTest {
 	public void testGetResource() throws IOException {
 		// test get a resource
 
-		WebResourceInfo webResource1 = resourceManager.getResource("test.png");
-		WebResourceInfo webResource2 = resourceManager.getResource("folder/info-32.png");
+		WebResourceInfo webResource1 = webResourceManager.getResource("test.png");
+		WebResourceInfo webResource2 = webResourceManager.getResource("folder/info-32.png");
 
 		assertResourceContentEquals(webResource1, "sample/web/test.png");
 		assertResourceContentEquals(webResource2, "sample/web/folder/info-32.png");

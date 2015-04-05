@@ -53,7 +53,8 @@ public class ExtensionNameMimeTypeDetector implements MimeTypeDetector {
 		Resource resource = resourceLoader.getResource(resourceName);
 		if (!resource.exists()) {
 			//logger.error("Can not find the mime type list file.");
-			throw new FileNotFoundException("Can not find the mime type list file.");
+			throw new FileNotFoundException(
+					String.format("Can not find the mime type list file [%s].", resourceName));
 		}
 		
 		InputStream in = null;

@@ -97,7 +97,9 @@ public class WebResourceManagerTest {
 		assertEquals(location1, webResourceManager.getLocation("test.css"));
 	
 		// test get by version name
-		String versionName1 =location1.substring(location1.lastIndexOf('/') + 1);
+		String versionName1 = webResourceManager.getVersionName(webResource1); //location1.substring(location1.lastIndexOf('/') + 1);
+		assertNotNull(versionName1);
+		
 		WebResourceInfo webResourceByVersionName1 = webResourceManager.getResourceByVersionName(versionName1);
 		assertEquals(webResource1, webResourceByVersionName1);
 		

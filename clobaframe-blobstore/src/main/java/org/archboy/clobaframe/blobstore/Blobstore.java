@@ -12,8 +12,8 @@ import java.io.IOException;
  */
 public interface Blobstore {
 
-	public static final int MIN_STORE_PRIORITY = 0;
-	public static final int DEFAULT_STORE_PRIOTITY = 5;
+	public static final int PRIORITY_MIN = 0;
+	public static final int PRIOTITY_DEFAULT = 5;
 	
 	/**
 	 * Check whether a repository exists.

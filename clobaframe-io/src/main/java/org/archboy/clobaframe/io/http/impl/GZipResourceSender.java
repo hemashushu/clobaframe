@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,22 +37,24 @@ import org.archboy.clobaframe.io.impl.DefaultResourceInfoFactory;
  */
 public class GZipResourceSender implements ResourceSender {
 
-	private int minCompressSize;
 	private ResourceSender resourceSender;
+	private Set<String> mimeTypeList;
+	private int minCompressSize;
 	
 	private ResourceInfoFactory resourceInfoFactory = new DefaultResourceInfoFactory();
 	
-	private List<String> mimeTypes = Arrays.asList(
-			"text/html",
-			"text/plain",
-			"text/xml",
-			"application/xhtml+xml",
-			"text/css",
-			"application/javascript",
-			"image/svg+xml");
+//	private List<String> mimeTypes = Arrays.asList(
+//			"text/html",
+//			"text/plain",
+//			"text/xml",
+//			"application/xhtml+xml",
+//			"text/css",
+//			"application/javascript",
+//			"image/svg+xml");
 
-	public GZipResourceSender(ResourceSender resourceSender, int minCompressSize) {
+	public GZipResourceSender(ResourceSender resourceSender, Set<String> mimeTypeList, int minCompressSize) {
 		this.resourceSender = resourceSender;
+		this.mimeTypeList = mimeTypeList;
 		this.minCompressSize = minCompressSize;
 	}
 	
@@ -61,7 +64,7 @@ public class GZipResourceSender implements ResourceSender {
 		
 		if (StringUtils.isNotEmpty(acceptEncoding) && acceptEncoding.contains("gzip")){
 			if (minCompressSize == 0 || resourceInfo.getContentLength() >= minCompressSize) {
-				if (mimeTypes.contains(resourceInfo.getMimeType())){
+				if (mimeTypeList.contains(resourceInfo.getMimeType())){
 					if (response.getHeader("Content-Encoding") == null &&
 							(extraHeaders == null || !extraHeaders.containsKey("Content-Encoding"))){
 						

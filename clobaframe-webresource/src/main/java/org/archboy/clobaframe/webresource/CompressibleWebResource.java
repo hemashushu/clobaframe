@@ -4,7 +4,7 @@ package org.archboy.clobaframe.webresource;
  *
  * @author yang
  */
-public interface CompressableWebResource {
+public interface CompressibleWebResource {
 	
 	/**
 	 * Commonly is "gzip".
