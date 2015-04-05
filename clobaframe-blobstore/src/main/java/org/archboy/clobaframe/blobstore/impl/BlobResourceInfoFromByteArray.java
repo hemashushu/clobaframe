@@ -14,16 +14,16 @@ import org.archboy.clobaframe.blobstore.BlobResourceInfo;
  */
 public class BlobResourceInfoFromByteArray extends AbstractBlobResourceInfo{
 
-	private String bucketName;
+	private String repositoryName;
 	private String key;
 	private byte[] content;
 	private String mimeType;
 	private Date lastModified;
 	private Map<String, Object> metadata;
 
-	public BlobResourceInfoFromByteArray(String bucketName, String key,
+	public BlobResourceInfoFromByteArray(String repositoryName, String key,
 			byte[] content, String mimeType, Date lastModified, Map<String, Object> metadata) {
-		this.bucketName = bucketName;
+		this.repositoryName = repositoryName;
 		this.key = key;
 		this.content = content;
 		this.mimeType = mimeType;
@@ -32,8 +32,8 @@ public class BlobResourceInfoFromByteArray extends AbstractBlobResourceInfo{
 	}
 
 	@Override
-	public String getBucketName() {
-		return bucketName;
+	public String getRepositoryName() {
+		return repositoryName;
 	}
 
 	@Override

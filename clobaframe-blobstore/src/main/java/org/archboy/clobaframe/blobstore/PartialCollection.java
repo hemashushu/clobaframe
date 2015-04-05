@@ -4,7 +4,7 @@ import java.util.Collection;
 
 /**
  * Partial connection.
- * Because the amount of the blob objects in a bucket maybe huge,
+ * Because the amount of the blob objects in a repository maybe huge,
  * so the caller should fetch the list in many times.
  *
  * @author yang

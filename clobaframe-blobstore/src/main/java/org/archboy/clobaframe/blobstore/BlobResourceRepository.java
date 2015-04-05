@@ -11,7 +11,7 @@ import java.io.IOException;
 public interface BlobResourceRepository {
 	
 	/**
-	 * The bucket name;
+	 * The repository name;
 	 * @return 
 	 */
 	String getName();
@@ -46,14 +46,13 @@ public interface BlobResourceRepository {
 	 * Get object by key.
 	 *
 	 * @param key
-	 * @return
-	 * @throws IOException If the specify key does not exists.
+	 * @return NULL If the specify key does not exists
 	 */
-	BlobResourceInfo get(String key) throws IOException;
+	BlobResourceInfo get(String key);
 
 	/**
 	 * Remove object by key.
-	 * If the specified object does not exist will not generate an exception.
+	 * It will NOT occurs an exception if the specify object does not exist.
 	 *
 	 * @param key
 	 * @throws java.io.IOException Delete failed.

@@ -15,33 +15,33 @@ import org.springframework.util.Assert;
 public class DefaultBlobResourceInfoFactory implements BlobResourceInfoFactory {
 
 	@Override
-	public BlobResourceInfo make(String bucketName, String key,
+	public BlobResourceInfo make(String repositoryName, String key,
 			InputStream inputStream, long contentLength, 
 			String mimeType, Date lastModified,
 			Map<String, Object> metadata) {
-		Assert.notNull(bucketName);
+		Assert.notNull(repositoryName);
 		Assert.notNull(key);
 		Assert.notNull(inputStream);
 		Assert.isTrue(contentLength >0);
 		Assert.hasText(mimeType);
 		Assert.notNull(lastModified);
 		
-		return new BlobResourceInfoFromInputStream(bucketName, key, 
+		return new BlobResourceInfoFromInputStream(repositoryName, key, 
 				inputStream, contentLength, mimeType, lastModified,
 				metadata);
 	}
 
 	@Override
-	public BlobResourceInfo make(String bucketName, String key,
+	public BlobResourceInfo make(String repositoryName, String key,
 			byte[] content, String mimeType, Date lastModified,
 			Map<String, Object> metadata) {
-		Assert.notNull(bucketName);
+		Assert.notNull(repositoryName);
 		Assert.notNull(key);
 		Assert.notNull(content);
 		Assert.hasText(mimeType);
 		Assert.notNull(lastModified);
 		
-		return new BlobResourceInfoFromByteArray(bucketName, key, 
+		return new BlobResourceInfoFromByteArray(repositoryName, key, 
 				content, mimeType, lastModified,
 				metadata);
 	}

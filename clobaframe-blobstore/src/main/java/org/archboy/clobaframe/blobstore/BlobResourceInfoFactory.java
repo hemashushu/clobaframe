@@ -14,7 +14,7 @@ public interface BlobResourceInfoFactory {
 	/**
 	 * Create the blob object by InputStream.
 	 *
-	 * @param bucketName
+	 * @param repositoryName
 	 * @param key
 	 * @param inputStream
 	 * @param contentLength
@@ -24,7 +24,7 @@ public interface BlobResourceInfoFactory {
 	 * @return
 	 */
 	BlobResourceInfo make(
-			String bucketName, String key,
+			String repositoryName, String key,
 			InputStream inputStream, long contentLength,
 			String mimeType, Date lastModified,
 			Map<String, Object> metadata);
@@ -32,7 +32,7 @@ public interface BlobResourceInfoFactory {
 	/**
 	 * Create the blob object by byte array.
 	 *
-	 * @param bucketName
+	 * @param repositoryName
 	 * @param key
 	 * @param content
 	 * @param mimeType
@@ -41,7 +41,7 @@ public interface BlobResourceInfoFactory {
 	 * @return
 	 */
 	BlobResourceInfo make(
-			String bucketName, String key,
+			String repositoryName, String key,
 			byte[] content, String mimeType, Date lastModified,
 			Map<String, Object> metadata);
 

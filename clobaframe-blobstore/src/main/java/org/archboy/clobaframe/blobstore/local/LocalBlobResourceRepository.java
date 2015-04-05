@@ -1,5 +1,7 @@
 package org.archboy.clobaframe.blobstore.local;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -7,12 +9,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableSet;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.archboy.clobaframe.blobstore.BlobResourceInfo;
 import org.archboy.clobaframe.blobstore.BlobResourceRepository;
 import org.archboy.clobaframe.blobstore.PartialCollection;
+import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
+import org.mapdb.Serializer;
 import org.springframework.util.Assert;
 
 /**
@@ -21,18 +29,35 @@ import org.springframework.util.Assert;
  */
 public class LocalBlobResourceRepository implements BlobResourceRepository, Closeable{
 
-	private String name;
-	private File bucketDir;
+	private String name; // repository name
+	private File rootDir; // repository root dir
 	
 	private DB db;
+	private BTreeMap<String, ResourceAttributes> table;
 	
-	public LocalBlobResourceRepository(String name, File indexFile,  File bucketDir) {
+	private static final String tableName = "meta";
+	
+	// serializer
+	private ObjectMapper objectMapper = new ObjectMapper();
+	
+	private final TypeReference<Map<String, Object>> metaDataTypeReference = 
+			new TypeReference<Map<String, Object>>() {};
+	
+	public LocalBlobResourceRepository(String name, File indexFile,  File rootDir) {
 		this.name = name;
-		this.bucketDir = bucketDir;
+		this.rootDir = rootDir;
+		
+		Serializer<ResourceAttributes> serializer = new ResourceAttributesSerializer();
 		
 		db = DBMaker.newFileDB(indexFile)
            //.closeOnJvmShutdown()
            .make();
+		
+//		table = db.createTreeMap(indexName)
+//				.valueSerializer(serializer)
+//				.makeOrGet();
+		
+		table = db.getTreeMap(tableName);
 	}
 	
 	@Override
@@ -51,7 +76,7 @@ public class LocalBlobResourceRepository implements BlobResourceRepository, Clos
 		Assert.notNull(blobResourceInfo);
 		
 		String key = blobResourceInfo.getKey();
-		File file = new File(bucketDir, key);
+		File file = new File(rootDir, key);
 
 		// copy content
 		InputStream in = blobResourceInfo.getContent();
@@ -62,33 +87,39 @@ public class LocalBlobResourceRepository implements BlobResourceRepository, Clos
 		IOUtils.closeQuietly(in);
 		
 		// write meta data
+		ResourceAttributes attributes = new ResourceAttributes();
+		attributes.setLastModified(blobResourceInfo.getLastModified());
+		attributes.setMimeType(blobResourceInfo.getMimeType());
+		
+		Map<String, Object> metaData = blobResourceInfo.getMetadata();
+		if (metaData != null && !metaData.isEmpty()){
+			String metas = objectMapper.writeValueAsString(metaData);
+			attributes.setMetas(metas);
+		}
+		
+		table.put(key, attributes);
+		db.commit();
 	}
 	
 	@Override
 	public void put(BlobResourceInfo blobResourceInfo, boolean publicReadable, int priority) throws IOException {
+		// the local blob resource repository does not supports the read permission and priority
 		put(blobResourceInfo);
 	}
 
 	@Override
-	public BlobResourceInfo get(String key) throws IOException {
+	public BlobResourceInfo get(String key) {
 		Assert.notNull(key);
-		
-		File file = new File(bucketDir, key);
-		if (!file.exists() || file.isDirectory()) {
-			throw new FileNotFoundException(
-					String.format("File [%s] not found in bucket [%s].",
-					key, name));
-		}
 
-		// read meta
-		return new LocalBlobResourceInfo(name, key, file, null, null, null);
+		ResourceAttributes attributes = table.get(key);
+		return getBlobResourceInfo(key, attributes);
 	}
 
 	@Override
 	public void delete(String key) throws IOException {
 		Assert.notNull(key);
 		
-		File file = new File(bucketDir, key);
+		File file = new File(rootDir, key);
 
 		if (!file.exists()){
 			return;
@@ -102,22 +133,19 @@ public class LocalBlobResourceRepository implements BlobResourceRepository, Clos
 
 	@Override
 	public PartialCollection<BlobResourceInfo> list() {
-//		File[] files = bucket.listFiles(new FilenameFilter() {
-//			@Override
-//			public boolean accept(File dir, String name) {
-//				return (startName == null || name.startsWith(startName));
-//			}
-//		});
-//
-//		for (File file : files) {
-//			BlobKey blobKey = new BlobKey(bucketName, file.getName());
-//			String contentType = getContentType(file);
-//			collection.add(new LocalBlobResourceInfo(blobKey, file, contentType));
-//		}
+		List<BlobResourceInfo> infos = new ArrayList<BlobResourceInfo>();
 		
-		PartialArrayList<BlobResourceInfo> infos = new PartialArrayList<BlobResourceInfo>(
-				new ArrayList<BlobResourceInfo>(), false);
-		return infos;
+		NavigableSet<String> keys = table.keySet();
+		for(String key : keys){
+			ResourceAttributes attributes = table.get(key);
+			BlobResourceInfo info = getBlobResourceInfo(key, attributes);
+			if (info != null) {
+				infos.add(info);
+			}
+		}
+		
+		PartialArrayList<BlobResourceInfo> pinfos = new PartialArrayList<BlobResourceInfo>(infos , false);
+		return pinfos;
 	}
 
 	@Override
@@ -130,4 +158,24 @@ public class LocalBlobResourceRepository implements BlobResourceRepository, Clos
 				new ArrayList<BlobResourceInfo>(), false);
 	}
 	
+	private BlobResourceInfo getBlobResourceInfo(String key, ResourceAttributes attributes) {
+		File file = new File(rootDir, key);
+		if (!file.exists() || file.isDirectory()) {
+			return null;
+		}
+		
+		Map<String, Object> metaData = null;
+		if (attributes.getMetas() != null && StringUtils.isNotEmpty(attributes.getMetas())){
+			try{
+				metaData = objectMapper.readValue(attributes.getMetas(), metaDataTypeReference);
+			}catch(IOException e){
+				// ignore
+			}
+		}
+		
+		return new LocalBlobResourceInfo(name, key, file,
+				attributes.getMimeType(),
+				attributes.getLastModified(), 
+				metaData);
+	}
 }

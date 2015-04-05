@@ -1,10 +1,11 @@
 package org.archboy.clobaframe.blobstore;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
- * Blob bucket manager.
+ * Blob repository manager.
+ * 
+ * A repository is the collection of blob objects, just like the folder to the file.
  *
  * @author yang
  *
@@ -15,41 +16,40 @@ public interface Blobstore {
 	public static final int DEFAULT_STORE_PRIOTITY = 5;
 	
 	/**
-	 * Check whether a bucket exists.
+	 * Check whether a repository exists.
 	 *
-	 * A bucket is the collection of blob objects, just like the folder to the file.
-	 *
-	 * @param bucketName
+	 * @param repoName
 	 * @return
 	 */
-	boolean exist(String bucketName);
+	boolean exist(String repoName);
 
 	/**
-	 * Create a bucket by name.
+	 * Create a repository.
 	 * Duplicate name will be ignored.
 	 *
-	 * @param bucketName
+	 * @param repoName
 	 * @throws IOException
 	 */
-	void create(String bucketName) throws IOException;
+	void create(String repoName) throws IOException;
 
 	/**
 	 * 
-	 * @param bucketName
-	 * @return
-	 * @throws IOException 
+	 * @param repoName
+	 * @return NULL if the specify bucket does not exists.
 	 */
-	BlobResourceRepository getRepository(String bucketName) throws IOException;
+	BlobResourceRepository getRepository(String repoName);
 	
 	/**
-	 * Delete a bucket.
-	 * This function can only delete an empty bucket.
-	 * If the specified store does not exist will not generate an exception.
+	 * Delete a repository.
+	 * This function can only delete an empty repository,
+	 * all blob objects must deleted first before delete the repository.
+	 * 
+	 * It will NOT occurs an exception if the specify repository does not exist.
 	 *
-	 * @param bucketName
+	 * @param repoName
 	 * @throws IOException Delete failed.
 	 */
-	void delete(String bucketName) throws IOException;
+	void delete(String repoName) throws IOException;
 
 
 }

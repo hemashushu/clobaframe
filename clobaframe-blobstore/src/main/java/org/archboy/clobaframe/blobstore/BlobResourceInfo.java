@@ -9,7 +9,13 @@ import org.archboy.clobaframe.io.ResourceInfo;
  */
 public interface BlobResourceInfo extends ResourceInfo {
 
-	String getBucketName();
+	/**
+	 * The repository likes as the blob object collection.
+	 * 
+	 * There are many repositories in one blob store.
+	 * @return
+	 */
+	String getRepositoryName();
 	
 	/**
 	 * The blob object key.
@@ -24,16 +30,4 @@ public interface BlobResourceInfo extends ResourceInfo {
 	 */
 	Map<String, Object> getMetadata();
 
-	/**
-	 * 
-	 * @param metadata 
-	 */
-	//void setMetadata(Map<String, Object> metadata);
-	
-	/**
-	 *
-	 * @param key
-	 * @param value
-	 */
-	//void addMetadata(String key, Object value);
 }

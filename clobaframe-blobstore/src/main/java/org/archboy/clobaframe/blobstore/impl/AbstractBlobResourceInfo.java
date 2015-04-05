@@ -14,7 +14,7 @@ public abstract class AbstractBlobResourceInfo implements BlobResourceInfo {
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder()
-				.append(getBucketName())
+				.append(getRepositoryName())
 				.append(getKey())
 				.toHashCode();
 	}
@@ -31,7 +31,7 @@ public abstract class AbstractBlobResourceInfo implements BlobResourceInfo {
 
 		BlobResourceInfo other = (BlobResourceInfo) obj;
 		return new EqualsBuilder()
-				.append(getBucketName(), other.getBucketName())
+				.append(getRepositoryName(), other.getRepositoryName())
 				.append(getKey(), other.getKey())
 				.isEquals();
 	}
@@ -39,7 +39,7 @@ public abstract class AbstractBlobResourceInfo implements BlobResourceInfo {
 	@Override
 	public String toString() {
 		return new ToStringBuilder(this)
-				.append("bucketName", getBucketName())
+				.append("repositoryName", getRepositoryName())
 				.append("key", getKey()).toString();
 	}
 	

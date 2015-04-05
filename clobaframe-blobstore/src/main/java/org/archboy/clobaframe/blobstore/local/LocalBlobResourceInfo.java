@@ -17,17 +17,17 @@ import org.archboy.clobaframe.io.file.impl.PartialFileInputStream;
  */
 public class LocalBlobResourceInfo extends AbstractBlobResourceInfo implements FileBaseResourceInfo {
 
-	private String bucketName;
+	private String repositoryName;
 	private String key;
 	private File file;
 	private String mimeType;
 	private Date lastModified;
 	private Map<String, Object> metadata;
 
-	public LocalBlobResourceInfo(String bucketName, String key,
+	public LocalBlobResourceInfo(String repositoryName, String key,
 			File file, String mimeType, 
 			Date lastModified, Map<String, Object> metadata) {
-		this.bucketName = bucketName;
+		this.repositoryName = repositoryName;
 		this.key = key;
 		this.file = file;
 		this.mimeType = mimeType;
@@ -36,8 +36,8 @@ public class LocalBlobResourceInfo extends AbstractBlobResourceInfo implements F
 	}
 	
 	@Override
-	public String getBucketName() {
-		return bucketName;
+	public String getRepositoryName() {
+		return repositoryName;
 	}
 
 	@Override

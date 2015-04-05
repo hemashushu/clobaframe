@@ -39,8 +39,8 @@ public class BlobstoreWebResourceSynchronizer{
 	@Inject
 	private BlobResourceInfoFactory blobResourceInfoFactory;
 
-	@Value("${webresource.blobstore.bucketName}")
-	private String bucketName;
+	@Value("${webresource.blobstore.repoName}")
+	private String repoName;
 
 	@Value("${webresource.blobstore.keyNamePrefix}")
 	private String keyNamePrefix;
@@ -76,11 +76,11 @@ public class BlobstoreWebResourceSynchronizer{
 
 		// put bucket first
 		if (autoCreateBucket){
-			if (!blobstore.existBucket(bucketName)) {
-				blobstore.createBucket(bucketName);
+			if (!blobstore.existBucket(repoName)) {
+				blobstore.createBucket(repoName);
 
 				logger.info("Create bucket [{}] for storing web resources.",
-					bucketName);
+					repoName);
 			}
 		}
 
@@ -123,7 +123,7 @@ public class BlobstoreWebResourceSynchronizer{
 		if (!unmodifiedKeys.isEmpty()){
 			logger.info("Found {} unmodified remote web resources in bucket [{}].",
 					unmodifiedKeys.size(),
-					bucketName);
+					repoName);
 		}
 
 		// delete the keys of unmodified resources, i.e. they doesn't need to be updated.
@@ -148,7 +148,7 @@ public class BlobstoreWebResourceSynchronizer{
 	private List<BlobResourceInfo> getRemoteBlobResourceInfos() {
 		List<BlobResourceInfo> blobResourceInfos = new ArrayList<BlobResourceInfo>();
 
-		BlobKey prefix = new BlobKey(bucketName, keyNamePrefix);
+		BlobKey prefix = new BlobKey(repoName, keyNamePrefix);
 		PartialCollection<BlobResourceInfo> partialBlobResourceInfos = null;
 		do {
 			partialBlobResourceInfos = blobstore.list(prefix);
@@ -175,7 +175,7 @@ public class BlobstoreWebResourceSynchronizer{
 	private void upload(WebResourceInfo webResourceInfo) throws IOException {
 
 		BlobKey blobKey = new BlobKey(
-				bucketName,
+				repoName,
 				keyNamePrefix + webResourceInfo.getUniqueName());
 
 		logger.info("Upload web resource [{}] to [{}, {}].", new Object[]{

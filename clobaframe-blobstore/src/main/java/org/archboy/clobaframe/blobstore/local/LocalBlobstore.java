@@ -22,7 +22,7 @@ import org.springframework.util.Assert;
 /**
  *
  * Local blob store.
- * for test and development, or low demand environment.
+ * local blob store only for testing and development, or the low demand environment.
  *
  * @author yang
  */
@@ -74,84 +74,93 @@ public class LocalBlobstore extends AbstractBlobstore {
 	}
 
 	@Override
-	public boolean exist(String bucketName) {
-		Assert.hasText(bucketName);
-		File bucket = new File(rootDir, bucketName);
+	public boolean exist(String repoName) {
+		Assert.hasText(repoName);
+		File bucket = new File(rootDir, repoName);
 		return (bucket.exists() && bucket.isDirectory());
 	}
 
 	@Override
-	public void create(String bucketName) throws IOException {
-		Assert.hasText(bucketName);
+	public void create(String repoName) throws IOException {
+		Assert.hasText(repoName);
 		
-		File bucket = new File(rootDir, bucketName);
-		if (bucket.exists() && bucket.isDirectory()) {
+		File repoDir = new File(rootDir, repoName);
+		if (repoDir.exists() && repoDir.isDirectory()) {
+			// duplicate
 			return;
 		}
 
-		boolean result = bucket.mkdir();
+		// create data folder
+		boolean result = repoDir.mkdir();
 		if (!result) {
 			throw new IOException(
-					String.format("Create bucket [%s] failed.", bucketName));
+					String.format("Create blob repository [%s] failed.", repoName));
 		}
+		
+		// the index file will create later automatically
+		
 	}
 
 	@Override
-	public void delete(String bucketName) throws IOException {
-		Assert.hasText(bucketName);
+	public void delete(String repoName) throws IOException {
+		Assert.hasText(repoName);
 		
 		// close repository first
-		BlobResourceRepository repository = repositories.get(bucketName);
+		BlobResourceRepository repository = repositories.get(repoName);
 		if (repository != null){
 			((Closeable)repository).close();
 		}
 		
 		// delete index file
-		File indexFile = getIndexFile(bucketName);
+		File indexFile = getIndexFile(repoName);
 		if (indexFile.exists()) {
 			if (!indexFile.delete()){
 				throw new IOException(
-						String.format("Delete bucket [%s] index failed.", bucketName));
+						String.format("Delete blob repository [%s] index failed.", repoName));
 			}
 		}
 		
-		// delete folder
-		File bucket = new File(rootDir, bucketName);
-		if (bucket.exists()) {
-			if (!bucket.delete()) {
+		// delete data folder
+		File repoDir = new File(rootDir, repoName);
+		if (repoDir.exists()) {
+			if (!repoDir.delete()) {
 				throw new IOException(
-						String.format("Delete bucket [%s] failed.", bucketName));
+						String.format("Delete blob repository [%s] failed.", repoName));
 			}
 		}
 		
-		repositories.remove(bucketName);
+		repositories.remove(repoName);
 	}
 
 	@Override
-	public BlobResourceRepository getRepository(String bucketName) throws IOException {
-		Assert.hasText(bucketName);
+	public BlobResourceRepository getRepository(String repoName) {
+		Assert.hasText(repoName);
 		
-		BlobResourceRepository exists = repositories.get(bucketName);
+		// fetch from cache first
+		BlobResourceRepository exists = repositories.get(repoName);
 		if (exists != null) {
 			return exists;
 		}
 		
-		File bucket = new File(rootDir, bucketName);
+		File repoDir = new File(rootDir, repoName);
 		
-		if (!(bucket.exists() && bucket.isDirectory())){
-			throw new FileNotFoundException(
-					String.format("Bucket [%s] not found.", bucketName));
+		if (!(repoDir.exists() && repoDir.isDirectory())){
+//			throw new FileNotFoundException(
+//					String.format("Bucket [%s] not found.", repoName));
+			return null;
 		}
 		
+		File indexFile = getIndexFile(repoName);
 		BlobResourceRepository repository = new LocalBlobResourceRepository(
-				bucketName, getIndexFile(bucketName), bucket);
+				repoName, indexFile, repoDir);
 		
-		repositories.put(bucketName, repository);
+		// add to cache
+		repositories.put(repoName, repository);
 		return repository;
 	}
 	
-	private File getIndexFile(String bucketName){
-		return new File(rootDir, bucketName + ".idx");
+	private File getIndexFile(String repoName){
+		return new File(rootDir, repoName + ".idx");
 	}
 
 }
