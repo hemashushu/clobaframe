@@ -38,7 +38,6 @@
 		<module>clobaframe-media</module>
 		<module>clobaframe-blobstore</module>
 		<module>clobaframe-webresource</module>
-		<module>clobaframe-webresource-sync</module>
 		<module>clobaframe-mail</module>
 	</modules>
 

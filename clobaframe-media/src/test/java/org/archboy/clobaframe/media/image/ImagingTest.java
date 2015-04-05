@@ -270,8 +270,8 @@ public class ImagingTest {
 
 		assertEquals(100, image3.getHeight());
 		assertEquals(100, image4.getHeight());
-		assertEquals((Math.round(image1.getWidth() * 100.0D / image1.getHeight())), image3.getWidth());
-		assertEquals((Math.round(image2.getWidth() * 100.0D / image2.getHeight())), image4.getWidth());
+		assertTrue((Math.round(image1.getWidth() * 100.0D / image1.getHeight())) - image3.getWidth() <= 1);
+		assertTrue((Math.round(image2.getWidth() * 100.0D / image2.getHeight())) - image4.getWidth() <= 1);
 	}
 
 	@Test

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<comment></comment>
+	
+	<!-- The following are mail template messages -->
+	<entry key="mail.template.hello.subject">Welcome to Clobaframe-mail</entry>
+	<entry key="mail.template.hello.content">Hi {0}, Now is {1}.</entry>
+
+</properties>

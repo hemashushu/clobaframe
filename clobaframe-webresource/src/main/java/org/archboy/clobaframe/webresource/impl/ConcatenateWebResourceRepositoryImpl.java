@@ -44,8 +44,7 @@ public class ConcatenateWebResourceRepositoryImpl implements ConcatenateWebResou
 	public void init() throws IOException {
 		
 		Resource resource = resourceLoader.getResource(concatenateConfig);
-		File rootDir = resource.getFile();
-		if (!rootDir.exists()){
+		if (!resource.exists()){
 			throw new FileNotFoundException(String.format(
 					"Can not find the composite config file [%s].",
 					concatenateConfig));

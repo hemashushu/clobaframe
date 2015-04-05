@@ -14,5 +14,18 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
 			</list>
 		</property>
 	</bean>
+	
+	<!-- Application Message Bundle -->
+	<bean id="messageSource"
+		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basename" value="classpath:org/archboy/clobaframe/mail/i18n/messages"/>
+		<property name="cacheSeconds" value="-1"/>
+		<!--
+			Set the number of seconds to cache loaded properties files.
+			Default is "-1", indicating to cache forever (just like java.util.ResourceBundle).
+			A positive number will cache loaded properties files for the given number of seconds. This is essentially the interval between refresh checks. Note that a refresh attempt will first check the last-modified timestamp of the file before actually reloading it; so if files don't change, this interval can be set rather low, as refresh attempts will not actually reload.
+			A value of "0" will check the last-modified timestamp of the file on every message access. Do not use this in a production environment!
+		-->
+	</bean>
 
 </beans>
