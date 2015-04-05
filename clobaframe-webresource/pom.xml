@@ -93,13 +93,11 @@
 		</dependency>
 
 		<!-- Apache Commons -->
-		<!-- need by clobaframe-io -->
-		<!--
+		<!-- need by clobaframe-webresource, clobaframe-io -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
-		-->
 
 		<!-- need by clobaframe-webresource, clobaframe-io -->
 		<dependency>
@@ -145,6 +143,7 @@
 			</exclusions>
 		</dependency>
 
+		<!--
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpmime</artifactId>
@@ -157,7 +156,8 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
+		-->
+		
 		<!-- Jetty for test -->
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>

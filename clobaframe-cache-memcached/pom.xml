@@ -97,7 +97,7 @@
 		</dependency>
 
 		<!-- Spy memcached client -->
-		<!-- need by clobaframe-cache -->
+		<!-- need by clobaframe-cache-memcached -->
 		<dependency>
 			<groupId>net.spy</groupId>
 			<artifactId>spymemcached</artifactId>
