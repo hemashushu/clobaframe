@@ -39,6 +39,7 @@ public class SmtpMailSender extends AbstractMailSender {
 	private String loginName;
 	private String loginPassword;
 	private String fromAddress;
+	private String fromName;
 
 	private static final String DEFAULT_SMTP_CONFIG = "classpath:org/archboy/clobaframe/mail/smtp/config-example.properties";
 	
@@ -54,9 +55,9 @@ public class SmtpMailSender extends AbstractMailSender {
 	public void init() throws IOException{
 		Resource resource = resourceLoader.getResource(smtpConfig);
 		if (!resource.exists()){
-			throw new FileNotFoundException(String.format(
-					"Can not find the smtp config file [%s].",
-					smtpConfig));
+			logger.warn("Can not find the smtp config file [%s].",
+					smtpConfig);
+			return;
 		}
 
 		Properties properties = new Properties();
@@ -66,13 +67,13 @@ public class SmtpMailSender extends AbstractMailSender {
 			in = resource.getInputStream();
 			properties.load(in);
 			
-			this.host = properties.getProperty("host");
-			this.port = Integer.parseInt(properties.getProperty("port"));
-			this.tls = Boolean.parseBoolean(properties.getProperty("tls"));
-			this.loginName = properties.getProperty("loginName");
-			this.loginPassword = properties.getProperty("loginPassword");
-			this.fromAddress = properties.getProperty("fromAddress");
-
+			this.host = properties.getProperty("smtp.host");
+			this.port = Integer.parseInt(properties.getProperty("smtp.port"));
+			this.tls = Boolean.parseBoolean(properties.getProperty("smtp.tls"));
+			this.loginName = properties.getProperty("smtp.loginName");
+			this.loginPassword = properties.getProperty("smtp.loginPassword");
+			this.fromAddress = properties.getProperty("smtp.fromAddress");
+			this.fromName = properties.getProperty("smtp.fromName");
 		}finally{
 			IOUtils.closeQuietly(in);
 		}
@@ -97,7 +98,7 @@ public class SmtpMailSender extends AbstractMailSender {
 
 		try {
 			email.setCharset("UTF-8"); // specify the charset.
-			email.setFrom(fromAddress);
+			email.setFrom(fromAddress, fromName);
 			email.setSubject(subject);
 			email.setMsg(content);
 			email.addTo(recipient);
@@ -123,7 +124,7 @@ public class SmtpMailSender extends AbstractMailSender {
 
 		try {
 			email.setCharset("UTF-8"); // specify the charset.
-			email.setFrom(fromAddress);
+			email.setFrom(fromAddress, fromName);
 			email.setSubject(subject);
 			email.setHtmlMsg(content);
 			//email.setMsg(""); // can set plain text either
@@ -133,6 +134,62 @@ public class SmtpMailSender extends AbstractMailSender {
 			throw new SendMailException(
 					String.format("Failed to send mail to %s.", recipient), e);
 		}
+	}
+
+	public String getHost() {
+		return host;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
+	}
+
+	public boolean isTls() {
+		return tls;
+	}
+
+	public void setTls(boolean tls) {
+		this.tls = tls;
+	}
+
+	public String getLoginName() {
+		return loginName;
+	}
+
+	public void setLoginName(String loginName) {
+		this.loginName = loginName;
+	}
+
+	public String getLoginPassword() {
+		return loginPassword;
+	}
+
+	public void setLoginPassword(String loginPassword) {
+		this.loginPassword = loginPassword;
+	}
+
+	public String getFromAddress() {
+		return fromAddress;
+	}
+
+	public void setFromAddress(String fromAddress) {
+		this.fromAddress = fromAddress;
+	}
+
+	public String getFromName() {
+		return fromName;
+	}
+
+	public void setFromName(String fromName) {
+		this.fromName = fromName;
 	}
 	
 }
