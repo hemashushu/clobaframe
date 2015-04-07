@@ -24,7 +24,7 @@ public class DefaultBlobResourceInfoFactory implements BlobResourceInfoFactory {
 		Assert.notNull(inputStream);
 		Assert.isTrue(contentLength >0);
 		Assert.hasText(mimeType);
-		Assert.notNull(lastModified);
+		//Assert.notNull(lastModified);
 		
 		return new BlobResourceInfoFromInputStream(repositoryName, key, 
 				inputStream, contentLength, mimeType, lastModified,
@@ -39,7 +39,7 @@ public class DefaultBlobResourceInfoFactory implements BlobResourceInfoFactory {
 		Assert.notNull(key);
 		Assert.notNull(content);
 		Assert.hasText(mimeType);
-		Assert.notNull(lastModified);
+		//Assert.notNull(lastModified);
 		
 		return new BlobResourceInfoFromByteArray(repositoryName, key, 
 				content, mimeType, lastModified,

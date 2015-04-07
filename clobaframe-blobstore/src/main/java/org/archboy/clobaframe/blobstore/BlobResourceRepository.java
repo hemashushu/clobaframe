@@ -10,6 +10,9 @@ import java.io.IOException;
  */
 public interface BlobResourceRepository {
 	
+	public static final int PRIORITY_MIN = 0;
+	public static final int PRIORITY_DEFAULT = 5;
+	
 	/**
 	 * The repository name;
 	 * @return 
@@ -31,11 +34,11 @@ public interface BlobResourceRepository {
 	 * Store the blob object into repository.
 	 *
 	 * @param blobResourceInfo
-	 * @param publicReadable This blob object can be public read.
+	 * @param publicReadable Indicates this blob object can be public read, default is TRUE.
 	 * @param priority
 	 *     0~9, smaller indicates this object is less important, and storing into a
-	 *     minor repository (if possible). "Minor repository" means
-	 *     reduced redundancy storing.
+	 *     minor repository (if possible), "Minor repository" means
+	 *     reduced redundancy storing, default is {@link BlobResourceRepository#PRIORITY_DEFAULT}
 	 * @throws java.io.IOException
 	 */
 	void put(BlobResourceInfo blobResourceInfo, 
@@ -69,9 +72,9 @@ public interface BlobResourceRepository {
 	/**
 	 * List the remain objects by the previous result.
 	 *
-	 * @param collection
+	 * @param prevCollection
 	 * @return
 	 */
-	PartialCollection<BlobResourceInfo> listNext(PartialCollection<BlobResourceInfo> collection);
+	PartialCollection<BlobResourceInfo> listNext(PartialCollection<BlobResourceInfo> prevCollection);
 	
 }

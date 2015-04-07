@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
@@ -17,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.archboy.clobaframe.blobstore.BlobResourceInfo;
 import org.archboy.clobaframe.blobstore.BlobResourceRepository;
 import org.archboy.clobaframe.blobstore.PartialCollection;
+import org.archboy.clobaframe.blobstore.impl.AbstractBlobResourceRepository;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -27,7 +29,7 @@ import org.springframework.util.Assert;
  *
  * @author yang
  */
-public class LocalBlobResourceRepository implements BlobResourceRepository, Closeable{
+public class LocalBlobResourceRepository extends AbstractBlobResourceRepository implements Closeable{
 
 	private String name; // repository name
 	private File rootDir; // repository root dir
@@ -72,8 +74,11 @@ public class LocalBlobResourceRepository implements BlobResourceRepository, Clos
 	}
 	
 	@Override
-	public void put(BlobResourceInfo blobResourceInfo) throws IOException {
+	public void put(BlobResourceInfo blobResourceInfo, boolean publicReadable, int priority) throws IOException {
 		Assert.notNull(blobResourceInfo);
+
+		// NOTE:: the local blob resource repository does not supports the 
+		// read permission and priority
 		
 		String key = blobResourceInfo.getKey();
 		File file = new File(rootDir, key);
@@ -86,9 +91,11 @@ public class LocalBlobResourceRepository implements BlobResourceRepository, Clos
 		IOUtils.closeQuietly(out);
 		IOUtils.closeQuietly(in);
 		
+		Date now = new Date();
+		
 		// write meta data
 		ResourceAttributes attributes = new ResourceAttributes();
-		attributes.setLastModified(blobResourceInfo.getLastModified());
+		attributes.setLastModified(now); //blobResourceInfo.getLastModified());
 		attributes.setMimeType(blobResourceInfo.getMimeType());
 		
 		Map<String, Object> metaData = blobResourceInfo.getMetadata();
@@ -99,12 +106,6 @@ public class LocalBlobResourceRepository implements BlobResourceRepository, Clos
 		
 		table.put(key, attributes);
 		db.commit();
-	}
-	
-	@Override
-	public void put(BlobResourceInfo blobResourceInfo, boolean publicReadable, int priority) throws IOException {
-		// the local blob resource repository does not supports the read permission and priority
-		put(blobResourceInfo);
 	}
 
 	@Override
@@ -149,10 +150,12 @@ public class LocalBlobResourceRepository implements BlobResourceRepository, Clos
 	}
 
 	@Override
-	public PartialCollection<BlobResourceInfo> listNext(PartialCollection<BlobResourceInfo> collection) {
-		if (!collection.hasMore()) {
+	public PartialCollection<BlobResourceInfo> listNext(PartialCollection<BlobResourceInfo> prevCollection) {
+		if (!prevCollection.hasMore()) {
 			throw new IllegalArgumentException("There is no more items.");
 		}
+		
+		// the local blob resource repository does not support the partial list.
 		
 		return new PartialArrayList<BlobResourceInfo>(
 				new ArrayList<BlobResourceInfo>(), false);

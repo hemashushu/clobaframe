@@ -72,8 +72,8 @@ public class LocalBlobResourceRepositoryTest {
 
 		// test put blob
 		Calendar calendar = Calendar.getInstance();
-		Date now = calendar.getTime();
-		writeContent(repository, key1, "hello", "text/plain", now);
+		Date now1 = calendar.getTime();
+		writeContent(repository, key1, "hello", "text/plain"); //, now);
 
 		// test get blob by key
 		BlobResourceInfo blobResourceInfo1 = repository.get(key1);
@@ -81,7 +81,7 @@ public class LocalBlobResourceRepositoryTest {
 		
 		assertEquals(5, blobResourceInfo1.getContentLength());
 		assertEquals(key1, blobResourceInfo1.getKey());
-		assertDateEquals(now, blobResourceInfo1.getLastModified());
+		assertDateEquals(now1, blobResourceInfo1.getLastModified());
 		assertNull(blobResourceInfo1.getMetadata());
 		assertEquals("text/plain", blobResourceInfo1.getMimeType());
 
@@ -92,8 +92,9 @@ public class LocalBlobResourceRepositoryTest {
 		assertEquals("ll", readContent(blobResourceInfo1,2,2));
 
 		// test overwrite blob content and append meta data
-		calendar.add(Calendar.MINUTE, -10);
-		Date tenMinsAgo = calendar.getTime();
+//		calendar.add(Calendar.MINUTE, -10);
+//		Date tenMinsAgo = calendar.getTime();
+		Date now2 = calendar.getTime();
 		
 		calendar.add(Calendar.HOUR_OF_DAY, -1);
 		Date oneHourAgo = calendar.getTime();
@@ -104,11 +105,11 @@ public class LocalBlobResourceRepositoryTest {
 		meta1.put("price", 99.1D);
 		meta1.put("update", oneHourAgo);
 		
-		writeContent(repository, key1, "<html></html>", "text/html", tenMinsAgo, meta1);
+		writeContent(repository, key1, "<html></html>", "text/html", meta1); //tenMinsAgo, meta1);
 		
 		// check update
 		BlobResourceInfo blobResourceInfo2 = repository.get(key1);
-		assertDateEquals(tenMinsAgo, blobResourceInfo2.getLastModified());
+		assertDateEquals(now2, blobResourceInfo2.getLastModified());
 		assertEquals("text/html", blobResourceInfo2.getMimeType());
 		assertEquals("<html></html>", readContent(blobResourceInfo2));
 
@@ -163,9 +164,9 @@ public class LocalBlobResourceRepositoryTest {
 		Date now = calendar.getTime();
 		
 		// test put blob
-		writeContent(repository, key1, "body {}", "text/css", now);
-		writeContent(repository, key2, "div {}", "text/css", now);
-		writeContent(repository, key3, "p {}", "text/css", now);
+		writeContent(repository, key1, "body {}", "text/css"); //, now);
+		writeContent(repository, key2, "div {}", "text/css"); //, now);
+		writeContent(repository, key3, "p {}", "text/css"); //, now);
 
 		// test list
 		PartialCollection<BlobResourceInfo> blobs1 = repository.list();
@@ -185,9 +186,10 @@ public class LocalBlobResourceRepositoryTest {
 			BlobResourceRepository repository,
 			String key,
 			String content,
-			String mimeType,
-			Date lastModified) throws IOException{
-		writeContent(repository, key, content, mimeType, lastModified, null);
+			String mimeType //,
+			//Date lastModified
+			) throws IOException{
+		writeContent(repository, key, content, mimeType, null); // lastModified, null);
 	}
 
 	private void writeContent(
@@ -195,12 +197,12 @@ public class LocalBlobResourceRepositoryTest {
 			String key,
 			String content,
 			String mimeType,
-			Date lastModified,
+			//Date lastModified,
 			Map<String, Object> metadata) throws IOException{
 		
 		byte[] data = content.getBytes();
 		BlobResourceInfo blobResourceInfo = blobResourceInfoFactory.make(
-				testRepositoryName1, key, data, mimeType, lastModified, metadata);
+				testRepositoryName1, key, data, mimeType, null, metadata);
 		repository.put(blobResourceInfo);
 	}
 
