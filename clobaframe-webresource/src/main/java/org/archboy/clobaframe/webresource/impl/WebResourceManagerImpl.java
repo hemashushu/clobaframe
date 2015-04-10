@@ -39,11 +39,14 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	private VersionStrategy versionStrategy;
 
 	private WebResourceCache webResourceCache;
+
+	private LocationGenerator locationGenerator; 
 	
 	@Inject
 	private ConcatenateWebResourceRepository concatenateResourceRepository;
 	
 	private List<String> compressibleWebResourceMimeTypes; 
+	private List<String> minifyWebResourceMimeTypes; 
 
 	@Value("${clobaframe.webresource.minify}")
 	private boolean canMinify;
@@ -57,9 +60,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	@Value("${clobaframe.webresource.baseLocation}")
 	private String baseLocation;
 	
-	private LocationGenerator locationGenerator; 
-	
-	private static final int DEFAULT_CACHE_SECONDS = 5 * 60;
+	private static final int DEFAULT_CACHE_SECONDS = 10 * 60;
 	
 	@Value("${clobaframe.webresource.cacheSeconds}")
 	private int cacheSeconds = DEFAULT_CACHE_SECONDS;
@@ -93,8 +94,15 @@ public class WebResourceManagerImpl implements WebResourceManager {
 		compressibleWebResourceMimeTypes.add(MIME_TYPE_STYLE_SHEET);
 		compressibleWebResourceMimeTypes.addAll(MIME_TYPE_JAVA_SCRIPT);
 		compressibleWebResourceMimeTypes.addAll(MIME_TYPE_TEXT);
+		
+		// Some types of font file are compressed,
+		// excepted the ttf and svg.
 		compressibleWebResourceMimeTypes.add("application/x-font-ttf"); // ttf
 		compressibleWebResourceMimeTypes.add("image/svg+xml"); // svg
+		
+		minifyWebResourceMimeTypes = new ArrayList<String>();
+		minifyWebResourceMimeTypes.add(MIME_TYPE_STYLE_SHEET);
+		minifyWebResourceMimeTypes.addAll(MIME_TYPE_JAVA_SCRIPT);
 	}
 
 	/**
@@ -135,7 +143,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 		}
 		
 		// minify
-		if (canMinify && compressibleWebResourceMimeTypes.contains(resourceInfo.getMimeType())) {
+		if (canMinify && minifyWebResourceMimeTypes.contains(resourceInfo.getMimeType())) {
 			resourceInfo = new MinifyWebResourceInfo(resourceInfo);
 		}
 		
@@ -168,7 +176,6 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	
 	@Override
 	public WebResourceInfo getResource(String name) throws FileNotFoundException {
-		
 		WebResourceInfo resource = getResourceInternal(name);
 		
 		if (resource == null) {
@@ -176,6 +183,22 @@ public class WebResourceManagerImpl implements WebResourceManager {
 		}
 		
 		return resource;
+	}
+
+	@Override
+	public WebResourceInfo getOriginalResource(String name) throws FileNotFoundException {
+		WebResourceInfo resource = concatenateResourceRepository.getByName(name);
+		
+		if (resource == null) {
+			throw new FileNotFoundException(String.format("Can not found the web resource [%s]", name));
+		}
+		
+		return resource;
+	}
+
+	@Override
+	public Collection<String> getAllNames() {
+		return concatenateResourceRepository.getAllNames();
 	}
 	
 	@Override
@@ -216,8 +239,13 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	}
 
 	@Override
-	public void setResourceCache(WebResourceCache webResourceCache) {
+	public void setWebResourceCache(WebResourceCache webResourceCache) {
 		this.webResourceCache = webResourceCache;
+	}
+
+	@Override
+	public void setVersionStrategy(VersionStrategy versionStrategy) {
+		this.versionStrategy = versionStrategy;
 	}
 	
 }

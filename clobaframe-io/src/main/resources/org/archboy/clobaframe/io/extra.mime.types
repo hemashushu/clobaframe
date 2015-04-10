@@ -1,3 +1,4 @@
 # MIME type (lowercased)			Extensions
 # ============================================	==========
 audio/mpeg							m4a
+text/x-velocity						vm

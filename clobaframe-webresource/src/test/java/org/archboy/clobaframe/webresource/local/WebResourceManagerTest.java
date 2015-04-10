@@ -7,10 +7,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import javax.inject.Inject;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
@@ -71,10 +70,14 @@ public class WebResourceManagerTest {
 			"css/concat-34.css", "css/concat-345.css"
 		};
 		
-		//List<WebResourceInfo> infos = new ArrayList<WebResourceInfo>();
 		for (String name : names) {
 			WebResourceInfo webResourceInfo = webResourceManager.getResource(name);
 			assertTrue(webResourceInfo.getContentLength() > 0);
+		}
+		
+		Collection<String> namesByManager1 = webResourceManager.getAllNames();
+		for(String name : names){
+			assertTrue(namesByManager1.contains(name));
 		}
 		
 	}
@@ -151,12 +154,20 @@ public class WebResourceManagerTest {
 					return null;
 				}
 			}
+
+			@Override
+			public Collection<String> list() {
+				return Arrays.asList("one.css");
+			}
 		};
 				
 		virtualResourceRepository.addProvider(provider);
 		
 		WebResourceInfo webResourceInfo1 = webResourceManager.getResource("one.css");
 		assertTextResourceContentEquals(webResourceInfo1, "body {}");
+		
+		Collection<String> namesByManager1 = webResourceManager.getAllNames();
+		assertTrue(namesByManager1.contains("one.css"));
 	}
 	
 	@Test
@@ -178,6 +189,11 @@ public class WebResourceManagerTest {
 				}else{
 					return null;
 				}
+			}
+
+			@Override
+			public Collection<String> list() {
+				return Arrays.asList("l1.css", "l2a.css", "l2b.css", "l3.css");
 			}
 		};
 				

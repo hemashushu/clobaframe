@@ -35,19 +35,20 @@ public class MimeTypeDetectorTest {
 		"sample/data/test.png", 
 		"sample/data/test.txt", 
 		"sample/data/test.xml", 
-		"sample/data/test.data", // it's a png image file.
+		"sample/data/test.data", // its content is a png image file.
 		"sample/data/test.css", 
 		"sample/data/test.js", 
 		"sample/data/test.m4a", // some mime-types list does not identify this type.
 		"sample/data/test.mov",
 		"sample/data/test.mp3",
 		"sample/data/test.mp4",
-		"sample/data/test-no-extension", // it's a xml file
+		"sample/data/test-no-extension", // its content is a xml file
 		"sample/data/FontAwesome.otf",
 		"sample/data/fontawesome-webfont.eot",
 		"sample/data/fontawesome-webfont.svg",
 		"sample/data/fontawesome-webfont.ttf",
-		"sample/data/fontawesome-webfont.woff"};
+		"sample/data/fontawesome-webfont.woff",
+		"sample/data/test.vm"};
 	
 	@Before
 	public void setUp() throws Exception {
@@ -66,19 +67,21 @@ public class MimeTypeDetectorTest {
 			"image/png",
 			"text/plain",
 			"application/xml",
-			"application/octet-stream", // data
+			"application/octet-stream", // *.data, its content is a png image file.
 			"text/css",
 			"application/javascript",
 			"audio/mpeg", // m4a
 			"video/quicktime",
 			"audio/mpeg",
 			"video/mp4",
-			"application/octet-stream", // no extension
+			"application/octet-stream", // no extension, its content is a xml file
 			"application/x-font-otf",
 			"application/vnd.ms-fontobject", // eot
 			"image/svg+xml",
 			"application/x-font-ttf",
-			"application/x-font-woff"};
+			"application/x-font-woff",
+			"text/x-velocity" // apache velocity templates
+		};
 
 		for(int idx=0; idx<sampleFiles.length; idx++){
 			String name = sampleFiles[idx];

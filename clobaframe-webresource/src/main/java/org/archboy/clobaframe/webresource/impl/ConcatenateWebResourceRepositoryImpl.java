@@ -8,9 +8,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -86,26 +88,18 @@ public class ConcatenateWebResourceRepositoryImpl implements ConcatenateWebResou
 		return new ConcatenateWebResourceInfo(webResourceInfos, name);
 	}
 
-	private List<WebResourceInfo> getAllConcatenates() {
-		List<WebResourceInfo> webResourceInfos = new ArrayList<WebResourceInfo>();
-		for(String name : concatenates.keySet()) {
-			webResourceInfos.add(getConcatenateWebResourceInfo(name));
-		}
-		return webResourceInfos;
-	}
-
-	
 	@Override
-	public Collection<WebResourceInfo> getAll() {
-		List<WebResourceInfo> webResourceInfos = new ArrayList<WebResourceInfo>();
+	public Collection<String> getAllNames() {
+		Set<String> names = new HashSet<String>();
 		
 		for (WebResourceRepository resourceRepository : resourceRepositories){
-			webResourceInfos.addAll(resourceRepository.getAll());
+			Collection<String> ns = resourceRepository.getAllNames(); 
+			names.addAll(ns);
 		}
 			
-		webResourceInfos.addAll(getAllConcatenates());
+		names.addAll(concatenates.keySet());
 		
-		return webResourceInfos;
+		return names;
 	}
 	
 	

@@ -2,13 +2,8 @@ package org.archboy.clobaframe.webresource.local;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import javax.inject.Inject;
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
@@ -64,24 +59,44 @@ public class WebResourceMinifyTest {
 			"sample/web/css/test2.css"
 		};
 		
+		// check original resource
+		for (int idx=0; idx<names1.length; idx++) {
+			WebResourceInfo webResourceInfo = webResourceManager.getOriginalResource(names1[idx]);
+			assertResourceContentEquals(webResourceInfo, files1[idx]);
+		}
+		
+		// check minified content length
 		for (int idx=0; idx<names1.length; idx++) {
 			WebResourceInfo webResourceInfo = webResourceManager.getResource(names1[idx]);
 			assertTrue(webResourceInfo.getContentLength() < getFileContent(files1[idx]).length);
 		}
 		
 		// the files that only have comments and new-line symbols will minified to empty.
-		String[] names2 = new String[]{
+		String[] emptyResourceNames1 = new String[]{
 			"test.js", 
 			"css/test3.css", "css/test4.css", "css/test5.css"
 		};
 		
-		for (String name : names2) {
+		for (String name : emptyResourceNames1) {
 			WebResourceInfo webResourceInfo = webResourceManager.getResource(name);
 			assertTrue(webResourceInfo.getContentLength() == 0);
 		}
 		
 	}
 
+	private void assertResourceContentEquals(WebResourceInfo resourceInfo, String resourceName) throws IOException {
+		byte[] data = getFileContent(resourceName);
+		assertResourceContentEquals(resourceInfo, data);
+	}
+	
+	private void assertResourceContentEquals(WebResourceInfo resourceInfo, byte[] data) throws IOException {
+		InputStream in = resourceInfo.getContent();
+		byte[] content = IOUtils.toByteArray(in);
+		in.close();
+
+		assertArrayEquals(data, content);
+	}
+	
 	/**
 	 *
 	 * @param name Relate to the 'src/test/resources' folder.

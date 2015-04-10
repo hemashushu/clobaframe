@@ -1,5 +1,7 @@
 package org.archboy.clobaframe.webresource;
 
+import java.util.Collection;
+
 /**
  *
  * @author yang
@@ -14,4 +16,9 @@ public interface VirtualWebResourceProvider {
 	 */
 	WebResourceInfo lookup(String name);
 	
+	/**
+	 * 
+	 * @return EMPTY when no resources.
+	 */
+	Collection<String> list();
 }

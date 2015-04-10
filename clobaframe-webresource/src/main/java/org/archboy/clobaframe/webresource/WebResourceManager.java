@@ -52,6 +52,27 @@ public interface WebResourceManager {
 	 */
 	WebResourceInfo getResourceByVersionName(String versionName) throws FileNotFoundException;
 
+	/**
+	 * Get the un-compressed, un-minified, un-cached web resource.
+	 * @param name
+	 * @return
+	 * @throws FileNotFoundException 
+	 */
+	WebResourceInfo getOriginalResource(String name) throws FileNotFoundException;
+	
+	/**
+	 * Get all web resources name.
+	 * Keep in mind that some virtual web resource repository can NOT be list.
+	 * 
+	 * @return 
+	 */
+	Collection<String> getAllNames();
+	
+	/**
+	 * 
+	 * @param webResourceInfo
+	 * @return 
+	 */
 	String getVersionName(WebResourceInfo webResourceInfo);
 	
 	/**
@@ -90,5 +111,11 @@ public interface WebResourceManager {
 	 * 
 	 * @param webResourceCache 
 	 */
-	void setResourceCache(WebResourceCache webResourceCache);
+	void setWebResourceCache(WebResourceCache webResourceCache);
+	
+	/**
+	 * 
+	 * @param versionStrategy 
+	 */
+	void setVersionStrategy(VersionStrategy versionStrategy);
 }

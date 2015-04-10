@@ -1,0 +1,2 @@
+#set($text='hello world')
+<p>$text</p>

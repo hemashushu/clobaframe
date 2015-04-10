@@ -2,8 +2,10 @@ package org.archboy.clobaframe.webresource.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import org.archboy.clobaframe.webresource.*;
 import java.util.List;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -43,7 +45,15 @@ public class VirtualWebResourceRepositoryImpl extends AbstractWebResourceReposit
 	}
 
 	@Override
-	public Collection<WebResourceInfo> getAll() {
-		return new ArrayList<WebResourceInfo>();
+	public Collection<String> getAllNames() {
+		// NOTE:: not all virtual web resource repository can be list.
+		Set<String> names = new HashSet<String>();
+		
+		for (VirtualWebResourceProvider resourceProvider : virtualResourceProviders){
+			Collection<String> ns = resourceProvider.list(); 
+			names.addAll(ns);
+		}
+		
+		return names;
 	}
 }

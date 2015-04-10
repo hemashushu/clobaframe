@@ -69,8 +69,8 @@ public class LocalWebResourceRepository extends AbstractWebResourceRepository{
 	}
 	
 	@Override
-	public Collection<WebResourceInfo> getAll() {
-		List<WebResourceInfo> webResourcesInfos = new ArrayList<WebResourceInfo>();
+	public Collection<String> getAllNames() {
+		List<String> names = new ArrayList<String>();
 
 		Stack<File> dirs = new Stack<File>();
 		dirs.push(rootDir);
@@ -83,17 +83,18 @@ public class LocalWebResourceRepository extends AbstractWebResourceRepository{
 					dirs.push(file);
 				} else {
 					String name = getResourceName(file);
-					String mimeType = getMimeType(file);
-
-					LocalWebResourceInfo webResourceInfo = new LocalWebResourceInfo(
-						file, name, mimeType);
-				
-					webResourcesInfos.add(webResourceInfo);
+//					String mimeType = getMimeType(file);
+//
+//					LocalWebResourceInfo webResourceInfo = new LocalWebResourceInfo(
+//						file, name, mimeType);
+//				
+//					names.add(webResourceInfo);
+					names.add(name);
 				}
 			}
 		}
 
-		return webResourcesInfos;
+		return names;
 	}
 
 	private String getMimeType(File file){
