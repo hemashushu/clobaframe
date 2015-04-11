@@ -146,8 +146,9 @@ public class WebResourceManagerTest {
 	@Test
 	public void testGetVirtualResource() throws IOException {
 		VirtualWebResourceProvider provider = new VirtualWebResourceProvider() {
+			
 			@Override
-			public WebResourceInfo lookup(String name) {
+			public WebResourceInfo getByName(String name) {
 				if (name.equals("one.css")){
 					return new TextWebResourceInfo("one.css", "body {}");
 				}else{
@@ -156,7 +157,7 @@ public class WebResourceManagerTest {
 			}
 
 			@Override
-			public Collection<String> list() {
+			public Collection<String> getAllNames() {
 				return Arrays.asList("one.css");
 			}
 		};
@@ -177,7 +178,7 @@ public class WebResourceManagerTest {
 		
 		VirtualWebResourceProvider provider = new VirtualWebResourceProvider() {
 			@Override
-			public WebResourceInfo lookup(String name) {
+			public WebResourceInfo getByName(String name) {
 				if (name.equals("l3.css")){
 					return new TextWebResourceInfo("l3.css", "@import url('l2a.css') \n body {}");
 				}else if (name.equals("l2a.css")){
@@ -192,7 +193,7 @@ public class WebResourceManagerTest {
 			}
 
 			@Override
-			public Collection<String> list() {
+			public Collection<String> getAllNames() {
 				return Arrays.asList("l1.css", "l2a.css", "l2b.css", "l3.css");
 			}
 		};

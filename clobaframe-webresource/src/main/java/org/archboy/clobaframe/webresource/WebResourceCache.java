@@ -17,5 +17,9 @@ public interface WebResourceCache {
 	 */
 	WebResourceInfo getByName(String name);
 	
-	void add (WebResourceInfo webResourceInfo);
+	/**
+	 * 
+	 * @param webResourceInfo 
+	 */
+	void add(WebResourceInfo webResourceInfo);
 }

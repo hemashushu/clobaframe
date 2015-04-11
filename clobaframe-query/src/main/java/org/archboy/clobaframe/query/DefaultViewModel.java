@@ -84,7 +84,7 @@ public class DefaultViewModel extends HashMap<String, Object>
 	}
 	
 	public static ViewModel Wrap(Object object, boolean deep){
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new UnsupportedOperationException("Does not supported.");
 	}
 	
 	/**

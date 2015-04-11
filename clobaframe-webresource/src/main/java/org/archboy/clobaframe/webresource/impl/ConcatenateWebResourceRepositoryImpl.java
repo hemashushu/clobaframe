@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.webresource.ConcatenateWebResourceRepository;
+import org.archboy.clobaframe.webresource.VirtualWebResourceRepository;
 import org.archboy.clobaframe.webresource.WebResourceRepository;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +38,9 @@ public class ConcatenateWebResourceRepositoryImpl implements ConcatenateWebResou
 	@Inject
 	private ResourceLoader resourceLoader;
 		
+	@Inject
+	private VirtualWebResourceRepository virtualWebResourceRepository;
+	
 	@Inject
 	private List<WebResourceRepository> resourceRepositories;
 	
@@ -92,11 +96,14 @@ public class ConcatenateWebResourceRepositoryImpl implements ConcatenateWebResou
 	public Collection<String> getAllNames() {
 		Set<String> names = new HashSet<String>();
 		
+		// list normal resource repository first
 		for (WebResourceRepository resourceRepository : resourceRepositories){
 			Collection<String> ns = resourceRepository.getAllNames(); 
 			names.addAll(ns);
 		}
-			
+		
+		// then list virtual resource for overwrite the duplicate name resource.
+		names.addAll(virtualWebResourceRepository.getAllNames());
 		names.addAll(concatenates.keySet());
 		
 		return names;
@@ -104,12 +111,15 @@ public class ConcatenateWebResourceRepositoryImpl implements ConcatenateWebResou
 	
 	
 	private WebResourceInfo getResourceFromRepositories(String name){
-		WebResourceInfo webResourceInfo = null;
+		// lookup virtual resource first
+		WebResourceInfo webResourceInfo = virtualWebResourceRepository.getByName(name);
 		
-		for (WebResourceRepository resourceRepository : resourceRepositories){
-			webResourceInfo = resourceRepository.getByName(name);
-			if (webResourceInfo != null) {
-				break;
+		if (webResourceInfo == null){
+			for (WebResourceRepository resourceRepository : resourceRepositories){
+				webResourceInfo = resourceRepository.getByName(name);
+				if (webResourceInfo != null) {
+					break;
+				}
 			}
 		}
 		return webResourceInfo;

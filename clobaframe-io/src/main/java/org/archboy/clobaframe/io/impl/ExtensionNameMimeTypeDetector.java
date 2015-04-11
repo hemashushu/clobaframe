@@ -113,7 +113,7 @@ public class ExtensionNameMimeTypeDetector implements MimeTypeDetector {
 	public String getByContent(InputStream in) {
 		Assert.notNull(in);
 		
-		throw new UnsupportedOperationException("Not supported yet.");
+		throw new UnsupportedOperationException("Does not supported.");
 	}
 	
 	

@@ -30,7 +30,7 @@ public class VirtualWebResourceRepositoryImpl extends AbstractWebResourceReposit
 	@Override
 	public WebResourceInfo getByName(String name) {
 		for(VirtualWebResourceProvider virtualResourceProvider : virtualResourceProviders) {
-			WebResourceInfo webResourceInfo = virtualResourceProvider.lookup(name);
+			WebResourceInfo webResourceInfo = virtualResourceProvider.getByName(name);
 			if (webResourceInfo != null) {
 				return webResourceInfo;
 			}
@@ -50,7 +50,7 @@ public class VirtualWebResourceRepositoryImpl extends AbstractWebResourceReposit
 		Set<String> names = new HashSet<String>();
 		
 		for (VirtualWebResourceProvider resourceProvider : virtualResourceProviders){
-			Collection<String> ns = resourceProvider.list(); 
+			Collection<String> ns = resourceProvider.getAllNames(); 
 			names.addAll(ns);
 		}
 		
