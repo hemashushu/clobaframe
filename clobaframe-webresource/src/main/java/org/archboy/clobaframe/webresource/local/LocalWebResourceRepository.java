@@ -41,6 +41,11 @@ public class LocalWebResourceRepository extends AbstractWebResourceRepository{
 		return "local";
 	}
 
+	@Override
+	public int getPriority() {
+		return PRIORITY_DEFAULT;
+	}
+
 	@PostConstruct
 	public void init() throws IOException {
 		Resource resource = resourceLoader.getResource(localPath);

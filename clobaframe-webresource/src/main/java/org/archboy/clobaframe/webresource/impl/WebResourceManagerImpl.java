@@ -11,7 +11,7 @@ import javax.inject.Named;
 import org.archboy.clobaframe.webresource.AbstractVersionStrategy;
 import org.archboy.clobaframe.webresource.CacheableWebResource;
 import org.archboy.clobaframe.webresource.CacheableWebResourceUpdateListener;
-import org.archboy.clobaframe.webresource.ConcatenateWebResourceRepository;
+import org.archboy.clobaframe.webresource.WebResourceRepositorySet;
 import org.archboy.clobaframe.webresource.LocationGenerator;
 import org.archboy.clobaframe.webresource.WebResourceCache;
 import org.archboy.clobaframe.webresource.VersionStrategy;
@@ -43,7 +43,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	private LocationGenerator locationGenerator; 
 	
 	@Inject
-	private ConcatenateWebResourceRepository concatenateResourceRepository;
+	private WebResourceRepositorySet webResourceRepositorySet;
 	
 	private List<String> compressibleWebResourceMimeTypes; 
 	private List<String> minifyWebResourceMimeTypes; 
@@ -110,7 +110,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	 * @param name
 	 * @return NULL if the specify resource not found.
 	 */
-	private WebResourceInfo getResourceInternal(String name) {
+	private WebResourceInfo assembleResource(String name) {
 		
 		// load from collection first
 		WebResourceInfo resourceInfo = webResourceCache.getByName(name);
@@ -119,7 +119,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 		}
 		
 		// then load from concatenate and repository
-		resourceInfo = concatenateResourceRepository.getByName(name);
+		resourceInfo = webResourceRepositorySet.getByName(name);
 		
 		if (resourceInfo == null) {
 			return null;
@@ -159,7 +159,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 			// insert the update listener into the child resources
 			if (childResourceNames != null){
 				for(String n : childResourceNames) {
-					WebResourceInfo r = getResourceInternal(n);
+					WebResourceInfo r = assembleResource(n);
 					if (r != null && r instanceof CacheableWebResource) {
 						((CacheableWebResource)r).addUpdateListener((CacheableWebResourceUpdateListener)resourceInfo);
 					}
@@ -176,7 +176,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	
 	@Override
 	public WebResourceInfo getResource(String name) throws FileNotFoundException {
-		WebResourceInfo resource = getResourceInternal(name);
+		WebResourceInfo resource = assembleResource(name);
 		
 		if (resource == null) {
 			throw new FileNotFoundException(String.format("Can not found the web resource [%s]", name));
@@ -187,7 +187,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 
 	@Override
 	public WebResourceInfo getOriginalResource(String name) throws FileNotFoundException {
-		WebResourceInfo resource = concatenateResourceRepository.getByName(name);
+		WebResourceInfo resource = webResourceRepositorySet.getByName(name);
 		
 		if (resource == null) {
 			throw new FileNotFoundException(String.format("Can not found the web resource [%s]", name));
@@ -198,7 +198,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 
 	@Override
 	public Collection<String> getAllNames() {
-		return concatenateResourceRepository.getAllNames();
+		return webResourceRepositorySet.getAllNames();
 	}
 	
 	@Override
@@ -225,7 +225,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 
 	@Override
 	public void refresh(String name) {
-		WebResourceInfo resource = getResourceInternal(name);
+		WebResourceInfo resource = assembleResource(name);
 		if (resource != null) {
 			if (resource instanceof CacheableWebResource) {
 				((CacheableWebResource)resource).refresh();

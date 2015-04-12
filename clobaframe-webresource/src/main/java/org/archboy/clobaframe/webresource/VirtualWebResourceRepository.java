@@ -11,7 +11,7 @@ import javax.inject.Named;
  * @author yang
  */
 @Named
-public interface VirtualWebResourceRepository extends WebResourceCollection {
+public interface VirtualWebResourceRepository extends WebResourceRepository {
 
 	/**
 	 * 

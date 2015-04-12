@@ -1,6 +1,5 @@
 package org.archboy.clobaframe.webresource.impl;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,19 +7,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.commons.io.IOUtils;
-import org.archboy.clobaframe.webresource.ConcatenateWebResourceRepository;
-import org.archboy.clobaframe.webresource.VirtualWebResourceRepository;
-import org.archboy.clobaframe.webresource.WebResourceRepository;
+import org.archboy.clobaframe.webresource.AbstractWebResourceRepository;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
+import org.archboy.clobaframe.webresource.WebResourceRepositorySet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -30,20 +26,28 @@ import org.springframework.core.io.ResourceLoader;
  * @author yang
  */
 @Named
-public class ConcatenateWebResourceRepositoryImpl implements ConcatenateWebResourceRepository {
+public class ConcatenateWebResourceRepository extends AbstractWebResourceRepository {
 
 	@Value("${clobaframe.webresource.concatenateConfig}")
 	private String concatenateConfig;
 	
 	@Inject
 	private ResourceLoader resourceLoader;
-		
-	@Inject
-	private VirtualWebResourceRepository virtualWebResourceRepository;
 	
 	@Inject
-	private List<WebResourceRepository> resourceRepositories;
+	private WebResourceRepositorySet webResourceRepositorySet;
 	
+	@Override
+	public String getName() {
+		return "concatenate";
+	}
+
+	@Override
+	public int getPriority() {
+		return PRIORITY_TOP;
+	}
+	
+	// the concatenate web resource
 	private Map<String, List<String>> concatenates = new HashMap<String, List<String>>();
 
 	@PostConstruct
@@ -73,55 +77,25 @@ public class ConcatenateWebResourceRepositoryImpl implements ConcatenateWebResou
 		}
 		
 	}
-
+	
 	@Override
 	public WebResourceInfo getByName(String name) {
-		if (concatenates.containsKey(name)){
-			return getConcatenateWebResourceInfo(name);
-		}else{
-			return getResourceFromRepositories(name);
-		}
-	}
-
-	private WebResourceInfo getConcatenateWebResourceInfo(String name) {
 		List<String> names = concatenates.get(name);
+		
+		if (names == null || names.isEmpty()){
+			return null;
+		}
+		
 		List<WebResourceInfo> webResourceInfos = new ArrayList<WebResourceInfo>(names.size());
 		for(String n : names){
-			webResourceInfos.add(getResourceFromRepositories(n));
+			webResourceInfos.add(webResourceRepositorySet.getByName(n));
 		}
 		return new ConcatenateWebResourceInfo(webResourceInfos, name);
 	}
 
 	@Override
 	public Collection<String> getAllNames() {
-		Set<String> names = new HashSet<String>();
-		
-		// list normal resource repository first
-		for (WebResourceRepository resourceRepository : resourceRepositories){
-			Collection<String> ns = resourceRepository.getAllNames(); 
-			names.addAll(ns);
-		}
-		
-		// then list virtual resource for overwrite the duplicate name resource.
-		names.addAll(virtualWebResourceRepository.getAllNames());
-		names.addAll(concatenates.keySet());
-		
-		return names;
+		return concatenates.keySet();
 	}
 	
-	
-	private WebResourceInfo getResourceFromRepositories(String name){
-		// lookup virtual resource first
-		WebResourceInfo webResourceInfo = virtualWebResourceRepository.getByName(name);
-		
-		if (webResourceInfo == null){
-			for (WebResourceRepository resourceRepository : resourceRepositories){
-				webResourceInfo = resourceRepository.getByName(name);
-				if (webResourceInfo != null) {
-					break;
-				}
-			}
-		}
-		return webResourceInfo;
-	}
 }

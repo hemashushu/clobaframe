@@ -28,6 +28,11 @@ public class VirtualWebResourceRepositoryImpl extends AbstractWebResourceReposit
 	}
 
 	@Override
+	public int getPriority() {
+		return PRIORITY_LESS_THAN_TOP;
+	}
+
+	@Override
 	public WebResourceInfo getByName(String name) {
 		for(VirtualWebResourceProvider virtualResourceProvider : virtualResourceProviders) {
 			WebResourceInfo webResourceInfo = virtualResourceProvider.getByName(name);

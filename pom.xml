@@ -194,28 +194,42 @@
 		</dependencies>
 	</dependencyManagement>
 
+	<repositories>
+	</repositories>
+
 	<build>
-		<plugins>
-			<!-- Skip some unit test here -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.14.1</version>
-				<configuration>
-					<excludes>
-						<exclude>**/SomeSkipTest.java</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
-		</plugins>
-		
 		<pluginManagement>
 			<plugins>
+				<!-- Skip some unit test here -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.18.1</version>
+					<configuration>
+						<excludes>
+							<exclude>**/SomeSkipTest.java</exclude>
+						</excludes>
+					</configuration>
+				</plugin>
+				
+				<!-- Skip some files in package (jar:jar) -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>2.6</version>
+					<configuration>
+						<excludes>
+							<!-- exclude somethings here -->
+							<exclude>/script/**</exclude>
+						</excludes>
+					</configuration>
+				</plugin>
+			
 				<!-- Java compile version -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>2.3.2</version>
+					<version>3.3</version>
 					<configuration>
 						<source>1.6</source>
 						<target>1.6</target>
@@ -231,7 +245,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>2.5.1</version>
+					<version>2.10</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>

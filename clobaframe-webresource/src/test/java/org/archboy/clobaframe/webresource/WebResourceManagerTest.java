@@ -1,4 +1,4 @@
-package org.archboy.clobaframe.webresource.local;
+package org.archboy.clobaframe.webresource;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
