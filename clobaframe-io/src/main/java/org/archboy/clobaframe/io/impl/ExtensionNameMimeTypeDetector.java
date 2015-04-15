@@ -1,12 +1,16 @@
 package org.archboy.clobaframe.io.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -36,17 +40,19 @@ public class ExtensionNameMimeTypeDetector implements MimeTypeDetector {
 	private static final String mimeTypeListFile = "classpath:org/archboy/clobaframe/io/mime.types";
 	
 	// the custom mime type list
-	private static final String extraMimeTypeListFile = "classpath:org/archboy/clobaframe/io/extra.mime.types";
+	private static final String extraMimeTypeListFile = "classpath:org/archboy/clobaframe/io/extra.mime.types.json";
 	
 	@Inject
 	private ResourceLoader resourceLoader;
+	
+	private ObjectMapper objectMapper = new ObjectMapper();
 	
 	private final Logger logger = LoggerFactory.getLogger(ExtensionNameMimeTypeDetector.class);
 	
 	@PostConstruct
 	public void init() throws IOException {
 		loadMimeTypesList(mimeTypeListFile);
-		loadMimeTypesList(extraMimeTypeListFile);
+		loadExtraMimeTypesList(extraMimeTypeListFile);
 	}
 	
 	private void loadMimeTypesList(String resourceName) throws IOException {
@@ -85,6 +91,27 @@ public class ExtensionNameMimeTypeDetector implements MimeTypeDetector {
 					mimeTypes.put(e, name);
 					//}
 				}
+			}
+		}finally{
+			IOUtils.closeQuietly(in);
+		}
+	}
+	
+	private void loadExtraMimeTypesList(String resourceName) throws IOException {
+		Resource resource = resourceLoader.getResource(resourceName);
+		if (!resource.exists()) {
+			//logger.error("Can not find the mime type list file.");
+			throw new FileNotFoundException(
+					String.format("Can not find the mime type list file [%s].", resourceName));
+		}
+		
+		InputStream in = null;
+		try{
+			in = resource.getInputStream();
+			String text = IOUtils.toString(in, "UTF-8");
+			Map<String, String> map = objectMapper.readValue(text, new TypeReference<Map<String, String>>() {});
+			for(Map.Entry<String, String> entry : map.entrySet()){
+				mimeTypes.put(entry.getKey(), entry.getValue());
 			}
 		}finally{
 			IOUtils.closeQuietly(in);

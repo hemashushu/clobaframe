@@ -1,11 +1,14 @@
 package org.archboy.clobaframe.io.http.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.PostConstruct;
@@ -39,13 +42,15 @@ public class ResourceSenderImpl implements ResourceSender {
 	@Value("${clobaframe.io.http.gzip.minCompressSize}")
 	private int minCompressSize = DEFAULT_MIN_COMPRESS_SIZE;
 	
-	private static final String DEFAULT_COMPRESSIBLE_MIME_TYPE_LIST = "classpath:org/archboy/clobaframe/io/compressibleMimeType.list";
+	private static final String DEFAULT_COMPRESSIBLE_MIME_TYPE_LIST = "classpath:org/archboy/clobaframe/io/compressibleMimeType.json";
 	
 	@Value("${clobaframe.io.http.gzip.mimeTypeList}")
 	private String compressibleMimeTypeList = DEFAULT_COMPRESSIBLE_MIME_TYPE_LIST;
 		
 	@Inject
 	private ResourceLoader resourceLoader;
+	
+	private ObjectMapper objectMapper = new ObjectMapper();
 	
 	private ResourceSender resourceSender;
 	
@@ -71,16 +76,23 @@ public class ResourceSenderImpl implements ResourceSender {
 		}
 
 		Set<String> mimeTypes = new HashSet<String>();
-		InputStream in = resource.getInputStream();
+		InputStream in = null;
 		
 		try{
-			BufferedReader r = new BufferedReader(new InputStreamReader(in));
-			while(true){
-				String line = r.readLine();
-				if (line == null) break;
-				if (line.startsWith("#")) continue;
-				mimeTypes.add(line);
+//			BufferedReader r = new BufferedReader(new InputStreamReader(in));
+//			while(true){
+//				String line = r.readLine();
+//				if (line == null) break;
+//				if (line.startsWith("#")) continue;
+//				mimeTypes.add(line);
+//			}
+			in = resource.getInputStream();
+			String text = IOUtils.toString(in, "UTF-8");
+			List<String> list = objectMapper.readValue(text, new TypeReference<List<String>>() {});
+			for(String item : list){
+				mimeTypes.add(item);
 			}
+			
 		}finally{
 			IOUtils.closeQuietly(in);
 		}

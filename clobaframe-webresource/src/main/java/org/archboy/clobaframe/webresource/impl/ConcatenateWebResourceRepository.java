@@ -1,5 +1,7 @@
 package org.archboy.clobaframe.webresource.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +16,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.archboy.clobaframe.webresource.AbstractWebResourceRepository;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceRepositorySet;
@@ -36,7 +39,12 @@ public class ConcatenateWebResourceRepository extends AbstractWebResourceReposit
 	
 	@Inject
 	private WebResourceRepositorySet webResourceRepositorySet;
+
+	private ObjectMapper objectMapper = new ObjectMapper();
 	
+	// the concatenate web resource
+	private Map<String, List<String>> concatenates = new HashMap<String, List<String>>();
+
 	@Override
 	public String getName() {
 		return "concatenate";
@@ -46,12 +54,13 @@ public class ConcatenateWebResourceRepository extends AbstractWebResourceReposit
 	public int getPriority() {
 		return PRIORITY_TOP;
 	}
-	
-	// the concatenate web resource
-	private Map<String, List<String>> concatenates = new HashMap<String, List<String>>();
 
 	@PostConstruct
 	public void init() throws IOException {
+		
+		if (StringUtils.isEmpty(concatenateConfig)){
+			return;
+		}
 		
 		Resource resource = resourceLoader.getResource(concatenateConfig);
 		if (!resource.exists()){
@@ -60,20 +69,23 @@ public class ConcatenateWebResourceRepository extends AbstractWebResourceReposit
 					concatenateConfig));
 		}
 
-		Properties properties = new Properties();
+		//Properties properties = new Properties();
 		InputStream in = null;
 		
 		try{
 			in = resource.getInputStream();
-			properties.load(in);
+			String text = IOUtils.toString(in, "UTF-8");
+			Map<String, List<String>> map = objectMapper.readValue(text, new TypeReference<Map<String, List<String>>>() {});
+			//properties.load(in);
+			
+			for(Map.Entry<String, List<String>> entry: map.entrySet()){
+				//String key = keyObj.toString();
+				//String values = properties.getProperty(key);
+				//concatenates.put(key, Arrays.asList(values.split(",")));
+				concatenates.put(entry.getKey(), entry.getValue());
+			}
 		}finally{
 			IOUtils.closeQuietly(in);
-		}
-		
-		for(Object keyObj : properties.keySet()){
-			String key = keyObj.toString();
-			String values = properties.getProperty(key);
-			concatenates.put(key, Arrays.asList(values.split(",")));
 		}
 		
 	}

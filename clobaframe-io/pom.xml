@@ -206,19 +206,15 @@
 		</dependency>
 		-->
 		
-		<!-- Jackson JSON Mapper for test-->
+		<!-- Jackson JSON Mapper -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
-			<version>2.5.1</version>
-			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.5.1</version>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	
@@ -231,7 +227,7 @@
 					<include>**/*.xml</include>
 					<include>**/*.cache</include>
 					<include>**/*.types</include>
-					<include>**/*.list</include>
+					<include>**/*.json</include>
 				</includes>
 			</resource>
 		</resources>
