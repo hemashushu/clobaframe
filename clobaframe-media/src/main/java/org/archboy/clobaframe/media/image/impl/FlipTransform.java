@@ -1,9 +1,7 @@
 package org.archboy.clobaframe.media.image.impl;
 
-import java.awt.image.BufferedImage;
-
-
 import com.jhlabs.image.FlipFilter;
+import java.awt.image.BufferedImage;
 
 /**
  *

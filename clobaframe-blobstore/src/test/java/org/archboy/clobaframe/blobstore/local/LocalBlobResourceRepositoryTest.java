@@ -19,6 +19,7 @@ import org.archboy.clobaframe.blobstore.BlobResourceInfo;
 import org.archboy.clobaframe.blobstore.BlobResourceInfoFactory;
 import org.archboy.clobaframe.blobstore.BlobResourceRepository;
 import org.archboy.clobaframe.blobstore.Blobstore;
+import org.archboy.clobaframe.blobstore.BlobstoreManager;
 import org.archboy.clobaframe.blobstore.PartialCollection;
 import org.archboy.clobaframe.blobstore.impl.DefaultBlobResourceInfoFactory;
 import static org.junit.Assert.*;
@@ -29,8 +30,8 @@ import static org.junit.Assert.*;
 public class LocalBlobResourceRepositoryTest {
 
 	@Inject
-	@Named("defaultBlobstore")
-	private Blobstore blobstore;
+	//@Named("defaultBlobstore")
+	private BlobstoreManager blobstoreManager;
 	
 	private BlobResourceInfoFactory blobResourceInfoFactory = new DefaultBlobResourceInfoFactory();
 
@@ -57,6 +58,8 @@ public class LocalBlobResourceRepositoryTest {
 
 	@Test
 	public void testPut() throws IOException {
+		Blobstore blobstore = blobstoreManager.getDefault();
+		
 		// check bucket first
 		if (!blobstore.exist(testRepositoryName1)){
 			blobstore.create(testRepositoryName1);
@@ -145,6 +148,8 @@ public class LocalBlobResourceRepositoryTest {
 
 	@Test
 	public void testList() throws IOException {
+		Blobstore blobstore = blobstoreManager.getDefault();
+		
 		// check bucket first
 		if (!blobstore.exist(testRepositoryName2)){
 			blobstore.create(testRepositoryName2);

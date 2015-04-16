@@ -9,18 +9,21 @@ import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.TemporaryResources;
 
 /**
- *
+ * Make {@link Media} from input stream or resource.
+ * 
  * @author yang
  */
 public interface MediaFactory {
+	
 	/**
 	 * Make by byte array.
 	 *
 	 * @param data
 	 * @param mimeType 
 	 * @param lastModified Specify the last modified date, NULL for current date.
+	 * @param temporaryResources
 	 * @return
-	 * @throws ImagingException
+	 * @throws IOException
 	 */
 	Media make(byte[] data, String mimeType, Date lastModified, TemporaryResources temporaryResources) throws IOException;
 
@@ -33,8 +36,9 @@ public interface MediaFactory {
 	 * </p>
 	 * @param mimeType 
 	 * @param lastModified Specify the last modified date, NULL for current date.
+	 * @param temporaryResources
 	 * @return
-	 * @throws
+	 * @throws IOException
 	 */
 	Media make(InputStream inputStream, String mimeType, Date lastModified, TemporaryResources temporaryResources) throws IOException;
 	
@@ -42,8 +46,9 @@ public interface MediaFactory {
 	 * Make by file.
 	 *
 	 * @param file
+	 * @param temporaryResources
 	 * @return
-	 * @throws ImagingException
+	 * @throws IOException
 	 */
 	Media make(File file, TemporaryResources temporaryResources) throws IOException;
 
@@ -51,8 +56,9 @@ public interface MediaFactory {
 	 * Make by URL.
 	 *
 	 * @param url
+	 * @param temporaryResources
 	 * @return
-	 * @throws ImagingException
+	 * @throws IOException
 	 */
 	Media make(URL url, TemporaryResources temporaryResources) throws IOException;
 
@@ -60,6 +66,7 @@ public interface MediaFactory {
 	 * Make by {@link ResourceInfo}.
 	 * 
 	 * @param resourceInfo
+	 * @param temporaryResources
 	 * @return
 	 * @throws IOException 
 	 */

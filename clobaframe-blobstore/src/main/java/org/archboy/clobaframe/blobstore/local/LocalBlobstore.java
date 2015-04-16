@@ -17,6 +17,7 @@ import org.archboy.clobaframe.blobstore.BlobResourceRepository;
 import org.archboy.clobaframe.blobstore.impl.AbstractBlobstore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.util.Assert;
 
 /**
@@ -54,9 +55,9 @@ public class LocalBlobstore extends AbstractBlobstore {
 			rootDir.mkdirs();
 		}
 	}
-	
+
 	@PreDestroy
-	public void destory(){
+	public void destroy() throws Exception {
 		for(BlobResourceRepository r : repositories.values()){
 			try{
 				((Closeable)r).close();

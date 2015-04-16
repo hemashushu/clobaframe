@@ -9,10 +9,7 @@ import com.coremedia.iso.boxes.MovieHeaderBox;
 import com.googlecode.mp4parser.DataSource;
 import com.googlecode.mp4parser.FileDataSourceImpl;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.channels.FileChannel;
 import java.util.List;
 import javax.inject.Named;
 import org.apache.commons.io.IOUtils;
@@ -30,28 +27,9 @@ import org.springframework.util.Assert;
 public class M4aLoader implements MediaLoader{
 	
 	public static final String MIME_TYPE_AUDIO_MP4 = "audio/mp4"; // *.m4a, *.mp4a
-//	public static final String CONTENT_TYPE_AUDIO_MPEG = "audio/mpeg"; // *.mp3
-	
-//	private List<String> supportContentTypes = Arrays.asList(
-//			CONTENT_TYPE_AUDIO_MPEG, 
-//			MIME_TYPE_AUDIO_MP4);
-	
-//	private static final List<String> mp4_audio_brands = Arrays.asList(
-//             "M4A ", "M4B ", "F4A ", "F4B ");
-//	
-//	private static final List<String> mp4_video_brands = Arrays.asList(
-//             "mp41", "mp42");
-	
-	   
+
 	@Override
 	public boolean support(String mimeType) {
-//		for (String supportContentType : supportContentTypes){
-//			if (supportContentType.equals(contentType)){
-//				return true;
-//			}
-//		}
-//		
-//		return false;
 		return MIME_TYPE_AUDIO_MP4.equals(mimeType);
 	}
 
@@ -61,23 +39,6 @@ public class M4aLoader implements MediaLoader{
 		
 		File file = fileBaseResourceInfo.getFile();
 		
-//		AudioFile audioFile = null;
-//
-//		try{
-//			audioFile = AudioFileIO.read(file);
-//		} catch(CannotReadException e){
-//			return null;
-//		} catch (TagException ex) {
-//			return null;
-//		} catch (ReadOnlyFileException ex) {
-//			return null;
-//		} catch (InvalidAudioFrameException ex) {
-//			return null;
-//		}
-//		
-//		AudioHeader audioHeader = audioFile.getAudioHeader();
-//		audioHeader.getFormat() // AAC, MPEG-1 Layer 3
-
 		DataSource dataSource = new FileDataSourceImpl(file);
 		try{
 			IsoFile isoFile = new IsoFile(dataSource);

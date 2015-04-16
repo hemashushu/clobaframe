@@ -2,13 +2,11 @@ package org.archboy.clobaframe.media.image.impl;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.image.BufferedImage;
+import javax.inject.Named;
 import org.archboy.clobaframe.media.image.Composite;
 import org.archboy.clobaframe.media.image.Image;
 import org.archboy.clobaframe.media.image.Imaging;
 import org.archboy.clobaframe.media.image.Transform;
-
-import javax.inject.Named;
 import org.springframework.util.Assert;
 
 /**

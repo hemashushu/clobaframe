@@ -1,6 +1,5 @@
 package org.archboy.clobaframe.media;
 
-import java.io.InputStream;
 import java.util.Date;
 import org.archboy.clobaframe.io.ResourceInfo;
 
@@ -10,12 +9,16 @@ import org.archboy.clobaframe.io.ResourceInfo;
  */
 public interface Media {
 	
-	//String getContentType();
-	
+	/**
+	 * 
+	 * @return 
+	 */
 	MetaData getMetaData();
 	
-	//InputStream getInputStream();
-	
+	/**
+	 * 
+	 * @return 
+	 */
 	ResourceInfo getResourceInfo();
 	
 	/**

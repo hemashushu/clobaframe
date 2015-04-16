@@ -10,8 +10,6 @@ import org.archboy.clobaframe.media.image.Transform;
  */
 public abstract class AbstractTransform implements Transform {
 
-	//public static final String CONTENT_TYPE_IMAGE_PNG = "image/png";
-	
 	@Override
 	public Image transform(Image image) {
 		BufferedImage bufferedImageBefore = image.getBufferedImage();

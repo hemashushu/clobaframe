@@ -42,7 +42,6 @@ public class MediaFactoryImpl implements MediaFactory{
 
 	private final Logger logger = LoggerFactory.getLogger(MediaFactoryImpl.class);
 
-//	@Inject
 	private ResourceInfoFactory resourceInfoFactory = new DefaultResourceInfoFactory();
 	
 	@Inject
@@ -50,10 +49,6 @@ public class MediaFactoryImpl implements MediaFactory{
 	
 	@Inject
 	private List<MediaLoader> mediaLoaders;
-	
-//	public void setMaxHandleSizeKB(int maxHandleSizeKB) {
-//		this.maxHandleSizeByte = maxHandleSizeKB * 1024L;
-//	}
 	
 	@Override
 	public Media make(byte[] data, String mimeType, Date lastModified, TemporaryResources temporaryResources) throws IOException {
@@ -139,7 +134,6 @@ public class MediaFactoryImpl implements MediaFactory{
 							maxHandleSizeByte, resourceInfo.getContentLength()));
 		}
 		
-		//TemporaryResources temporaryResources = new TemporaryResources();
 		FileBaseResourceInfo fileBaseResourceInfo = fileBaseResourceInfoFactory.wrap(
 				resourceInfo, temporaryResources);
 		
@@ -159,42 +153,8 @@ public class MediaFactoryImpl implements MediaFactory{
 							resourceInfo.getMimeType()));
 		}
 
-//		if (media instanceof AbstractMedia){
-//			for(MetaDataParser metaDataParser : metaDataParsers){
-//				if (metaDataParser.support(media.getContentType())){
-//					MetaData metaData = metaDataParser.parse(fileBaseResourceInfo);
-//					((AbstractMedia)media).setMetaData(metaData);
-//					break;
-//				}
-//			}
-//		}
-
 		return media;
-			
-//		}finally{
-//			// close the temp file.
-//			temporaryResources.close();
-//		}
 	}
-
-//	/*
-//	 * java 6 ImageInputStream does not implement Closable interface
-//	 */
-//	private void closeQuietly(ImageInputStream stream) {
-//		if (stream != null) {
-//			try {
-//				stream.close();
-//			} catch (IOException e) {
-//				// ignore
-//			}
-//		}
-//	}
-//
-//	private void closeQuietly(ImageReader reader) {
-//		if (reader != null) {
-//			reader.dispose();
-//		}
-//	}
 	
 	private byte[] toByteArrayWithSizeLimit(InputStream inputStream) throws IOException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();

@@ -26,7 +26,7 @@ public class CacheManagerImpl implements CacheManager {
 	@Inject
 	private List<AbstractCache> caches;
 
-	@Bean(name = "defaultCache")
+	//@Bean(name = "defaultCache")
 	@Override
 	public Cache getDefault(){
 		return getCache(defaultCacheName);

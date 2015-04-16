@@ -74,11 +74,6 @@ public class DefaultAudio implements Audio {
 		this.bitrateMode = bitrateMode;
 	}
 
-//	@Override
-//	public String getContentType() {
-//		return resourceInfo.getContentType();
-//	}
-
 	@Override
 	public ResourceInfo getResourceInfo() {
 		return resourceInfo;

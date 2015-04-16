@@ -6,7 +6,6 @@ import javax.inject.Named;
 import org.archboy.clobaframe.blobstore.Blobstore;
 import org.archboy.clobaframe.blobstore.BlobstoreManager;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.util.Assert;
 
 /**
@@ -38,7 +37,7 @@ public class BlobstoreManagerImpl implements BlobstoreManager {
 				String.format("Can not find the specify blobstore implementation [%s].", name));
 	}
 
-	@Bean(name="defaultBlobstore")
+	//@Bean(name="defaultBlobstore")
 	@Override
 	public Blobstore getDefault() {
 		return getBlobstore(defaultBlobstoreName);

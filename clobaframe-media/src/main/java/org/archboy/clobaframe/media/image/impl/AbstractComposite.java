@@ -3,15 +3,12 @@ package org.archboy.clobaframe.media.image.impl;
 import java.awt.image.BufferedImage;
 import org.archboy.clobaframe.media.image.Composite;
 import org.archboy.clobaframe.media.image.Image;
-import org.archboy.clobaframe.media.image.Transform;
 
 /**
  *
  * @author yang
  */
 public abstract class AbstractComposite implements Composite {
-
-	//public static final String CONTENT_TYPE_IMAGE_PNG = "image/png";
 
 	@Override
 	public Image composite(Image image) {

@@ -144,6 +144,12 @@
 			<version>3.0.2</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>com.twelvemonkeys.servlet</groupId>
+			<artifactId>servlet</artifactId>
+			<version>3.0.2</version>
+		</dependency>
+		
 		<!-- Image meta data -->
 		<!-- need by clobaframe-media -->
 		<dependency>

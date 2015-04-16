@@ -12,6 +12,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.archboy.clobaframe.cache.Cache;
 import org.archboy.clobaframe.cache.Cache;
+import org.archboy.clobaframe.cache.CacheManager;
 import org.archboy.clobaframe.cache.Expiration;
 import org.archboy.clobaframe.cache.Expiration;
 import static org.junit.Assert.*;
@@ -21,8 +22,8 @@ import static org.junit.Assert.*;
 public class CacheTest {
 
 	@Inject
-	@Named("defaultCache")
-	private Cache cache;
+	//@Named("defaultCache")
+	private CacheManager cacheManager;
 
 	@Before
 	public void setUp() throws Exception {
@@ -81,7 +82,8 @@ public class CacheTest {
 
 	@Test
 	public void testPut() throws InterruptedException {
-
+		Cache cache = cacheManager.getDefault();
+		
 		String key1 = "key1";
 		String key2 = "key2";
 		String key3 = "key3";
@@ -123,7 +125,8 @@ public class CacheTest {
 
 	@Test
 	public void testPutWithExpiration() throws InterruptedException {
-
+		Cache cache = cacheManager.getDefault();
+		
 		String key1 = "key1e";
 		String key2 = "key2e";
 		String key3 = "key3e";

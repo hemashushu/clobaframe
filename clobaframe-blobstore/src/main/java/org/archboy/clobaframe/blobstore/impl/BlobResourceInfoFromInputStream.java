@@ -3,9 +3,7 @@ package org.archboy.clobaframe.blobstore.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
-import org.archboy.clobaframe.blobstore.BlobResourceInfo;
 
 /**
  *
@@ -87,18 +85,4 @@ public class BlobResourceInfoFromInputStream extends AbstractBlobResourceInfo {
 	public Map<String, Object> getMetadata() {
 		return metadata;
 	}
-
-//	@Override
-//	public void setMetadata(Map<String, Object> metadata) {
-//		this.metadata = metadata;
-//	}
-//	
-//	@Override
-//	public void addMetadata(String key, Object value) {
-//		if (metadata == null){
-//			metadata = new HashMap<String, Object>();
-//		}
-//		
-//		metadata.put(key, value);
-//	}
 }

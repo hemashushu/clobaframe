@@ -14,31 +14,11 @@ import org.springframework.util.Assert;
  */
 public class Mp3MetaDataPaser implements MetaDataParser{
 
-//	public static final String CONTENT_TYPE_AUDIO_MPEG = "audio/mpeg";
-
-//	@Override
-//	public boolean support(String contentType) {
-//		return (CONTENT_TYPE_AUDIO_MPEG.equals(contentType));
-//	}
-
 	@Override
 	public MetaData parse(Object object) {
 		Assert.isTrue(object instanceof Mp3File, "Support Mp3File class only.");
-		
-//		FileBaseResourceInfo fileBaseResourceInfo = (FileBaseResourceInfo)object;
-//		
-//		File file = fileBaseResourceInfo.getFile();
-//		
+
 		Mp3File mp3 = (Mp3File)object;
-//		try{
-//			mp3 = new Mp3File(file.getPath());
-//		}catch (UnsupportedTagException e){
-//			return null;
-//		}catch (InvalidDataException ex) {
-//			return null;
-//		}catch (IOException e) {
-//			return null;
-//		}
 				
 		MetaData metaData = new MetaData();
 		

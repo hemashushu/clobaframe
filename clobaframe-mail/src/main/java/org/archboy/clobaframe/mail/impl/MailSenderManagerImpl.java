@@ -1,16 +1,13 @@
 package org.archboy.clobaframe.mail.impl;
 
 import java.util.List;
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.archboy.clobaframe.mail.MailSender;
 import org.archboy.clobaframe.mail.MailSenderManager;
-import org.archboy.clobaframe.mail.SendMailException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.util.Assert;
 
 /**
@@ -30,7 +27,7 @@ public class MailSenderManagerImpl implements MailSenderManager {
 
 	private final Logger logger = LoggerFactory.getLogger(MailSenderManagerImpl.class);
 
-	@Bean(name = "defaultMailSender")
+	//@Bean(name = "defaultMailSender")
 	@Override
 	public MailSender getDefault() {
 		return getMailSender(defaultMailSenderName);

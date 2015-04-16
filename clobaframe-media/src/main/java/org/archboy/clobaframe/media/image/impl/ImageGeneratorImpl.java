@@ -3,10 +3,9 @@ package org.archboy.clobaframe.media.image.impl;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.util.Date;
+import javax.inject.Named;
 import org.archboy.clobaframe.media.image.Image;
 import org.archboy.clobaframe.media.image.ImageGenerator;
-import javax.inject.Named;
 import org.springframework.util.Assert;
 
 /**

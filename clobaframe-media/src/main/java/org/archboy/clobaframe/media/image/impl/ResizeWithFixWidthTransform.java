@@ -1,12 +1,8 @@
 package org.archboy.clobaframe.media.image.impl;
 
-import com.twelvemonkeys.image.DiffusionDither;
 import com.twelvemonkeys.image.ResampleOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
-
-
-import org.imgscalr.Scalr;
 
 /**
  *

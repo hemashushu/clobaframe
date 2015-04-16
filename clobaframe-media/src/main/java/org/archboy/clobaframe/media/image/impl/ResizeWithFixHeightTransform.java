@@ -4,9 +4,6 @@ import com.twelvemonkeys.image.ResampleOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 
-
-import org.imgscalr.Scalr;
-
 /**
  *
  * @author yang

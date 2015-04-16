@@ -1,31 +1,31 @@
 package org.archboy.clobaframe.blobstore.impl;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.Map;
+import org.archboy.clobaframe.io.ResourceInfo;
 
 /**
  *
  * @author yang
+ *
  */
-public class BlobResourceInfoFromByteArray extends AbstractBlobResourceInfo{
+public class BlobResourceInfoFromResourceInfo extends AbstractBlobResourceInfo {
 
 	private String repositoryName;
 	private String key;
-	private byte[] content;
-	private String mimeType;
-	private Date lastModified;
+	private ResourceInfo resourceInfo;
 	private Map<String, Object> metadata;
 
-	public BlobResourceInfoFromByteArray(String repositoryName, String key,
-			byte[] content, String mimeType, Date lastModified, Map<String, Object> metadata) {
+	private boolean consumed;
+
+	public BlobResourceInfoFromResourceInfo(
+			String repositoryName, String key,
+			ResourceInfo resourceInfo, Map<String, Object> metadata) {
 		this.repositoryName = repositoryName;
 		this.key = key;
-		this.content = content;
-		this.mimeType = mimeType;
-		this.lastModified = lastModified;
+		this.resourceInfo = resourceInfo;
 		this.metadata = metadata;
 	}
 
@@ -41,37 +41,37 @@ public class BlobResourceInfoFromByteArray extends AbstractBlobResourceInfo{
 
 	@Override
 	public long getContentLength() {
-		return content.length;
+		return resourceInfo.getContentLength();
 	}
 
 	@Override
 	public String getMimeType() {
-		return mimeType;
+		return resourceInfo.getMimeType();
 	}
 
 	@Override
 	public Date getLastModified() {
-		return lastModified;
+		return resourceInfo.getLastModified();
 	}
 
 	@Override
-	public InputStream getContent() throws IOException{
-		return new ByteArrayInputStream(content);
+	public InputStream getContent() throws IOException {
+		return resourceInfo.getContent();
 	}
 
 	@Override
-	public InputStream getContent(long start, long length) throws IOException {
-		return new ByteArrayInputStream(
-				content, (int)start, (int)length);
+	public InputStream getContent(long start, long length) throws IOException{
+		return resourceInfo.getContent(start, length);
 	}
 
 	@Override
 	public boolean isSeekable() {
-		return true;
+		return resourceInfo.isSeekable();
 	}
 
 	@Override
 	public Map<String, Object> getMetadata() {
 		return metadata;
 	}
+
 }

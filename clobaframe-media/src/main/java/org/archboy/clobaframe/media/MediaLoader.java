@@ -1,11 +1,11 @@
 package org.archboy.clobaframe.media;
 
 import java.io.IOException;
-import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
 
 /**
- *
+ * The actually photo, video, audio loader.
+ * 
  * @author yang
  */
 public interface MediaLoader {

@@ -5,19 +5,14 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.Locale;
-
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
-import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import javax.imageio.stream.ImageOutputStream;
-
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.media.image.Image;
 import org.archboy.clobaframe.media.image.OutputSettings;
-import org.archboy.clobaframe.media.impl.MetaDataSettableMedia;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

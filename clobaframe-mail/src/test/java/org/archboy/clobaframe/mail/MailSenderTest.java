@@ -20,8 +20,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class MailSenderTest {
 
 	@Inject
-	@Named("defaultMailSender")
-	private MailSender mailSender;
+	//@Named("defaultMailSender")
+	private MailSenderManager mailSenderManager;
 
 	@Before
 	public void setUp() throws Exception {
@@ -33,6 +33,7 @@ public class MailSenderTest {
 
 	@Test
 	public void testSend() throws SendMailException  {
+		MailSender mailSender = mailSenderManager.getDefault();
 		// check by manual.
 		mailSender.send("hippospark@gmail.com", 
 				"Hello world!", 
@@ -41,6 +42,7 @@ public class MailSenderTest {
 
 	@Test
 	public void testSendWithHtml() throws SendMailException {
+		MailSender mailSender = mailSenderManager.getDefault();
 		// check by manual.
 		mailSender.sendWithHtml("hippospark@gmail.com", 
 				"Hello world!", 
@@ -49,6 +51,7 @@ public class MailSenderTest {
 	
 	@Test
 	public void testSendWithTemplate() throws SendMailException {
+		MailSender mailSender = mailSenderManager.getDefault();
 		// check by manual.
 		mailSender.sendWithTemplate("hippospark@gmail.com", 
 				"hello", 

@@ -33,20 +33,13 @@ public class VideoLoader implements MediaLoader {
 	public static final String MIME_TYPE_VIDEO_MP4 = "video/mp4"; // *.mp4
 	public static final String MIME_TYPE_VIDEO_MOV = "video/quicktime"; // *.mov
 	
-	private List<String> supportMimeTypes = Arrays.asList(MIME_TYPE_VIDEO_MP4, 
+	private List<String> supportMimeTypes = Arrays.asList(
+			MIME_TYPE_VIDEO_MP4, 
 			MIME_TYPE_VIDEO_MOV);
 	
 	@Override
 	public boolean support(String mimeType) {
-		//return MIME_TYPE_VIDEO_MP4.equals(contentType);
-		
-		for (String supportMimeType : supportMimeTypes){
-			if (supportMimeType.equals(mimeType)){
-				return true;
-			}
-		}
-		
-		return false;
+		return supportMimeTypes.contains(mimeType);
 	}
 
 	@Override

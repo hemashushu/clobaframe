@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Map;
 import org.archboy.clobaframe.blobstore.BlobResourceInfo;
 import org.archboy.clobaframe.blobstore.BlobResourceInfoFactory;
+import org.archboy.clobaframe.io.ResourceInfo;
 import org.springframework.util.Assert;
 
 /**
@@ -44,6 +45,15 @@ public class DefaultBlobResourceInfoFactory implements BlobResourceInfoFactory {
 		return new BlobResourceInfoFromByteArray(repositoryName, key, 
 				content, mimeType, lastModified,
 				metadata);
+	}
+
+	@Override
+	public BlobResourceInfo make(String repositoryName, String key, ResourceInfo resourceInfo, Map<String, Object> metadata) {
+		Assert.notNull(repositoryName);
+		Assert.notNull(key);
+		Assert.notNull(resourceInfo);
+		
+		return new BlobResourceInfoFromResourceInfo(repositoryName, key, resourceInfo, metadata);
 	}
 
 }

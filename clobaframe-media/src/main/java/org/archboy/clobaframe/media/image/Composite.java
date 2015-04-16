@@ -1,7 +1,5 @@
 package org.archboy.clobaframe.media.image;
 
-import java.awt.image.BufferedImage;
-
 /**
  *
  * @author yang
@@ -11,7 +9,7 @@ public interface Composite {
 
 	/**
 	 * 
-	 * @param bufferedImage
+	 * @param image
 	 * @return 
 	 */
 	Image composite(Image image);

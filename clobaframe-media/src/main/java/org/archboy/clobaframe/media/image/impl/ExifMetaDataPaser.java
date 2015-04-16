@@ -31,34 +31,21 @@ import org.springframework.util.Assert;
  */
 public class ExifMetaDataPaser implements MetaDataParser {
 
-	private final static String CONTENT_TYPE_IMAGE_JPEG = "image/jpeg";
-	private final static String CONTENT_TYPE_IMAGE_TIFF = "image/tiff";
+//	private final static String CONTENT_TYPE_IMAGE_JPEG = "image/jpeg";
+//	private final static String CONTENT_TYPE_IMAGE_TIFF = "image/tiff";
 	
 	private static final DecimalFormat decimalPoint2Formatter = new DecimalFormat("0.0##");
 	private static final DecimalFormat decimalPoint1Formatter = new DecimalFormat("0.#");
 	private static final SimpleDateFormat noTimezoneFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 	
-//	@Override
-//	public boolean support(String contentType) {
-//		return (CONTENT_TYPE_IMAGE_JPEG.equals(contentType) || 
-//				CONTENT_TYPE_IMAGE_TIFF.equals(contentType));
-//	}
-
 	@Override
 	public MetaData parse(Object object) {
-
-		Assert.isTrue(object instanceof FileBaseResourceInfo, "Support FileBaseResourceInfo class only.");
+		Assert.isTrue(object instanceof FileBaseResourceInfo, 
+				"Support FileBaseResourceInfo class only.");
 		
-		//Image image = (Image)media;
 		FileBaseResourceInfo resourceInfo = (FileBaseResourceInfo)object;
-		//InputStream in = null;
-		//ResourceContent resourceContent = null;
 		
 		try {
-			//resourceContent = resourceInfo.getContentSnapshot();
-			//InputStream in = resourceContent.getInputStream();
-			//in = resourceInfo.getInputStream();
-			//BufferedInputStream bin = new BufferedInputStream(in);
 			File file = resourceInfo.getFile();
 			Metadata metadata = ImageMetadataReader.readMetadata(file);
 
@@ -77,12 +64,6 @@ public class ExifMetaDataPaser implements MetaDataParser {
 				}
 			}
 			
-//			if (exifDirectory == null) {
-//				return null;
-//			}else{
-//				return makeFromDirectory(exifDirectory, gpsDirectory);
-//			}
-			
 			return metaData;
 			
 		} catch (ImageProcessingException ex) {
@@ -92,49 +73,19 @@ public class ExifMetaDataPaser implements MetaDataParser {
 		} catch (MetadataException ex){
 			//
 		}
-//		finally {
-//			IOUtils.closeQuietly(in);
-//		}
 		
 		return null;
 	}
 	
 	private void handleGpsDirectory(MetaData metaData, Directory directory) throws MetadataException{
 			
-			GpsDirectory gd = (GpsDirectory)directory;
-			GeoLocation geoLocation = gd.getGeoLocation();
-			
-			if (geoLocation != null){
-				metaData.put(Image.MetaName.GpsLongitude, geoLocation.getLongitude());
-				metaData.put(Image.MetaName.GpsLatitude, geoLocation.getLatitude());
-			}
-			
-//			if (gpsDirectory.containsTag(GpsDirectory.TAG_GPS_LONGITUDE)){
-//				float value = getDegree(gpsDirectory, GpsDirectory.TAG_GPS_LONGITUDE);
-//				if ("E".equals(gpsDirectory.getString(GpsDirectory.TAG_GPS_LONGITUDE_REF))){
-//					metaData.put(Image.MetaName.GpsLongitude, value);
-//				}else{
-//					metaData.put(Image.MetaName.GpsLongitude, -value);
-//				}
-//			}
-//			
-//			if (gpsDirectory.containsTag(GpsDirectory.TAG_GPS_LATITUDE)) {
-//				float value = getDegree(gpsDirectory, GpsDirectory.TAG_GPS_LATITUDE);
-//				if ("N".equals(gpsDirectory.getString(GpsDirectory.TAG_GPS_LATITUDE_REF))){
-//					metaData.put(Image.MetaName.GpsLatitude, value);
-//				}else{
-//					metaData.put(Image.MetaName.GpsLatitude, -value);
-//				}
-//			}
-//			
-//			if (gpsDirectory.containsTag(GpsDirectory.TAG_GPS_ALTITUDE)) {
-//				float value = gpsDirectory.getRational(GpsDirectory.TAG_GPS_ALTITUDE).floatValue();
-//				if (gpsDirectory.getInt(GpsDirectory.TAG_GPS_ALTITUDE_REF) == 0){
-//					metaData.put(Image.MetaName.GpsAltitude, value);
-//				}else{
-//					metaData.put(Image.MetaName.GpsAltitude, -value);
-//				}
-//			}
+		GpsDirectory gd = (GpsDirectory)directory;
+		GeoLocation geoLocation = gd.getGeoLocation();
+
+		if (geoLocation != null){
+			metaData.put(Image.MetaName.GpsLongitude, geoLocation.getLongitude());
+			metaData.put(Image.MetaName.GpsLatitude, geoLocation.getLatitude());
+		}
 	}
 	
 	private void handleExifSubIfDirectory(MetaData metaData, Directory directory) throws MetadataException{

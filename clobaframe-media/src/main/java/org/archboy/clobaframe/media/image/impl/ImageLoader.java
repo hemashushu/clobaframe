@@ -31,20 +31,15 @@ public class ImageLoader implements MediaLoader {
 	public static final String MIME_TYPE_IMAGE_BMP = "image/bmp";
 	public static final String MIME_TYPE_IMAGE_GIF = "image/gif";
 	
-	private List<String> supportMimeTypes = Arrays.asList(MIME_TYPE_IMAGE_JPEG, 
+	private List<String> supportMimeTypes = Arrays.asList(
+			MIME_TYPE_IMAGE_JPEG, 
 			MIME_TYPE_IMAGE_PNG,
 			MIME_TYPE_IMAGE_GIF, 
 			MIME_TYPE_IMAGE_BMP);
 	
 	@Override
 	public boolean support(String mimeType) {
-		for (String supportMimeType : supportMimeTypes){
-			if (supportMimeType.equals(mimeType)){
-				return true;
-			}
-		}
-		
-		return false;
+		return supportMimeTypes.contains(mimeType);
 	}
 
 	@Override
@@ -53,16 +48,11 @@ public class ImageLoader implements MediaLoader {
 		
 		// OpenJDK current support bmp, jpg, wbmp, jpeg, png, gif
 		
-		//ResourceContent resourceContent = null;
-		//InputStream in = null;
 		ImageInputStream in = null;
 		ImageReader imageReader = null;
 		Image image = null;
 
 		try {
-			//resourceContent = resourceInfo.getContentSnapshot();
-			//in = resourceContent.getInputStream();
-			//in = resourceInfo.getInputStream();
 			File file = fileBaseResourceInfo.getFile();
 			in = ImageIO.createImageInputStream(file);
 
@@ -102,28 +92,12 @@ public class ImageLoader implements MediaLoader {
 			
 		} finally {
 			closeQuietly(imageReader);
-			IOUtils.closeQuietly(in); // for java 7
-			//closeQuietly(stream); // for java 6
-			//IOUtils.closeQuietly(in);
-			//IOUtils.closeQuietly(resourceContent);
+			IOUtils.closeQuietly(in);
 		}
 
 		return image;
 	}
 	
-	/*
-	 * java 6 ImageInputStream does not implement Closable interface
-	 */
-//	private void closeQuietly(ImageInputStream stream) {
-//		if (stream != null) {
-//			try {
-//				stream.close();
-//			} catch (IOException e) {
-//				// ignore
-//			}
-//		}
-//	}
-
 	private void closeQuietly(ImageReader reader) {
 		if (reader != null) {
 			reader.dispose();

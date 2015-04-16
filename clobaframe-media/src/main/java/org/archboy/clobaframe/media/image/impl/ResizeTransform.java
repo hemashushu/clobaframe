@@ -4,9 +4,6 @@ import com.twelvemonkeys.image.ResampleOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 
-
-import org.imgscalr.Scalr;
-
 /**
  *
  * @author yang
@@ -55,7 +52,7 @@ public class ResizeTransform extends AbstractTransform {
 //				frameWidth, frameHeight, Scalr.OP_ANTIALIAS);
 		
 		// way 3
-		BufferedImageOp resampler = new ResampleOp(frameWidth, frameHeight, ResampleOp.FILTER_LANCZOS); // A good default filter, see class documentation for more info
+		BufferedImageOp resampler = new ResampleOp(targetWidth, targetHeight, ResampleOp.FILTER_LANCZOS); // A good default filter, see class documentation for more info
 		BufferedImage rescaled = resampler.filter(bufferedImage, null);
 		return rescaled;
 	}
