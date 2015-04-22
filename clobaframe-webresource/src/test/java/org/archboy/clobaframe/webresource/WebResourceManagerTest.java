@@ -135,12 +135,7 @@ public class WebResourceManagerTest {
 		}
 
 		// test get none-exists resource
-		try{
-			webResourceManager.getResource("none-exists");
-			fail();
-		}catch(FileNotFoundException e){
-			// pass
-		}
+		assertNull(webResourceManager.getResource("none-exists"));
 	}
 
 	@Test

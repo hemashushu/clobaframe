@@ -29,7 +29,7 @@ public class VirtualWebResourceRepositoryImpl extends AbstractWebResourceReposit
 
 	@Override
 	public int getPriority() {
-		return PRIORITY_LESS_THAN_TOP;
+		return PRIORITY_HIGHER;
 	}
 
 	@Override

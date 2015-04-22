@@ -38,12 +38,12 @@ public class WebResourceSenderImpl implements WebResourceSender{
 		Assert.notNull(request);
 		Assert.notNull(response);
 		
-		try{
-			WebResourceInfo webResourceInfo = webResourceManager.getResource(resourceName);
-			send(webResourceInfo, request, response);
-		}catch(FileNotFoundException e){
+		WebResourceInfo webResourceInfo = webResourceManager.getResource(resourceName);
+		if (webResourceInfo == null) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND,
-					"Resource not found");
+				"Resource not found");
+		}else{
+			send(webResourceInfo, request, response);
 		}
 	}
 
@@ -71,12 +71,12 @@ public class WebResourceSenderImpl implements WebResourceSender{
 		Assert.notNull(request);
 		Assert.notNull(response);
 		
-		try{
-			WebResourceInfo webResourceInfo = webResourceManager.getResourceByVersionName(versionName);
-			send(webResourceInfo, request, response);
-		}catch(FileNotFoundException e){
+		WebResourceInfo webResourceInfo = webResourceManager.getResourceByVersionName(versionName);
+		if (webResourceInfo == null){
 			response.sendError(HttpServletResponse.SC_NOT_FOUND,
 					"Resource not found");
+		}else{
+			send(webResourceInfo, request, response);
 		}
 	}
 }

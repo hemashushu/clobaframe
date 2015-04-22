@@ -6,9 +6,10 @@ package org.archboy.clobaframe.webresource;
  */
 public interface WebResourceRepository extends WebResourceCollection {
 
-	public static final int PRIORITY_TOP = 0;
-	public static final int PRIORITY_LESS_THAN_TOP = 1;
-	public static final int PRIORITY_DEFAULT = 5;
+	public static final int PRIORITY_HIGHEST = 0;
+	public static final int PRIORITY_HIGHER = 2;
+	public static final int PRIORITY_HIGH = 4;
+	public static final int PRIORITY_NORMAL = 5;
 	
 	/**
 	 * Get the priority of repository.

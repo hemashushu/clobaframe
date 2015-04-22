@@ -9,7 +9,14 @@ import java.util.List;
 /**
  * Web resources management service.
  *
- *
+ * A web resource manager will includes one web resource repository set.
+ * 
+ * manager --T-- repository set --T-- repository 1
+ *           |                    |-- repository 2
+ *           |-- cache            |-- virtual repository --T-- provider 1
+ *                                |                        |-- provider 2
+ *                                |                        |-- provider 3
+ * 
  * @author yang
  *
  */
@@ -37,28 +44,27 @@ public interface WebResourceManager {
 	);
 	
 	/**
-	 *
+	 * Get the specify web resource by name.
+	 * The resource maybe url-transformed, compressed, minified and/or cached.
+	 * 
 	 * @param name
 	 * @return
-	 * @throws java.io.FileNotFoundException
 	 */
-	WebResourceInfo getResource(String name) throws FileNotFoundException;
+	WebResourceInfo getResource(String name);
 
 	/**
 	 *
 	 * @param versionName The name that combines with resource name and version.
 	 * @return
-	 * @throws java.io.FileNotFoundException
 	 */
-	WebResourceInfo getResourceByVersionName(String versionName) throws FileNotFoundException;
+	WebResourceInfo getResourceByVersionName(String versionName);
 
 	/**
-	 * Get the un-compressed, un-minified, un-cached web resource.
+	 * Get the un-transform, un-compressed, un-minified, un-cached web resource.
 	 * @param name
 	 * @return
-	 * @throws FileNotFoundException 
 	 */
-	WebResourceInfo getOriginalResource(String name) throws FileNotFoundException;
+	WebResourceInfo getOriginalResource(String name);
 	
 	/**
 	 * Get all web resources name.
@@ -90,9 +96,8 @@ public interface WebResourceManager {
 	 * 
 	 * @param name
 	 * @return
-	 * @throws java.io.FileNotFoundException
 	 */
-	String getLocation(String name) throws FileNotFoundException;
+	String getLocation(String name);
 
 	/**
 	 * Force refresh a specify resource.

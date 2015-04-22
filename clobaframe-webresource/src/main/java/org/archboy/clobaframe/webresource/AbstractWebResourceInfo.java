@@ -14,10 +14,18 @@ public abstract class AbstractWebResourceInfo implements WebResourceInfo {
 	
 	private Set<Class<?>> underlayWebResourceInfoTypes = new HashSet<Class<?>>();
 	
+	/**
+	 * 
+	 * @param webResourceInfo 
+	 */
 	protected void addUnderlayWebResourceType(WebResourceInfo webResourceInfo) {
 		underlayWebResourceInfoTypes.add(webResourceInfo.getClass());
 	}
 
+	/**
+	 * 
+	 * @return 
+	 */
 	public Set<Class<?>> getUnderlayWebResourceInfoTypes() {
 		return underlayWebResourceInfoTypes;
 	}

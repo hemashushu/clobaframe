@@ -43,7 +43,7 @@ public class LocalWebResourceRepository extends AbstractWebResourceRepository{
 
 	@Override
 	public int getPriority() {
-		return PRIORITY_DEFAULT;
+		return PRIORITY_NORMAL;
 	}
 
 	@PostConstruct

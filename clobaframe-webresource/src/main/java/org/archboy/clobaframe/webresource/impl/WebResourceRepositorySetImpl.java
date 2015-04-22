@@ -25,7 +25,7 @@ public class WebResourceRepositorySetImpl implements WebResourceRepositorySet {
 
 	@PostConstruct
 	public void init() throws IOException {
-		// order the repositories
+		// sort the repositories
 		resourceRepositories.sort(new Comparator<WebResourceRepository>() {
 
 			@Override

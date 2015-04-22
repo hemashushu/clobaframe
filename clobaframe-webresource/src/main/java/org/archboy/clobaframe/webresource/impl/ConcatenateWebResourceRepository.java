@@ -52,7 +52,7 @@ public class ConcatenateWebResourceRepository extends AbstractWebResourceReposit
 
 	@Override
 	public int getPriority() {
-		return PRIORITY_TOP;
+		return PRIORITY_HIGHEST;
 	}
 
 	@PostConstruct

@@ -54,19 +54,20 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	@Value("${clobaframe.webresource.compress}")
 	private boolean canCompress;
 		
-	@Value("${clobaframe.webresource.cache}")
-	private boolean canCache;
+	@Value("${clobaframe.webresource.serverCache}")
+	private boolean canServerCache;
 
 	@Value("${clobaframe.webresource.baseLocation}")
 	private String baseLocation;
 	
-	private static final int DEFAULT_CACHE_SECONDS = 10 * 60;
+	private static final int DEFAULT_SERVER_CACHE_SECONDS = 10 * 60;
 	
-	@Value("${clobaframe.webresource.cacheSeconds}")
-	private int cacheSeconds = DEFAULT_CACHE_SECONDS;
+	@Value("${clobaframe.webresource.serverCacheSeconds}")
+	private int cacheSeconds = DEFAULT_SERVER_CACHE_SECONDS;
 	
 	private final Logger logger = LoggerFactory.getLogger(WebResourceManagerImpl.class);
 
+	// keep the current post-handling resources name.
 	// to prevent infinite loop
 	private Stack<String> buildingResourceNames = new Stack<String>();
 	
@@ -110,22 +111,22 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	 * @param name
 	 * @return NULL if the specify resource not found.
 	 */
-	private WebResourceInfo assembleResource(String name) {
+	private WebResourceInfo postHandleResource(String name) {
 		
-		// load from collection first
+		// load from in-momery cache first
 		WebResourceInfo resourceInfo = webResourceCache.getByName(name);
 		if (resourceInfo != null) {
 			return resourceInfo;
 		}
 		
-		// then load from concatenate and repository
+		// then load from repository set
 		resourceInfo = webResourceRepositorySet.getByName(name);
 		
 		if (resourceInfo == null) {
 			return null;
 		}
 		
-		// wrap resource
+		// post-handle resource
 		
 		// to prevent infinite loop
 		if (!buildingResourceNames.empty() && buildingResourceNames.contains(name)) {
@@ -152,14 +153,14 @@ public class WebResourceManagerImpl implements WebResourceManager {
 			resourceInfo = new CompressibleWebResourceInfo(resourceInfo);
 		}
 		
-		// cache
-		if (canCache) {
+		// server cache
+		if (canServerCache) {
 			resourceInfo = new CacheableWebResourceInfo(resourceInfo, cacheSeconds);
 			
 			// insert the update listener into the child resources
 			if (childResourceNames != null){
 				for(String n : childResourceNames) {
-					WebResourceInfo r = assembleResource(n);
+					WebResourceInfo r = postHandleResource(n);
 					if (r != null && r instanceof CacheableWebResource) {
 						((CacheableWebResource)r).addUpdateListener((CacheableWebResourceUpdateListener)resourceInfo);
 					}
@@ -167,6 +168,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 			}
 		}
 		
+		// store into in-momery cache
 		webResourceCache.add(resourceInfo);
 		
 		buildingResourceNames.pop();
@@ -175,25 +177,13 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	}
 	
 	@Override
-	public WebResourceInfo getResource(String name) throws FileNotFoundException {
-		WebResourceInfo resource = assembleResource(name);
-		
-		if (resource == null) {
-			throw new FileNotFoundException(String.format("Can not found the web resource [%s]", name));
-		}
-		
-		return resource;
+	public WebResourceInfo getResource(String name) {
+		return postHandleResource(name);
 	}
 
 	@Override
-	public WebResourceInfo getOriginalResource(String name) throws FileNotFoundException {
-		WebResourceInfo resource = webResourceRepositorySet.getByName(name);
-		
-		if (resource == null) {
-			throw new FileNotFoundException(String.format("Can not found the web resource [%s]", name));
-		}
-		
-		return resource;
+	public WebResourceInfo getOriginalResource(String name) {
+		return webResourceRepositorySet.getByName(name);
 	}
 
 	@Override
@@ -202,9 +192,9 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	}
 	
 	@Override
-	public WebResourceInfo getResourceByVersionName(String versionName) throws FileNotFoundException {
+	public WebResourceInfo getResourceByVersionName(String versionName) {
 		String name = versionStrategy.revert(versionName);
-		return getResource(name);
+		return name == null ? null : getResource(name);
 	}
 
 	@Override
@@ -218,14 +208,14 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	}
 
 	@Override
-	public String getLocation(String name) throws FileNotFoundException {
+	public String getLocation(String name) {
 		WebResourceInfo resource = getResource(name);
-		return getLocation(resource);
+		return resource == null ? null : getLocation(resource);
 	}
 
 	@Override
 	public void refresh(String name) {
-		WebResourceInfo resource = assembleResource(name);
+		WebResourceInfo resource = postHandleResource(name);
 		if (resource != null) {
 			if (resource instanceof CacheableWebResource) {
 				((CacheableWebResource)resource).refresh();
