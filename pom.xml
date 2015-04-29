@@ -31,13 +31,14 @@
 	</developers>
 
 	<modules>
-		<module>clobaframe-query</module>
-		<module>clobaframe-cache</module>
-		<module>clobaframe-io</module>
-		<module>clobaframe-media</module>
-		<module>clobaframe-blobstore</module>
-		<module>clobaframe-webresource</module>
-		<module>clobaframe-mail</module>
+		<module>query</module>
+		<module>setting</module>
+		<module>cache</module>
+		<module>io</module>
+		<module>media</module>
+		<module>blobstore</module>
+		<module>webresource</module>
+		<module>mail</module>
 	</modules>
 
 	<properties>

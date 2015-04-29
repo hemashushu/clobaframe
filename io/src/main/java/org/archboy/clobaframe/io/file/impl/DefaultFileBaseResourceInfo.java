@@ -8,7 +8,7 @@ import java.util.Date;
 import org.archboy.clobaframe.io.MimeTypeDetector;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
 
-public class FileResourceInfo implements FileBaseResourceInfo {
+public class DefaultFileBaseResourceInfo implements FileBaseResourceInfo {
 
 	private File file;
 	private String mimeType;
@@ -19,12 +19,12 @@ public class FileResourceInfo implements FileBaseResourceInfo {
 	 * @param file
 	 * @param mimeTypeDetector 
 	 */
-	public FileResourceInfo(File file, MimeTypeDetector mimeTypeDetector) {
+	public DefaultFileBaseResourceInfo(File file, MimeTypeDetector mimeTypeDetector) {
 		this.file = file;
 		this.mimeType = mimeTypeDetector.getByExtensionName(file.getName());
 	}
 
-	public FileResourceInfo(File file, String mimeType) {
+	public DefaultFileBaseResourceInfo(File file, String mimeType) {
 		this.file = file;
 		this.mimeType = mimeType;
 	}

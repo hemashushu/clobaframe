@@ -22,7 +22,7 @@ public class FileBaseResourceInfoFactoryImpl implements FileBaseResourceInfoFact
 	
 	@Override
 	public FileBaseResourceInfo make(File file) {
-		return new FileResourceInfo(file, mimeTypeDetector);
+		return new DefaultFileBaseResourceInfo(file, mimeTypeDetector);
 	}
 
 	@Override
