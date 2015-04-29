@@ -1,0 +1,4 @@
+Change into the 'source' folder, then execute these scripts.
+For example:
+$ cd source
+$ ../script/install
