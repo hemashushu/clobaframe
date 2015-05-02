@@ -48,17 +48,22 @@ public class WebResourceRepositorySetImpl implements WebResourceRepositorySet {
 	}
 
 	@Override
-	public Collection<String> getAllNames() {
-		Set<String> names = new HashSet<String>();
+	public Collection<WebResourceRepository> getResourceRepositories() {
+		return resourceRepositories;
+	}
+
+	@Override
+	public Collection<WebResourceInfo> getAll() {
+		Set<WebResourceInfo> resourceInfos = new HashSet<WebResourceInfo>();
 		
 		// list resource in the revert repository priority order
 		for (int idx = resourceRepositories.size() -1; idx>=0; idx--){
 			WebResourceRepository resourceRepository = resourceRepositories.get(idx);
-			Collection<String> ns = resourceRepository.getAllNames(); 
-			names.addAll(ns);
+			Collection<WebResourceInfo> ns = resourceRepository.getAll(); 
+			resourceInfos.addAll(ns);
 		}
 		
-		return names;
+		return resourceInfos;
 	}
 
 }

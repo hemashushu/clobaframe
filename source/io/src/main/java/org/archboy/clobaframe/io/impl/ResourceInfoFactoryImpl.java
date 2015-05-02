@@ -1,16 +1,21 @@
 package org.archboy.clobaframe.io.impl;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Date;
+import javax.inject.Named;
+import org.archboy.clobaframe.io.CacheableResourceInfo;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.ResourceInfoFactory;
+import org.archboy.clobaframe.io.TextResourceInfo;
 import org.springframework.util.Assert;
 
 /**
  *
  * @author yang
  */
-public class DefaultResourceInfoFactory implements ResourceInfoFactory {
+@Named
+public class ResourceInfoFactoryImpl implements ResourceInfoFactory {
 
 	@Override
 	public ResourceInfo make(byte[] content, String mimeType, Date lastModified) {
@@ -30,4 +35,15 @@ public class DefaultResourceInfoFactory implements ResourceInfoFactory {
 		
 		return new InputStreamResourceInfo(inputStream, contentLength, mimeType, lastModified);
 	}
+
+	@Override
+	public TextResourceInfo make(String text, Charset charset, String mimeType, Date lastModified) {
+		Assert.hasText(text);
+		Assert.notNull(charset);
+		Assert.hasText(mimeType);
+		Assert.notNull(lastModified);
+		
+		return new DefaultTextResourceInfo(text, charset, mimeType, lastModified);
+	}
+
 }

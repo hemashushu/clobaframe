@@ -17,8 +17,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.archboy.clobaframe.webresource.AbstractWebResourceRepository;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
+import org.archboy.clobaframe.webresource.WebResourceRepository;
 import org.archboy.clobaframe.webresource.WebResourceRepositorySet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -29,7 +29,7 @@ import org.springframework.core.io.ResourceLoader;
  * @author yang
  */
 @Named
-public class ConcatenateWebResourceRepository extends AbstractWebResourceRepository {
+public class ConcatenateWebResourceRepository implements WebResourceRepository {
 
 	@Value("${clobaframe.webresource.concatenateConfig}")
 	private String concatenateConfig;
@@ -102,12 +102,21 @@ public class ConcatenateWebResourceRepository extends AbstractWebResourceReposit
 		for(String n : names){
 			webResourceInfos.add(webResourceRepositorySet.getByName(n));
 		}
-		return new ConcatenateWebResourceInfo(webResourceInfos, name);
+		return new DefaultConcatenateWebResourceInfo(webResourceInfos, name);
 	}
 
 	@Override
-	public Collection<String> getAllNames() {
-		return concatenates.keySet();
+	public Collection<WebResourceInfo> getAll() {
+		List<WebResourceInfo> resourceInfos = new ArrayList<WebResourceInfo>();
+		
+		for (String name : concatenates.keySet()) {
+			WebResourceInfo resourceInfo = getByName(name);
+			if (resourceInfo != null) {
+				resourceInfos.add(resourceInfo);
+			}
+		}
+		
+		return resourceInfos;
 	}
 	
 }

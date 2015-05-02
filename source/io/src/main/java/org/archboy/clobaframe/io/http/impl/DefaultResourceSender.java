@@ -14,7 +14,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- *
+ * The base resource sender.
+ * 
  * @author yang
  */
 public class DefaultResourceSender implements ResourceSender {

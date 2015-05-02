@@ -15,13 +15,13 @@ import org.archboy.clobaframe.webresource.WebResourceInfo;
  *
  * @author yang
  */
-public class ConcatenateWebResourceInfo extends AbstractWebResourceInfo {
+public class DefaultConcatenateWebResourceInfo extends AbstractWebResourceInfo {
 
 	private List<WebResourceInfo> webResourceInfos;
 	private String name;
 	private String mimeType;
 
-	public ConcatenateWebResourceInfo(
+	public DefaultConcatenateWebResourceInfo(
 			List<WebResourceInfo> webResourceInfos, String name) {
 		this.webResourceInfos = webResourceInfos;
 		this.name = name;
@@ -30,7 +30,7 @@ public class ConcatenateWebResourceInfo extends AbstractWebResourceInfo {
 		this.mimeType = webResourceInfos.get(0).getMimeType();
 		
 		for(WebResourceInfo info : webResourceInfos) {
-			addUnderlayWebResourceType(info);
+			addType(DefaultConcatenateWebResourceInfo.class, info);
 		}
 	}
 

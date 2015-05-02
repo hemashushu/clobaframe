@@ -18,9 +18,10 @@ import javax.inject.Named;
  * @author yang
  */
 @Named
-public class VirtualWebResourceRepositoryImpl extends AbstractWebResourceRepository implements VirtualWebResourceRepository {
+public class VirtualWebResourceRepositoryImpl implements VirtualWebResourceRepository {
 
-	private List<VirtualWebResourceProvider> virtualResourceProviders = new ArrayList<VirtualWebResourceProvider>();
+	@Inject
+	private List<VirtualWebResourceProvider> virtualResourceProviders;
 	
 	@Override
 	public String getName() {
@@ -45,20 +46,20 @@ public class VirtualWebResourceRepositoryImpl extends AbstractWebResourceReposit
 	}
 
 	@Override
-	public void addProvider(VirtualWebResourceProvider provider) {
-		virtualResourceProviders.add(provider);
+	public Collection<VirtualWebResourceProvider> getResourceProviders() {
+		return virtualResourceProviders;
 	}
 
 	@Override
-	public Collection<String> getAllNames() {
+	public Collection<WebResourceInfo> getAll() {
 		// NOTE:: not all virtual web resource repository can be list.
-		Set<String> names = new HashSet<String>();
+		Set<WebResourceInfo> resourceInfos = new HashSet<WebResourceInfo>();
 		
 		for (VirtualWebResourceProvider resourceProvider : virtualResourceProviders){
-			Collection<String> ns = resourceProvider.getAllNames(); 
-			names.addAll(ns);
+			Collection<WebResourceInfo> ns = resourceProvider.getAll(); 
+			resourceInfos.addAll(ns);
 		}
 		
-		return names;
+		return resourceInfos;
 	}
 }

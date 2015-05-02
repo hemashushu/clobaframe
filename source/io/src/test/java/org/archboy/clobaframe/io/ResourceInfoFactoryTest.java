@@ -3,10 +3,13 @@ package org.archboy.clobaframe.io;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.Calendar;
 import java.util.Date;
 import javax.inject.Inject;
 import org.apache.commons.io.IOUtils;
-import org.archboy.clobaframe.io.impl.DefaultResourceInfoFactory;
+import org.archboy.clobaframe.io.impl.ResourceInfoFactoryImpl;
+import org.archboy.clobaframe.io.impl.DefaultTextResourceInfo;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,8 +26,8 @@ import static org.junit.Assert.*;
 @ContextConfiguration(locations = { "/applicationContext.xml" })
 public class ResourceInfoFactoryTest {
 
-//	@Inject
-	private ResourceInfoFactory resourceInfoFactory = new DefaultResourceInfoFactory();
+	@Inject
+	private ResourceInfoFactory resourceInfoFactory; // = new ResourceInfoFactoryImpl();
 	
 	@Before
 	public void setUp() throws Exception {
@@ -82,6 +85,30 @@ public class ResourceInfoFactoryTest {
 		in.close();
 	}
 	
+	@Test
+	public void testMakeTextResourceInfo() throws IOException {
+		//ResourceInfoFactory resourceInfoFactory = new DefaultResourceInfoFactory();
+		Charset charset = Charset.forName("UTF-8");
+		String text1 = "hello";
+		String mimeType1 = "text/plain";
+		Date lastModified1 = new Date();
+		
+		TextResourceInfo resourceInfo1 = resourceInfoFactory.make(text1, charset, mimeType1, lastModified1);
+		assertDateEquals(lastModified1, resourceInfo1.getLastModified());
+		assertEquals(mimeType1, resourceInfo1.getMimeType());
+		assertEquals(text1, IOUtils.toString(resourceInfo1.getContent(), charset));
+		
+		// test update content
+		String text2 = "world";
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.HOUR_OF_DAY, 1);
+		Date lastModified2 = calendar.getTime();
+		
+		resourceInfo1.updateContent(text2, lastModified2);
+		
+		assertEquals(lastModified2, resourceInfo1.getLastModified());
+		assertEquals(text2, IOUtils.toString(resourceInfo1.getContent(), charset));
+	}
 	
 	private static void assertDateEquals(Date expected, Date actual){
 		if (expected == null && actual == null){

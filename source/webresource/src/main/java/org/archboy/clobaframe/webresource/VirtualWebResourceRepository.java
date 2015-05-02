@@ -1,5 +1,6 @@
 package org.archboy.clobaframe.webresource;
 
+import java.util.Collection;
 import javax.inject.Named;
 
 /**
@@ -13,10 +14,5 @@ import javax.inject.Named;
 @Named
 public interface VirtualWebResourceRepository extends WebResourceRepository {
 
-	/**
-	 * 
-	 * @param provider 
-	 */
-	void addProvider(VirtualWebResourceProvider provider);
-	
+	Collection<VirtualWebResourceProvider> getResourceProviders();
 }

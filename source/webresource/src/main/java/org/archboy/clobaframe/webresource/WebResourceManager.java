@@ -48,38 +48,38 @@ public interface WebResourceManager {
 	 * The resource maybe url-transformed, compressed, minified and/or cached.
 	 * 
 	 * @param name
-	 * @return
+	 * @return NULL when the specify name can not be found.
 	 */
 	WebResourceInfo getResource(String name);
 
 	/**
 	 *
 	 * @param versionName The name that combines with resource name and version.
-	 * @return
+	 * @return NULL when the specify name can not be found.
 	 */
 	WebResourceInfo getResourceByVersionName(String versionName);
 
 	/**
 	 * Get the un-transform, un-compressed, un-minified, un-cached web resource.
 	 * @param name
-	 * @return
+	 * @return NULL when the specify name can not be found.
 	 */
 	WebResourceInfo getOriginalResource(String name);
 	
 	/**
-	 * Get all web resources name.
-	 * Keep in mind that some virtual web resource repository can NOT be list.
+	 * Get all original web resources.
+	 * NOTE: virtual web resource repository may CAN NOT be listed.
 	 * 
 	 * @return 
 	 */
-	Collection<String> getAllNames();
+	Collection<WebResourceInfo> getAllOriginalResource();
 	
-	/**
-	 * 
-	 * @param webResourceInfo
-	 * @return 
-	 */
-	String getVersionName(WebResourceInfo webResourceInfo);
+//	/**
+//	 * 
+//	 * @param webResourceInfo
+//	 * @return 
+//	 */
+//	String getVersionName(WebResourceInfo webResourceInfo);
 	
 	/**
 	 * Get the location (URL) of the specify resource.
@@ -95,7 +95,7 @@ public interface WebResourceManager {
 	 * Get the location (URL) of the specify resource.
 	 * 
 	 * @param name
-	 * @return
+	 * @return NULL when the specify name can not be found.
 	 */
 	String getLocation(String name);
 
@@ -106,21 +106,5 @@ public interface WebResourceManager {
 	 */
 	void refresh(String name);
 	
-	/**
-	 * 
-	 * @param locationGenerator 
-	 */
-	void setLocationGenerator(LocationGenerator locationGenerator);
 	
-	/**
-	 * 
-	 * @param webResourceCache 
-	 */
-	void setWebResourceCache(WebResourceCache webResourceCache);
-	
-	/**
-	 * 
-	 * @param versionStrategy 
-	 */
-	void setVersionStrategy(VersionStrategy versionStrategy);
 }

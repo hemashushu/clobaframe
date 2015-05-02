@@ -11,7 +11,7 @@ import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.ResourceInfoFactory;
 import org.archboy.clobaframe.io.TemporaryResources;
-import org.archboy.clobaframe.io.impl.DefaultResourceInfoFactory;
+import org.archboy.clobaframe.io.impl.ResourceInfoFactoryImpl;
 import org.archboy.clobaframe.io.impl.DefaultTemporaryResources;
 import org.junit.After;
 import org.junit.Before;
@@ -40,8 +40,8 @@ public class FileBaseResourceInfoFactoryTest {
 	@Inject
 	private ResourceLoader resourceLoader;
 	
-//	@Inject
-	private ResourceInfoFactory resourceInfoFactory = new DefaultResourceInfoFactory();
+	//@Inject
+	//private ResourceInfoFactory resourceInfoFactory; // = new ResourceInfoFactoryImpl();
 	
 	@Inject
 	private FileBaseResourceInfoFactory fileBaseResourceInfoFactory;
@@ -77,50 +77,6 @@ public class FileBaseResourceInfoFactoryTest {
 		InputStream in2 = resourceInfo.getContent(1, 3);
 		assertArrayEquals(new byte[]{0x31,0x32,0x33}, IOUtils.toByteArray(in2));
 		in2.close();
-		
-	}
-	
-	@Test
-	public void testWrap() throws IOException{
-		
-		String mimeType = "application/octet-stream";
-		byte[] data = new byte[]{0,1,2,3,4,5};
-		InputStream in = new ByteArrayInputStream(data);
-		Date now = new Date();
-		
-		ResourceInfo resourceInfo = resourceInfoFactory.make(in, data.length, mimeType, now);
-		
-		TemporaryResources temporaryResources = new DefaultTemporaryResources();
-		FileBaseResourceInfo fileBaseResourceInfo =
-				fileBaseResourceInfoFactory.wrap(resourceInfo, temporaryResources);
-		
-		// check file
-		File file = fileBaseResourceInfo.getFile();
-		assertNotNull(file);
-		
-		assertEquals(resourceInfo.getContentLength(), fileBaseResourceInfo.getContentLength());
-		assertEquals(resourceInfo.getMimeType(), fileBaseResourceInfo.getMimeType());
-		assertDateEquals(resourceInfo.getLastModified(), fileBaseResourceInfo.getLastModified());
-		assertTrue(fileBaseResourceInfo.isSeekable());
-		
-		InputStream in1 = fileBaseResourceInfo.getContent();
-		assertArrayEquals(data, IOUtils.toByteArray(in1));
-		in1.close();
-		
-		InputStream in2 = fileBaseResourceInfo.getContent(1, 3);
-		assertArrayEquals(new byte[]{1,2,3}, IOUtils.toByteArray(in2));
-		in2.close();
-		
-		// check file content
-		InputStream in3 = new FileInputStream(file);
-		assertArrayEquals(data, IOUtils.toByteArray(in3));
-		in3.close();
-		
-		// check close
-		assertTrue(file.exists());
-//		fileBaseResourceInfo.close();
-		temporaryResources.close();
-		assertFalse(file.exists());
 		
 	}
 	

@@ -27,7 +27,7 @@ import org.springframework.util.Assert;
  *
  * @author yang
  */
-public class MinifyWebResourceInfo extends AbstractWebResourceInfo {
+public class DefaultMinifyWebResourceInfo extends AbstractWebResourceInfo {
 
 	private WebResourceInfo webResourceInfo;
 	private String lastContentHash;
@@ -36,12 +36,12 @@ public class MinifyWebResourceInfo extends AbstractWebResourceInfo {
 	// see http://yui.github.io/yuicompressor/
 	private static final int maxColumnsPerLine = 4096; // "0" means break each line.
 
-	private final Logger logger = LoggerFactory.getLogger(MinifyWebResourceInfo.class);
+	private final Logger logger = LoggerFactory.getLogger(DefaultMinifyWebResourceInfo.class);
 	
-	public MinifyWebResourceInfo(WebResourceInfo webResourceInfo) {
+	public DefaultMinifyWebResourceInfo(WebResourceInfo webResourceInfo) {
 		Assert.notNull(webResourceInfo);
 		this.webResourceInfo = webResourceInfo;
-		addUnderlayWebResourceType(webResourceInfo);
+		addType(DefaultMinifyWebResourceInfo.class, webResourceInfo);
 		rebuild();
 	}
 

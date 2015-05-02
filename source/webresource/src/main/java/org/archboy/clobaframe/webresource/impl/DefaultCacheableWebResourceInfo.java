@@ -8,12 +8,12 @@ import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.webresource.AbstractWebResourceInfo;
-import org.archboy.clobaframe.webresource.CacheableWebResource;
-import org.archboy.clobaframe.webresource.CacheableWebResourceUpdateListener;
+import org.archboy.clobaframe.webresource.CacheableWebResourceInfo;
+import org.archboy.clobaframe.webresource.CacheableWebResourceInfoUpdateListener;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.springframework.util.Assert;
 
-public class CacheableWebResourceInfo extends AbstractWebResourceInfo implements CacheableWebResource, CacheableWebResourceUpdateListener {
+public class DefaultCacheableWebResourceInfo extends AbstractWebResourceInfo implements CacheableWebResourceInfo, CacheableWebResourceInfoUpdateListener {
 
 	private long cacheMilliSeconds;
 	private long lastCheckingTime;
@@ -28,16 +28,25 @@ public class CacheableWebResourceInfo extends AbstractWebResourceInfo implements
 	// to prevent infinite loop
 	private boolean rebuilding;
 	
-	private Set<CacheableWebResourceUpdateListener> resourceUpdateListeners;
+	private Set<CacheableWebResourceInfoUpdateListener> resourceUpdateListeners;
 
-	public CacheableWebResourceInfo(WebResourceInfo webResourceInfo, int cacheSeconds) {
+	/**
+	 * 
+	 * @param webResourceInfo
+	 * @param cacheSeconds -1 = cache always, 0 = no cache, >0 cache seconds.
+	 */
+	public DefaultCacheableWebResourceInfo(WebResourceInfo webResourceInfo, int cacheSeconds) {
 		Assert.notNull(webResourceInfo);
-		this.webResourceInfo = webResourceInfo;
-		this.cacheMilliSeconds = cacheSeconds * 1000;
-		this.resourceUpdateListeners = new HashSet<CacheableWebResourceUpdateListener>();
 		
-		addUnderlayWebResourceType(webResourceInfo);
+		this.webResourceInfo = webResourceInfo;
+		this.cacheMilliSeconds = (cacheSeconds == -1 ? -1 : cacheSeconds * 1000);
+		this.resourceUpdateListeners = new HashSet<CacheableWebResourceInfoUpdateListener>();
+		
+		addType(CacheableWebResourceInfo.class, webResourceInfo);
+		
+		// first time rebuild
 		rebuild();
+		this.lastCheckingTime = System.currentTimeMillis();
 	}
 
 	@Override
@@ -87,11 +96,18 @@ public class CacheableWebResourceInfo extends AbstractWebResourceInfo implements
 	}
 
 	private void recheck() {
-		long now = System.currentTimeMillis();
-		long span = now - lastCheckingTime;
-		if (span > cacheMilliSeconds){
-			lastCheckingTime = now;
+		if (cacheMilliSeconds == -1) {
+			// cache always
+		}else if (cacheMilliSeconds == 0) {
+			// no cache
 			rebuild();
+		}else{
+			long now = System.currentTimeMillis();
+			long span = now - lastCheckingTime;
+			if (span > cacheMilliSeconds){
+				lastCheckingTime = now;
+				rebuild();
+			}
 		}
 	}
 
@@ -119,7 +135,7 @@ public class CacheableWebResourceInfo extends AbstractWebResourceInfo implements
 		}
 		
 		// notify update listeners
-		for(CacheableWebResourceUpdateListener listener : resourceUpdateListeners){
+		for(CacheableWebResourceInfoUpdateListener listener : resourceUpdateListeners){
 			listener.onUpdate(webResourceInfo.getName());
 		}
 		
@@ -134,7 +150,7 @@ public class CacheableWebResourceInfo extends AbstractWebResourceInfo implements
 	}
 
 	@Override
-	public void addUpdateListener(CacheableWebResourceUpdateListener resourceUpdateListener) {
+	public void addUpdateListener(CacheableWebResourceInfoUpdateListener resourceUpdateListener) {
 		resourceUpdateListeners.add(resourceUpdateListener);
 	}
 

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import org.apache.commons.io.IOUtils;
+import org.archboy.clobaframe.io.CacheableResourceInfo;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.springframework.util.Assert;
 
@@ -12,7 +13,7 @@ import org.springframework.util.Assert;
  *
  * @author yang
  */
-public class CacheableResourceInfo implements ResourceInfo {
+public class DefaultCacheableResourceInfo implements CacheableResourceInfo {
 
 	/**
 	 * Cache milliseconds.
@@ -33,24 +34,33 @@ public class CacheableResourceInfo implements ResourceInfo {
 	// to prevent infinite loop
 	private boolean rebuilding;
 
-	public CacheableResourceInfo(ResourceInfo resourceInfo, int cacheSeconds) {
+	public DefaultCacheableResourceInfo(ResourceInfo resourceInfo, int cacheSeconds) {
 		Assert.notNull(resourceInfo);
 		this.resourceInfo = resourceInfo;
-		this.cacheMilliSeconds = (cacheSeconds == -1 ? -1 : cacheSeconds * 1000);
+		this.cacheMilliSeconds = (cacheSeconds == CACHE_ALWAYS ? CACHE_ALWAYS : cacheSeconds * 1000);
+		
+		// first time rebuild.
 		rebuild();
+		this.lastCheckingTime = System.currentTimeMillis();
 	}
 	
 	private void recheck() {
-		long now = System.currentTimeMillis();
-		long span = now - lastCheckingTime;
-		if (span > cacheMilliSeconds){
-			lastCheckingTime = now;
+		if (cacheMilliSeconds == CACHE_ALWAYS) {
+			// cache always
+		}else if (cacheMilliSeconds == NO_CACHE) {
+			// no cache
 			rebuild();
+		}else{
+			long now = System.currentTimeMillis();
+			long span = now - lastCheckingTime;
+			if (span > cacheMilliSeconds){
+				lastCheckingTime = now;
+				rebuild();
+			}
 		}
 	}
 
 	private void rebuild() {
-
 		if (rebuilding || 
 				(!forceRefresh && resourceInfo.getLastModified().equals(lastModified))){
 			// resource not changed
@@ -74,6 +84,7 @@ public class CacheableResourceInfo implements ResourceInfo {
 		this.rebuilding = false;
 	}
 
+	@Override
 	public void refresh() {
 		// force update content
 		forceRefresh = true;

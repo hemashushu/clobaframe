@@ -10,7 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.archboy.clobaframe.io.http.CacheResourceSender;
 import org.archboy.clobaframe.webresource.AbstractWebResourceInfo;
-import org.archboy.clobaframe.webresource.CompressibleWebResource;
+import org.archboy.clobaframe.webresource.CacheableWebResourceInfo;
+import org.archboy.clobaframe.webresource.CompressibleWebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceManager;
 import org.archboy.clobaframe.webresource.WebResourceSender;
@@ -50,11 +51,11 @@ public class WebResourceSenderImpl implements WebResourceSender{
 	private void send(WebResourceInfo webResourceInfo, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Map<String, Object> headers = new HashMap<String, Object>();
 		
-		if (webResourceInfo instanceof CompressibleWebResource ||
+		if (webResourceInfo instanceof CompressibleWebResourceInfo ||
 			(webResourceInfo instanceof AbstractWebResourceInfo &&
-				((AbstractWebResourceInfo)webResourceInfo).getUnderlayWebResourceInfoTypes()
+				((AbstractWebResourceInfo)webResourceInfo).getTypes()
 					.contains(CompressibleWebResourceInfo.class))){
-			
+			// it's compressed resource already.
 			headers.put("Content-Encoding", "gzip");
 		}
 		

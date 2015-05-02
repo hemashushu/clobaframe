@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.ResourceInfoFactory;
 import org.archboy.clobaframe.io.http.ResourceSender;
-import org.archboy.clobaframe.io.impl.DefaultResourceInfoFactory;
+import org.archboy.clobaframe.io.impl.ResourceInfoFactoryImpl;
 
 /**
  * Send whole or partial resource to client.
@@ -21,10 +21,11 @@ import org.archboy.clobaframe.io.impl.DefaultResourceInfoFactory;
 public class PartialResourceSender implements ResourceSender {
 
 	private ResourceSender resourceSender;
-	private ResourceInfoFactory resourceInfoFactory = new DefaultResourceInfoFactory();
+	private ResourceInfoFactory resourceInfoFactory; // = new ResourceInfoFactoryImpl();
 	
-	public PartialResourceSender(ResourceSender resourceSender) {
+	public PartialResourceSender(ResourceSender resourceSender, ResourceInfoFactory resourceInfoFactory) {
 		this.resourceSender = resourceSender;
+		this.resourceInfoFactory = resourceInfoFactory;
 	}
 	
 	@Override

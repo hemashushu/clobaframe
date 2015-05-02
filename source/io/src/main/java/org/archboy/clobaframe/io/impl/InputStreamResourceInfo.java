@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import org.archboy.clobaframe.io.ResourceInfo;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -20,6 +21,10 @@ public class InputStreamResourceInfo implements ResourceInfo {
 
 	public InputStreamResourceInfo(InputStream inputStream, long contentLength, 
 			String mimeType, Date lastModified) {
+		Assert.notNull(inputStream);
+		Assert.hasText(mimeType);
+		Assert.notNull(lastModified);
+		
 		this.contentLength = contentLength;
 		this.mimeType = mimeType;
 		this.lastModified = lastModified;

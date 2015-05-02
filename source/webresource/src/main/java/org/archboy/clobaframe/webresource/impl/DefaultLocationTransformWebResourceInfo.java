@@ -15,7 +15,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.archboy.clobaframe.webresource.AbstractWebResourceInfo;
-import org.archboy.clobaframe.webresource.LocationTransformResource;
+import org.archboy.clobaframe.webresource.LocationTransformResourceInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
@@ -28,9 +28,9 @@ import org.springframework.util.Assert;
  *
  * @author yang
  */
-public class LocationTransformWebResourceInfo extends AbstractWebResourceInfo implements LocationTransformResource {
+public class DefaultLocationTransformWebResourceInfo extends AbstractWebResourceInfo implements LocationTransformResourceInfo {
 
-	private final Logger logger = LoggerFactory.getLogger(LocationTransformWebResourceInfo.class);
+	private final Logger logger = LoggerFactory.getLogger(DefaultLocationTransformWebResourceInfo.class);
 
 	private WebResourceManager webResourceManager;
 	private WebResourceInfo webResourceInfo;
@@ -40,14 +40,14 @@ public class LocationTransformWebResourceInfo extends AbstractWebResourceInfo im
 	private byte[] content;
 	private String contentHash;
 
-	private Collection<String> childResourceNames;
+	private Collection<String> childResourceNames = new ArrayList<String>();
 	
 	private static final String resourceNameRegex = "([\\/\\w\\.-]+)([^'\"\\)]*)";
 
 	private static final String urlRegex = "url\\(['|\"]?" + resourceNameRegex + "['|\"]?\\)";
 	private static final Pattern urlPattern = Pattern.compile(urlRegex);
 
-	public LocationTransformWebResourceInfo(
+	public DefaultLocationTransformWebResourceInfo(
 			WebResourceManager webResourceManager,
 			WebResourceInfo webResourceInfo) {
 
@@ -57,7 +57,7 @@ public class LocationTransformWebResourceInfo extends AbstractWebResourceInfo im
 		this.webResourceManager = webResourceManager;
 		this.webResourceInfo = webResourceInfo;
 		
-		addUnderlayWebResourceType(webResourceInfo);
+		addType(LocationTransformResourceInfo.class, webResourceInfo);
 		
 		rebuild();
 	}
@@ -116,7 +116,7 @@ public class LocationTransformWebResourceInfo extends AbstractWebResourceInfo im
 //
 //		lastContentHash = webResourceInfo.getContentHash();
 
-		childResourceNames = new ArrayList<String>();
+		childResourceNames.clear();
 		
 		String text = null;
 		//ResourceContent resourceContent = null;
@@ -158,14 +158,13 @@ public class LocationTransformWebResourceInfo extends AbstractWebResourceInfo im
 				String location = webResourceManager.getLocation(canonicalName);
 				
 				if (StringUtils.isNotEmpty(matcher.group(2))){
-					location = combineVersionName(location, matcher.group(2));
+					location = appendQueryString(location, matcher.group(2));
 				}
 				
 //				String group = matcher.group();
 //				result= group.replace(name, location);
 				
 				result = String.format("url('%s')", location);
-				
 				childResourceNames.add(canonicalName);
 			}catch(FileNotFoundException e){
 				// ignore
@@ -181,7 +180,7 @@ public class LocationTransformWebResourceInfo extends AbstractWebResourceInfo im
 		return replacedText;
 	}
 
-	private String combineVersionName(String location, String query) {
+	private String appendQueryString(String location, String query) {
 		
 		/**
 		 * The name maybe includes the query and url hash.

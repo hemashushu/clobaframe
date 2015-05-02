@@ -16,23 +16,32 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import javax.inject.Named;
 import org.archboy.clobaframe.io.MimeTypeDetector;
-import org.archboy.clobaframe.webresource.AbstractWebResourceRepository;
+import org.archboy.clobaframe.io.ResourceInfo;
+import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
+import org.archboy.clobaframe.io.file.ResourceScanner;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
+import org.archboy.clobaframe.webresource.WebResourceRepository;
 
 @Named
-public class LocalWebResourceRepository extends AbstractWebResourceRepository{
+public class LocalWebResourceRepository implements WebResourceRepository{
 
 	@Inject
 	private ResourceLoader resourceLoader;
 
 	@Inject
 	private MimeTypeDetector mimeTypeDetector;
-
+	
+	@Inject
+	private ResourceScanner resourceScanner;
+	
+	private LocalWebResourceNameStrategy localWebResourceNameStrategy;
+	
+	private LocalWebResourceInfoFactory localWebResourceInfoGenerator;
+	
 	@Value("${clobaframe.webresource.repository.local.path}")
 	private String localPath;
 	
-	private File rootDir;
-	private String rootPath;
+	private File baseDir;
 	
 	private final Logger logger = LoggerFactory.getLogger(LocalWebResourceRepository.class);
 
@@ -49,77 +58,41 @@ public class LocalWebResourceRepository extends AbstractWebResourceRepository{
 	@PostConstruct
 	public void init() throws IOException {
 		Resource resource = resourceLoader.getResource(localPath);
-		rootDir = resource.getFile();
-		if (!rootDir.exists()){
+		baseDir = resource.getFile();
+		if (!baseDir.exists()){
 			throw new FileNotFoundException(String.format(
 					"Can not find the file [%s], p.s. the current path is [%s].",
 					localPath,
 					resourceLoader.getResource(".").getFile().getAbsolutePath()));
 		}
 
-		rootPath = rootDir.getPath();
+		localWebResourceNameStrategy = new DefaultLocalWebResourceNameStrategy(baseDir);
+		localWebResourceInfoGenerator = new LocalWebResourceInfoFactory(mimeTypeDetector, localWebResourceNameStrategy);
 	}
 
 	@Override
 	public WebResourceInfo getByName(String name) {
-		File file = new File(rootDir, name);
+		File file = new File(baseDir, name);
 		if (!file.exists()) {
 			return null;
 		}
 		
-		String mimeType = getMimeType(file);
-		LocalWebResourceInfo webResourceInfo = new LocalWebResourceInfo(
-				file, name, mimeType);
-		return webResourceInfo;
+		return (WebResourceInfo)localWebResourceInfoGenerator.make(file);
 	}
-	
+
 	@Override
-	public Collection<String> getAllNames() {
-		List<String> names = new ArrayList<String>();
-
-		Stack<File> dirs = new Stack<File>();
-		dirs.push(rootDir);
-
-		while (!dirs.isEmpty()) {
-			File dir = dirs.pop();
-			File[] files = dir.listFiles();
-			for (File file : files) {
-				if (file.isDirectory()) {
-					dirs.push(file);
-				} else {
-					String name = getResourceName(file);
-//					String mimeType = getMimeType(file);
-//
-//					LocalWebResourceInfo webResourceInfo = new LocalWebResourceInfo(
-//						file, name, mimeType);
-//				
-//					names.add(webResourceInfo);
-					names.add(name);
-				}
-			}
+	public Collection<WebResourceInfo> getAll() {
+		
+		Collection<ResourceInfo> resourceInfos = resourceScanner.list(baseDir, localWebResourceInfoGenerator);
+		
+		List<WebResourceInfo> webResourceInfos = new ArrayList<WebResourceInfo>();
+		
+		for(ResourceInfo resourceInfo : resourceInfos) {
+			webResourceInfos.add((WebResourceInfo)resourceInfo);
 		}
-
-		return names;
-	}
-
-	private String getMimeType(File file){
-		String fileName = file.getName();
-		return mimeTypeDetector.getByExtensionName(fileName);
+		
+		return webResourceInfos;
 	}
 		
-	/**
-	 * Return resource name by file.
-	 * 
-	 * By default, the resource name is the file name that excludes the resource dir path.
-	 * e.g. 'css/common.css', 'js/moments.js'.
-	 * 
-	 * @param resourceDir
-	 * @param file
-	 * @return 
-	 */
-	private String getResourceName(File file){
-		String name = file.getPath().substring(rootPath.length() + 1);
-		return name.replace('\\', '/');
-	}
 
 }

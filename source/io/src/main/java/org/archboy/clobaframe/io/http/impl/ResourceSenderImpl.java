@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.io.ResourceInfo;
+import org.archboy.clobaframe.io.ResourceInfoFactory;
 import org.archboy.clobaframe.io.http.ResourceSender;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -50,6 +51,9 @@ public class ResourceSenderImpl implements ResourceSender {
 	@Inject
 	private ResourceLoader resourceLoader;
 	
+	@Inject
+	private ResourceInfoFactory resourceInfoFactory;
+	
 	private ObjectMapper objectMapper = new ObjectMapper();
 	
 	private ResourceSender resourceSender;
@@ -60,10 +64,10 @@ public class ResourceSenderImpl implements ResourceSender {
 		
 		if (enableGzip) {
 			Set<String> mimeTypeList = getCompressibleMimeTypeList();
-			resourceSender = new GZipResourceSender(resourceSender, mimeTypeList, minCompressSize);
+			resourceSender = new GZipResourceSender(resourceSender, mimeTypeList, minCompressSize, resourceInfoFactory);
 		}
 		
-		resourceSender = new PartialResourceSender(resourceSender);
+		resourceSender = new PartialResourceSender(resourceSender, resourceInfoFactory);
 		resourceSender = new LastModifiedCheckingResourceSender(resourceSender);
 	}
 	

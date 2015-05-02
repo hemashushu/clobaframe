@@ -6,7 +6,7 @@ import java.util.Collection;
  *
  * @author yang
  */
-public interface LocationTransformResource {
+public interface LocationTransformResourceInfo extends WebResourceInfo {
 	
 	/**
 	 * 

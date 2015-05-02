@@ -2,16 +2,20 @@ package org.archboy.clobaframe.webresource.impl;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Named;
-import org.archboy.clobaframe.webresource.AbstractVersionStrategy;
+import org.archboy.clobaframe.webresource.VersionStrategy;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.springframework.beans.factory.annotation.Value;
 
 /**
- *
+ * The default version strategy.
+ * 
+ * Format:
+ * resource name + "?" + "v" + left(content hash, 8).
+ * 
  * @author yang
  */
 @Named
-public class DefaultVersionStrategy extends AbstractVersionStrategy {
+public class DefaultVersionStrategy implements VersionStrategy {
 	
 	@Override
 	public String getName() {

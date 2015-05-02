@@ -12,22 +12,24 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  */
 public abstract class AbstractWebResourceInfo implements WebResourceInfo {
 	
-	private Set<Class<?>> underlayWebResourceInfoTypes = new HashSet<Class<?>>();
+	// the underlay web resource types
+	private Set<Class<? extends WebResourceInfo>> types = 
+			new HashSet<Class<? extends WebResourceInfo>>();
 	
-	/**
-	 * 
-	 * @param webResourceInfo 
-	 */
-	protected void addUnderlayWebResourceType(WebResourceInfo webResourceInfo) {
-		underlayWebResourceInfoTypes.add(webResourceInfo.getClass());
+	protected void addType(Class<? extends WebResourceInfo> clazz){
+		types.add(clazz);
+	}
+	
+	protected void addType(Class<? extends WebResourceInfo> clazz, WebResourceInfo underlay) {
+		if (underlay instanceof AbstractWebResourceInfo) {
+			types.addAll(((AbstractWebResourceInfo)underlay).getTypes());
+		}
+		
+		types.add(clazz);
 	}
 
-	/**
-	 * 
-	 * @return 
-	 */
-	public Set<Class<?>> getUnderlayWebResourceInfoTypes() {
-		return underlayWebResourceInfoTypes;
+	public Set<Class<? extends WebResourceInfo>> getTypes() {
+		return types;
 	}
 
 	@Override

@@ -13,17 +13,6 @@ public class DefaultFileBaseResourceInfo implements FileBaseResourceInfo {
 	private File file;
 	private String mimeType;
 
-	/**
-	 * Detect the mime type by the file extension name.
-	 * 
-	 * @param file
-	 * @param mimeTypeDetector 
-	 */
-	public DefaultFileBaseResourceInfo(File file, MimeTypeDetector mimeTypeDetector) {
-		this.file = file;
-		this.mimeType = mimeTypeDetector.getByExtensionName(file.getName());
-	}
-
 	public DefaultFileBaseResourceInfo(File file, String mimeType) {
 		this.file = file;
 		this.mimeType = mimeType;

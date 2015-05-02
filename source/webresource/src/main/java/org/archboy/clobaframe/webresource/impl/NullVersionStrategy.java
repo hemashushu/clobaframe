@@ -1,7 +1,7 @@
 package org.archboy.clobaframe.webresource.impl;
 
 import javax.inject.Named;
-import org.archboy.clobaframe.webresource.AbstractVersionStrategy;
+import org.archboy.clobaframe.webresource.VersionStrategy;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 
 /**
@@ -9,7 +9,7 @@ import org.archboy.clobaframe.webresource.WebResourceInfo;
  * @author yang
  */
 @Named
-public class NullVersionStrategy extends AbstractVersionStrategy {
+public class NullVersionStrategy implements VersionStrategy {
 
 	@Override
 	public String getName() {

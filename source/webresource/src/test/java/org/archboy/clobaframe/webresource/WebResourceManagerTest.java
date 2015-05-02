@@ -7,10 +7,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import javax.inject.Inject;
+import javax.inject.Named;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.webresource.AbstractWebResourceInfo;
@@ -75,11 +79,15 @@ public class WebResourceManagerTest {
 			assertTrue(webResourceInfo.getContentLength() > 0);
 		}
 		
-		Collection<String> namesByManager1 = webResourceManager.getAllNames();
-		for(String name : names){
-			assertTrue(namesByManager1.contains(name));
+		List<String> nameList1 = new ArrayList<String>();
+		Collection<WebResourceInfo> resourcesByManager1 = webResourceManager.getAllOriginalResource();
+		for(WebResourceInfo resourceInfo : resourcesByManager1){
+			nameList1.add(resourceInfo.getName());
 		}
 		
+		for(String name : names) {
+			assertTrue(nameList1.contains(name));
+		}
 	}
 
 	@Test
@@ -100,9 +108,7 @@ public class WebResourceManagerTest {
 		assertEquals(location1, webResourceManager.getLocation("test.css"));
 	
 		// test get by version name
-		String versionName1 = webResourceManager.getVersionName(webResource1); //location1.substring(location1.lastIndexOf('/') + 1);
-		assertNotNull(versionName1);
-		
+		String versionName1 = location1.substring(location1.lastIndexOf('/') + 1);
 		WebResourceInfo webResourceByVersionName1 = webResourceManager.getResourceByVersionName(versionName1);
 		assertEquals(webResource1, webResourceByVersionName1);
 		
@@ -138,62 +144,62 @@ public class WebResourceManagerTest {
 		assertNull(webResourceManager.getResource("none-exists"));
 	}
 
+	private static final TextWebResourceInfo info1 = new TextWebResourceInfo("l1.css", "text/css", "p {}");
+	private static final TextWebResourceInfo info2a = new TextWebResourceInfo("l2a.css", "text/css", "@import url('l1.css') \n h1 {}");
+	private static final TextWebResourceInfo info2b = new TextWebResourceInfo("l2b.css", "text/css", "h2 {}");
+	private static final TextWebResourceInfo info3 = new TextWebResourceInfo("l3.css", "text/css", "@import url('l2a.css') \n body {}");
+	
+	@Named
+	public static class TestVirtualWebResourceProvider implements VirtualWebResourceProvider {
+
+		@Override
+		public WebResourceInfo getByName(String name) {
+			if (name.equals("l3.css")){
+				return info3;
+			}else if (name.equals("l2a.css")){
+				return info2a;
+			}else if (name.equals("l2b.css")){
+				return info2b;
+			}else if (name.equals("l1.css")){
+				return info1;
+			}else{
+				return null;
+			}
+		}
+
+		@Override
+		public Collection<WebResourceInfo> getAll() {
+			return Arrays.asList(
+					getByName("l1.css"),
+					getByName("l2a.css"),
+					getByName("l2b.css"),
+					getByName("l3.css"));
+		}
+
+	};
+	
+	
 	@Test
 	public void testGetVirtualResource() throws IOException {
-		VirtualWebResourceProvider provider = new VirtualWebResourceProvider() {
-			
-			@Override
-			public WebResourceInfo getByName(String name) {
-				if (name.equals("one.css")){
-					return new TextWebResourceInfo("one.css", "body {}");
-				}else{
-					return null;
-				}
-			}
+		
+		WebResourceInfo webResourceInfo1 = webResourceManager.getResource("l1.css");
+		assertTextResourceContentEquals(webResourceInfo1, "p {}");
+		
+		String[] names = new String[]{"l1.css", "l2a.css", "l2b.css", "l3.css"};
 
-			@Override
-			public Collection<String> getAllNames() {
-				return Arrays.asList("one.css");
-			}
-		};
-				
-		virtualResourceRepository.addProvider(provider);
+		List<String> nameList1 = new ArrayList<String>();
+		Collection<WebResourceInfo> resourcesByManager1 = webResourceManager.getAllOriginalResource();
+		for(WebResourceInfo resourceInfo : resourcesByManager1){
+			nameList1.add(resourceInfo.getName());
+		}
 		
-		WebResourceInfo webResourceInfo1 = webResourceManager.getResource("one.css");
-		assertTextResourceContentEquals(webResourceInfo1, "body {}");
-		
-		Collection<String> namesByManager1 = webResourceManager.getAllNames();
-		assertTrue(namesByManager1.contains("one.css"));
+		for(String name : names) {
+			assertTrue(nameList1.contains(name));
+		}
 	}
 	
 	@Test
 	public void testGetChainUpdate() throws IOException {
-		final TextWebResourceInfo info1 = new TextWebResourceInfo("l1.css", "p {}");
-		final TextWebResourceInfo info2 = new TextWebResourceInfo("l2a.css", "@import url('l1.css') \n h1 {}");
-		
-		VirtualWebResourceProvider provider = new VirtualWebResourceProvider() {
-			@Override
-			public WebResourceInfo getByName(String name) {
-				if (name.equals("l3.css")){
-					return new TextWebResourceInfo("l3.css", "@import url('l2a.css') \n body {}");
-				}else if (name.equals("l2a.css")){
-					return info2;
-				}else if (name.equals("l2b.css")){
-					return new TextWebResourceInfo("l2b.css", "h2 {}");
-				}else if (name.equals("l1.css")){
-					return info1;
-				}else{
-					return null;
-				}
-			}
-
-			@Override
-			public Collection<String> getAllNames() {
-				return Arrays.asList("l1.css", "l2a.css", "l2b.css", "l3.css");
-			}
-		};
-				
-		virtualResourceRepository.addProvider(provider);
 		
 		String location1 = webResourceManager.getLocation("l3.css");
 		String location2 = webResourceManager.getLocation("l2a.css");
@@ -201,7 +207,11 @@ public class WebResourceManagerTest {
 		String location4 = webResourceManager.getLocation("l1.css");
 		
 		// update l2a.css
-		info2.update("@import url('l1.css') \n h1,h3 {}");
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.HOUR_OF_DAY, 1);
+		Date date1 = calendar.getTime();
+		
+		info2a.updateContent("@import url('l1.css') \n h1,h3 {}", date1);
 		
 		assertEquals(location1, webResourceManager.getLocation("l3.css"));
 		assertEquals(location2, webResourceManager.getLocation("l2a.css"));
@@ -217,7 +227,9 @@ public class WebResourceManagerTest {
 		assertEquals(location4, webResourceManager.getLocation("l1.css"));
 		
 		// update l1.css
-		info1.update("div {}");
+		calendar.add(Calendar.HOUR_OF_DAY, 2);
+		Date date2 = calendar.getTime();
+		info1.updateContent("div {}", date2);
 		
 		webResourceManager.refresh("l1.css");
 		
@@ -298,61 +310,4 @@ public class WebResourceManagerTest {
 		return resource.getFile();
 	}	
 
-	private static class TextWebResourceInfo extends AbstractWebResourceInfo {
-		
-		private String name;
-		private byte[] content;
-		private Date lastModified;
-
-		public TextWebResourceInfo(String name, String text) {
-			this.name = name;
-			this.content = text.getBytes();
-			this.lastModified = new Date();
-		}
-		
-		@Override
-		public String getName() {
-			return name;
-		}
-
-		@Override
-		public String getContentHash() {
-			return DigestUtils.sha256Hex(content);
-		}
-
-		@Override
-		public long getContentLength() {
-			return content.length;
-		}
-
-		@Override
-		public String getMimeType() {
-			return "text/css";
-		}
-
-		@Override
-		public InputStream getContent() throws IOException {
-			return new ByteArrayInputStream(content);
-		}
-
-		@Override
-		public InputStream getContent(long start, long length) throws IOException {
-			return new ByteArrayInputStream(content, (int)start, (int)length);
-		}
-
-		@Override
-		public boolean isSeekable() {
-			return true;
-		}
-
-		@Override
-		public Date getLastModified() {
-			return lastModified;
-		}
-		
-		public void update(String text){
-			this.content = text.getBytes();
-			this.lastModified = new Date();
-		}
-	}
 }

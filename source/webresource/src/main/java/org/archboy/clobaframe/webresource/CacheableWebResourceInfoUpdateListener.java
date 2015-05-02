@@ -11,7 +11,7 @@ package org.archboy.clobaframe.webresource;
  * 
  * @author yang
  */
-public interface CacheableWebResourceUpdateListener {
+public interface CacheableWebResourceInfoUpdateListener {
 	
 	/**
 	 * Occur while the child resource has been modified.

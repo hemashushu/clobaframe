@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import org.archboy.clobaframe.io.ResourceInfo;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -12,7 +13,6 @@ import org.archboy.clobaframe.io.ResourceInfo;
  */
 public class ByteArrayResourceInfo implements ResourceInfo {
 
-	private long contentLength;
 	private String mimeType;
 	private Date lastModified;
 	private byte[] content;
@@ -20,7 +20,10 @@ public class ByteArrayResourceInfo implements ResourceInfo {
 	public ByteArrayResourceInfo(byte[] content,
 			String mimeType,
 			Date lastModified) {
-		this.contentLength = content.length;
+		Assert.notNull(content);
+		Assert.hasText(mimeType);
+		Assert.notNull(lastModified);
+		
 		this.mimeType = mimeType;
 		this.lastModified = lastModified;
 		this.content = content;
@@ -28,7 +31,7 @@ public class ByteArrayResourceInfo implements ResourceInfo {
 
 	@Override
 	public long getContentLength() {
-		return contentLength;
+		return content.length;
 	}
 
 	@Override

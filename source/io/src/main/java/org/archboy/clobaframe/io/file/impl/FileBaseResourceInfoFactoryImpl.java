@@ -9,6 +9,7 @@ import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.TemporaryResources;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
+import org.archboy.clobaframe.io.file.FileBaseResourceInfoWrapper;
 
 /**
  *
@@ -22,13 +23,7 @@ public class FileBaseResourceInfoFactoryImpl implements FileBaseResourceInfoFact
 	
 	@Override
 	public FileBaseResourceInfo make(File file) {
-		return new DefaultFileBaseResourceInfo(file, mimeTypeDetector);
+		String mimeType = mimeTypeDetector.getByExtensionName(file.getName());
+		return new DefaultFileBaseResourceInfo(file, mimeType);
 	}
-
-	@Override
-	public FileBaseResourceInfo wrap(ResourceInfo resourceInfo, TemporaryResources temporaryResources) throws IOException{
-		return new TemporaryFileBaseResourceInfo(
-				resourceInfo, temporaryResources);
-	}
-
 }
