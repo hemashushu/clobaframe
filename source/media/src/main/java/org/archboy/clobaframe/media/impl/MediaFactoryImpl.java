@@ -24,7 +24,7 @@ import javax.inject.Named;
 import org.archboy.clobaframe.io.ResourceInfoFactory;
 import org.archboy.clobaframe.io.TemporaryResources;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
-import org.archboy.clobaframe.io.impl.DefaultResourceInfoFactory;
+import org.archboy.clobaframe.io.file.FileBaseResourceInfoWrapper;
 import org.springframework.util.Assert;
 
 /**
@@ -42,10 +42,14 @@ public class MediaFactoryImpl implements MediaFactory{
 
 	private final Logger logger = LoggerFactory.getLogger(MediaFactoryImpl.class);
 
-	private ResourceInfoFactory resourceInfoFactory = new DefaultResourceInfoFactory();
+	@Inject
+	private ResourceInfoFactory resourceInfoFactory; // = new DefaultResourceInfoFactory();
 	
 	@Inject
 	private FileBaseResourceInfoFactory fileBaseResourceInfoFactory;
+	
+	@Inject
+	private FileBaseResourceInfoWrapper fileBaseResourceInfoWrapper;
 	
 	@Inject
 	private List<MediaLoader> mediaLoaders;
@@ -134,7 +138,7 @@ public class MediaFactoryImpl implements MediaFactory{
 							maxHandleSizeByte, resourceInfo.getContentLength()));
 		}
 		
-		FileBaseResourceInfo fileBaseResourceInfo = fileBaseResourceInfoFactory.wrap(
+		FileBaseResourceInfo fileBaseResourceInfo = fileBaseResourceInfoWrapper.wrap(
 				resourceInfo, temporaryResources);
 		
 		//try{

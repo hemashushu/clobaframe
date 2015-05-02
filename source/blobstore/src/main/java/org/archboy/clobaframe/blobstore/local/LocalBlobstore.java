@@ -14,7 +14,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import javax.inject.Named;
 import org.archboy.clobaframe.blobstore.BlobResourceRepository;
-import org.archboy.clobaframe.blobstore.impl.AbstractBlobstore;
+import org.archboy.clobaframe.blobstore.Blobstore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -28,7 +28,7 @@ import org.springframework.util.Assert;
  * @author yang
  */
 @Named
-public class LocalBlobstore extends AbstractBlobstore {
+public class LocalBlobstore implements Blobstore {
 
 	@Inject
 	private ResourceLoader resourceLoader;

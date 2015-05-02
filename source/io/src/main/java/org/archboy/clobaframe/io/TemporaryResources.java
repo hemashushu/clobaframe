@@ -57,7 +57,7 @@ public interface TemporaryResources extends Closeable {
 	 * @throws IOException if one or more of the tracked resources could not be
 	 * closed
 	 */
-	@Override
-	void close() throws IOException;
+	//@Override
+	//void close() throws IOException;
 
 }

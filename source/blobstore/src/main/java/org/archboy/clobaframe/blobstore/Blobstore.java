@@ -13,6 +13,12 @@ import java.io.IOException;
 public interface Blobstore {
 
 	/**
+	 * The implementation name.
+	 * @return 
+	 */
+	String getName();
+	
+	/**
 	 * Check whether a repository exists.
 	 *
 	 * @param repoName

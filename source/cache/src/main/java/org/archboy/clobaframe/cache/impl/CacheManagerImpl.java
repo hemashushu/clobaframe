@@ -24,7 +24,7 @@ public class CacheManagerImpl implements CacheManager {
 	private String defaultCacheName = DEFAULT_CACHE_NAME;
 
 	@Inject
-	private List<AbstractCache> caches;
+	private List<Cache> caches;
 
 	//@Bean(name = "defaultCache")
 	@Override
@@ -36,7 +36,7 @@ public class CacheManagerImpl implements CacheManager {
 	public Cache getCache(String name) {
 		Assert.hasText(name);
 		
-		for (AbstractCache cache : caches){
+		for (Cache cache : caches){
 			if (cache.getName().equals(name)) {
 				return cache;
 			}

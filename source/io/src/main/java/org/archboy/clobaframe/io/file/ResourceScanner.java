@@ -16,7 +16,7 @@ public interface ResourceScanner {
 	 * @param fileBaseResourceInfoFactory
 	 * @return 
 	 */
-	Collection<ResourceInfo> list(
+	Collection<ResourceInfo> scan(
 			File basePath,
 			FileBaseResourceInfoFactory fileBaseResourceInfoFactory);
 }

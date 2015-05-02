@@ -16,7 +16,13 @@ public interface Cache {
 		REPLACE_ONLY_IF_PRESENT,
 		SET_ALWAYS
 	}
-		
+	
+	/**
+	 * The cache implementation name.
+	 * @return 
+	 */
+	public abstract String getName();
+	
 	/**
 	 * Clean all cache items.
 	 */

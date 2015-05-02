@@ -60,7 +60,7 @@ public class ResourceScannerTest {
 //			}
 //		};
 		
-		Collection<ResourceInfo> resourceInfos1 = resourceScanner.list(file, fileBaseResourceInfoFactory);
+		Collection<ResourceInfo> resourceInfos1 = resourceScanner.scan(file, fileBaseResourceInfoFactory);
 		
 		assertContainsFile(resourceInfos1, getFileByName("sample/data/test.js"));
 		assertContainsFile(resourceInfos1, getFileByName("sample/data/test.css"));

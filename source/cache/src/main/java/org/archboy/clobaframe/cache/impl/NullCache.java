@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.inject.Named;
+import org.archboy.clobaframe.cache.Cache;
 import org.archboy.clobaframe.cache.Cache.Policy;
 import org.archboy.clobaframe.cache.Expiration;
 
@@ -14,7 +15,7 @@ import org.archboy.clobaframe.cache.Expiration;
  * @author yang
  */
 @Named
-public class NullCache extends AbstractCache {
+public class NullCache implements Cache {
 
 	@Override
 	public String getName() {

@@ -83,7 +83,7 @@ public class LocalWebResourceRepository implements WebResourceRepository{
 	@Override
 	public Collection<WebResourceInfo> getAll() {
 		
-		Collection<ResourceInfo> resourceInfos = resourceScanner.list(baseDir, localWebResourceInfoGenerator);
+		Collection<ResourceInfo> resourceInfos = resourceScanner.scan(baseDir, localWebResourceInfoGenerator);
 		
 		List<WebResourceInfo> webResourceInfos = new ArrayList<WebResourceInfo>();
 		

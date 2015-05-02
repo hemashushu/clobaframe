@@ -18,7 +18,7 @@ import org.archboy.clobaframe.io.file.ResourceScanner;
 public class ResourceScannerImpl implements ResourceScanner {
 
 	@Override
-	public Collection<ResourceInfo> list(
+	public Collection<ResourceInfo> scan(
 			File basePath, 
 			FileBaseResourceInfoFactory fileBaseResourceInfoFactory) {
 

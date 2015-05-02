@@ -21,13 +21,13 @@ public class BlobstoreManagerImpl implements BlobstoreManager {
 	private String defaultBlobstoreName = DEFAULT_BLOBSTORE_NAME;
 	
 	@Inject
-	private List<AbstractBlobstore> blobstores;
+	private List<Blobstore> blobstores;
 	
 	@Override
 	public Blobstore getBlobstore(String name) {
 		Assert.hasText(name);
 		
-		for (AbstractBlobstore blobstore : blobstores){
+		for (Blobstore blobstore : blobstores){
 			if (blobstore.getName().equals(name)) {
 				return blobstore;
 			}
