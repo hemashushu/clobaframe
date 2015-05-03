@@ -87,125 +87,18 @@
 		</dependency>
 
 		<!-- Apache Commons -->
-		<!-- need by clobaframe-io -->
+		<!-- need by clobaframe-setting -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
 
-		<!-- need by clobaframe-io -->
+		<!-- need by clobaframe-setting -->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 		</dependency>
 
-		<!-- need by clobaframe-io -->
-		<dependency>
-			<groupId>commons-fileupload</groupId>
-			<artifactId>commons-fileupload</artifactId>
-		</dependency>
-
-		<!-- javax servlet -->
-		<!-- need by clobaframe-io -->
-		<dependency>
-			<groupId>org.mortbay.jetty</groupId>
-			<artifactId>servlet-api</artifactId>
-		</dependency>
-
-		<!-- Mime type detector -->
-		<!-- need by clobaframe-io -->
-		<!-- THERE ARE SOME BUGS
-		<dependency>
-			<groupId>eu.medsea.mimeutil</groupId>
-			<artifactId>mime-util</artifactId>
-			<version>2.1.3</version>
-		</dependency>
-		-->
-
-		<!-- Apache http components for test -->
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpcore</artifactId>
-			<version>4.3.2</version>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.3.3</version>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpmime</artifactId>
-			<version>4.3.3</version>
-			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<artifactId>commons-logging</artifactId>
-					<groupId>commons-logging</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<!-- need by http-client -->
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Embed Jetty for test -->
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-server</artifactId>
-			<version>${org.eclipse.jetty-version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-servlet</artifactId>
-			<version>${org.eclipse.jetty-version}</version>
-			<scope>test</scope>
-		</dependency>
-		
-		<!-- Embed Tomcat for test -->
-		<!--
-		<dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>tomcat-catalina</artifactId>
-			<version>${org.apache.tomcat-version}</version>
-			<scope>test</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>tomcat-util</artifactId>
-			<version>${org.apache.tomcat-version}</version>
-			<scope>test</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.apache.tomcat.embed</groupId>
-			<artifactId>tomcat-embed-core</artifactId>
-			<version>${org.apache.tomcat-version}</version>
-			<scope>test</scope>
-		</dependency>
-		-->
-		
 		<!-- Jackson JSON Mapper -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -217,20 +110,5 @@
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
 	</dependencies>
-	
-	<build>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>false</filtering>
-				<includes>
-					<include>**/*.xml</include>
-					<include>**/*.cache</include>
-					<include>**/*.types</include>
-					<include>**/*.json</include>
-				</includes>
-			</resource>
-		</resources>
-	</build>
 	
 </project>

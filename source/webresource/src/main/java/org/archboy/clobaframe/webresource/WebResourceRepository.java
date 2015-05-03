@@ -11,7 +11,7 @@ public interface WebResourceRepository {
 	public static final int PRIORITY_HIGHEST = 0;
 	public static final int PRIORITY_HIGHER = 2;
 	public static final int PRIORITY_HIGH = 4;
-	public static final int PRIORITY_NORMAL = 5;
+	public static final int PRIORITY_NORMAL = 6;
 	
 	/**
 	 * Get the repository implementation name.

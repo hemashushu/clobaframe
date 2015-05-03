@@ -1,4 +1,4 @@
-package org.archboy.clobaframe.io;
+package org.archboy.clobaframe.setting.system;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/applicationContext.xml" })
-public class SettingManagerTest {
+public class SystemSettingTest {
 
 	//@Inject
 	//private SettingManager settingManager;
