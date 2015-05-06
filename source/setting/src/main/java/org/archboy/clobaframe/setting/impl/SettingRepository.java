@@ -11,17 +11,12 @@ import java.util.Properties;
  *
  * @author yang
  */
-public interface SettingStore {
+public interface SettingRepository {
 	
 	Map<String, Object> read(InputStream in) throws IOException;
 	
 	void write(
-			InputStream in, OutputStream outputStream, 
+			OutputStream outputStream, 
 			Map<String, Object> setting)
-			throws IOException;
-	
-	void write(
-			InputStream in, OutputStream outputStream, 
-			String key, Object value)
 			throws IOException;
 }

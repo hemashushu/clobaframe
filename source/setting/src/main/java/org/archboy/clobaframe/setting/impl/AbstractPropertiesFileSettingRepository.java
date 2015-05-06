@@ -11,7 +11,7 @@ import java.util.Properties;
  *
  * @author yang
  */
-public abstract class PropertiesFileSettingStore extends AbstractSettingStore {
+public abstract class AbstractPropertiesFileSettingRepository implements SettingRepository {
 	
 	@Override
 	public Map<String, Object> read(InputStream in) throws IOException{
@@ -28,14 +28,11 @@ public abstract class PropertiesFileSettingStore extends AbstractSettingStore {
 	
 	@Override
 	public void write(
-			InputStream in, OutputStream outputStream, 
+			OutputStream outputStream, 
 			Map<String, Object> setting)
 			throws IOException {
-		Map<String, Object> origin = read(in);
-		Support.merge(origin, setting);
-		
 		Properties properties = new Properties();
-		properties.putAll(origin);
+		properties.putAll(setting);
 		properties.store(outputStream, null);
 	}
 

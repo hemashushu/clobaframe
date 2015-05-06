@@ -10,7 +10,7 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">
 			<list>
-				<value>classpath:clobaframe.properties</value>
+				<value>classpath:application.properties</value>
 			</list>
 		</property>
 	</bean>
