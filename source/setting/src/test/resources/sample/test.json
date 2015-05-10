@@ -1,0 +1,23 @@
+{
+  "item" : "abc",
+  "sub" : {
+    "item" : "xyz"
+  },
+  "foo" : {
+    "bar" : {
+      "id" : "123456",
+      "name" : "world"
+    },
+    "com" : {
+      "id" : "${foo.bar.id}789",
+      "name" : "hello ${foo.bar.name}",
+      "concat" : "${foo.bar.id}-${foo.bar.name}",
+      "depth" : "Mr. ${foo.com.name}",
+      "depthx2" : "hello ${foo.com.depth}"
+    }
+  },
+  "broken" : {
+    "name" : "hello ${foo.bar.firstName}",
+    "part" : "${foo.bar.id}-${foo.bar.firstName}"
+  }
+}

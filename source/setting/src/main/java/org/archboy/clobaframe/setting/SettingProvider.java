@@ -17,11 +17,6 @@ public interface SettingProvider {
 	
 	int getPriority();
 	
-	Map<String, Object> get();
-
-	boolean canWrite();
+	Map<String, Object> getAll();
 	
-	void set(Map<String, Object> item);
-	
-	void set(String key, Object value);
 }

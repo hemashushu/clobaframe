@@ -1,0 +1,2 @@
+Consider using (Apache Commons Imaging)[http://commons.apache.org/proper/commons-imaging/] to read/write
+JPEG EXIF meta.

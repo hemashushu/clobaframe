@@ -13,6 +13,8 @@ public interface ProfileSetting {
 	
 	Object get(Profile profile, String key, Object defaultValue);
 	
+	Map<String, Object> getAll();
+	
 	void set(Profile profile, String key, Object value);
 	
 	void set(Profile profile, Map<String, Object> items);

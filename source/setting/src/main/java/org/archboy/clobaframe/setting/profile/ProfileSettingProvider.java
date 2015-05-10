@@ -22,9 +22,4 @@ public interface ProfileSettingProvider {
 	
 	Map<String, Object> get(Profile profile);
 
-	boolean canWrite();
-	
-	void set(Profile profile, Map<String, Object> item);
-	
-	void set(Profile profile, String key, Object value);
 }

@@ -12,8 +12,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import javax.inject.Inject;
 import org.archboy.clobaframe.setting.SettingProvider;
-import org.archboy.clobaframe.setting.system.impl.SystemEnvironmentSettingProvider;
-import org.archboy.clobaframe.setting.system.impl.SystemPropertiesSettingProvider;
+import org.archboy.clobaframe.setting.system.impl.EnvironmentSettingProvider;
+import org.archboy.clobaframe.setting.system.impl.PropertiesSettingProvider;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ContextConfiguration;
@@ -45,5 +45,12 @@ public class SystemSettingTest {
 	public void testGetSystemSetting(){
 		String osName = (String)systemSetting.get("os.name");
 		System.out.println(osName);
+		
+		for(Map.Entry<String, Object> entry : systemSetting.getAll().entrySet()){
+			System.out.println("item: " + entry.getKey() + "=" + entry.getValue());
+		}
+		
+		System.out.println(systemSetting.get("setting.dataDir"));
+		systemSetting.set(systemSetting.getAll());
 	}
 }
