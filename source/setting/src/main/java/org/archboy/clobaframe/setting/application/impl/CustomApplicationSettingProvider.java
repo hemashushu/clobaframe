@@ -1,4 +1,4 @@
-package org.archboy.clobaframe.setting.system.impl;
+package org.archboy.clobaframe.setting.application.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -6,25 +6,24 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.setting.impl.AbstractJsonSettingAccess;
 import org.archboy.clobaframe.setting.impl.Support;
-import org.archboy.clobaframe.setting.system.SystemSettingProvider;
-import org.archboy.clobaframe.setting.system.SystemSettingRepository;
+import org.archboy.clobaframe.setting.application.ApplicationSettingProvider;
+import org.archboy.clobaframe.setting.application.ApplicationSettingRepository;
 
 /**
  *
  * @author yang
  */
-public class JsonSystemSettingProvider extends AbstractJsonSettingAccess implements SystemSettingProvider, SystemSettingRepository {
+public class CustomApplicationSettingProvider extends AbstractJsonSettingAccess implements ApplicationSettingProvider, ApplicationSettingRepository {
 
 	private String dataDir;
 	private String fileName;
 	
-	public JsonSystemSettingProvider(String dataDir, String fileName) {
+	public CustomApplicationSettingProvider(String dataDir, String fileName) {
 		this.dataDir = dataDir;
 		this.fileName = fileName;
 	}
@@ -71,7 +70,7 @@ public class JsonSystemSettingProvider extends AbstractJsonSettingAccess impleme
 			if (!file.exists() || 
 				(file.exists() && file.isFile())){
 				out = new FileOutputStream(file);
-				write(out, item);
+				write(out, map);
 			}
 		} catch (IOException e) {
 			// ignore

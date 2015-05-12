@@ -8,9 +8,29 @@ import java.util.Map;
  */
 public interface Setting {
 
-	Object get(String key);
+	/**
+	 * Get the item value and resolve the placeholder.
+	 * 
+	 * @param key
+	 * @return 
+	 */
+	Object getValue(String key);
 	
-	Object get(String key, Object defaultValue);
+	/**
+	 * Get the item value and resolve the placeholder.
+	 * 
+	 * @param key
+	 * @param defaultValue
+	 * @return 
+	 */
+	Object getValue(String key, Object defaultValue);
+	
+	/**
+	 * 
+	 * @param key
+	 * @return 
+	 */
+	Object get(String key);
 	
 	Map<String, Object> getAll();
 	
@@ -18,4 +38,5 @@ public interface Setting {
 	
 	void set(Map<String, Object> items);
 
+	void refresh();
 }

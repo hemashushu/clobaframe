@@ -9,17 +9,10 @@ import org.archboy.clobaframe.setting.SettingProvider;
  */
 public interface ProfileSettingProvider {
 	
-	public static final int PRIORITY_HIGHEST = 0;
-	public static final int PRIORITY_HIGHER = 20;
-	public static final int PRIORITY_HIGH = 40;
-	public static final int PRIORITY_NORMAL = 60;
-	public static final int PRIORITY_LOW = 80;
-	public static final int PRIORITY_LOWER = 100;
-	
-	int getPriority();
-	
 	boolean support(Profile profile);
 	
-	Map<String, Object> get(Profile profile);
+	Object get(Profile profile, String key);
+	
+	Map<String, Object> getAll(Profile profile);
 
 }

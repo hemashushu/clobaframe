@@ -1,16 +1,15 @@
-package org.archboy.clobaframe.setting.system.impl;
+package org.archboy.clobaframe.setting.application.impl;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
-import org.archboy.clobaframe.setting.system.SystemSettingProvider;
+import org.archboy.clobaframe.setting.application.ApplicationSettingProvider;
 
 /**
  *
  * @author yang
  */
-public class PropertiesSettingProvider implements SystemSettingProvider {
+public class PropertiesSettingProvider implements ApplicationSettingProvider {
 
 	@Override
 	public int getPriority() {

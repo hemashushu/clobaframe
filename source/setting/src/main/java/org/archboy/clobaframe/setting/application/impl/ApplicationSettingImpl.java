@@ -1,8 +1,7 @@
-package org.archboy.clobaframe.setting.system.impl;
+package org.archboy.clobaframe.setting.application.impl;
 
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,9 +9,9 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.archboy.clobaframe.setting.impl.Support;
-import org.archboy.clobaframe.setting.system.SystemSetting;
-import org.archboy.clobaframe.setting.system.SystemSettingProvider;
-import org.archboy.clobaframe.setting.system.SystemSettingRepository;
+import org.archboy.clobaframe.setting.application.ApplicationSetting;
+import org.archboy.clobaframe.setting.application.ApplicationSettingProvider;
+import org.archboy.clobaframe.setting.application.ApplicationSettingRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +22,7 @@ import org.springframework.core.io.ResourceLoader;
  * @author yang
  */
 @Named
-public class SystemSettingImpl implements SystemSetting {
+public class ApplicationSettingImpl implements ApplicationSetting {
 
 	private static final String DEFAULT_DATA_DIR = "/var/lib/${setting.appName}";
 	private static final String DEFAULT_SETTING_FILE_NAME = "classpath:default.properties";
@@ -50,15 +49,21 @@ public class SystemSettingImpl implements SystemSetting {
 	
 	private Map<String, Object> setting = new LinkedHashMap<String, Object>();
 	
-	private List<SystemSettingProvider> systemSettingProviders;
+	private List<ApplicationSettingProvider> systemSettingProviders = new ArrayList<ApplicationSettingProvider>();;
 	
-	private SystemSettingRepository systemSettingRepository;
+	private ApplicationSettingRepository systemSettingRepository;
 
-	private final Logger logger = LoggerFactory.getLogger(SystemSettingImpl.class);
+	private final Logger logger = LoggerFactory.getLogger(ApplicationSettingImpl.class);
 	
 	@PostConstruct
 	public void init(){
+		refresh();
+	}
+	
+	@Override
+	public void refresh(){
 		// add default values
+		setting.clear();
 		setting.put("setting.appName", appName);
 		setting.put("setting.dataDir", Support.resolvePlaceholder(setting, dataDir));
 		setting.put("setting.defaultSettingFileName", Support.resolvePlaceholder(setting, defaultSettingFileName));
@@ -66,36 +71,48 @@ public class SystemSettingImpl implements SystemSetting {
 		setting.put("setting.extraSettingFileName", Support.resolvePlaceholder(setting, extraSettingFileName));
 				
 		// add setting provider
-		systemSettingProviders = new ArrayList<SystemSettingProvider>();
-		systemSettingProviders.add(new PropertiesFileSystemSettingProvider(resourceLoader, defaultSettingFileName));
+		systemSettingProviders.clear();
+		systemSettingProviders.add(new DefaultApplicationSettingProvider(resourceLoader, defaultSettingFileName));
 		systemSettingProviders.add(new EnvironmentSettingProvider());
 		systemSettingProviders.add(new PropertiesSettingProvider());
-		systemSettingProviders.add(new JsonSystemSettingProvider(dataDir, customSettingFileName));
-		systemSettingProviders.add(new JsonSystemSettingProvider(dataDir, extraSettingFileName));
+		systemSettingProviders.add(new CustomApplicationSettingProvider(dataDir, customSettingFileName));
+		systemSettingProviders.add(new CustomApplicationSettingProvider(dataDir, extraSettingFileName));
 		
-		for(SystemSettingProvider provider : systemSettingProviders){
+		// add setting repository
+		systemSettingRepository = (ApplicationSettingRepository)
+				(new CustomApplicationSettingProvider(dataDir, customSettingFileName));
+
+		// merge all settings.
+		systemSettingProviders.sort(new Comparator<ApplicationSettingProvider>() {
+			@Override
+			public int compare(ApplicationSettingProvider o1, ApplicationSettingProvider o2) {
+				return o1.getPriority() - o2.getPriority();
+			}
+		});
+		
+		for(ApplicationSettingProvider provider : systemSettingProviders){
 			Map<String, Object> map = provider.getAll();
 			setting = Support.merge(setting, map);
 		}
-		
-
-		this.systemSettingRepository = (SystemSettingRepository)
-				(new JsonSystemSettingProvider(dataDir, customSettingFileName));
-
 	}
 	
 	@Override
-	public Object get(String key) {
+	public Object getValue(String key) {
 		Object value = setting.get(key);
 		return (value == null ? null : Support.resolvePlaceholder(setting, value));
 	}
 
 	@Override
-	public Object get(String key, Object defaultValue) {
-		Object value = get(key);
+	public Object getValue(String key, Object defaultValue) {
+		Object value = getValue(key);
 		return (value == null ? defaultValue : value);
 	}
 
+	@Override
+	public Object get(String key) {
+		return setting.get(key);
+	}
+	
 	@Override
 	public void set(String key, Object value) {
 		systemSettingRepository.update(key, value);

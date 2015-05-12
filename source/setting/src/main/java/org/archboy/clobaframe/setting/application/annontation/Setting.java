@@ -1,4 +1,4 @@
-package org.archboy.clobaframe.setting.system.annontation;
+package org.archboy.clobaframe.setting.application.annontation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,7 +1,6 @@
 package org.archboy.clobaframe.setting.profile;
 
 import java.util.Map;
-import org.archboy.clobaframe.setting.*;
 
 /**
  *
@@ -11,7 +10,9 @@ public interface ProfileSetting {
 
 	Object get(Profile profile, String key);
 	
-	Object get(Profile profile, String key, Object defaultValue);
+	Object getValue(Profile profile, String key);
+	
+	Object getValue(Profile profile, String key, Object defaultValue);
 	
 	Map<String, Object> getAll();
 	
@@ -19,4 +20,5 @@ public interface ProfileSetting {
 	
 	void set(Profile profile, Map<String, Object> items);
 
+	void Refresh();
 }

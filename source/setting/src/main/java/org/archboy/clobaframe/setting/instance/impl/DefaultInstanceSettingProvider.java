@@ -1,12 +1,15 @@
-package org.archboy.clobaframe.setting.system.impl;
+package org.archboy.clobaframe.setting.instance.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.setting.impl.AbstractPropertiesFileSettingAccess;
-import org.archboy.clobaframe.setting.system.SystemSettingProvider;
+import org.archboy.clobaframe.setting.instance.InstanceSettingProvider;
+import org.archboy.clobaframe.setting.application.ApplicationSetting;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
@@ -14,16 +17,15 @@ import org.springframework.core.io.ResourceLoader;
  *
  * @author yang
  */
-public class PropertiesFileSystemSettingProvider extends AbstractPropertiesFileSettingAccess implements SystemSettingProvider {
+@Named
+public class DefaultInstanceSettingProvider extends AbstractPropertiesFileSettingAccess implements InstanceSettingProvider {
 
+	@Inject
 	private ResourceLoader resourceLoader;
-	private String fileName;
 	
-	public PropertiesFileSystemSettingProvider(ResourceLoader resourceLoader, String fileName) {
-		super();
-		this.resourceLoader = resourceLoader;
-		this.fileName = fileName;
-	}
+	@Inject
+	private ApplicationSetting applicationSetting;
+	//private String fileName;
 	
 	@Override
 	public int getPriority() {
@@ -32,6 +34,12 @@ public class PropertiesFileSystemSettingProvider extends AbstractPropertiesFileS
 
 	@Override
 	public Map<String, Object> getAll() {
+		
+		String fileName = (String)applicationSetting.getValue("instance.defaultSettingFileName");
+		if (fileName == null) {
+			return new HashMap<String, Object>();
+		}
+		
 		Resource resource = resourceLoader.getResource(fileName);
 		if (resource.exists()) {
 			InputStream in = null;
