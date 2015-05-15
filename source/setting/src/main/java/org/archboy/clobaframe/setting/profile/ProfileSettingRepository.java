@@ -6,7 +6,7 @@ import java.util.Map;
  *
  * @author yang
  */
-public interface ProfileSettingRepository {
+public interface ProfileSettingRepository extends ProfileSpecial {
 	
 	void set(Profile profile, Map<String, Object> item);
 	

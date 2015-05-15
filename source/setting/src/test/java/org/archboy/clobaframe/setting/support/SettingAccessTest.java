@@ -1,19 +1,16 @@
-package org.archboy.clobaframe.setting;
+package org.archboy.clobaframe.setting.support;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.inject.Inject;
 import org.apache.commons.io.IOUtils;
-import org.archboy.clobaframe.setting.impl.AbstractJsonSettingAccess;
-import org.archboy.clobaframe.setting.impl.AbstractPropertiesFileSettingAccess;
-import org.archboy.clobaframe.setting.impl.SettingAccess;
-import org.archboy.clobaframe.setting.impl.Support;
+import org.archboy.clobaframe.setting.support.AbstractJsonSettingAccess;
+import org.archboy.clobaframe.setting.support.AbstractPropertiesFileSettingAccess;
+import org.archboy.clobaframe.setting.support.SettingAccess;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -147,5 +144,5 @@ public class SettingAccessTest {
 	private File getFileByName(String name) throws IOException{
 		Resource resource = resourceLoader.getResource(name); //"file:target/test-classes/" +
 		return resource.getFile();
-	}	
+	}
 }

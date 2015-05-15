@@ -1,4 +1,4 @@
-package org.archboy.clobaframe.setting.impl;
+package org.archboy.clobaframe.setting.support;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,12 +27,12 @@ public abstract class AbstractJsonSettingAccess implements SettingAccess {
 	@Override
 	public Map<String, Object> read(InputStream in) throws IOException {
 		Map<String, Object> map = objectMapper.readValue(in, typeReference);
-		return Support.flat(map);
+		return Utils.flat(map);
 	}
 
 	@Override
 	public void write(OutputStream outputStream, Map<String, Object> setting) throws IOException {
-		Map<String, Object> map = Support.cascade(setting);
+		Map<String, Object> map = Utils.cascade(setting);
 		objectMapper.writeValue(outputStream, map);
 	}
 }

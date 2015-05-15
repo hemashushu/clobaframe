@@ -9,12 +9,19 @@ import java.util.Map;
 public interface SettingRepository {
 	
 	/**
-	 * merge and update.
-	 * The implementation should NOT modify the "item" object.
+	 * Merge and update many items.
+	 * The implementation should NOT modify the map object.
+	 * 
 	 * @param item 
 	 */
 	void update(Map<String, Object> item);
 	
+	/**
+	 * Merge and update an item.
+	 * 
+	 * @param key
+	 * @param value 
+	 */
 	void update(String key, Object value);
 	
 }

@@ -1,4 +1,4 @@
-package org.archboy.clobaframe.setting.impl;
+package org.archboy.clobaframe.setting.support;
 
 import java.util.AbstractMap;
 import java.util.Collections;

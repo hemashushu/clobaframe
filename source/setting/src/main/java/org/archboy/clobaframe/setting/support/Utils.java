@@ -1,4 +1,4 @@
-package org.archboy.clobaframe.setting.impl;
+package org.archboy.clobaframe.setting.support;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -10,7 +10,7 @@ import org.springframework.util.Assert;
  *
  * @author yang
  */
-public class Support {
+public class Utils {
 	private static final String placeholderRegex = "\\$\\{([\\w\\.-]+)\\}";
 	private static final Pattern placeholderPattern = Pattern.compile(placeholderRegex);
 	

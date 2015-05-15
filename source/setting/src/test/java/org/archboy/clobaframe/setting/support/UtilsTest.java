@@ -1,4 +1,4 @@
-package org.archboy.clobaframe.setting;
+package org.archboy.clobaframe.setting.support;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -6,9 +6,9 @@ import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
-import org.archboy.clobaframe.setting.impl.AbstractPropertiesFileSettingAccess;
-import org.archboy.clobaframe.setting.impl.SettingAccess;
-import org.archboy.clobaframe.setting.impl.Support;
+import org.archboy.clobaframe.setting.support.AbstractPropertiesFileSettingAccess;
+import org.archboy.clobaframe.setting.support.SettingAccess;
+import org.archboy.clobaframe.setting.support.Utils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/applicationContext.xml" })
-public class SupportTest {
+public class UtilsTest {
 	
 	@Before
 	public void setUp() throws Exception {
@@ -52,13 +52,13 @@ public class SupportTest {
 		setting1.put("broken.part","${foo.bar.id}-${foo.bar.firstName}");
 		
 		// test resolve placeholder
-		assertEquals("123456789", Support.resolvePlaceholder(setting1, setting1.get("foo.com.id")));
-		assertEquals("hello world", Support.resolvePlaceholder(setting1, setting1.get("foo.com.name")));
-		assertEquals("123456-world", Support.resolvePlaceholder(setting1, setting1.get("foo.com.concat")));
-		assertEquals("Mr. hello world", Support.resolvePlaceholder(setting1, setting1.get("foo.com.depth")));
-		assertEquals("hello Mr. hello world", Support.resolvePlaceholder(setting1, setting1.get("foo.com.depthx2")));
-		assertEquals("hello ${foo.bar.firstName}", Support.resolvePlaceholder(setting1, setting1.get("broken.name")));
-		assertEquals("123456-${foo.bar.firstName}", Support.resolvePlaceholder(setting1, setting1.get("broken.part")));
+		assertEquals("123456789", Utils.resolvePlaceholder(setting1, setting1.get("foo.com.id")));
+		assertEquals("hello world", Utils.resolvePlaceholder(setting1, setting1.get("foo.com.name")));
+		assertEquals("123456-world", Utils.resolvePlaceholder(setting1, setting1.get("foo.com.concat")));
+		assertEquals("Mr. hello world", Utils.resolvePlaceholder(setting1, setting1.get("foo.com.depth")));
+		assertEquals("hello Mr. hello world", Utils.resolvePlaceholder(setting1, setting1.get("foo.com.depthx2")));
+		assertEquals("hello ${foo.bar.firstName}", Utils.resolvePlaceholder(setting1, setting1.get("broken.name")));
+		assertEquals("123456-${foo.bar.firstName}", Utils.resolvePlaceholder(setting1, setting1.get("broken.part")));
 	}
 	
 	@Test
@@ -74,14 +74,14 @@ public class SupportTest {
 		setting1.put("foo.com.depth","Mr. ${foo.com.name}");
 		
 		// test merge
-		setting1 = Support.merge(setting1, "new.id", 123);
-		setting1 = Support.merge(setting1, "new.checked", true);
-		setting1 = Support.merge(setting1, "foo.bar.id", "000"); // override
+		setting1 = Utils.merge(setting1, "new.id", 123);
+		setting1 = Utils.merge(setting1, "new.checked", true);
+		setting1 = Utils.merge(setting1, "foo.bar.id", "000"); // override
 		
 		assertEquals(123, setting1.get("new.id"));
 		assertEquals(Boolean.TRUE, setting1.get("new.checked"));
 		assertEquals("000", setting1.get("foo.bar.id"));
-		assertEquals("000789", Support.resolvePlaceholder(setting1, setting1.get("foo.com.id")));
+		assertEquals("000789", Utils.resolvePlaceholder(setting1, setting1.get("foo.com.id")));
 	
 		// test merge Map
 		Map<String, Object> setting2 = new LinkedHashMap<String, Object>();
@@ -89,11 +89,11 @@ public class SupportTest {
 		setting2.put("mer.name", "merge");
 		setting2.put("foo.bar.name", "MM"); // override
 		
-		setting1 = Support.merge(setting1, setting2);
+		setting1 = Utils.merge(setting1, setting2);
 		assertEquals(456, setting1.get("mer.id"));
 		assertEquals("merge", setting1.get("mer.name"));
 		assertEquals("MM", setting1.get("foo.bar.name"));
-		assertEquals("hello MM", Support.resolvePlaceholder(setting1, setting1.get("foo.com.name")));
+		assertEquals("hello MM", Utils.resolvePlaceholder(setting1, setting1.get("foo.com.name")));
 	}
 
 	@Test
@@ -122,7 +122,7 @@ public class SupportTest {
 		
 		setting1.put("foo", foo);
 		
-		Map<String, Object> flat1 = Support.flat(setting1);
+		Map<String, Object> flat1 = Utils.flat(setting1);
 		
 		assertEquals(8, flat1.size());
 		assertEquals("abc", flat1.get("item"));
@@ -147,7 +147,7 @@ public class SupportTest {
 		setting1.put("foo.com.concat","${foo.bar.id}-${foo.bar.name}");
 		setting1.put("foo.com.depth","Mr. ${foo.com.name}");
 		
-		Map<String, Object> cascade1 = Support.cascade(setting1);
+		Map<String, Object> cascade1 = Utils.cascade(setting1);
 	
 		assertEquals(3, cascade1.size());
 		assertEquals("abc", cascade1.get("item"));

@@ -7,9 +7,12 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.commons.io.IOUtils;
-import org.archboy.clobaframe.setting.impl.AbstractPropertiesFileSettingAccess;
+import org.archboy.clobaframe.setting.support.AbstractPropertiesFileSettingAccess;
 import org.archboy.clobaframe.setting.instance.InstanceSettingProvider;
 import org.archboy.clobaframe.setting.application.ApplicationSetting;
+import org.archboy.clobaframe.setting.application.impl.ApplicationSettingImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
@@ -25,7 +28,8 @@ public class DefaultInstanceSettingProvider extends AbstractPropertiesFileSettin
 	
 	@Inject
 	private ApplicationSetting applicationSetting;
-	//private String fileName;
+
+	private final Logger logger = LoggerFactory.getLogger(DefaultInstanceSettingProvider.class);
 	
 	@Override
 	public int getPriority() {
@@ -41,13 +45,18 @@ public class DefaultInstanceSettingProvider extends AbstractPropertiesFileSettin
 		}
 		
 		Resource resource = resourceLoader.getResource(fileName);
-		if (resource.exists()) {
+		if (!resource.exists()) {
+			logger.warn("Default instance setting [{}] not found.", fileName);
+		}else{
+			logger.info("Load default instance setting [{}]", fileName);
+			
 			InputStream in = null;
 			try{
 				in = resource.getInputStream();
 				return read(in);
 			}catch(IOException e) {
 				// ignore
+				logger.error("Load default instance setting failed: " + e.getMessage());
 			}finally {
 				IOUtils.closeQuietly(in);
 			}

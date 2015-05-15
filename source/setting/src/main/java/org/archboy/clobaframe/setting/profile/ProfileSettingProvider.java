@@ -7,12 +7,20 @@ import org.archboy.clobaframe.setting.SettingProvider;
  *
  * @author yang
  */
-public interface ProfileSettingProvider {
+public interface ProfileSettingProvider extends ProfileSpecial {
 	
-	boolean support(Profile profile);
+	/**
+	 * The provider priority.
+	 * 
+	 * The higher priority item value will be selected when
+	 * many items have the same item key (/name).
+	 * @return 
+	 */
+	int getPriority();
 	
 	Object get(Profile profile, String key);
 	
 	Map<String, Object> getAll(Profile profile);
 
+	
 }

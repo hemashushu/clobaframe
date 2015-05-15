@@ -9,22 +9,27 @@ import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
-import org.archboy.clobaframe.setting.impl.AbstractJsonSettingAccess;
-import org.archboy.clobaframe.setting.impl.Support;
+import org.archboy.clobaframe.setting.support.AbstractJsonSettingAccess;
+import org.archboy.clobaframe.setting.support.Utils;
 import org.archboy.clobaframe.setting.application.ApplicationSettingProvider;
 import org.archboy.clobaframe.setting.application.ApplicationSettingRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author yang
  */
-public class CustomApplicationSettingProvider extends AbstractJsonSettingAccess implements ApplicationSettingProvider, ApplicationSettingRepository {
+public class CustomApplicationSettingProvider extends AbstractJsonSettingAccess implements ApplicationSettingProvider {
 
-	private String dataDir;
-	private String fileName;
+	protected String dataFolder;
+	protected String fileName;
 	
-	public CustomApplicationSettingProvider(String dataDir, String fileName) {
-		this.dataDir = dataDir;
+	protected final Logger logger = LoggerFactory.getLogger(CustomApplicationSettingRepository.class);
+	
+	public CustomApplicationSettingProvider(String dataFolder, String fileName) {
+		super();
+		this.dataFolder = dataFolder;
 		this.fileName = fileName;
 	}
 
@@ -35,55 +40,28 @@ public class CustomApplicationSettingProvider extends AbstractJsonSettingAccess 
 
 	@Override
 	public Map<String, Object> getAll() {
-		File folder = new File(dataDir);
-		if (folder.exists()) {
-			File file = new File(folder, fileName);
-			if (file.exists() && file.isFile()) {
-				InputStream in = null;
-				try{
-					in = new FileInputStream(file);
-					return read(in);
-				}catch(IOException e){
-					// ignore
-				}finally{
-					IOUtils.closeQuietly(in);
-				}
+		File file = new File(dataFolder, fileName);
+		
+		if (!file.exists()){
+			logger.warn("Custom application setting [{}] not found.", file.getAbsolutePath());
+		}else if (file.isDirectory()) {
+			logger.warn("Custom application setting [{}] duplicate name with a file.", file.getAbsolutePath());
+		}else {
+			logger.info("Load custom application setting [{}]", file.getAbsolutePath());
+
+			InputStream in = null;
+			try{
+				in = new FileInputStream(file);
+				return read(in);
+			}catch(IOException e){
+				// ignore
+				logger.error("Load custom application setting failed: {}", e.getMessage());
+			}finally{
+				IOUtils.closeQuietly(in);
 			}
 		}
 		
 		return new LinkedHashMap<String, Object>();
-	}
-
-	@Override
-	public void update(Map<String, Object> item) {
-		Map<String, Object> map = Support.merge(getAll(), item);
-		
-		// save
-		OutputStream out = null;
-		try {
-			File folder = new File(dataDir);
-			if (!folder.exists()) {
-				folder.mkdirs();
-			}
-
-			File file = new File(folder, fileName);
-			if (!file.exists() || 
-				(file.exists() && file.isFile())){
-				out = new FileOutputStream(file);
-				write(out, map);
-			}
-		} catch (IOException e) {
-			// ignore
-		} finally {
-			IOUtils.closeQuietly(out);
-		}
-	}
-
-	@Override
-	public void update(String key, Object value) {
-		Map<String, Object> map = new LinkedHashMap<String, Object>();
-		map.put(key, value);
-		update(map);
 	}
 	
 }

@@ -1,22 +1,10 @@
 package org.archboy.clobaframe.setting.application;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import javax.inject.Inject;
-import org.archboy.clobaframe.setting.SettingProvider;
-import org.archboy.clobaframe.setting.application.impl.EnvironmentSettingProvider;
-import org.archboy.clobaframe.setting.application.impl.PropertiesSettingProvider;
-import org.archboy.clobaframe.setting.application.impl.ApplicationSettingImpl;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.junit.Assert.*;
@@ -75,21 +63,22 @@ public class ApplicationSettingTest {
 		assertTrue(systemSetting.getAll().size() > 1);
 	
 		logger.info("temp dir:" + systemSetting.getValue("java.io.tmpdir"));
+		logger.info("user home dir:" + systemSetting.getValue("user.home"));
 	}
 	
 	@Test
 	public void testSet(){
-		String testStatus = (String)systemSetting.getValue("test.status");
-		String testUpdate = (String)systemSetting.getValue("test.update");
+		String testStatus = (String)systemSetting.getValue("app.set.status");
+		String testUpdate = (String)systemSetting.getValue("app.set.update");
 
 		if ("original".equals(testStatus)){
 			assertEquals("bbb", testUpdate);
 			
-			systemSetting.set("test.status", "updated");
-			systemSetting.set("test.update", "zzz");
+			systemSetting.set("app.set.status", "updated");
+			systemSetting.set("app.set.update", "ccc");
 			
 		}else{
-			assertEquals("zzz", testUpdate);
+			assertEquals("ccc", testUpdate);
 		}
 	}
 	
