@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import javax.inject.Inject;
+import javax.inject.Named;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.junit.Assert.*;
@@ -22,7 +23,7 @@ public class ApplicationSettingTest {
 	private final Logger logger = LoggerFactory.getLogger(ApplicationSettingTest.class);
 	
 	@Inject
-	private ApplicationSetting systemSetting;
+	private ApplicationSetting applicationSetting;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -36,53 +37,65 @@ public class ApplicationSettingTest {
 
 	@Test
 	public void testGetValue(){
-		String appVersion = (String)systemSetting.getValue("app.version");
-		String testFoo = (String)systemSetting.getValue("test.foo");
-		String testBar = (String)systemSetting.getValue("test.bar");
-		String osName = (String)systemSetting.getValue("os.name");
-		String itemValue = (String)systemSetting.getValue("item");
+		String appVersion = (String)applicationSetting.getValue("app.version");
+		String testFoo = (String)applicationSetting.getValue("test.foo");
+		String testBar = (String)applicationSetting.getValue("test.bar");
+		String osName = (String)applicationSetting.getValue("os.name");
+		//String itemValue = (String)applicationSetting.getValue("item");
 		
 		assertEquals("1.0", appVersion);
 		assertEquals("hello", testFoo);
 		assertEquals("123456", testBar);
 		
-		String userName = (String)systemSetting.getValue("user.name");
-		assertEquals(testFoo + " " + userName , systemSetting.getValue("test.com"));
+		String userName = (String)applicationSetting.getValue("user.name");
+		assertEquals(testFoo + " " + userName , applicationSetting.getValue("test.com"));
 		
 		assertFalse("aaa".equals(osName)); // override by system properties
-		assertEquals("application", itemValue);
+		//assertEquals("application", itemValue);
 		
 		// test none-exists
-		assertNull(systemSetting.getValue("test.none-exist"));
-		assertEquals("defaultValue", systemSetting.getValue("test.none-exist", "defaultValue"));
+		assertNull(applicationSetting.getValue("test.none-exist"));
+		assertEquals("defaultValue", applicationSetting.getValue("test.none-exist", "defaultValue"));
 		
 		// test get original value
-		assertEquals("${test.foo} ${user.name}", systemSetting.get("test.com"));
+		assertEquals("${test.foo} ${user.name}", applicationSetting.get("test.com"));
 		
 		// test get all
-		assertTrue(systemSetting.getAll().size() > 1);
+		assertTrue(applicationSetting.getAll().size() > 1);
 	
-		logger.info("temp dir:" + systemSetting.getValue("java.io.tmpdir"));
-		logger.info("user home dir:" + systemSetting.getValue("user.home"));
+		// test inject
+		assertEquals("ok", applicationSetting.get("foo.inject"));
+		
+		logger.info("temp dir:" + applicationSetting.getValue("java.io.tmpdir"));
+		logger.info("user home dir:" + applicationSetting.getValue("user.home"));
 	}
 	
 	@Test
 	public void testSet(){
-		String testStatus = (String)systemSetting.getValue("app.set.status");
-		String testUpdate = (String)systemSetting.getValue("app.set.update");
+		String testStatus = (String)applicationSetting.getValue("app.set.status");
+		String testUpdate = (String)applicationSetting.getValue("app.set.update");
 
 		if ("original".equals(testStatus)){
 			assertEquals("bbb", testUpdate);
 			
-			systemSetting.set("app.set.status", "updated");
-			systemSetting.set("app.set.update", "ccc");
+			applicationSetting.set("app.set.status", "updated");
+			applicationSetting.set("app.set.update", "ccc");
 			
 		}else{
 			assertEquals("ccc", testUpdate);
 			
-			systemSetting.set("app.set.status", "original");
-			systemSetting.set("app.set.update", "bbb");
+			applicationSetting.set("app.set.status", "original");
+			applicationSetting.set("app.set.update", "bbb");
 		}
 	}
 	
+	@Named
+	public static class TestingPostApplicationSetting implements PostApplicationSetting {
+
+		@Override
+		public void execute(ApplicationSetting applicationSetting) {
+			applicationSetting.set("foo.inject", "ok");
+		}
+		
+	}
 }

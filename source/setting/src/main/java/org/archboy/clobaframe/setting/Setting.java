@@ -1,10 +1,9 @@
 package org.archboy.clobaframe.setting;
 
 import java.util.Map;
-import org.archboy.clobaframe.setting.instance.InstanceSettingRepository;
 
 /**
- * The application settings manager.
+ * The abstract settings manager.
  * 
  * @author yang
  */
@@ -19,7 +18,7 @@ public interface Setting {
 	 * item3 = ${item2}-${item1}
 	 * 
 	 * @param key
-	 * @return 
+	 * @return Null when key not found.
 	 */
 	Object getValue(String key);
 	
@@ -28,7 +27,7 @@ public interface Setting {
 	 * 
 	 * @param key
 	 * @param defaultValue
-	 * @return 
+	 * @return Default value when key not found.
 	 */
 	Object getValue(String key, Object defaultValue);
 	
@@ -37,13 +36,14 @@ public interface Setting {
 	 * I.e. leave the placeholder un-resolve.
 	 * 
 	 * @param key
-	 * @return 
+	 * @return Null when key not found.
 	 */
 	Object get(String key);
 
 	/**
 	 * Get all items original value.
-	 * @return 
+	 * 
+	 * @return Never return null.
 	 */
 	Map<String, Object> getAll();
 	
@@ -56,7 +56,7 @@ public interface Setting {
 	void set(String key, Object value);
 	
 	/**
-	 * Update or add many items.
+	 * Update or add several items.
 	 * 
 	 * @param items 
 	 */

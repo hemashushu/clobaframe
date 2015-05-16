@@ -2,14 +2,12 @@ package org.archboy.clobaframe.setting.application.impl;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.archboy.clobaframe.setting.SettingRepository;
 import org.archboy.clobaframe.setting.support.Utils;
 import org.archboy.clobaframe.setting.application.ApplicationSetting;
 import org.archboy.clobaframe.setting.application.ApplicationSettingProvider;
@@ -30,7 +28,7 @@ public class ApplicationSettingImpl implements ApplicationSetting {
 
 	private static final String DEFAULT_DATA_FOLDER = "/var/lib/${clobaframe.setting.appName}";
 	private static final boolean DEFAULT_AUTO_CREATE_DATA_FOLDER = true;
-	private static final String DEFAULT_SETTING_FILE_NAME = "classpath:application-default.properties";
+	private static final String DEFAULT_SETTING_FILE_NAME = "classpath:application-setting-default.properties";
 	private static final String DEFAULT_CUSTOM_SETTING_FILE_NAME = "settings.json";
 	private static final String DEFAULT_EXTRA_SETTING_FILE_NAME = "extra.json";
 	
@@ -56,7 +54,7 @@ public class ApplicationSettingImpl implements ApplicationSetting {
 	private ResourceLoader resourceLoader;
 
 	@Autowired(required = false)
-	private List<PostApplicationSetting> postApplicationSettings = new ArrayList<PostApplicationSetting>();
+	private List<PostApplicationSetting> postApplicationSettings;
 	
 	private Map<String, Object> setting = new LinkedHashMap<String, Object>();
 	

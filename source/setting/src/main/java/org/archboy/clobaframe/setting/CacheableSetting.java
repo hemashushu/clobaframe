@@ -1,7 +1,5 @@
 package org.archboy.clobaframe.setting;
 
-import java.util.Map;
-
 /**
  * Cache-able setting manager.
  * 

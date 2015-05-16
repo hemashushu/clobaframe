@@ -1,4 +1,4 @@
-package org.archboy.clobaframe.setting.instance.impl;
+package org.archboy.clobaframe.setting.global.impl;
 
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -7,10 +7,10 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.archboy.clobaframe.setting.instance.InstanceSettingProvider;
-import org.archboy.clobaframe.setting.instance.InstanceSettingRepository;
+import org.archboy.clobaframe.setting.global.GlobalSettingProvider;
+import org.archboy.clobaframe.setting.global.GlobalSettingRepository;
 import org.archboy.clobaframe.setting.support.Utils;
-import org.archboy.clobaframe.setting.instance.InstanceSetting;
+import org.archboy.clobaframe.setting.global.GlobalSetting;
 import org.archboy.clobaframe.setting.application.ApplicationSetting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,48 +21,29 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author yang
  */
 @Named
-public class InstanceSettingImpl implements InstanceSetting {
+public class GlobalSettingImpl implements GlobalSetting {
 	
 	@Inject
-	private ApplicationSetting systemSetting;
-	
-	@Inject
-	private List<InstanceSettingProvider> instanceSettingProviders;
-	
-//	@Inject
-//	private List<InstanceSettingRepository> instanceSettingRepositorys;
+	private List<GlobalSettingProvider> globalSettingProviders;
 
 	@Autowired(required = false)
-	private InstanceSettingRepository instanceSettingRepository;
+	private GlobalSettingRepository globalSettingRepository;
 	
 	private Map<String, Object> setting = new LinkedHashMap<String, Object>();
 	
-	private final Logger logger = LoggerFactory.getLogger(InstanceSettingImpl.class);
+	private final Logger logger = LoggerFactory.getLogger(GlobalSettingImpl.class);
 	
 	@PostConstruct
 	public void init(){
 		
 		// sort providers, from higher(smaller number) priority to lower.
-		instanceSettingProviders.sort(new Comparator<InstanceSettingProvider>() {
+		globalSettingProviders.sort(new Comparator<GlobalSettingProvider>() {
 			@Override
-			public int compare(InstanceSettingProvider o1, InstanceSettingProvider o2) {
+			public int compare(GlobalSettingProvider o1, GlobalSettingProvider o2) {
 				return o1.getPriority() - o2.getPriority();
 			}
 		});
-		
-		// set repository
-//		if (instanceSettingRepositorys.size() > 1){
-//			for(InstanceSettingRepository repository : instanceSettingRepositorys){
-//				if (repository instanceof NullInstanceSettingRepository){
-//					continue;
-//				}
-//				this.instanceSettingRepository = repository;
-//				break;
-//			}
-//		}else{
-//			this.instanceSettingRepository = instanceSettingRepositorys.iterator().next();
-//		}
-		
+
 		refresh();
 	}
 	
@@ -72,12 +53,9 @@ public class InstanceSettingImpl implements InstanceSetting {
 		// clear setting
 		setting.clear();
 		
-		// merge system setting
-		setting = Utils.merge(setting, systemSetting.getAll());
-
 		// merge all providers setting
-		for(int idx = instanceSettingProviders.size() -1; idx >=0; idx--){
-			InstanceSettingProvider provider = instanceSettingProviders.get(idx);
+		for(int idx = globalSettingProviders.size() -1; idx >=0; idx--){
+			GlobalSettingProvider provider = globalSettingProviders.get(idx);
 			Map<String, Object> map = provider.getAll();
 			setting = Utils.merge(setting, map);
 		}
@@ -107,11 +85,11 @@ public class InstanceSettingImpl implements InstanceSetting {
 
 	@Override
 	public void set(String key, Object value) {
-		instanceSettingRepository.update(key, value);
+		globalSettingRepository.update(key, value);
 	}
 
 	@Override
 	public void set(Map<String, Object> items) {
-		instanceSettingRepository.update(items);
+		globalSettingRepository.update(items);
 	}
 }

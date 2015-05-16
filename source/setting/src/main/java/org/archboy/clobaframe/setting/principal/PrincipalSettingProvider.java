@@ -1,13 +1,12 @@
-package org.archboy.clobaframe.setting.profile;
+package org.archboy.clobaframe.setting.principal;
 
 import java.util.Map;
-import org.archboy.clobaframe.setting.SettingProvider;
 
 /**
  *
  * @author yang
  */
-public interface ProfileSettingProvider extends ProfileSpecial {
+public interface PrincipalSettingProvider extends PrincipalSpecial {
 	
 	/**
 	 * The provider priority.
@@ -18,7 +17,7 @@ public interface ProfileSettingProvider extends ProfileSpecial {
 	 */
 	int getPriority();
 	
-	Object get(Profile profile, String key);
+	Object get(Principal profile, String key);
 	
 	/**
 	 * Never return null.
@@ -26,7 +25,7 @@ public interface ProfileSettingProvider extends ProfileSpecial {
 	 * @param profile
 	 * @return 
 	 */
-	Map<String, Object> getAll(Profile profile);
+	Map<String, Object> getAll(Principal profile);
 
 	
 }

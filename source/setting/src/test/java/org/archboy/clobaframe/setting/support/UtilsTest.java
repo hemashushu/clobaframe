@@ -1,14 +1,8 @@
 package org.archboy.clobaframe.setting.support;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.apache.commons.io.IOUtils;
-import org.archboy.clobaframe.setting.support.AbstractPropertiesFileSettingAccess;
-import org.archboy.clobaframe.setting.support.SettingAccess;
-import org.archboy.clobaframe.setting.support.Utils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

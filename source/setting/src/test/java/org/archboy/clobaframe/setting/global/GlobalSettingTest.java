@@ -1,13 +1,11 @@
-package org.archboy.clobaframe.setting.instance;
+package org.archboy.clobaframe.setting.global;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import javax.annotation.PostConstruct;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,12 +28,12 @@ import org.slf4j.LoggerFactory;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/applicationContext.xml" })
-public class InstanceSettingTest {
+public class GlobalSettingTest {
 	
-	private final Logger logger = LoggerFactory.getLogger(InstanceSettingTest.class);
+	private final Logger logger = LoggerFactory.getLogger(GlobalSettingTest.class);
 	
 	@Inject
-	private InstanceSetting instanceSetting;
+	private GlobalSetting globalSetting;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -49,43 +47,43 @@ public class InstanceSettingTest {
 
 	@Test
 	public void testGetValue(){
-		String siteTitle = (String)instanceSetting.getValue("site.title");
-		String itemValue = (String)instanceSetting.getValue("item");
+		String siteTitle = (String)globalSetting.getValue("site.title");
+		String itemValue = (String)globalSetting.getValue("item");
 		
 		assertEquals("the clobaframe project", siteTitle);
 		assertEquals("abc", itemValue); // override by 'sample/test.json'
 		
-		assertEquals("xyz", instanceSetting.getValue("sub.item"));
-		assertEquals("123456", instanceSetting.getValue("foo.bar.id"));
-		assertEquals("world", instanceSetting.getValue("foo.bar.name"));
+		assertEquals("xyz", globalSetting.getValue("sub.item"));
+		assertEquals("123456", globalSetting.getValue("foo.bar.id"));
+		assertEquals("world", globalSetting.getValue("foo.bar.name"));
 		
 		// test none-exists
-		assertNull(instanceSetting.getValue("test.none-exist"));
-		assertEquals("defaultValue", instanceSetting.getValue("test.none-exist", "defaultValue"));
+		assertNull(globalSetting.getValue("test.none-exist"));
+		assertEquals("defaultValue", globalSetting.getValue("test.none-exist", "defaultValue"));
 		
 	}
 	
 	@Test
 	public void testSet(){
-		String testStatus = (String)instanceSetting.getValue("instance.set.status");
-		String testUpdate = (String)instanceSetting.getValue("instance.set.update");
+		String testStatus = (String)globalSetting.getValue("instance.set.status");
+		String testUpdate = (String)globalSetting.getValue("instance.set.update");
 
 		if ("original".equals(testStatus)){
 			assertEquals("ddd", testUpdate);
 			
-			instanceSetting.set("instance.set.status", "updated");
-			instanceSetting.set("instance.set.update", "eee");
+			globalSetting.set("instance.set.status", "updated");
+			globalSetting.set("instance.set.update", "eee");
 			
 		}else{
 			assertEquals("eee", testUpdate);
 			
-			instanceSetting.set("instance.set.status", "original");
-			instanceSetting.set("instance.set.update", "ddd");
+			globalSetting.set("instance.set.status", "original");
+			globalSetting.set("instance.set.update", "ddd");
 		}
 	}
 	
 	@Named
-	public static class TestingInstanceSettingProvider extends AbstractJsonSettingAccess implements InstanceSettingProvider {
+	public static class TestingInstanceSettingProvider extends AbstractJsonSettingAccess implements GlobalSettingProvider {
 
 		@Inject
 		private ResourceLoader resourceLoader;
@@ -126,7 +124,7 @@ public class InstanceSettingTest {
 	}
 	
 	@Named
-	public static class InMemoryInstanceSettingRepository implements InstanceSettingProvider, InstanceSettingRepository {
+	public static class InMemoryInstanceSettingRepository implements GlobalSettingProvider, GlobalSettingRepository {
 
 		protected Map<String, Object> setting = new LinkedHashMap<String, Object>();
 		
