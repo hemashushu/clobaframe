@@ -78,6 +78,9 @@ public class InstanceSettingTest {
 			
 		}else{
 			assertEquals("eee", testUpdate);
+			
+			instanceSetting.set("instance.set.status", "original");
+			instanceSetting.set("instance.set.update", "ddd");
 		}
 	}
 	
@@ -106,7 +109,7 @@ public class InstanceSettingTest {
 				// ignore
 			}
 			
-			return new HashMap<String, Object>();
+			return new LinkedHashMap<String, Object>();
 		}
 		
 		/**

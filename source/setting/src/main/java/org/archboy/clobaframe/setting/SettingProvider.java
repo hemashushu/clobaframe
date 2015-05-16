@@ -25,7 +25,7 @@ public interface SettingProvider {
 	int getPriority();
 	
 	/**
-	 * 
+	 * Never return null.
 	 * @return 
 	 */
 	Map<String, Object> getAll();

@@ -79,6 +79,9 @@ public class ApplicationSettingTest {
 			
 		}else{
 			assertEquals("ccc", testUpdate);
+			
+			systemSetting.set("app.set.status", "original");
+			systemSetting.set("app.set.update", "bbb");
 		}
 	}
 	

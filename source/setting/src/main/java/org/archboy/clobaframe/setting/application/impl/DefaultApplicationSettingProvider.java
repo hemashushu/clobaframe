@@ -3,6 +3,7 @@ package org.archboy.clobaframe.setting.application.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.setting.support.AbstractPropertiesFileSettingAccess;
@@ -54,6 +55,6 @@ public class DefaultApplicationSettingProvider extends AbstractPropertiesFileSet
 			}
 		}
 		
-		return new HashMap<String, Object>();
+		return new LinkedHashMap<String, Object>();
 	}
 }

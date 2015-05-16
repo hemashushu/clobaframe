@@ -2,13 +2,10 @@ package org.archboy.clobaframe.setting.profile.impl;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
 import javax.inject.Named;
-import org.archboy.clobaframe.setting.instance.InstanceSettingProvider;
 import org.archboy.clobaframe.setting.profile.Profile;
 import org.archboy.clobaframe.setting.profile.ProfileSetting;
 import org.archboy.clobaframe.setting.profile.ProfileSettingProvider;

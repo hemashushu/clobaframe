@@ -20,6 +20,12 @@ public interface ProfileSettingProvider extends ProfileSpecial {
 	
 	Object get(Profile profile, String key);
 	
+	/**
+	 * Never return null.
+	 * 
+	 * @param profile
+	 * @return 
+	 */
 	Map<String, Object> getAll(Profile profile);
 
 	

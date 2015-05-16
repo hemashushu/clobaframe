@@ -3,9 +3,10 @@ package org.archboy.clobaframe.setting.profile;
 /**
  *
  * @author yang
+ * @param <T>
  */
-public interface Profile {
+public interface Profile<T> {
 	
-	Object getId();
+	T getId();
 	
 }

@@ -3,6 +3,7 @@ package org.archboy.clobaframe.setting.instance.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -41,7 +42,7 @@ public class DefaultInstanceSettingProvider extends AbstractPropertiesFileSettin
 		
 		String fileName = (String)applicationSetting.getValue("instance.defaultSettingFileName");
 		if (fileName == null) {
-			return new HashMap<String, Object>();
+			return new LinkedHashMap<String, Object>();
 		}
 		
 		Resource resource = resourceLoader.getResource(fileName);
@@ -62,6 +63,6 @@ public class DefaultInstanceSettingProvider extends AbstractPropertiesFileSettin
 			}
 		}
 		
-		return new HashMap<String, Object>();
+		return new LinkedHashMap<String, Object>();
 	}
 }
