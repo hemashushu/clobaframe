@@ -11,6 +11,7 @@ import org.archboy.clobaframe.setting.principal.PrincipalSetting;
 import org.archboy.clobaframe.setting.principal.PrincipalSettingProvider;
 import org.archboy.clobaframe.setting.principal.PrincipalSettingRepository;
 import org.archboy.clobaframe.setting.support.Utils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -19,30 +20,32 @@ import org.archboy.clobaframe.setting.support.Utils;
 @Named
 public class PrincipalSettingImpl implements PrincipalSetting {
 
-	private List<PrincipalSettingProvider> principalSettingProviders = new ArrayList<PrincipalSettingProvider>();
+	@Autowired(required = false)
+	private List<PrincipalSettingProvider> principalSettingProviders; // = new ArrayList<PrincipalSettingProvider>();
 
-	private List<PrincipalSettingRepository> principalSettingRepositorys = new ArrayList<PrincipalSettingRepository>();
+	@Autowired(required = false)
+	private List<PrincipalSettingRepository> principalSettingRepositorys; // = new ArrayList<PrincipalSettingRepository>();
 	
-	@Override
-	public void addProfileSettingProvider(PrincipalSettingProvider profileSettingProvider) {
-		principalSettingProviders.add(profileSettingProvider);
-		sortProviders();
-	}
-
-	@Override
-	public void addProfileSettingRepository(PrincipalSettingRepository profileSettingRepository) {
-		principalSettingRepositorys.add(profileSettingRepository);
-	}
+//	@Override
+//	public void addProfileSettingProvider(PrincipalSettingProvider profileSettingProvider) {
+//		principalSettingProviders.add(profileSettingProvider);
+//		sortProviders();
+//	}
+//
+//	@Override
+//	public void addProfileSettingRepository(PrincipalSettingRepository profileSettingRepository) {
+//		principalSettingRepositorys.add(profileSettingRepository);
+//	}
 	
-	private void sortProviders(){
-		// sort providers, from higher(smaller number) priority to lower.
-		principalSettingProviders.sort(new Comparator<PrincipalSettingProvider>() {
-			@Override
-			public int compare(PrincipalSettingProvider o1, PrincipalSettingProvider o2) {
-				return o1.getPriority() - o2.getPriority();
-			}
-		});
-	}
+//	private void sortProviders(){
+//		// sort providers, from higher(smaller number) priority to lower.
+//		principalSettingProviders.sort(new Comparator<PrincipalSettingProvider>() {
+//			@Override
+//			public int compare(PrincipalSettingProvider o1, PrincipalSettingProvider o2) {
+//				return o1.getPriority() - o2.getPriority();
+//			}
+//		});
+//	}
 	
 	@Override
 	public Object get(Principal profile, String key) {

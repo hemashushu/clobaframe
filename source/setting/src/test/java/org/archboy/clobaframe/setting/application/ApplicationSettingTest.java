@@ -1,5 +1,8 @@
 package org.archboy.clobaframe.setting.application;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -66,8 +69,8 @@ public class ApplicationSettingTest {
 		// test inject
 		assertEquals("ok", applicationSetting.get("foo.inject"));
 		
-		logger.info("temp dir:" + applicationSetting.getValue("java.io.tmpdir"));
-		logger.info("user home dir:" + applicationSetting.getValue("user.home"));
+//		logger.info("temp dir:" + applicationSetting.getValue("java.io.tmpdir"));
+//		logger.info("user home dir:" + applicationSetting.getValue("user.home"));
 	}
 	
 	@Test
@@ -89,13 +92,11 @@ public class ApplicationSettingTest {
 		}
 	}
 	
-	@Named
 	public static class TestingPostApplicationSetting implements PostApplicationSetting {
 
 		@Override
-		public void execute(ApplicationSetting applicationSetting) {
-			applicationSetting.set("foo.inject", "ok");
+		public void execute(Map<String, Object> settings) throws Exception {
+			settings.put("foo.inject", "ok");
 		}
-		
 	}
 }

@@ -3,6 +3,7 @@ package org.archboy.clobaframe.setting.principal;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,7 +11,6 @@ import org.junit.runner.RunWith;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.archboy.clobaframe.setting.SettingProvider;
-import static org.archboy.clobaframe.setting.SettingProvider.PRIORITY_HIGH;
 import org.archboy.clobaframe.setting.support.Utils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -128,17 +128,15 @@ public class PrincipalSettingTest {
 
 		private Map<String, Object> setting1 = new LinkedHashMap<String, Object>();
 		
-		@Inject
-		public UserDefaultSettingProvider(PrincipalSetting profileSetting) {
+		@PostConstruct
+		public void init() {
 			setting1.put("entry", "index");
 			setting1.put("color", "white");
-			
-			profileSetting.addProfileSettingProvider(this);
 		}
 		
 		@Override
-		public int getPriority() {
-			return SettingProvider.PRIORITY_LOWER;
+		public int getOrder() {
+			return 10;
 		}
 
 		@Override
@@ -165,8 +163,8 @@ public class PrincipalSettingTest {
 		private Map<String, Object> setting2 = new LinkedHashMap<String, Object>();
 		private Map<String, Map<String, Object>> settings = new HashMap<String, Map<String, Object>>();
 		
-		@Inject
-		public InMemoryUserSettingRepository(PrincipalSetting profileSetting) {
+		@PostConstruct
+		public void init() {
 			setting1.put("entry", "page1");
 			setting1.put("color", "red");
 			setting1.put("notify", Boolean.FALSE);
@@ -176,13 +174,13 @@ public class PrincipalSettingTest {
 			settings.put("001", setting1);
 			settings.put("002", setting2);
 			
-			profileSetting.addProfileSettingProvider(this);
-			profileSetting.addProfileSettingRepository(this);
+//			profileSetting.addProfileSettingProvider(this);
+//			profileSetting.addProfileSettingRepository(this);
 		}
 		
 		@Override
-		public int getPriority() {
-			return PRIORITY_HIGH;
+		public int getOrder() {
+			return 1;
 		}
 
 		@Override
@@ -231,8 +229,8 @@ public class PrincipalSettingTest {
 		private Map<String, Object> setting2 = new LinkedHashMap<String, Object>();
 		private Map<String, Map<String, Object>> settings = new HashMap<String, Map<String, Object>>();
 		
-		@Inject
-		public InMemoryGroupSettingRepository(PrincipalSetting profileSetting) {
+		@PostConstruct
+		public void init() {
 			setting1.put("entry", "doc1");
 			setting1.put("color", "black");
 			
@@ -241,13 +239,13 @@ public class PrincipalSettingTest {
 			settings.put("001", setting1);
 			settings.put("002", setting2);
 			
-			profileSetting.addProfileSettingProvider(this);
-			profileSetting.addProfileSettingRepository(this);
+//			profileSetting.addProfileSettingProvider(this);
+//			profileSetting.addProfileSettingRepository(this);
 		}
 		
 		@Override
-		public int getPriority() {
-			return PRIORITY_HIGH;
+		public int getOrder() {
+			return 1;
 		}
 
 		@Override

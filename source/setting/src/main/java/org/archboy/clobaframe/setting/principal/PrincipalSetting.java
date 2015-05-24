@@ -42,17 +42,17 @@ public interface PrincipalSetting {
 	 */
 	void set(Principal profile, Map<String, Object> items);
 	
-	/**
-	 * Late binding.
-	 * 
-	 * @param profileSettingProvider 
-	 */
-	void addProfileSettingProvider(PrincipalSettingProvider profileSettingProvider);
-	
-	/**
-	 * Late binding.
-	 * 
-	 * @param profileSettingRepository 
-	 */
-	void addProfileSettingRepository(PrincipalSettingRepository profileSettingRepository);
+//	/**
+//	 * Late binding.
+//	 * 
+//	 * @param profileSettingProvider 
+//	 */
+//	void addProfileSettingProvider(PrincipalSettingProvider profileSettingProvider);
+//	
+//	/**
+//	 * Late binding.
+//	 * 
+//	 * @param profileSettingRepository 
+//	 */
+//	void addProfileSettingRepository(PrincipalSettingRepository profileSettingRepository);
 }

@@ -5,8 +5,8 @@ import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
-import org.archboy.clobaframe.setting.support.AbstractPropertiesFileSettingAccess;
 import org.archboy.clobaframe.setting.application.ApplicationSettingProvider;
+import org.archboy.clobaframe.setting.support.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -16,7 +16,7 @@ import org.springframework.core.io.ResourceLoader;
  *
  * @author yang
  */
-public class PropertiesApplicationSettingProvider extends AbstractPropertiesFileSettingAccess implements ApplicationSettingProvider {
+public class PropertiesApplicationSettingProvider implements ApplicationSettingProvider {
 
 	private ResourceLoader resourceLoader;
 	private String fileName;
@@ -24,14 +24,13 @@ public class PropertiesApplicationSettingProvider extends AbstractPropertiesFile
 	private final Logger logger = LoggerFactory.getLogger(PropertiesApplicationSettingProvider.class);
 	
 	public PropertiesApplicationSettingProvider(ResourceLoader resourceLoader, String fileName) {
-		super();
 		this.resourceLoader = resourceLoader;
 		this.fileName = fileName;
 	}
 	
 	@Override
 	public int getOrder() {
-		return LOWEST_PRECEDENCE;
+		return 10;
 	}
 
 	@Override
@@ -45,7 +44,7 @@ public class PropertiesApplicationSettingProvider extends AbstractPropertiesFile
 			InputStream in = null;
 			try{
 				in = resource.getInputStream();
-				return read(in);
+				return Utils.readProperties(in);
 			}catch(IOException e) {
 				// ignore
 				logger.error("Load default application setting failed: {}", e.getMessage());

@@ -7,8 +7,8 @@ import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
-import org.archboy.clobaframe.setting.support.AbstractJsonSettingAccess;
 import org.archboy.clobaframe.setting.application.ApplicationSettingProvider;
+import org.archboy.clobaframe.setting.support.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author yang
  */
-public class JsonApplicationSettingProvider extends AbstractJsonSettingAccess implements ApplicationSettingProvider {
+public class JsonApplicationSettingProvider implements ApplicationSettingProvider {
 
 	protected String dataFolder;
 	protected String fileName;
@@ -24,14 +24,13 @@ public class JsonApplicationSettingProvider extends AbstractJsonSettingAccess im
 	protected final Logger logger = LoggerFactory.getLogger(CustomApplicationSettingRepository.class);
 	
 	public JsonApplicationSettingProvider(String dataFolder, String fileName) {
-		super();
 		this.dataFolder = dataFolder;
 		this.fileName = fileName;
 	}
 
 	@Override
 	public int getOrder() {
-		return 10;
+		return 1;
 	}
 
 	@Override
@@ -48,7 +47,7 @@ public class JsonApplicationSettingProvider extends AbstractJsonSettingAccess im
 			InputStream in = null;
 			try{
 				in = new FileInputStream(file);
-				return read(in);
+				return Utils.readJson(in);
 			}catch(IOException e){
 				// ignore
 				logger.error("Load custom application setting failed: {}", e.getMessage());

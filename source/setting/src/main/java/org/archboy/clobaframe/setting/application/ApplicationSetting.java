@@ -1,7 +1,6 @@
 package org.archboy.clobaframe.setting.application;
 
 import java.util.Collection;
-import java.util.List;
 import org.archboy.clobaframe.setting.CacheableSetting;
 
 /**

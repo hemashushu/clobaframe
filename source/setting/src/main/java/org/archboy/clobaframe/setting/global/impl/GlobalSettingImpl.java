@@ -1,6 +1,5 @@
 package org.archboy.clobaframe.setting.global.impl;
 
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +10,6 @@ import org.archboy.clobaframe.setting.global.GlobalSettingProvider;
 import org.archboy.clobaframe.setting.global.GlobalSettingRepository;
 import org.archboy.clobaframe.setting.support.Utils;
 import org.archboy.clobaframe.setting.global.GlobalSetting;
-import org.archboy.clobaframe.setting.application.ApplicationSetting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,27 +21,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Named
 public class GlobalSettingImpl implements GlobalSetting {
 	
+	private Map<String, Object> setting = new LinkedHashMap<String, Object>();
+	
 	@Inject
 	private List<GlobalSettingProvider> globalSettingProviders;
 
 	@Autowired(required = false)
 	private GlobalSettingRepository globalSettingRepository;
 	
-	private Map<String, Object> setting = new LinkedHashMap<String, Object>();
-	
 	private final Logger logger = LoggerFactory.getLogger(GlobalSettingImpl.class);
 	
 	@PostConstruct
 	public void init(){
-		
-		// sort providers, from higher(smaller number) priority to lower.
-		globalSettingProviders.sort(new Comparator<GlobalSettingProvider>() {
-			@Override
-			public int compare(GlobalSettingProvider o1, GlobalSettingProvider o2) {
-				return o1.getPriority() - o2.getPriority();
-			}
-		});
-
+//		// sort providers, from higher(smaller number) priority to lower.
+//		globalSettingProviders.sort(new Comparator<GlobalSettingProvider>() {
+//			@Override
+//			public int compare(GlobalSettingProvider o1, GlobalSettingProvider o2) {
+//				return o1.getPriority() - o2.getPriority();
+//			}
+//		});
 		refresh();
 	}
 	

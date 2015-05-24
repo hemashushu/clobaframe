@@ -6,6 +6,19 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
 
 	<context:component-scan base-package="org.archboy.clobaframe" />
 
+	<bean id="testingPostApplicationSetting" 
+		class="org.archboy.clobaframe.setting.application.ApplicationSettingTest.TestingPostApplicationSetting">
+	</bean>
+
+	<bean id="applicationSetting"
+		class="org.archboy.clobaframe.setting.application.impl.ApplicationSettingImpl">
+		<property name="postApplicationSettings">
+			<list>
+				<ref bean="testingPostApplicationSetting"/>
+			</list>
+		</property>
+	</bean>
+			
 	<bean id="propertyPlaceholderConfigurer"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">

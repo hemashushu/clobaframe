@@ -29,7 +29,7 @@ public class CustomApplicationSettingRepository extends JsonApplicationSettingPr
 		OutputStream out = null;
 		try {
 			out = new FileOutputStream(file);
-			write(out, map);
+			Utils.writeJson(out, item);
 		} catch (IOException e) {
 			// ignore
 			logger.error("Save custom application setting to [{}] failed: {}", 

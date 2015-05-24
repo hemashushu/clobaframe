@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.archboy.clobaframe.setting.support.AbstractJsonSettingAccess;
 import org.archboy.clobaframe.setting.support.Utils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -83,7 +82,7 @@ public class GlobalSettingTest {
 	}
 	
 	@Named
-	public static class TestingInstanceSettingProvider extends AbstractJsonSettingAccess implements GlobalSettingProvider {
+	public static class TestingInstanceSettingProvider implements GlobalSettingProvider {
 
 		@Inject
 		private ResourceLoader resourceLoader;
@@ -93,8 +92,8 @@ public class GlobalSettingTest {
 		}
 		
 		@Override
-		public int getPriority() {
-			return PRIORITY_NORMAL;
+		public int getOrder() {
+			return 5;
 		}
 
 		@Override
@@ -102,7 +101,7 @@ public class GlobalSettingTest {
 			try{
 				File file = getFileByName("sample/test.json");
 				InputStream in = new FileInputStream(file);
-				return read(in);
+				return Utils.readJson(in);
 			}catch(IOException e){
 				// ignore
 			}
@@ -129,8 +128,8 @@ public class GlobalSettingTest {
 		protected Map<String, Object> setting = new LinkedHashMap<String, Object>();
 		
 		@Override
-		public int getPriority() {
-			return PRIORITY_HIGH;
+		public int getOrder() {
+			return 1;
 		}
 
 		@Override

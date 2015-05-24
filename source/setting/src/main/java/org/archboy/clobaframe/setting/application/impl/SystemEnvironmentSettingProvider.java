@@ -11,8 +11,8 @@ import org.archboy.clobaframe.setting.application.ApplicationSettingProvider;
 public class SystemEnvironmentSettingProvider implements ApplicationSettingProvider {
 
 	@Override
-	public int getPriority() {
-		return PRIORITY_LOW;
+	public int getOrder() {
+		return 9;
 	}
 
 	@Override
