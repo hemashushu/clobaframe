@@ -35,7 +35,7 @@ public interface ViewModel extends Map<String, Object> {
 	/**
 	 * Return the parent model (if exists).
 	 * 
-	 * @return 
+	 * @return NULL when does not exist.
 	 */
 	ViewModel parent();
 	

@@ -114,16 +114,16 @@ public class ApplicationSettingTest {
 		String testUpdate = (String)applicationSetting.getValue("app.set.update");
 
 		if ("original".equals(testStatus)){
-			assertEquals("bbb", testUpdate);
-			
 			applicationSetting.set("app.set.status", "updated");
 			applicationSetting.set("app.set.update", "ccc");
 			
-		}else{
-			assertEquals("ccc", testUpdate);
+			assertEquals("bbb", testUpdate);
 			
+		}else{
 			applicationSetting.set("app.set.status", "original");
 			applicationSetting.set("app.set.update", "bbb");
+			
+			assertEquals("ccc", testUpdate);
 		}
 	}
 	

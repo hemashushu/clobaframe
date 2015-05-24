@@ -25,14 +25,11 @@ public class DefaultGlobalSettingProvider implements GlobalSettingProvider {
 
 	@Inject
 	private ResourceLoader resourceLoader;
-	
-	@Inject
-	private ApplicationSetting applicationSetting;
 
-	private static final String DEFAULT_GLOBAL_SETTING_FILE_NAME = "global.properties";
+	private static final String DEFAULT_GLOBAL_SETTING_FILE_NAME = "classpath:global.properties";
 	
-	//@Value("${clobaframe.setting.defaultGlobalSettingFileName}")
-	private String defaultGlobalSettingFileName = DEFAULT_GLOBAL_SETTING_FILE_NAME;
+	@Value("${clobaframe.setting.defaultGlobalSettingFileName:" + DEFAULT_GLOBAL_SETTING_FILE_NAME + "}")
+	private String defaultGlobalSettingFileName;
 	
 	private final Logger logger = LoggerFactory.getLogger(DefaultGlobalSettingProvider.class);
 	
@@ -43,17 +40,11 @@ public class DefaultGlobalSettingProvider implements GlobalSettingProvider {
 
 	@Override
 	public Map<String, Object> getAll() {
-		
-//		String fileName = (String)applicationSetting.getValue("setting.defaultGlobalSettingFileName");
-//		if (fileName == null) {
-//			return new LinkedHashMap<String, Object>();
-//		}
-		
 		Resource resource = resourceLoader.getResource(defaultGlobalSettingFileName);
 		if (!resource.exists()) {
-			logger.warn("Default instance setting [{}] not found.", defaultGlobalSettingFileName);
+			logger.warn("Default global setting [{}] not found.", resource.getFilename());
 		}else{
-			logger.info("Load default instance setting [{}]", defaultGlobalSettingFileName);
+			logger.info("Loading default global setting [{}]", resource.getFilename());
 			
 			InputStream in = null;
 			try{
@@ -61,7 +52,7 @@ public class DefaultGlobalSettingProvider implements GlobalSettingProvider {
 				return Utils.readProperties(in);
 			}catch(IOException e) {
 				// ignore
-				logger.error("Load default global setting failed: " + e.getMessage());
+				logger.error("Load default global setting [{}] failed: {}", resource.getFilename(), e.getMessage());
 			}finally {
 				IOUtils.closeQuietly(in);
 			}

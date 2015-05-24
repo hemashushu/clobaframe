@@ -69,16 +69,15 @@ public class GlobalSettingTest {
 		String testUpdate = (String)globalSetting.getValue("global.set.update");
 
 		if ("original".equals(testStatus)){
-			assertEquals("ddd", testUpdate);
-			
 			globalSetting.set("global.set.status", "updated");
 			globalSetting.set("global.set.update", "eee");
-			
+
+			assertEquals("ddd", testUpdate);
 		}else{
-			assertEquals("eee", testUpdate);
-			
 			globalSetting.set("global.set.status", "original");
 			globalSetting.set("global.set.update", "ddd");
+			
+			assertEquals("eee", testUpdate);
 		}
 	}
 	

@@ -29,7 +29,7 @@ import org.springframework.util.Assert;
 public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoaderAware, InitializingBean {
 
 	private static final String DEFAULT_ROOT_CONFIG_FILE_NAME = "classpath:root.properties";
-	private static final String DEFAULT_DATA_FOLDER = "/var/lib/${clobaframe.setting.appName}";
+	private static final String DEFAULT_DATA_FOLDER = "${java.io.tmpdir}/${clobaframe.setting.appName}";
 	private static final boolean DEFAULT_AUTO_CREATE_DATA_FOLDER = true;
 	private static final String DEFAULT_SETTING_FILE_NAME = "classpath:application.properties";
 	private static final String DEFAULT_CUSTOM_SETTING_FILE_NAME = "settings.json";
@@ -37,11 +37,18 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 
 	private String rootConfigFileName = DEFAULT_ROOT_CONFIG_FILE_NAME;
 	private String appName;
-	private String dataFolder;
-	private boolean autoCreateDataFolder;
-	private String defaultSettingFileName;
-	private String customSettingFileName;
-	private String extraSettingFileName;
+	
+	/**
+	 * folder that store application running necessary files.
+	 * in linux it's ~/.local/share
+	 * in osx ~/Library/Application Support
+	 * in windows ~\Application Data\Local|Roaming
+	 */
+	private String dataFolder = DEFAULT_DATA_FOLDER;
+	private boolean autoCreateDataFolder = DEFAULT_AUTO_CREATE_DATA_FOLDER;
+	private String defaultSettingFileName = DEFAULT_SETTING_FILE_NAME;
+	private String customSettingFileName = DEFAULT_CUSTOM_SETTING_FILE_NAME;
+	private String extraSettingFileName = DEFAULT_EXTRA_SETTING_FILE_NAME;
 	
 	private Map<String, Object> setting = new LinkedHashMap<String, Object>();
 	
@@ -94,6 +101,12 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 	private void loadRootConfig(){
 		Map<String, Object> rootSetting = null;
 		Resource resource = resourceLoader.getResource(rootConfigFileName);
+		
+		if (!resource.exists()) {
+			logger.warn("Application root setting resource [{}] not found.", resource.getFilename());
+			return;
+		}
+		
 		InputStream in = null;
 		try{
 			in = resource.getInputStream();
@@ -115,8 +128,6 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 		this.defaultSettingFileName = getRootConfigValue(rootSetting, "clobaframe.setting.defaultSettingFileName", DEFAULT_SETTING_FILE_NAME);
 		this.customSettingFileName = getRootConfigValue(rootSetting, "clobaframe.setting.customSettingFileName", DEFAULT_CUSTOM_SETTING_FILE_NAME);
 		this.extraSettingFileName = getRootConfigValue(rootSetting, "clobaframe.setting.extraSettingFileName", DEFAULT_EXTRA_SETTING_FILE_NAME);
-		
-		Assert.hasText(appName, "App name should not empty.");
 	}
 	
 	private String getRootConfigValue(Map<String, Object> rootSetting, String key, String defaultValue) {
@@ -136,6 +147,25 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 	}
 	
 	private void initComponents(){
+		// add setting provider, from lower priority to higher priority.
+		applicationSettingProviders = new ArrayList<ApplicationSettingProvider>();
+		applicationSettingProviders.add(new PropertiesApplicationSettingProvider(resourceLoader, defaultSettingFileName));
+		applicationSettingProviders.add(new EnvironmentVariablesSettingProvider());
+		applicationSettingProviders.add(new SystemPropertiesSettingProvider());
+		
+		// add other in-app application setting providers
+		if (locations != null) {
+			for(Resource resource : locations){
+				applicationSettingProviders.add(new PropertiesApplicationSettingProvider(resource));
+			}
+		}
+		
+		// merge all settings.
+		for(ApplicationSettingProvider provider : applicationSettingProviders){
+			Map<String, Object> map = provider.getAll();
+			setting = Utils.merge(setting, map);
+		}
+		
 		// get the data dir and file name
 		String dataFolderValue = (String)Utils.resolvePlaceholder(setting, dataFolder);
 		String customFileNameValue = (String)Utils.resolvePlaceholder(setting, customSettingFileName);
@@ -151,6 +181,7 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 				logger.error("Application data folder duplicate name with a file [{}].", file.getAbsolutePath());
 			}else{
 				try{
+					logger.info("Creating application data folder [{}].", file.getAbsolutePath());
 					file.mkdirs();
 				}catch(Exception e){
 					logger.error("Fail to create application data folder [{}].", file.getAbsolutePath());
@@ -158,31 +189,24 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 			}
 		}
 		
-		// add setting provider, from lower priority to higher priority.
-		applicationSettingProviders = new ArrayList<ApplicationSettingProvider>();
-		applicationSettingProviders.add(new PropertiesApplicationSettingProvider(resourceLoader, defaultSettingFileName));
-		applicationSettingProviders.add(new EnvironmentVariablesSettingProvider());
-		applicationSettingProviders.add(new SystemPropertiesSettingProvider());
-		
-		// add other in-app application setting providers
-		if (locations != null) {
-			for(Resource resource : locations){
-				applicationSettingProviders.add(new PropertiesApplicationSettingProvider(resource));
-			}
-		}
-		
 		// add user custom application setting providers
-		applicationSettingProviders.add(new JsonApplicationSettingProvider(dataFolderValue, customFileNameValue));
-		applicationSettingProviders.add(new JsonApplicationSettingProvider(dataFolderValue, extraFileNameValue));
+		List<ApplicationSettingProvider> customApplicationSettingProviders = new ArrayList<ApplicationSettingProvider>();
+		customApplicationSettingProviders.add(new JsonApplicationSettingProvider(dataFolderValue, customFileNameValue));
+		customApplicationSettingProviders.add(new JsonApplicationSettingProvider(dataFolderValue, extraFileNameValue));
 
-		// set setting repository
-		applicationSettingRepository = new JsonApplicationSettingRepository(dataFolder, customSettingFileName);
-
-		// merge all settings.
-		for(ApplicationSettingProvider provider : applicationSettingProviders){
+		// merge all custom settings.
+		for(ApplicationSettingProvider provider : customApplicationSettingProviders){
 			Map<String, Object> map = provider.getAll();
 			setting = Utils.merge(setting, map);
 		}
+		
+		// merge custom providers
+		applicationSettingProviders.addAll(customApplicationSettingProviders);
+		
+		// set setting repository
+		applicationSettingRepository = new JsonApplicationSettingRepository(dataFolderValue, customFileNameValue);
+
+		
 	}
 
 	private void executePostSetting() {

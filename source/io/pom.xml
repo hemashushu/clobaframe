@@ -216,6 +216,13 @@
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
+		
+		<!-- clobaframe -->
+		<dependency>
+			<groupId>org.archboy.clobaframe</groupId>
+			<artifactId>clobaframe-setting</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 	
 	<build>

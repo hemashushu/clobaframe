@@ -33,7 +33,7 @@ public class JsonApplicationSettingRepository extends JsonApplicationSettingProv
 		try {
 			File file = resource.getFile();
 			out = new FileOutputStream(file);
-			Utils.writeJson(out, item);
+			Utils.writeJson(out, map);
 		} catch (IOException e) {
 			// ignore
 			logger.error("Save setting to resource [{}] failed: {}", 
