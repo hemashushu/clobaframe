@@ -9,7 +9,7 @@ import org.archboy.clobaframe.setting.application.ApplicationSettingProvider;
  *
  * @author yang
  */
-public class PropertiesSettingProvider implements ApplicationSettingProvider {
+public class SystemPropertiesSettingProvider implements ApplicationSettingProvider {
 
 	@Override
 	public int getPriority() {

@@ -16,22 +16,22 @@ import org.slf4j.LoggerFactory;
  *
  * @author yang
  */
-public class CustomApplicationSettingProvider extends AbstractJsonSettingAccess implements ApplicationSettingProvider {
+public class JsonApplicationSettingProvider extends AbstractJsonSettingAccess implements ApplicationSettingProvider {
 
 	protected String dataFolder;
 	protected String fileName;
 	
 	protected final Logger logger = LoggerFactory.getLogger(CustomApplicationSettingRepository.class);
 	
-	public CustomApplicationSettingProvider(String dataFolder, String fileName) {
+	public JsonApplicationSettingProvider(String dataFolder, String fileName) {
 		super();
 		this.dataFolder = dataFolder;
 		this.fileName = fileName;
 	}
 
 	@Override
-	public int getPriority() {
-		return PRIORITY_HIGH;
+	public int getOrder() {
+		return 10;
 	}
 
 	@Override

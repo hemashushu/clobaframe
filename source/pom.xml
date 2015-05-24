@@ -103,6 +103,17 @@
 				<version>1</version>
 			</dependency>
 		
+			<!-- Spring version -->
+			<!--
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-framework-bom</artifactId>
+				<version>${org.springframework-version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			-->
+			
 			<!-- Spring Core -->
 			<dependency>
 				<groupId>org.springframework</groupId>

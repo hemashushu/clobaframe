@@ -14,7 +14,7 @@ import org.archboy.clobaframe.setting.application.ApplicationSettingRepository;
  *
  * @author yang
  */
-public class CustomApplicationSettingRepository extends CustomApplicationSettingProvider implements ApplicationSettingRepository {
+public class CustomApplicationSettingRepository extends JsonApplicationSettingProvider implements ApplicationSettingRepository {
 
 	public CustomApplicationSettingRepository(String dataFolder, String fileName) {
 		super(dataFolder, fileName);

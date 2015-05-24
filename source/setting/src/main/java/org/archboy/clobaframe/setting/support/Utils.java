@@ -1,7 +1,14 @@
 package org.archboy.clobaframe.setting.support;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.util.Assert;
@@ -13,6 +20,44 @@ import org.springframework.util.Assert;
 public class Utils {
 	private static final String placeholderRegex = "\\$\\{([\\w\\.-]+)\\}";
 	private static final Pattern placeholderPattern = Pattern.compile(placeholderRegex);
+	
+	private static final TypeReference<Map<String, Object>> typeReference = 
+			new TypeReference<Map<String, Object>>() {};
+
+	private static final ObjectMapper objectMapper = new ObjectMapper();
+
+	public static Map<String, Object> readJson(InputStream in) throws IOException {
+		Map<String, Object> map = objectMapper.readValue(in, typeReference);
+		return Utils.flat(map);
+	}
+
+	public static void writeJson(OutputStream outputStream, Map<String, Object> setting) throws IOException {
+		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+		
+		Map<String, Object> map = Utils.cascade(setting);
+		objectMapper.writeValue(outputStream, map);
+	}
+	
+	public static Map<String, Object> readProperties(InputStream in) throws IOException{
+		Properties properties = new OrderedProperties();
+		properties.load(in);
+		
+		Map<String, Object> setting = new LinkedHashMap<String, Object>();
+		for(Map.Entry<Object, Object> entry : properties.entrySet()){
+			setting.put((String)entry.getKey(), entry.getValue());
+		}
+		
+		return setting;
+	}
+	
+	public static void writeProperties(
+			OutputStream outputStream, 
+			Map<String, Object> setting)
+			throws IOException {
+		Properties properties = new OrderedProperties();
+		properties.putAll(setting);
+		properties.store(outputStream, null);
+	}
 	
 	public static Map<String, Object> resolvePlaceholder(Map<String, Object> setting){
 		Map<String, Object> resolvedMap = new LinkedHashMap<String, Object>();

@@ -16,22 +16,22 @@ import org.springframework.core.io.ResourceLoader;
  *
  * @author yang
  */
-public class DefaultApplicationSettingProvider extends AbstractPropertiesFileSettingAccess implements ApplicationSettingProvider {
+public class PropertiesApplicationSettingProvider extends AbstractPropertiesFileSettingAccess implements ApplicationSettingProvider {
 
 	private ResourceLoader resourceLoader;
 	private String fileName;
 	
-	private final Logger logger = LoggerFactory.getLogger(DefaultApplicationSettingProvider.class);
+	private final Logger logger = LoggerFactory.getLogger(PropertiesApplicationSettingProvider.class);
 	
-	public DefaultApplicationSettingProvider(ResourceLoader resourceLoader, String fileName) {
+	public PropertiesApplicationSettingProvider(ResourceLoader resourceLoader, String fileName) {
 		super();
 		this.resourceLoader = resourceLoader;
 		this.fileName = fileName;
 	}
 	
 	@Override
-	public int getPriority() {
-		return PRIORITY_LOWER;
+	public int getOrder() {
+		return LOWEST_PRECEDENCE;
 	}
 
 	@Override

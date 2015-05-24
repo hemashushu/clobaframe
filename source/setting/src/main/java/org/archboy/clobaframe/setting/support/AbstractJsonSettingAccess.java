@@ -18,12 +18,7 @@ public abstract class AbstractJsonSettingAccess implements SettingAccess {
 			new TypeReference<Map<String, Object>>() {};
 
 	private ObjectMapper objectMapper = new ObjectMapper();
-	
-	
-	public AbstractJsonSettingAccess(){
-		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-	}
-	
+
 	@Override
 	public Map<String, Object> read(InputStream in) throws IOException {
 		Map<String, Object> map = objectMapper.readValue(in, typeReference);
@@ -32,6 +27,8 @@ public abstract class AbstractJsonSettingAccess implements SettingAccess {
 
 	@Override
 	public void write(OutputStream outputStream, Map<String, Object> setting) throws IOException {
+		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+		
 		Map<String, Object> map = Utils.cascade(setting);
 		objectMapper.writeValue(outputStream, map);
 	}
