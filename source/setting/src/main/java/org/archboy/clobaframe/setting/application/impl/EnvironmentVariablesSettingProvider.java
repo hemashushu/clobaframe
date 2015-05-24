@@ -8,7 +8,7 @@ import org.archboy.clobaframe.setting.application.ApplicationSettingProvider;
  *
  * @author yang
  */
-public class SystemEnvironmentSettingProvider implements ApplicationSettingProvider {
+public class EnvironmentVariablesSettingProvider implements ApplicationSettingProvider {
 
 	@Override
 	public int getOrder() {

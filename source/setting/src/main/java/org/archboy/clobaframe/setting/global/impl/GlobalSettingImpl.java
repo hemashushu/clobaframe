@@ -23,7 +23,7 @@ public class GlobalSettingImpl implements GlobalSetting {
 	
 	private Map<String, Object> setting = new LinkedHashMap<String, Object>();
 	
-	@Inject
+	@Autowired(required = false)
 	private List<GlobalSettingProvider> globalSettingProviders;
 
 	@Autowired(required = false)
@@ -48,6 +48,10 @@ public class GlobalSettingImpl implements GlobalSetting {
 		
 		// clear setting
 		setting.clear();
+		
+		if (globalSettingProviders == null || globalSettingProviders.isEmpty()) {
+			return;
+		}
 		
 		// merge all providers setting
 		for(int idx = globalSettingProviders.size() -1; idx >=0; idx--){

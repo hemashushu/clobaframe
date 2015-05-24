@@ -6,20 +6,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.archboy.clobaframe.setting.support.Utils;
+import org.junit.After;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import static org.junit.Assert.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -46,15 +46,16 @@ public class GlobalSettingTest {
 
 	@Test
 	public void testGetValue(){
-		String siteTitle = (String)globalSetting.getValue("site.title");
-		String itemValue = (String)globalSetting.getValue("item");
+		String testId = (String)globalSetting.getValue("test.id");
+		String testName = (String)globalSetting.getValue("test.name");
 		
-		assertEquals("the clobaframe project", siteTitle);
-		assertEquals("abc", itemValue); // override by 'sample/test.json'
+		assertEquals("123456", testId);
+		assertEquals("foobar", testName);
 		
-		assertEquals("xyz", globalSetting.getValue("sub.item"));
-		assertEquals("123456", globalSetting.getValue("foo.bar.id"));
-		assertEquals("world", globalSetting.getValue("foo.bar.name"));
+		// test  // override by 'global-layer2.json'
+		
+		assertEquals("global-layer2", globalSetting.getValue("test.layer"));
+		assertEquals(Boolean.TRUE, globalSetting.getValue("test.other"));
 		
 		// test none-exists
 		assertNull(globalSetting.getValue("test.none-exist"));
@@ -64,20 +65,20 @@ public class GlobalSettingTest {
 	
 	@Test
 	public void testSet(){
-		String testStatus = (String)globalSetting.getValue("instance.set.status");
-		String testUpdate = (String)globalSetting.getValue("instance.set.update");
+		String testStatus = (String)globalSetting.getValue("global.set.status");
+		String testUpdate = (String)globalSetting.getValue("global.set.update");
 
 		if ("original".equals(testStatus)){
 			assertEquals("ddd", testUpdate);
 			
-			globalSetting.set("instance.set.status", "updated");
-			globalSetting.set("instance.set.update", "eee");
+			globalSetting.set("global.set.status", "updated");
+			globalSetting.set("global.set.update", "eee");
 			
 		}else{
 			assertEquals("eee", testUpdate);
 			
-			globalSetting.set("instance.set.status", "original");
-			globalSetting.set("instance.set.update", "ddd");
+			globalSetting.set("global.set.status", "original");
+			globalSetting.set("global.set.update", "ddd");
 		}
 	}
 	
@@ -99,7 +100,7 @@ public class GlobalSettingTest {
 		@Override
 		public Map<String, Object> getAll() {
 			try{
-				File file = getFileByName("sample/test.json");
+				File file = getFileByName("global-layer2.json");
 				InputStream in = new FileInputStream(file);
 				return Utils.readJson(in);
 			}catch(IOException e){

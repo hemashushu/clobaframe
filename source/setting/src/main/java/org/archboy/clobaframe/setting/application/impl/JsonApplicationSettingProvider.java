@@ -11,6 +11,9 @@ import org.archboy.clobaframe.setting.application.ApplicationSettingProvider;
 import org.archboy.clobaframe.setting.support.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 
 /**
  *
@@ -18,14 +21,26 @@ import org.slf4j.LoggerFactory;
  */
 public class JsonApplicationSettingProvider implements ApplicationSettingProvider {
 
-	protected String dataFolder;
-	protected String fileName;
+//	protected String dataFolder;
+//	protected String fileName;
 	
-	protected final Logger logger = LoggerFactory.getLogger(CustomApplicationSettingRepository.class);
+	protected Resource resource;
+	
+	private final Logger logger = LoggerFactory.getLogger(JsonApplicationSettingProvider.class);
 	
 	public JsonApplicationSettingProvider(String dataFolder, String fileName) {
-		this.dataFolder = dataFolder;
-		this.fileName = fileName;
+//		this.dataFolder = dataFolder;
+//		this.fileName = fileName;
+		File file = new File(dataFolder, fileName);
+		resource = new FileSystemResource(file);
+	}
+	
+	public JsonApplicationSettingProvider(ResourceLoader resourceLoader, String fileName) {
+		this.resource = resourceLoader.getResource(fileName);
+	}
+
+	public JsonApplicationSettingProvider(Resource resource) {
+		this.resource = resource;
 	}
 
 	@Override
@@ -35,22 +50,18 @@ public class JsonApplicationSettingProvider implements ApplicationSettingProvide
 
 	@Override
 	public Map<String, Object> getAll() {
-		File file = new File(dataFolder, fileName);
-		
-		if (!file.exists()){
-			logger.warn("Custom application setting [{}] not found.", file.getAbsolutePath());
-		}else if (file.isDirectory()) {
-			logger.warn("Custom application setting [{}] duplicate name with a file.", file.getAbsolutePath());
+		if (!resource.exists()){
+			logger.warn("Setting resource [{}] not found.", resource.getFilename());
 		}else {
-			logger.info("Load custom application setting [{}]", file.getAbsolutePath());
+			logger.info("Loading setting resource [{}]", resource.getFilename());
 
 			InputStream in = null;
 			try{
-				in = new FileInputStream(file);
+				in = resource.getInputStream();
 				return Utils.readJson(in);
 			}catch(IOException e){
 				// ignore
-				logger.error("Load custom application setting failed: {}", e.getMessage());
+				logger.error("Load setting resource [{}] failed: {}",resource.getFilename(), e.getMessage());
 			}finally{
 				IOUtils.closeQuietly(in);
 			}

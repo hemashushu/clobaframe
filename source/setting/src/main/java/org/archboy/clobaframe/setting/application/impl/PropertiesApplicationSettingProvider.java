@@ -18,14 +18,21 @@ import org.springframework.core.io.ResourceLoader;
  */
 public class PropertiesApplicationSettingProvider implements ApplicationSettingProvider {
 
-	private ResourceLoader resourceLoader;
-	private String fileName;
+//	private ResourceLoader resourceLoader;
+//	private String fileName;
+	
+	protected Resource resource;
 	
 	private final Logger logger = LoggerFactory.getLogger(PropertiesApplicationSettingProvider.class);
 	
 	public PropertiesApplicationSettingProvider(ResourceLoader resourceLoader, String fileName) {
-		this.resourceLoader = resourceLoader;
-		this.fileName = fileName;
+//		this.resourceLoader = resourceLoader;
+//		this.fileName = fileName;
+		this.resource = resourceLoader.getResource(fileName);
+	}
+
+	public PropertiesApplicationSettingProvider(Resource resource) {
+		this.resource = resource;
 	}
 	
 	@Override
@@ -35,19 +42,17 @@ public class PropertiesApplicationSettingProvider implements ApplicationSettingP
 
 	@Override
 	public Map<String, Object> getAll() {
-		Resource resource = resourceLoader.getResource(fileName);
-		
 		if (!resource.exists()) {
-			logger.warn("Default application setting [{}] not found.", fileName);
+			logger.warn("Setting resource [{}] not found.", resource.getFilename());
 		}else{
-			logger.info("Load default application setting [{}]", fileName);
+			logger.info("Loading setting resource [{}]", resource.getFilename());
 			InputStream in = null;
 			try{
 				in = resource.getInputStream();
 				return Utils.readProperties(in);
 			}catch(IOException e) {
 				// ignore
-				logger.error("Load default application setting failed: {}", e.getMessage());
+				logger.error("Load setting resource [{}] failed: {}", resource.getFilename(), e.getMessage());
 			}finally {
 				IOUtils.closeQuietly(in);
 			}

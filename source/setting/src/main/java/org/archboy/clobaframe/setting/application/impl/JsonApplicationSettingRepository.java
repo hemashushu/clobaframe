@@ -9,14 +9,18 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.setting.support.Utils;
 import org.archboy.clobaframe.setting.application.ApplicationSettingRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author yang
  */
-public class CustomApplicationSettingRepository extends JsonApplicationSettingProvider implements ApplicationSettingRepository {
+public class JsonApplicationSettingRepository extends JsonApplicationSettingProvider implements ApplicationSettingRepository {
 
-	public CustomApplicationSettingRepository(String dataFolder, String fileName) {
+	private final Logger logger = LoggerFactory.getLogger(JsonApplicationSettingRepository.class);
+	
+	public JsonApplicationSettingRepository(String dataFolder, String fileName) {
 		super(dataFolder, fileName);
 	}
 
@@ -25,15 +29,15 @@ public class CustomApplicationSettingRepository extends JsonApplicationSettingPr
 		Map<String, Object> map = Utils.merge(getAll(), item);
 		
 		// save
-		File file = new File(dataFolder, fileName);
 		OutputStream out = null;
 		try {
+			File file = resource.getFile();
 			out = new FileOutputStream(file);
 			Utils.writeJson(out, item);
 		} catch (IOException e) {
 			// ignore
-			logger.error("Save custom application setting to [{}] failed: {}", 
-					file.getAbsolutePath(),
+			logger.error("Save setting to resource [{}] failed: {}", 
+					resource.getFilename(),
 					e.getMessage());
 		} finally {
 			IOUtils.closeQuietly(out);

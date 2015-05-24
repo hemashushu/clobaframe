@@ -1,0 +1,6 @@
+{
+  "test" : {
+	"other" : true,
+    "layer" : "global-layer2"
+  }
+}

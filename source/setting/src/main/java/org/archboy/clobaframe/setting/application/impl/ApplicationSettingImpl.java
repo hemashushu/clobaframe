@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Named;
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.setting.support.Utils;
 import org.archboy.clobaframe.setting.application.ApplicationSetting;
@@ -46,6 +45,8 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 	
 	private Map<String, Object> setting = new LinkedHashMap<String, Object>();
 	
+	private Resource[] locations;
+	
 	private ResourceLoader resourceLoader;
 	private List<ApplicationSettingProvider> applicationSettingProviders;
 	private ApplicationSettingRepository applicationSettingRepository;
@@ -53,6 +54,16 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 	
 	private final Logger logger = LoggerFactory.getLogger(ApplicationSettingImpl.class);
 
+	@Override
+	public void setApplicationName(String name) {
+		this.appName = name;
+	}
+
+	@Override
+	public String getApplicationName() {
+		return appName;
+	}
+	
 	public void setRootConfigFileName(String rootConfigFileName) {
 		this.rootConfigFileName = rootConfigFileName;
 	}
@@ -67,6 +78,11 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 		this.resourceLoader = resourceLoader;
 	}
 
+	@Override
+	public void setLocations(Resource... locations) {
+		this.locations = locations;
+	}
+	
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		loadRootConfig();
@@ -93,7 +109,7 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 			return;
 		}
 		
-		this.appName = getRootConfigValue(rootSetting, "clobaframe.setting.appName", null);
+		this.appName = getRootConfigValue(rootSetting, "clobaframe.setting.appName", appName);
 		this.dataFolder = getRootConfigValue(rootSetting, "clobaframe.setting.dataFolder", DEFAULT_DATA_FOLDER);
 		this.autoCreateDataFolder = Boolean.parseBoolean(getRootConfigValue(rootSetting, "clobaframe.setting.autoCreateDataFolder", Boolean.toString(DEFAULT_AUTO_CREATE_DATA_FOLDER)));
 		this.defaultSettingFileName = getRootConfigValue(rootSetting, "clobaframe.setting.defaultSettingFileName", DEFAULT_SETTING_FILE_NAME);
@@ -145,18 +161,22 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 		// add setting provider, from lower priority to higher priority.
 		applicationSettingProviders = new ArrayList<ApplicationSettingProvider>();
 		applicationSettingProviders.add(new PropertiesApplicationSettingProvider(resourceLoader, defaultSettingFileName));
-		applicationSettingProviders.add(new SystemEnvironmentSettingProvider());
+		applicationSettingProviders.add(new EnvironmentVariablesSettingProvider());
 		applicationSettingProviders.add(new SystemPropertiesSettingProvider());
 		
 		// add other in-app application setting providers
-		// TODO..
+		if (locations != null) {
+			for(Resource resource : locations){
+				applicationSettingProviders.add(new PropertiesApplicationSettingProvider(resource));
+			}
+		}
 		
 		// add user custom application setting providers
 		applicationSettingProviders.add(new JsonApplicationSettingProvider(dataFolderValue, customFileNameValue));
 		applicationSettingProviders.add(new JsonApplicationSettingProvider(dataFolderValue, extraFileNameValue));
 
 		// set setting repository
-		applicationSettingRepository = new CustomApplicationSettingRepository(dataFolder, customSettingFileName);
+		applicationSettingRepository = new JsonApplicationSettingRepository(dataFolder, customSettingFileName);
 
 		// merge all settings.
 		for(ApplicationSettingProvider provider : applicationSettingProviders){

@@ -1,19 +1,17 @@
 package org.archboy.clobaframe.setting.application;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import javax.inject.Inject;
-import javax.inject.Named;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.junit.Assert.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  *
@@ -24,6 +22,17 @@ import org.slf4j.LoggerFactory;
 public class ApplicationSettingTest {
 
 	private final Logger logger = LoggerFactory.getLogger(ApplicationSettingTest.class);
+	
+	@Value("${test.foo}")
+	private String placeholderTestFoo;
+	
+	@Value("${test.none-exist}")
+	private String placeholderTestNoneExist;
+	
+	private static final String DEFAULT_TEST_PLACEHOLDER_VALUE = "defaultValue";
+	
+	@Value("${test.none-exist-with-default-value:" + DEFAULT_TEST_PLACEHOLDER_VALUE +"}")
+	private String placeholderTestNoneExistWithDefaultValue;
 	
 	@Inject
 	private ApplicationSetting applicationSetting;
@@ -40,21 +49,26 @@ public class ApplicationSettingTest {
 
 	@Test
 	public void testGetValue(){
-		String appVersion = (String)applicationSetting.getValue("app.version");
+		
+		assertEquals("clobaframe", applicationSetting.getApplicationName());
+		
 		String testFoo = (String)applicationSetting.getValue("test.foo");
 		String testBar = (String)applicationSetting.getValue("test.bar");
+		String testCom = (String)applicationSetting.getValue("test.com");
 		String osName = (String)applicationSetting.getValue("os.name");
-		//String itemValue = (String)applicationSetting.getValue("item");
-		
-		assertEquals("1.0", appVersion);
+
 		assertEquals("hello", testFoo);
 		assertEquals("123456", testBar);
 		
+		// test get from system properties
 		String userName = (String)applicationSetting.getValue("user.name");
-		assertEquals(testFoo + " " + userName , applicationSetting.getValue("test.com"));
+		assertEquals(System.getProperty("user.name"), userName);
 		
-		assertFalse("aaa".equals(osName)); // override by system properties
-		//assertEquals("application", itemValue);
+		// test concatenation
+		assertEquals(testFoo + " " + userName, testCom);
+		
+		// test override system properties
+		assertFalse("aaa".equals(osName)); 
 		
 		// test none-exists
 		assertNull(applicationSetting.getValue("test.none-exist"));
@@ -64,17 +78,38 @@ public class ApplicationSettingTest {
 		assertEquals("${test.foo} ${user.name}", applicationSetting.get("test.com"));
 		
 		// test get all
-		assertTrue(applicationSetting.getAll().size() > 1);
-	
+		Map<String, Object> all = applicationSetting.getAll();
+		assertTrue(all.containsKey("test.foo"));
+		assertTrue(all.containsKey("test.bar"));
+		assertTrue(all.containsKey("test.com"));
+		assertTrue(all.containsKey("user.name"));
+		assertTrue(all.containsKey("user.home"));
+		assertTrue(all.containsKey("java.io.tmpdir"));
+		
+		// test other in-application-package settings
+		assertEquals("ok", applicationSetting.get("test.other"));
+		
+		// test layer
+		assertEquals("application-layer2", applicationSetting.get("test.layer"));
+		
 		// test inject
 		assertEquals("ok", applicationSetting.get("foo.inject"));
-		
-//		logger.info("temp dir:" + applicationSetting.getValue("java.io.tmpdir"));
-//		logger.info("user home dir:" + applicationSetting.getValue("user.home"));
+
+	}
+	
+	
+	@Test
+	public void testGetPlaceholderValue(){
+		assertEquals("hello", placeholderTestFoo);
+		assertEquals("${test.none-exist}", placeholderTestNoneExist);
+		assertEquals(DEFAULT_TEST_PLACEHOLDER_VALUE, placeholderTestNoneExistWithDefaultValue);
 	}
 	
 	@Test
 	public void testSet(){
+		logger.info("user home dir:" + applicationSetting.getValue("user.home"));
+		logger.info("temp dir:" + applicationSetting.getValue("java.io.tmpdir"));
+		
 		String testStatus = (String)applicationSetting.getValue("app.set.status");
 		String testUpdate = (String)applicationSetting.getValue("app.set.update");
 
