@@ -1,6 +1,5 @@
 package org.archboy.clobaframe.io.file;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -8,11 +7,6 @@ import java.io.InputStream;
 import java.util.Date;
 import javax.inject.Inject;
 import org.apache.commons.io.IOUtils;
-import org.archboy.clobaframe.io.ResourceInfo;
-import org.archboy.clobaframe.io.ResourceInfoFactory;
-import org.archboy.clobaframe.io.TemporaryResources;
-import org.archboy.clobaframe.io.impl.ResourceInfoFactoryImpl;
-import org.archboy.clobaframe.io.impl.DefaultTemporaryResources;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,10 +33,7 @@ public class FileBaseResourceInfoFactoryTest {
 
 	@Inject
 	private ResourceLoader resourceLoader;
-	
-	//@Inject
-	//private ResourceInfoFactory resourceInfoFactory; // = new ResourceInfoFactoryImpl();
-	
+		
 	@Inject
 	private FileBaseResourceInfoFactory fileBaseResourceInfoFactory;
 	

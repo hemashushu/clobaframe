@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Date;
-import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.TextResourceInfo;
 import org.springframework.util.Assert;
 

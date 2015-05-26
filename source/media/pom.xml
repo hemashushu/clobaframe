@@ -32,6 +32,12 @@
 		<!-- Clobaframe -->
 		<dependency>
 			<groupId>org.archboy.clobaframe</groupId>
+			<artifactId>clobaframe-setting</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.archboy.clobaframe</groupId>
 			<artifactId>clobaframe-io</artifactId>
 			<version>${project.version}</version>
 		</dependency>

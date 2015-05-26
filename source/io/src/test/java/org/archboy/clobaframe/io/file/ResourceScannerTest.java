@@ -31,9 +31,6 @@ public class ResourceScannerTest {
 	
 	@Inject
 	private FileBaseResourceInfoFactory fileBaseResourceInfoFactory;
-	
-	@Inject
-	private FileBaseResourceInfoWrapper fileBaseResourceInfoWrapper;
 
 	@Inject
 	private ResourceScanner resourceScanner;

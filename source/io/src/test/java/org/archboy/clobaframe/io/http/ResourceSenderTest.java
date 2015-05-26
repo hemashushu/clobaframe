@@ -32,7 +32,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
-import org.archboy.clobaframe.io.file.FileBaseResourceInfoWrapper;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.springframework.core.io.Resource;

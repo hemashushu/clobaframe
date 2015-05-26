@@ -1,10 +1,9 @@
 package org.archboy.clobaframe.setting;
 
 /**
- * Cache-able setting manager.
+ * Cacheable setting manager.
  * 
- * All item's value would be load first and store in the memory cache,
- * rather than load from provider each access.
+ * All item's value would be load once and store in the memory (as cache).
  * 
  * @author yang
  */

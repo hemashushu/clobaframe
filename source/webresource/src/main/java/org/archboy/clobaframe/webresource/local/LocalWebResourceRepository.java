@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Stack;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +16,6 @@ import org.springframework.core.io.ResourceLoader;
 import javax.inject.Named;
 import org.archboy.clobaframe.io.MimeTypeDetector;
 import org.archboy.clobaframe.io.ResourceInfo;
-import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
 import org.archboy.clobaframe.io.file.ResourceScanner;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceRepository;
@@ -38,10 +36,16 @@ public class LocalWebResourceRepository implements WebResourceRepository{
 	
 	private LocalWebResourceInfoFactory localWebResourceInfoGenerator;
 	
-	@Value("${clobaframe.webresource.repository.local.path}")
+	// local resource path, usually relative to the 'src/main/webapp' folder.
+	// to using this repository, the web application war package must be expended when running.
+	private static final String DEFAULT_LOCAL_PATH = "resources";
+	
+	@Value("${clobaframe.webresource.repository.local.path:" + DEFAULT_LOCAL_PATH + "}")
 	private String localPath;
 	
 	private File baseDir;
+	
+	private boolean isInitialized = false;
 	
 	private final Logger logger = LoggerFactory.getLogger(LocalWebResourceRepository.class);
 
@@ -51,27 +55,36 @@ public class LocalWebResourceRepository implements WebResourceRepository{
 	}
 
 	@Override
-	public int getPriority() {
+	public int getOrder() {
 		return PRIORITY_NORMAL;
 	}
 
 	@PostConstruct
-	public void init() throws IOException {
+	public void init() {
 		Resource resource = resourceLoader.getResource(localPath);
-		baseDir = resource.getFile();
-		if (!baseDir.exists()){
-			throw new FileNotFoundException(String.format(
-					"Can not find the file [%s], p.s. the current path is [%s].",
-					localPath,
-					resourceLoader.getResource(".").getFile().getAbsolutePath()));
+		
+		try{
+			baseDir = resource.getFile();
+			if (!baseDir.exists()){
+				logger.error("Can not find the web resource folder [{}].", localPath);
+				return;
+			}
+			
+			localWebResourceNameStrategy = new DefaultLocalWebResourceNameStrategy(baseDir);
+			localWebResourceInfoGenerator = new LocalWebResourceInfoFactory(mimeTypeDetector, localWebResourceNameStrategy);
+			isInitialized = true;
+			
+		}catch(IOException e){
+			logger.error("Load local web resource repository error, {}", e.getMessage());
 		}
-
-		localWebResourceNameStrategy = new DefaultLocalWebResourceNameStrategy(baseDir);
-		localWebResourceInfoGenerator = new LocalWebResourceInfoFactory(mimeTypeDetector, localWebResourceNameStrategy);
 	}
 
 	@Override
 	public WebResourceInfo getByName(String name) {
+		if (!isInitialized) {
+			return null;
+		}
+		
 		File file = new File(baseDir, name);
 		if (!file.exists()) {
 			return null;
@@ -82,11 +95,13 @@ public class LocalWebResourceRepository implements WebResourceRepository{
 
 	@Override
 	public Collection<WebResourceInfo> getAll() {
-		
-		Collection<ResourceInfo> resourceInfos = resourceScanner.scan(baseDir, localWebResourceInfoGenerator);
-		
 		List<WebResourceInfo> webResourceInfos = new ArrayList<WebResourceInfo>();
 		
+		if (!isInitialized) {
+			return webResourceInfos;
+		}
+		
+		Collection<ResourceInfo> resourceInfos = resourceScanner.scan(baseDir, localWebResourceInfoGenerator);
 		for(ResourceInfo resourceInfo : resourceInfos) {
 			webResourceInfos.add((WebResourceInfo)resourceInfo);
 		}

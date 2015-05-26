@@ -2,6 +2,7 @@ package org.archboy.clobaframe.cache.ehcache;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,8 +15,11 @@ import javax.inject.Named;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.cache.Cache.Policy;
 import org.archboy.clobaframe.cache.Expiration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -30,10 +34,10 @@ public class EhcacheCache implements org.archboy.clobaframe.cache.Cache, Closeab
 	private static final String DEFAULT_CACHE_REGION_NAME = "common";
 	private static final String DEFAULT_CACHE_CONFIGURATION_FILE = "ehcache.xml";
 
-	@Value("${clobaframe.cache.ehcache.region}")
+	@Value("${clobaframe.cache.ehcache.region:" + DEFAULT_CACHE_REGION_NAME + "}")
 	private String cacheRegionName = DEFAULT_CACHE_REGION_NAME;
 
-	@Value("${clobaframe.cache.ehcache.configuration}")
+	@Value("${clobaframe.cache.ehcache.configuration:" + DEFAULT_CACHE_CONFIGURATION_FILE + "}")
 	private String cacheConfigurationFile = DEFAULT_CACHE_CONFIGURATION_FILE;
 
 	@Inject
@@ -42,11 +46,21 @@ public class EhcacheCache implements org.archboy.clobaframe.cache.Cache, Closeab
 	private CacheManager cacheManager;
 	private Cache cache;
 
+	private final Logger logger = LoggerFactory.getLogger(EhcacheCache.class);
+			
 	@PostConstruct
-	public void init() throws IOException{
+	public void init() {
 		Resource resource = resourceLoader.getResource(cacheConfigurationFile);
-		cacheManager = CacheManager.create(resource.getURL());
-		cache = cacheManager.getCache(cacheRegionName);
+		InputStream in = null;
+		try{
+			in = resource.getInputStream();
+			cacheManager = CacheManager.create(in);
+			cache = cacheManager.getCache(cacheRegionName);
+		}catch(IOException e){
+			logger.error("Can not create EhCache, cause: {}.", e.getMessage());
+		}finally{
+			IOUtils.closeQuietly(in);
+		}
 	}
 
 	@PreDestroy

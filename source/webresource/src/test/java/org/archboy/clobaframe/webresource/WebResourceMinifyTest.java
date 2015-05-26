@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import javax.inject.Inject;
 import org.apache.commons.io.IOUtils;
-import org.archboy.clobaframe.webresource.WebResourceInfo;
-import org.archboy.clobaframe.webresource.WebResourceManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;

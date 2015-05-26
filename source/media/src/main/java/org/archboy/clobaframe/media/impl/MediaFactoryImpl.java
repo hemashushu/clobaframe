@@ -37,8 +37,8 @@ public class MediaFactoryImpl implements MediaFactory{
 	// default 32 MB
 	private static final long DEFAULT_MAX_HANDLE_SIZE_BYTE = 32L * 1024 * 1024;
 	
-	@Value("${clobaframe.media.maxHandleSize}")
-	private long maxHandleSizeByte = DEFAULT_MAX_HANDLE_SIZE_BYTE;
+	@Value("${clobaframe.media.maxHandleSize:" + DEFAULT_MAX_HANDLE_SIZE_BYTE + "}")
+	private long maxHandleSizeByte;
 
 	private final Logger logger = LoggerFactory.getLogger(MediaFactoryImpl.class);
 

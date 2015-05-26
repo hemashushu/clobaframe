@@ -6,12 +6,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -20,6 +18,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceRepository;
 import org.archboy.clobaframe.webresource.WebResourceRepositorySet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -31,7 +31,9 @@ import org.springframework.core.io.ResourceLoader;
 @Named
 public class ConcatenateWebResourceRepository implements WebResourceRepository {
 
-	@Value("${clobaframe.webresource.concatenateConfig}")
+	private static final String DEFAULT_CONCATENATE_CONFIG = "";
+	
+	@Value("${clobaframe.webresource.concatenateConfig:" + DEFAULT_CONCATENATE_CONFIG + "}")
 	private String concatenateConfig;
 	
 	@Inject
@@ -45,19 +47,20 @@ public class ConcatenateWebResourceRepository implements WebResourceRepository {
 	// the concatenate web resource
 	private Map<String, List<String>> concatenates = new HashMap<String, List<String>>();
 
+	private final Logger logger = LoggerFactory.getLogger(ConcatenateWebResourceRepository.class);
+	
 	@Override
 	public String getName() {
 		return "concatenate";
 	}
 
 	@Override
-	public int getPriority() {
+	public int getOrder() {
 		return PRIORITY_HIGHEST;
 	}
 
 	@PostConstruct
 	public void init() throws IOException {
-		
 		if (StringUtils.isEmpty(concatenateConfig)){
 			return;
 		}
@@ -65,7 +68,7 @@ public class ConcatenateWebResourceRepository implements WebResourceRepository {
 		Resource resource = resourceLoader.getResource(concatenateConfig);
 		if (!resource.exists()){
 			throw new FileNotFoundException(String.format(
-					"Can not find the composite config file [%s].",
+					"Can not find the concatenate config file [%s].",
 					concatenateConfig));
 		}
 

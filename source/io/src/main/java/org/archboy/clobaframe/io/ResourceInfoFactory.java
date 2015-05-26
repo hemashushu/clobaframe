@@ -1,6 +1,5 @@
 package org.archboy.clobaframe.io;
 
-import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Date;

@@ -4,7 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Named;
 import org.archboy.clobaframe.setting.global.GlobalSettingProvider;
 import org.archboy.clobaframe.setting.global.GlobalSettingRepository;
@@ -33,13 +32,6 @@ public class GlobalSettingImpl implements GlobalSetting {
 	
 	@PostConstruct
 	public void init(){
-//		// sort providers, from higher(smaller number) priority to lower.
-//		globalSettingProviders.sort(new Comparator<GlobalSettingProvider>() {
-//			@Override
-//			public int compare(GlobalSettingProvider o1, GlobalSettingProvider o2) {
-//				return o1.getPriority() - o2.getPriority();
-//			}
-//		});
 		refresh();
 	}
 	
@@ -85,11 +77,17 @@ public class GlobalSettingImpl implements GlobalSetting {
 
 	@Override
 	public void set(String key, Object value) {
+		if (globalSettingRepository == null){
+			throw new IllegalArgumentException("No global setting repository.");
+		}
 		globalSettingRepository.update(key, value);
 	}
 
 	@Override
 	public void set(Map<String, Object> items) {
+		if (globalSettingRepository == null){
+			throw new IllegalArgumentException("No global setting repository.");
+		}
 		globalSettingRepository.update(items);
 	}
 }

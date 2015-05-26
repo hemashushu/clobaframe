@@ -1,7 +1,6 @@
 package org.archboy.clobaframe.setting.application.impl;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
@@ -20,17 +19,12 @@ import org.springframework.core.io.ResourceLoader;
  * @author yang
  */
 public class JsonApplicationSettingProvider implements ApplicationSettingProvider {
-
-//	protected String dataFolder;
-//	protected String fileName;
 	
 	protected Resource resource;
 	
 	private final Logger logger = LoggerFactory.getLogger(JsonApplicationSettingProvider.class);
 	
 	public JsonApplicationSettingProvider(String dataFolder, String fileName) {
-//		this.dataFolder = dataFolder;
-//		this.fileName = fileName;
 		File file = new File(dataFolder, fileName);
 		resource = new FileSystemResource(file);
 	}

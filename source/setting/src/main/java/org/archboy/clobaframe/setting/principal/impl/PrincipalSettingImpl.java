@@ -1,7 +1,5 @@
 package org.archboy.clobaframe.setting.principal.impl;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,32 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class PrincipalSettingImpl implements PrincipalSetting {
 
 	@Autowired(required = false)
-	private List<PrincipalSettingProvider> principalSettingProviders; // = new ArrayList<PrincipalSettingProvider>();
+	private List<PrincipalSettingProvider> principalSettingProviders;
 
 	@Autowired(required = false)
-	private List<PrincipalSettingRepository> principalSettingRepositorys; // = new ArrayList<PrincipalSettingRepository>();
-	
-//	@Override
-//	public void addProfileSettingProvider(PrincipalSettingProvider profileSettingProvider) {
-//		principalSettingProviders.add(profileSettingProvider);
-//		sortProviders();
-//	}
-//
-//	@Override
-//	public void addProfileSettingRepository(PrincipalSettingRepository profileSettingRepository) {
-//		principalSettingRepositorys.add(profileSettingRepository);
-//	}
-	
-//	private void sortProviders(){
-//		// sort providers, from higher(smaller number) priority to lower.
-//		principalSettingProviders.sort(new Comparator<PrincipalSettingProvider>() {
-//			@Override
-//			public int compare(PrincipalSettingProvider o1, PrincipalSettingProvider o2) {
-//				return o1.getPriority() - o2.getPriority();
-//			}
-//		});
-//	}
-	
+	private List<PrincipalSettingRepository> principalSettingRepositorys;
+
 	@Override
 	public Object get(Principal profile, String key) {
 		for(PrincipalSettingProvider provider : principalSettingProviders) {
@@ -74,6 +51,10 @@ public class PrincipalSettingImpl implements PrincipalSetting {
 
 	@Override
 	public void set(Principal profile, String key, Object value) {
+		if (principalSettingRepositorys == null || principalSettingRepositorys.isEmpty()){
+			throw new IllegalArgumentException("No principal setting repository.");
+		}
+		
 		for(PrincipalSettingRepository repository : principalSettingRepositorys) {
 			if (repository.support(profile)) {
 				repository.set(profile, key, value);
@@ -84,6 +65,10 @@ public class PrincipalSettingImpl implements PrincipalSetting {
 
 	@Override
 	public void set(Principal profile, Map<String, Object> items) {
+		if (principalSettingRepositorys == null || principalSettingRepositorys.isEmpty()){
+			throw new IllegalArgumentException("No principal setting repository.");
+		}
+		
 		for(PrincipalSettingRepository repository : principalSettingRepositorys) {
 			if (repository.support(profile)) {
 				repository.set(profile, items);

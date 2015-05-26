@@ -8,25 +8,22 @@ import org.springframework.core.Ordered;
  * @author yang
  */
 public interface PrincipalSettingProvider extends PrincipalSpecial, Ordered {
-	
-//	/**
-//	 * The provider priority.
-//	 * 
-//	 * The higher priority item value will be selected when
-//	 * many items have the same item key (/name).
-//	 * @return 
-//	 */
-//	int getPriority();
-	
-	Object get(Principal profile, String key);
-	
+
 	/**
-	 * Never return null.
 	 * 
-	 * @param profile
+	 * @param principal
+	 * @param key
 	 * @return 
 	 */
-	Map<String, Object> getAll(Principal profile);
+	Object get(Principal principal, String key);
+	
+	/**
+	 * 
+	 * 
+	 * @param principal 
+	 * @return Never return null.
+	 */
+	Map<String, Object> getAll(Principal principal);
 
 	
 }

@@ -23,17 +23,17 @@ public class WebResourceRepositorySetImpl implements WebResourceRepositorySet {
 	@Inject
 	private List<WebResourceRepository> resourceRepositories;
 
-	@PostConstruct
-	public void init() throws IOException {
-		// sort the repositories
-		resourceRepositories.sort(new Comparator<WebResourceRepository>() {
-
-			@Override
-			public int compare(WebResourceRepository o1, WebResourceRepository o2) {
-				return o1.getPriority() - o2.getPriority();
-			}
-		});
-	}
+//	@PostConstruct
+//	public void init() throws IOException {
+//		// sort the repositories
+//		resourceRepositories.sort(new Comparator<WebResourceRepository>() {
+//
+//			@Override
+//			public int compare(WebResourceRepository o1, WebResourceRepository o2) {
+//				return o1.getPriority() - o2.getPriority();
+//			}
+//		});
+//	}
 
 	@Override
 	public WebResourceInfo getByName(String name) {

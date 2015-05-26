@@ -1,6 +1,5 @@
 package org.archboy.clobaframe.webresource;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -15,13 +14,7 @@ import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
-import org.archboy.clobaframe.webresource.AbstractWebResourceInfo;
-import org.archboy.clobaframe.webresource.VirtualWebResourceProvider;
-import org.archboy.clobaframe.webresource.VirtualWebResourceRepository;
-import org.archboy.clobaframe.webresource.WebResourceInfo;
-import org.archboy.clobaframe.webresource.WebResourceManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -46,9 +39,6 @@ public class WebResourceManagerTest {
 	private WebResourceManager webResourceManager;
 	
 	@Inject
-	private VirtualWebResourceRepository virtualResourceRepository;
-	
-	@Inject
 	private ResourceLoader resourceLoader;
 
 	private final Logger logger = LoggerFactory.getLogger(WebResourceManagerTest.class);
@@ -70,9 +60,10 @@ public class WebResourceManagerTest {
 			"test.css", "test.js", "test.png",
 			"css/test2.css", "css/test3.css", "css/test4.css", "css/test5.css",
 			"fonts/fontawesome-webfont.eot","fonts/fontawesome-webfont.svg","fonts/fontawesome-webfont.ttf","fonts/fontawesome-webfont.woff",
-			"image/info-32.png", "image/success-16.png", "image/warn-16.png",
-			"css/concat-34.css", "css/concat-345.css"
+			"image/info-32.png", "image/success-16.png", "image/warn-16.png" //,
 		};
+//			"css/concat-34.css", "css/concat-345.css"
+//		};
 		
 		for (String name : names) {
 			WebResourceInfo webResourceInfo = webResourceManager.getResource(name);

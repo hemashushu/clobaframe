@@ -33,6 +33,7 @@ public class DefaultResourceSender implements ResourceSender {
 		response.setBufferSize(sendBufferSize);
 		
 		// The default value is http 200 OK.
+		// It needn't set this property manually, cause of this is the default value.
 		//response.setStatus(HttpServletResponse.SC_OK);
 		
 		response.setContentType(resourceInfo.getMimeType());

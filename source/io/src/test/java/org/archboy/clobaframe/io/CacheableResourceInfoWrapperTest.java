@@ -1,14 +1,11 @@
 package org.archboy.clobaframe.io;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Calendar;
 import java.util.Date;
 import javax.inject.Inject;
 import org.apache.commons.io.IOUtils;
-import org.archboy.clobaframe.io.impl.ResourceInfoFactoryImpl;
 import org.archboy.clobaframe.io.impl.DefaultTextResourceInfo;
 import org.junit.After;
 import org.junit.Before;
@@ -27,10 +24,10 @@ import static org.junit.Assert.*;
 public class CacheableResourceInfoWrapperTest {
 
 	@Inject
-	private ResourceInfoFactory resourceInfoFactory; // = new ResourceInfoFactoryImpl();
+	private ResourceInfoFactory resourceInfoFactory;
 	
 	@Inject
-	private CacheableResourceInfoWrapper cacheableResourceInfoWrapper; // resourceInfoFactory = new ResourceInfoFactoryImpl();
+	private CacheableResourceInfoWrapper cacheableResourceInfoWrapper;
 	
 	@Before
 	public void setUp() throws Exception {

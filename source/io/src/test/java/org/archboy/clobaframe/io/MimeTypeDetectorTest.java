@@ -33,6 +33,8 @@ public class MimeTypeDetectorTest {
 	private String[] sampleFiles = new String[]{
 		"sample/data/test.jpg", 
 		"sample/data/test.png", 
+		"sample/data/test.svg", 
+		"sample/data/test.svgz", 
 		"sample/data/test.txt", 
 		"sample/data/test.xml", 
 		"sample/data/test.data", // its content is a png image file.
@@ -65,6 +67,9 @@ public class MimeTypeDetectorTest {
 		String[] types = new String[]{
 			"image/jpeg",
 			"image/png",
+			"image/svg+xml",
+			//"image/svg+xml-compressed", // *.svgz, it equals svg+gzip
+			"image/svg+xml",
 			"text/plain",
 			"application/xml",
 			"application/octet-stream", // *.data, its content is a png image file.

@@ -1,10 +1,8 @@
 package org.archboy.clobaframe.webresource.impl;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Named;
 import org.archboy.clobaframe.webresource.VersionStrategy;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
-import org.springframework.beans.factory.annotation.Value;
 
 /**
  * The default version strategy.

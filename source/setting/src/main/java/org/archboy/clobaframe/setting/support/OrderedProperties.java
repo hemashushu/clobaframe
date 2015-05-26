@@ -9,7 +9,9 @@ import java.util.Properties;
 import java.util.Set;
 
 /**
- *
+ * Ordered properties.
+ * For Keeping the items order when save the new values.
+ * 
  * @author yang
  */
 public class OrderedProperties extends Properties {

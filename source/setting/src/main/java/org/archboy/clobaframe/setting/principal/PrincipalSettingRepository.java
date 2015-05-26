@@ -8,7 +8,18 @@ import java.util.Map;
  */
 public interface PrincipalSettingRepository extends PrincipalSpecial {
 	
-	void set(Principal profile, Map<String, Object> item);
+	/**
+	 * 
+	 * @param principal
+	 * @param item 
+	 */
+	void set(Principal principal, Map<String, Object> item);
 	
-	void set(Principal profile, String key, Object value);
+	/**
+	 * 
+	 * @param principal
+	 * @param key
+	 * @param value 
+	 */
+	void set(Principal principal, String key, Object value);
 }

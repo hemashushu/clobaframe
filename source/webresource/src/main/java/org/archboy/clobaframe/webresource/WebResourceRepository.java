@@ -1,12 +1,13 @@
 package org.archboy.clobaframe.webresource;
 
 import java.util.Collection;
+import org.springframework.core.Ordered;
 
 /**
  *
  * @author yang
  */
-public interface WebResourceRepository {
+public interface WebResourceRepository extends Ordered {
 
 	public static final int PRIORITY_HIGHEST = 0;
 	public static final int PRIORITY_HIGHER = 20;
@@ -31,7 +32,7 @@ public interface WebResourceRepository {
 	 * 
 	 * @return 
 	 */
-	int getPriority();
+	//int getOrder();
 	
 	/**
 	 * 

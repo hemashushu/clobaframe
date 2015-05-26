@@ -29,7 +29,7 @@ public class VirtualWebResourceRepositoryImpl implements VirtualWebResourceRepos
 	}
 
 	@Override
-	public int getPriority() {
+	public int getOrder() {
 		return PRIORITY_HIGHER;
 	}
 

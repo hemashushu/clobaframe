@@ -24,6 +24,10 @@ public interface MultipartFormResourceInfo extends ResourceInfo{
 	 */
 	boolean isFormField();
 
+	/**
+	 * The not(isFormField()).
+	 * @return 
+	 */
 	boolean isFileField();
 	
 	/**

@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Date;
 import javax.inject.Named;
-import org.archboy.clobaframe.io.CacheableResourceInfo;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.ResourceInfoFactory;
 import org.archboy.clobaframe.io.TextResourceInfo;

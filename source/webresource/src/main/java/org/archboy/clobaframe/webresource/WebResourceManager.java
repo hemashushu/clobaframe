@@ -1,6 +1,5 @@
 package org.archboy.clobaframe.webresource;
 
-import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -73,13 +72,6 @@ public interface WebResourceManager {
 	 * @return 
 	 */
 	Collection<WebResourceInfo> getAllOriginalResource();
-	
-//	/**
-//	 * 
-//	 * @param webResourceInfo
-//	 * @return 
-//	 */
-//	String getVersionName(WebResourceInfo webResourceInfo);
 	
 	/**
 	 * Get the location (URL) of the specify resource.

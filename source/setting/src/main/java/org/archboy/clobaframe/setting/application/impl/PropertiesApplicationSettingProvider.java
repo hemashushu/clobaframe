@@ -17,17 +17,12 @@ import org.springframework.core.io.ResourceLoader;
  * @author yang
  */
 public class PropertiesApplicationSettingProvider implements ApplicationSettingProvider {
-
-//	private ResourceLoader resourceLoader;
-//	private String fileName;
 	
 	protected Resource resource;
 	
 	private final Logger logger = LoggerFactory.getLogger(PropertiesApplicationSettingProvider.class);
 	
 	public PropertiesApplicationSettingProvider(ResourceLoader resourceLoader, String fileName) {
-//		this.resourceLoader = resourceLoader;
-//		this.fileName = fileName;
 		this.resource = resourceLoader.getResource(fileName);
 	}
 

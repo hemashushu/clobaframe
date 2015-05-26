@@ -8,8 +8,6 @@ import java.util.Calendar;
 import java.util.Date;
 import javax.inject.Inject;
 import org.apache.commons.io.IOUtils;
-import org.archboy.clobaframe.io.impl.ResourceInfoFactoryImpl;
-import org.archboy.clobaframe.io.impl.DefaultTextResourceInfo;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +25,7 @@ import static org.junit.Assert.*;
 public class ResourceInfoFactoryTest {
 
 	@Inject
-	private ResourceInfoFactory resourceInfoFactory; // = new ResourceInfoFactoryImpl();
+	private ResourceInfoFactory resourceInfoFactory;
 	
 	@Before
 	public void setUp() throws Exception {

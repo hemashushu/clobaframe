@@ -13,7 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.ResourceInfoFactory;
 import org.archboy.clobaframe.io.http.ResourceSender;
-import org.archboy.clobaframe.io.impl.ResourceInfoFactoryImpl;
 
 /**
  * Http compress.
@@ -36,19 +35,10 @@ import org.archboy.clobaframe.io.impl.ResourceInfoFactoryImpl;
 public class GZipResourceSender implements ResourceSender {
 
 	private ResourceSender resourceSender;
-	private Set<String> mimeTypeList;
+	private Set<String> mimeTypeList; // compressable mime type list.
 	private int minCompressSize;
 	
-	private ResourceInfoFactory resourceInfoFactory; // = new ResourceInfoFactoryImpl();
-	
-//	private List<String> mimeTypes = Arrays.asList(
-//			"text/html",
-//			"text/plain",
-//			"text/xml",
-//			"application/xhtml+xml",
-//			"text/css",
-//			"application/javascript",
-//			"image/svg+xml");
+	private ResourceInfoFactory resourceInfoFactory;
 
 	public GZipResourceSender(ResourceSender resourceSender, Set<String> mimeTypeList, int minCompressSize, ResourceInfoFactory resourceInfoFactory) {
 		this.resourceSender = resourceSender;

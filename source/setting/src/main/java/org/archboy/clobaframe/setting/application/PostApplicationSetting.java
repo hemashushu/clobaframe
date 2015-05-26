@@ -6,7 +6,7 @@ import java.util.Map;
  * Do something after application setting load complete and before
  * other service startup.
  * 
- * such as application data initialize working etc.
+ * such as application data/database initialization etc.
  * 
  * @author yang
  */

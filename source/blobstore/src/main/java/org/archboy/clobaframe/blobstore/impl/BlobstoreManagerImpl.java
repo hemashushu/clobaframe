@@ -17,8 +17,8 @@ public class BlobstoreManagerImpl implements BlobstoreManager {
 
 	private static final String DEFAULT_BLOBSTORE_NAME = "local";
 
-	@Value("${clobaframe.blobstore.default}")
-	private String defaultBlobstoreName = DEFAULT_BLOBSTORE_NAME;
+	@Value("${clobaframe.blobstore.default:" + DEFAULT_BLOBSTORE_NAME + "}")
+	private String defaultBlobstoreName;
 	
 	@Inject
 	private List<Blobstore> blobstores;

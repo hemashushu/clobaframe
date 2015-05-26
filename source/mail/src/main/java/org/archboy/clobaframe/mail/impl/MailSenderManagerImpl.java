@@ -19,8 +19,8 @@ public class MailSenderManagerImpl implements MailSenderManager {
 
 	private static final String DEFAULT_MAIL_SENDER_NAME = "null";
 
-	@Value("${clobaframe.mail.default}")
-	private String defaultMailSenderName = DEFAULT_MAIL_SENDER_NAME;
+	@Value("${clobaframe.mail.default:" + DEFAULT_MAIL_SENDER_NAME + "}")
+	private String defaultMailSenderName;
 
 	@Inject
 	private List<AbstractMailSender> mailSenders;

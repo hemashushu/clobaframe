@@ -97,6 +97,13 @@
 			<version>2.5.1</version>
 		</dependency>
 
+		<!-- clobaframe -->
+		<dependency>
+			<groupId>org.archboy.clobaframe</groupId>
+			<artifactId>clobaframe-setting</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
 	</dependencies>
 
 	<repositories>

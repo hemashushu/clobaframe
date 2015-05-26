@@ -28,9 +28,16 @@ import org.springframework.beans.factory.annotation.Value;
 @Named
 public class WebResourceManagerImpl implements WebResourceManager {
 
+	private static final String DEFAULT_LOCATION_STRATEGY = "default";
+	private static final boolean DEFAULT_CAN_MINIFY = false;
+	private static final boolean DEFAULT_CAN_COMPRESS = true;
+	private static final boolean DEFAULT_CAN_SERVER_CACHE = true;
+	private static final int DEFAULT_SERVER_CACHE_SECONDS = 10 * 60;
+
+	
 	private ResourceCache resourceCache;
 
-	@Value("${clobaframe.webresource.locationStrategy}")
+	@Value("${clobaframe.webresource.locationStrategy:" + DEFAULT_LOCATION_STRATEGY + "}")
 	private String locationStrategyName;
 	
 	@Inject
@@ -43,21 +50,18 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	
 	private List<String> compressibleWebResourceMimeTypes; 
 	private List<String> minifyWebResourceMimeTypes; 
-
-	@Value("${clobaframe.webresource.minify}")
+	
+	@Value("${clobaframe.webresource.minify:" + DEFAULT_CAN_MINIFY + "}")
 	private boolean canMinify;
 	
-	@Value("${clobaframe.webresource.compress}")
+	@Value("${clobaframe.webresource.compress:" + DEFAULT_CAN_COMPRESS + "}")
 	private boolean canCompress;
-		
-	@Value("${clobaframe.webresource.serverCache}")
+	
+	@Value("${clobaframe.webresource.serverCache:" + DEFAULT_CAN_SERVER_CACHE + "}")
 	private boolean canServerCache;
-
 	
-	private static final int DEFAULT_SERVER_CACHE_SECONDS = 10 * 60;
-	
-	@Value("${clobaframe.webresource.serverCacheSeconds}")
-	private int cacheSeconds = DEFAULT_SERVER_CACHE_SECONDS;
+	@Value("${clobaframe.webresource.serverCacheSeconds:" + DEFAULT_SERVER_CACHE_SECONDS + "}")
+	private int cacheSeconds;
 	
 	private final Logger logger = LoggerFactory.getLogger(WebResourceManagerImpl.class);
 

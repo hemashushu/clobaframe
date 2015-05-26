@@ -33,10 +33,14 @@ public class LocalBlobstore implements Blobstore {
 	@Inject
 	private ResourceLoader resourceLoader;
 
-	@Value("${clobaframe.blobstore.local.path}")
+	private static final String DEFAULT_LOCAL_PATH = "file:${java.io.tmpdir}/${clobaframe.setting.appName}/blobstore";
+	
+	@Value("${clobaframe.blobstore.local.path:" + DEFAULT_LOCAL_PATH + "}")
 	private String localPath;
 
-	@Value("${clobaframe.blobstore.local.autoCreateRootFolder}")
+	private static final boolean DEFAULT_AUTO_CREATE_ROOT_FOLDER = true;
+	
+	@Value("${clobaframe.blobstore.local.autoCreateRootFolder:" + DEFAULT_AUTO_CREATE_ROOT_FOLDER + "}")
 	private boolean autoCreateRootFolder;
 
 	// local blobstore root dir

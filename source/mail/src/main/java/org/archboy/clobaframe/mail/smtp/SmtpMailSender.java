@@ -43,8 +43,8 @@ public class SmtpMailSender extends AbstractMailSender {
 
 	private static final String DEFAULT_SMTP_CONFIG = "classpath:org/archboy/clobaframe/mail/smtp/config-example.properties";
 	
-	@Value("${clobaframe.mail.smtp.config}")
-	private String smtpConfig = DEFAULT_SMTP_CONFIG;
+	@Value("${clobaframe.mail.smtp.config:" + DEFAULT_SMTP_CONFIG + "}")
+	private String smtpConfig;
 	
 	@Inject
 	private ResourceLoader resourceLoader;

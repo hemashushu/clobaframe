@@ -2,11 +2,9 @@ package org.archboy.clobaframe.io.http.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,19 +31,17 @@ import org.springframework.core.io.ResourceLoader;
 public class ResourceSenderImpl implements ResourceSender {
 
 	private static final boolean DEFAULT_ENABLE_GZIP = false;
-	
-	@Value("${clobaframe.io.http.gzip}")
-	private boolean enableGzip = DEFAULT_ENABLE_GZIP;
-
 	// only the content length large than this value would be compress
 	private static final int DEFAULT_MIN_COMPRESS_SIZE = 1024;
-	
-	@Value("${clobaframe.io.http.gzip.minCompressSize}")
-	private int minCompressSize = DEFAULT_MIN_COMPRESS_SIZE;
-	
 	private static final String DEFAULT_COMPRESSIBLE_MIME_TYPE_LIST = "classpath:org/archboy/clobaframe/io/compressibleMimeType.json";
 	
-	@Value("${clobaframe.io.http.gzip.mimeTypeList}")
+	@Value("${clobaframe.io.http.gzip:"+ DEFAULT_ENABLE_GZIP + "}")
+	private boolean enableGzip = DEFAULT_ENABLE_GZIP;
+
+	@Value("${clobaframe.io.http.gzip.minCompressSize:" + DEFAULT_MIN_COMPRESS_SIZE +"}")
+	private int minCompressSize = DEFAULT_MIN_COMPRESS_SIZE;
+	
+	@Value("${clobaframe.io.http.gzip.mimeTypeList:" + DEFAULT_COMPRESSIBLE_MIME_TYPE_LIST + "}")
 	private String compressibleMimeTypeList = DEFAULT_COMPRESSIBLE_MIME_TYPE_LIST;
 		
 	@Inject

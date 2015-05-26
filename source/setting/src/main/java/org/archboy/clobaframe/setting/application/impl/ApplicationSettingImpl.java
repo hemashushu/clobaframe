@@ -29,6 +29,7 @@ import org.springframework.util.Assert;
 public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoaderAware, InitializingBean {
 
 	private static final String DEFAULT_ROOT_CONFIG_FILE_NAME = "classpath:root.properties";
+	private static final String DEFAULT_APP_NAME = "clobaframe";
 	private static final String DEFAULT_DATA_FOLDER = "${java.io.tmpdir}/${clobaframe.setting.appName}";
 	private static final boolean DEFAULT_AUTO_CREATE_DATA_FOLDER = true;
 	private static final String DEFAULT_SETTING_FILE_NAME = "classpath:application.properties";
@@ -36,7 +37,7 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 	private static final String DEFAULT_EXTRA_SETTING_FILE_NAME = "extra.json";
 
 	private String rootConfigFileName = DEFAULT_ROOT_CONFIG_FILE_NAME;
-	private String appName;
+	private String appName = DEFAULT_APP_NAME;
 	
 	/**
 	 * folder that store application running necessary files.
@@ -52,6 +53,9 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 	
 	private Map<String, Object> setting = new LinkedHashMap<String, Object>();
 	
+	/**
+	 * Other in-jar-package settings resource.
+	 */
 	private Resource[] locations;
 	
 	private ResourceLoader resourceLoader;
@@ -244,11 +248,17 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 	
 	@Override
 	public void set(String key, Object value) {
+		if (applicationSettingRepository == null){
+			throw new IllegalArgumentException("No application setting repository.");
+		}
 		applicationSettingRepository.update(key, value);
 	}
 
 	@Override
 	public void set(Map<String, Object> items) {
+		if (applicationSettingRepository == null){
+			throw new IllegalArgumentException("No application setting repository.");
+		}
 		applicationSettingRepository.update(items);
 	}
 

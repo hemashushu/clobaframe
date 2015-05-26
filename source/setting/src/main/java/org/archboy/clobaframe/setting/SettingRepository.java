@@ -3,7 +3,9 @@ package org.archboy.clobaframe.setting;
 import java.util.Map;
 
 /**
- *
+ * The repository for persists the setting value.
+ * Commonly there is at most one repository for one setting manager.
+ * 
  * @author yang
  */
 public interface SettingRepository {
