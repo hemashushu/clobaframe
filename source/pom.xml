@@ -39,6 +39,7 @@
 		<module>blobstore</module>
 		<module>webresource</module>
 		<module>mail</module>
+		<module>search</module>
 	</modules>
 
 	<properties>
