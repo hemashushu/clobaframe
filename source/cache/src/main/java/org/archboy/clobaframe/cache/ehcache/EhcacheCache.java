@@ -35,10 +35,10 @@ public class EhcacheCache implements org.archboy.clobaframe.cache.Cache, Closeab
 	private static final String DEFAULT_CACHE_CONFIGURATION_FILE = "ehcache.xml";
 
 	@Value("${clobaframe.cache.ehcache.region:" + DEFAULT_CACHE_REGION_NAME + "}")
-	private String cacheRegionName = DEFAULT_CACHE_REGION_NAME;
+	private String cacheRegionName;
 
 	@Value("${clobaframe.cache.ehcache.configuration:" + DEFAULT_CACHE_CONFIGURATION_FILE + "}")
-	private String cacheConfigurationFile = DEFAULT_CACHE_CONFIGURATION_FILE;
+	private String cacheConfigurationFile;
 
 	@Inject
 	private ResourceLoader resourceLoader;

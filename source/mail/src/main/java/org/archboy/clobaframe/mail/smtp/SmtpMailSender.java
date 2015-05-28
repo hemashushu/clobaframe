@@ -21,6 +21,7 @@ import org.archboy.clobaframe.mail.impl.AbstractMailSender;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 
 /**
@@ -41,7 +42,8 @@ public class SmtpMailSender extends AbstractMailSender {
 	private String fromAddress;
 	private String fromName;
 
-	private static final String DEFAULT_SMTP_CONFIG = "classpath:org/archboy/clobaframe/mail/smtp/config-example.properties";
+	//private static final String DEFAULT_SMTP_CONFIG = "classpath:org/archboy/clobaframe/mail/smtp/config-example.properties";
+	private static final String DEFAULT_SMTP_CONFIG = "";
 	
 	@Value("${clobaframe.mail.smtp.config:" + DEFAULT_SMTP_CONFIG + "}")
 	private String smtpConfig;
@@ -53,11 +55,15 @@ public class SmtpMailSender extends AbstractMailSender {
 
 	@PostConstruct
 	public void init() throws IOException{
+		if (StringUtils.isEmpty(smtpConfig)) {
+			return;
+		}
+		
 		Resource resource = resourceLoader.getResource(smtpConfig);
 		if (!resource.exists()){
-			logger.warn("Can not find the smtp config file [%s].",
-					smtpConfig);
-			return;
+			throw new FileNotFoundException(
+					String.format("Can not find the smtp config file [%s].",
+					smtpConfig));
 		}
 
 		Properties properties = new Properties();

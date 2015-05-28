@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,13 +15,11 @@ import java.util.NavigableSet;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.archboy.clobaframe.blobstore.BlobResourceInfo;
-import org.archboy.clobaframe.blobstore.BlobResourceRepository;
 import org.archboy.clobaframe.blobstore.PartialCollection;
 import org.archboy.clobaframe.blobstore.impl.AbstractBlobResourceRepository;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
-import org.mapdb.Serializer;
 import org.springframework.util.Assert;
 
 /**
@@ -32,7 +29,7 @@ import org.springframework.util.Assert;
 public class LocalBlobResourceRepository extends AbstractBlobResourceRepository implements Closeable{
 
 	private String name; // repository name
-	private File rootDir; // repository root dir
+	private File repoDir; // repository root dir
 	
 	private DB db;
 	private BTreeMap<String, ResourceAttributes> table;
@@ -45,11 +42,11 @@ public class LocalBlobResourceRepository extends AbstractBlobResourceRepository 
 	private final TypeReference<Map<String, Object>> metaDataTypeReference = 
 			new TypeReference<Map<String, Object>>() {};
 	
-	public LocalBlobResourceRepository(String name, File indexFile,  File rootDir) {
+	public LocalBlobResourceRepository(String name, File indexFile,  File repoDir) {
 		this.name = name;
-		this.rootDir = rootDir;
+		this.repoDir = repoDir;
 		
-		Serializer<ResourceAttributes> serializer = new ResourceAttributesSerializer();
+		//Serializer<ResourceAttributes> serializer = new ResourceAttributesSerializer();
 		
 		db = DBMaker.newFileDB(indexFile)
            //.closeOnJvmShutdown()
@@ -81,7 +78,7 @@ public class LocalBlobResourceRepository extends AbstractBlobResourceRepository 
 		// read permission and priority
 		
 		String key = blobResourceInfo.getKey();
-		File file = new File(rootDir, key);
+		File file = new File(repoDir, key);
 
 		// copy content
 		InputStream in = blobResourceInfo.getContent();
@@ -120,7 +117,7 @@ public class LocalBlobResourceRepository extends AbstractBlobResourceRepository 
 	public void delete(String key) throws IOException {
 		Assert.notNull(key);
 		
-		File file = new File(rootDir, key);
+		File file = new File(repoDir, key);
 
 		if (!file.exists()){
 			return;
@@ -162,7 +159,7 @@ public class LocalBlobResourceRepository extends AbstractBlobResourceRepository 
 	}
 	
 	private BlobResourceInfo getBlobResourceInfo(String key, ResourceAttributes attributes) {
-		File file = new File(rootDir, key);
+		File file = new File(repoDir, key);
 		if (!file.exists() || file.isDirectory()) {
 			return null;
 		}

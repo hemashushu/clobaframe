@@ -68,6 +68,10 @@ public class Utils {
 	}
 	
 	public static Object resolvePlaceholder(Map<String, Object> setting, Object value){
+		if (value == null) {
+			return null;
+		}
+		
 		if (!(value instanceof String)){
 			return value;
 		}

@@ -20,7 +20,7 @@ public class CacheManagerImpl implements CacheManager {
 	private static final String DEFAULT_CACHE_NAME = "null";
 
 	@Value("${clobaframe.cache.default:" + DEFAULT_CACHE_NAME + "}")
-	private String defaultCacheName = DEFAULT_CACHE_NAME;
+	private String defaultCacheName;
 
 	@Inject
 	private List<Cache> caches;

@@ -27,7 +27,7 @@ public class MultipartFormResourceReceiverImpl implements MultipartFormResourceR
 	private static final long DEFAULT_MAX_UPLOAD_SIZE_BYTE = 12L * 1024 * 1024;
 
 	@Value("${clobaframe.io.maxUploadSize:" + DEFAULT_MAX_UPLOAD_SIZE_BYTE + "}")
-	private long maxUploadSizeByte = DEFAULT_MAX_UPLOAD_SIZE_BYTE;
+	private long maxUploadSizeByte;
 
 	@Override
 	public List<MultipartFormResourceInfo> receive(HttpServletRequest request,

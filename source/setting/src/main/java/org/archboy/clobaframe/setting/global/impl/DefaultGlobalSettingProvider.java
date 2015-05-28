@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.archboy.clobaframe.setting.global.GlobalSettingProvider;
 import org.archboy.clobaframe.setting.support.Utils;
 import org.slf4j.Logger;
@@ -25,7 +26,8 @@ public class DefaultGlobalSettingProvider implements GlobalSettingProvider {
 	@Inject
 	private ResourceLoader resourceLoader;
 
-	private static final String DEFAULT_GLOBAL_SETTING_FILE_NAME = "classpath:global.properties";
+	//private static final String DEFAULT_GLOBAL_SETTING_FILE_NAME = "classpath:global.properties";
+	private static final String DEFAULT_GLOBAL_SETTING_FILE_NAME = "";
 	
 	@Value("${clobaframe.setting.defaultGlobalSettingFileName:" + DEFAULT_GLOBAL_SETTING_FILE_NAME + "}")
 	private String defaultGlobalSettingFileName;
@@ -39,6 +41,10 @@ public class DefaultGlobalSettingProvider implements GlobalSettingProvider {
 
 	@Override
 	public Map<String, Object> getAll() {
+		if (StringUtils.isEmpty(defaultGlobalSettingFileName)){
+			return new LinkedHashMap<String, Object>();
+		}
+		
 		Resource resource = resourceLoader.getResource(defaultGlobalSettingFileName);
 		if (!resource.exists()) {
 			logger.warn("Default global setting [{}] not found.", resource.getFilename());

@@ -1,13 +1,11 @@
 package org.archboy.clobaframe.mail;
 
-
 import java.util.Date;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import javax.inject.Inject;
-import javax.inject.Named;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 

@@ -1,7 +1,6 @@
 package org.archboy.clobaframe.webresource.local;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,8 +44,6 @@ public class LocalWebResourceRepository implements WebResourceRepository{
 	
 	private File baseDir;
 	
-	private boolean isInitialized = false;
-	
 	private final Logger logger = LoggerFactory.getLogger(LocalWebResourceRepository.class);
 
 	@Override
@@ -72,7 +69,6 @@ public class LocalWebResourceRepository implements WebResourceRepository{
 			
 			localWebResourceNameStrategy = new DefaultLocalWebResourceNameStrategy(baseDir);
 			localWebResourceInfoGenerator = new LocalWebResourceInfoFactory(mimeTypeDetector, localWebResourceNameStrategy);
-			isInitialized = true;
 			
 		}catch(IOException e){
 			logger.error("Load local web resource repository error, {}", e.getMessage());
@@ -81,10 +77,6 @@ public class LocalWebResourceRepository implements WebResourceRepository{
 
 	@Override
 	public WebResourceInfo getByName(String name) {
-		if (!isInitialized) {
-			return null;
-		}
-		
 		File file = new File(baseDir, name);
 		if (!file.exists()) {
 			return null;
@@ -97,10 +89,6 @@ public class LocalWebResourceRepository implements WebResourceRepository{
 	public Collection<WebResourceInfo> getAll() {
 		List<WebResourceInfo> webResourceInfos = new ArrayList<WebResourceInfo>();
 		
-		if (!isInitialized) {
-			return webResourceInfos;
-		}
-		
 		Collection<ResourceInfo> resourceInfos = resourceScanner.scan(baseDir, localWebResourceInfoGenerator);
 		for(ResourceInfo resourceInfo : resourceInfos) {
 			webResourceInfos.add((WebResourceInfo)resourceInfo);
@@ -108,6 +96,4 @@ public class LocalWebResourceRepository implements WebResourceRepository{
 		
 		return webResourceInfos;
 	}
-		
-
 }

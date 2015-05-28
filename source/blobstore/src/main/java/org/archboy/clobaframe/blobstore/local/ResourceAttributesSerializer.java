@@ -1,13 +1,10 @@
 package org.archboy.clobaframe.blobstore.local;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.mapdb.Serializer;
 

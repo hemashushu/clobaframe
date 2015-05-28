@@ -36,13 +36,13 @@ public class ResourceSenderImpl implements ResourceSender {
 	private static final String DEFAULT_COMPRESSIBLE_MIME_TYPE_LIST = "classpath:org/archboy/clobaframe/io/compressibleMimeType.json";
 	
 	@Value("${clobaframe.io.http.gzip:"+ DEFAULT_ENABLE_GZIP + "}")
-	private boolean enableGzip = DEFAULT_ENABLE_GZIP;
+	private boolean enableGzip;
 
 	@Value("${clobaframe.io.http.gzip.minCompressSize:" + DEFAULT_MIN_COMPRESS_SIZE +"}")
-	private int minCompressSize = DEFAULT_MIN_COMPRESS_SIZE;
+	private int minCompressSize;
 	
 	@Value("${clobaframe.io.http.gzip.mimeTypeList:" + DEFAULT_COMPRESSIBLE_MIME_TYPE_LIST + "}")
-	private String compressibleMimeTypeList = DEFAULT_COMPRESSIBLE_MIME_TYPE_LIST;
+	private String compressibleMimeTypeList;
 		
 	@Inject
 	private ResourceLoader resourceLoader;

@@ -52,7 +52,7 @@ public class PrincipalSettingImpl implements PrincipalSetting {
 	@Override
 	public void set(Principal profile, String key, Object value) {
 		if (principalSettingRepositorys == null || principalSettingRepositorys.isEmpty()){
-			throw new IllegalArgumentException("No principal setting repository.");
+			throw new NullPointerException("No principal setting repository.");
 		}
 		
 		for(PrincipalSettingRepository repository : principalSettingRepositorys) {
@@ -66,7 +66,7 @@ public class PrincipalSettingImpl implements PrincipalSetting {
 	@Override
 	public void set(Principal profile, Map<String, Object> items) {
 		if (principalSettingRepositorys == null || principalSettingRepositorys.isEmpty()){
-			throw new IllegalArgumentException("No principal setting repository.");
+			throw new NullPointerException("No principal setting repository.");
 		}
 		
 		for(PrincipalSettingRepository repository : principalSettingRepositorys) {

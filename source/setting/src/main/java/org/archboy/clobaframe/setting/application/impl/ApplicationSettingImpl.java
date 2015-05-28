@@ -1,6 +1,7 @@
 package org.archboy.clobaframe.setting.application.impl;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.archboy.clobaframe.setting.support.Utils;
 import org.archboy.clobaframe.setting.application.ApplicationSetting;
 import org.archboy.clobaframe.setting.application.ApplicationSettingProvider;
@@ -20,7 +22,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.util.Assert;
 
 /**
  *
@@ -28,13 +29,13 @@ import org.springframework.util.Assert;
  */
 public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoaderAware, InitializingBean {
 
-	private static final String DEFAULT_ROOT_CONFIG_FILE_NAME = "classpath:root.properties";
+	private static final String DEFAULT_ROOT_CONFIG_FILE_NAME = ""; // "classpath:root.properties";
 	private static final String DEFAULT_APP_NAME = "clobaframe";
 	private static final String DEFAULT_DATA_FOLDER = "${java.io.tmpdir}/${clobaframe.setting.appName}";
-	private static final boolean DEFAULT_AUTO_CREATE_DATA_FOLDER = true;
-	private static final String DEFAULT_SETTING_FILE_NAME = "classpath:application.properties";
-	private static final String DEFAULT_CUSTOM_SETTING_FILE_NAME = "settings.json";
-	private static final String DEFAULT_EXTRA_SETTING_FILE_NAME = "extra.json";
+	private static final boolean DEFAULT_AUTO_CREATE_DATA_FOLDER = false;
+	private static final String DEFAULT_SETTING_FILE_NAME = ""; //"classpath:application.properties";
+	private static final String DEFAULT_CUSTOM_SETTING_FILE_NAME = ""; //"settings.json";
+	private static final String DEFAULT_EXTRA_SETTING_FILE_NAME = ""; //"extra.json";
 
 	private String rootConfigFileName = DEFAULT_ROOT_CONFIG_FILE_NAME;
 	private String appName = DEFAULT_APP_NAME;
@@ -102,22 +103,26 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 		executePostSetting();
 	}
 	
-	private void loadRootConfig(){
-		Map<String, Object> rootSetting = null;
-		Resource resource = resourceLoader.getResource(rootConfigFileName);
-		
-		if (!resource.exists()) {
-			logger.warn("Application root setting resource [{}] not found.", resource.getFilename());
+	private void loadRootConfig() throws IOException{
+		if (StringUtils.isEmpty(rootConfigFileName)){
 			return;
 		}
 		
+		Resource resource = resourceLoader.getResource(rootConfigFileName);
+		if (!resource.exists()) {
+			throw new FileNotFoundException(
+					String.format(
+							"Application root setting resource [{}] not found.", 
+							resource.getFilename()));
+		}
+		
+		Map<String, Object> rootSetting = null;
 		InputStream in = null;
 		try{
 			in = resource.getInputStream();
 			rootSetting = Utils.readProperties(in);
-		}catch(IOException e) {
-			// ignore
-			logger.error("Load root application configuration failed: {}", e.getMessage());
+		//}catch(IOException e) {
+		//	logger.error("Load root application configuration failed: {}", e.getMessage());
 		}finally {
 			IOUtils.closeQuietly(in);
 		}
@@ -153,7 +158,11 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 	private void initComponents(){
 		// add setting provider, from lower priority to higher priority.
 		applicationSettingProviders = new ArrayList<ApplicationSettingProvider>();
-		applicationSettingProviders.add(new PropertiesApplicationSettingProvider(resourceLoader, defaultSettingFileName));
+		
+		if (StringUtils.isNotEmpty(defaultSettingFileName)){
+			applicationSettingProviders.add(new PropertiesApplicationSettingProvider(resourceLoader, defaultSettingFileName));
+		}
+		
 		applicationSettingProviders.add(new EnvironmentVariablesSettingProvider());
 		applicationSettingProviders.add(new SystemPropertiesSettingProvider());
 		
@@ -195,8 +204,14 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 		
 		// add user custom application setting providers
 		List<ApplicationSettingProvider> customApplicationSettingProviders = new ArrayList<ApplicationSettingProvider>();
-		customApplicationSettingProviders.add(new JsonApplicationSettingProvider(dataFolderValue, customFileNameValue));
-		customApplicationSettingProviders.add(new JsonApplicationSettingProvider(dataFolderValue, extraFileNameValue));
+		
+		if (StringUtils.isNotEmpty(customFileNameValue)){
+			customApplicationSettingProviders.add(new JsonApplicationSettingProvider(dataFolderValue, customFileNameValue));
+		}
+		
+		if (StringUtils.isNotEmpty(extraFileNameValue)){
+			customApplicationSettingProviders.add(new JsonApplicationSettingProvider(dataFolderValue, extraFileNameValue));
+		}
 
 		// merge all custom settings.
 		for(ApplicationSettingProvider provider : customApplicationSettingProviders){
@@ -208,8 +223,9 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 		applicationSettingProviders.addAll(customApplicationSettingProviders);
 		
 		// set setting repository
-		applicationSettingRepository = new JsonApplicationSettingRepository(dataFolderValue, customFileNameValue);
-
+		if (StringUtils.isNotEmpty(customFileNameValue)){
+			applicationSettingRepository = new JsonApplicationSettingRepository(dataFolderValue, customFileNameValue);
+		}
 		
 	}
 
@@ -249,16 +265,18 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 	@Override
 	public void set(String key, Object value) {
 		if (applicationSettingRepository == null){
-			throw new IllegalArgumentException("No application setting repository.");
+			throw new NullPointerException("No application setting repository.");
 		}
+		
 		applicationSettingRepository.update(key, value);
 	}
 
 	@Override
 	public void set(Map<String, Object> items) {
 		if (applicationSettingRepository == null){
-			throw new IllegalArgumentException("No application setting repository.");
+			throw new NullPointerException("No application setting repository.");
 		}
+		
 		applicationSettingRepository.update(items);
 	}
 

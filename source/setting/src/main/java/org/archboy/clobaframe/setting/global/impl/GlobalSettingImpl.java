@@ -31,10 +31,6 @@ public class GlobalSettingImpl implements GlobalSetting {
 	private final Logger logger = LoggerFactory.getLogger(GlobalSettingImpl.class);
 	
 	@PostConstruct
-	public void init(){
-		refresh();
-	}
-	
 	@Override
 	public void refresh(){
 		
@@ -78,16 +74,18 @@ public class GlobalSettingImpl implements GlobalSetting {
 	@Override
 	public void set(String key, Object value) {
 		if (globalSettingRepository == null){
-			throw new IllegalArgumentException("No global setting repository.");
+			throw new NullPointerException("No global setting repository.");
 		}
+		
 		globalSettingRepository.update(key, value);
 	}
 
 	@Override
 	public void set(Map<String, Object> items) {
 		if (globalSettingRepository == null){
-			throw new IllegalArgumentException("No global setting repository.");
+			throw new NullPointerException("No global setting repository.");
 		}
+		
 		globalSettingRepository.update(items);
 	}
 }
