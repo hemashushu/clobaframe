@@ -1,24 +1,26 @@
 package org.archboy.clobaframe.webresource;
 
-import java.util.Collection;
-
 /**
- *
+ * The virtual resource repository.
+ * 
+ * The virtual resource means the resource that generate by dynamic,
+ * such as the user custom style sheet that stored in the database.
+ * 
  * @author yang
  */
-public interface VirtualWebResourceProvider {
-	
-	/**
-	 * 
-	 * @param name Resource name includes the relative path, e.g. "css/main.css".
-	 * @return NULL when can not find the specify resource.
-	 */
-	WebResourceInfo getByName(String name);
+public interface VirtualWebResourceProvider extends WebResourceProvider {
 
-	/**
-	 * 
-	 * @return EMPTY when no resources.
-	 */
-	Collection<WebResourceInfo> getAll();
+	//Collection<VirtualWebResourceSource> getResourceProviders();
 	
+	/**
+	 * Add source.
+	 * @param virtualWebResourceSource 
+	 */
+	void addSource(VirtualWebResourceSource virtualWebResourceSource);
+	
+	/**
+	 * Remove source.
+	 * @param sourceName 
+	 */
+	void removeSource(String sourceName);
 }

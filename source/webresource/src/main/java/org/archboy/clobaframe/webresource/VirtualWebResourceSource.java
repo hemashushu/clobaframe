@@ -6,9 +6,16 @@ import java.util.Collection;
  *
  * @author yang
  */
-public interface WebResourceRepositorySet {
-
-	Collection<WebResourceRepository> getResourceRepositories();
+public interface VirtualWebResourceSource {
+	
+	/**
+	 * The source name.
+	 * The source name MUST be unique. It's recommended that
+	 * use the form "virtual/" + "source name", e.g. "virtual/theme1",
+	 * "virtual/custom1".
+	 * @return 
+	 */
+	String getName();
 	
 	/**
 	 * 
@@ -22,4 +29,5 @@ public interface WebResourceRepositorySet {
 	 * @return EMPTY when no resources.
 	 */
 	Collection<WebResourceInfo> getAll();
+	
 }

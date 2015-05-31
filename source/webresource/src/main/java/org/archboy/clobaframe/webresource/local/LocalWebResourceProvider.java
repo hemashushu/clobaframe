@@ -17,10 +17,10 @@ import org.archboy.clobaframe.io.MimeTypeDetector;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.file.ResourceScanner;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
-import org.archboy.clobaframe.webresource.WebResourceRepository;
+import org.archboy.clobaframe.webresource.WebResourceProvider;
 
 @Named
-public class LocalWebResourceRepository implements WebResourceRepository{
+public class LocalWebResourceProvider implements WebResourceProvider{
 
 	@Inject
 	private ResourceLoader resourceLoader;
@@ -44,7 +44,7 @@ public class LocalWebResourceRepository implements WebResourceRepository{
 	
 	private File baseDir;
 	
-	private final Logger logger = LoggerFactory.getLogger(LocalWebResourceRepository.class);
+	private final Logger logger = LoggerFactory.getLogger(LocalWebResourceProvider.class);
 
 	@Override
 	public String getName() {
@@ -62,8 +62,12 @@ public class LocalWebResourceRepository implements WebResourceRepository{
 		
 		try{
 			baseDir = resource.getFile();
+			
+			// Do not throws exception because the web application maybe running in the
+			// WAR package.
 			if (!baseDir.exists()){
-				logger.error("Can not find the web resource folder [{}].", localPath);
+				logger.error("Can not find the web resource folder [{}], please ensure " +
+						"unpackage the WAR if you are running web application.", localPath);
 				return;
 			}
 			

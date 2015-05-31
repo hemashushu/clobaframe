@@ -12,7 +12,7 @@ public class EnvironmentVariablesSettingProvider implements ApplicationSettingPr
 
 	@Override
 	public int getOrder() {
-		return 9;
+		return PRIORITY_LOW;
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package org.archboy.clobaframe.cache.ehcache;
 
 import java.io.Closeable;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -16,6 +17,7 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.archboy.clobaframe.cache.Cache.Policy;
 import org.archboy.clobaframe.cache.Expiration;
 import org.slf4j.Logger;
@@ -32,7 +34,7 @@ import org.springframework.core.io.ResourceLoader;
 public class EhcacheCache implements org.archboy.clobaframe.cache.Cache, Closeable {
 
 	private static final String DEFAULT_CACHE_REGION_NAME = "common";
-	private static final String DEFAULT_CACHE_CONFIGURATION_FILE = "ehcache.xml";
+	private static final String DEFAULT_CACHE_CONFIGURATION_FILE = ""; //"classpath:ehcache.xml";
 
 	@Value("${clobaframe.cache.ehcache.region:" + DEFAULT_CACHE_REGION_NAME + "}")
 	private String cacheRegionName;
@@ -49,15 +51,23 @@ public class EhcacheCache implements org.archboy.clobaframe.cache.Cache, Closeab
 	private final Logger logger = LoggerFactory.getLogger(EhcacheCache.class);
 			
 	@PostConstruct
-	public void init() {
+	public void init() throws IOException {
+		if (StringUtils.isEmpty(cacheConfigurationFile)){
+			return;
+		}
+		
 		Resource resource = resourceLoader.getResource(cacheConfigurationFile);
+		if (!resource.exists()) {
+			throw new FileNotFoundException(String.format(
+					"Can not find the ehcache config file [%s].",
+					cacheConfigurationFile));
+		}
+		
 		InputStream in = null;
 		try{
 			in = resource.getInputStream();
 			cacheManager = CacheManager.create(in);
 			cache = cacheManager.getCache(cacheRegionName);
-		}catch(IOException e){
-			logger.error("Can not create EhCache, cause: {}.", e.getMessage());
 		}finally{
 			IOUtils.closeQuietly(in);
 		}
@@ -65,8 +75,10 @@ public class EhcacheCache implements org.archboy.clobaframe.cache.Cache, Closeab
 
 	@PreDestroy
 	@Override
-	public void close(){
-		cacheManager.shutdown();
+	public void close() throws IOException{
+		if (cacheManager != null){
+			cacheManager.shutdown();
+		}
 	}
 
 	@Override

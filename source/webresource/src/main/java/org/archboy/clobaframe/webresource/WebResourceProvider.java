@@ -7,7 +7,7 @@ import org.springframework.core.Ordered;
  *
  * @author yang
  */
-public interface WebResourceRepository extends Ordered {
+public interface WebResourceProvider extends Ordered {
 
 	public static final int PRIORITY_HIGHEST = 0;
 	public static final int PRIORITY_HIGHER = 20;

@@ -9,8 +9,8 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.archboy.clobaframe.webresource.WebResourceRepositorySet;
-import org.archboy.clobaframe.webresource.WebResourceRepository;
+import org.archboy.clobaframe.webresource.WebResourceProviderSet;
+import org.archboy.clobaframe.webresource.WebResourceProvider;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 
 /**
@@ -18,15 +18,15 @@ import org.archboy.clobaframe.webresource.WebResourceInfo;
  * @author yang
  */
 @Named
-public class WebResourceRepositorySetImpl implements WebResourceRepositorySet {
+public class WebResourceProviderSetImpl implements WebResourceProviderSet {
 		
 	@Inject
-	private List<WebResourceRepository> resourceRepositories;
+	private List<WebResourceProvider> webResourceProviders;
 
 	@Override
 	public WebResourceInfo getByName(String name) {
 		WebResourceInfo webResourceInfo = null;
-		for (WebResourceRepository resourceRepository : resourceRepositories){
+		for (WebResourceProvider resourceRepository : webResourceProviders){
 			webResourceInfo = resourceRepository.getByName(name);
 			if (webResourceInfo != null) {
 				break;
@@ -35,18 +35,18 @@ public class WebResourceRepositorySetImpl implements WebResourceRepositorySet {
 		return webResourceInfo;
 	}
 
-	@Override
-	public Collection<WebResourceRepository> getResourceRepositories() {
-		return resourceRepositories;
-	}
+//	@Override
+//	public Collection<WebResourceProvider> getResourceRepositories() {
+//		return resourceRepositories;
+//	}
 
 	@Override
 	public Collection<WebResourceInfo> getAll() {
 		Set<WebResourceInfo> resourceInfos = new HashSet<WebResourceInfo>();
 		
 		// list resource in the revert repository priority order
-		for (int idx = resourceRepositories.size() -1; idx>=0; idx--){
-			WebResourceRepository resourceRepository = resourceRepositories.get(idx);
+		for (int idx = webResourceProviders.size() -1; idx>=0; idx--){
+			WebResourceProvider resourceRepository = webResourceProviders.get(idx);
 			Collection<WebResourceInfo> ns = resourceRepository.getAll(); 
 			resourceInfos.addAll(ns);
 		}

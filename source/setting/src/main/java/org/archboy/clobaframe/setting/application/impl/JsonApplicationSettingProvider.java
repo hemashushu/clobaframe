@@ -39,7 +39,7 @@ public class JsonApplicationSettingProvider implements ApplicationSettingProvide
 
 	@Override
 	public int getOrder() {
-		return 1;
+		return PRIORITY_HIGH;
 	}
 
 	@Override

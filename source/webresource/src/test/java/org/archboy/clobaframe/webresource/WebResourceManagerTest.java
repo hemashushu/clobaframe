@@ -141,7 +141,12 @@ public class WebResourceManagerTest {
 	private static final TextWebResourceInfo info3 = new TextWebResourceInfo("l3.css", "text/css", "@import url('l2a.css') \n body {}");
 	
 	@Named
-	public static class TestVirtualWebResourceProvider implements VirtualWebResourceProvider {
+	public static class TestVirtualWebResourceSource implements VirtualWebResourceSource {
+
+		@Override
+		public String getName() {
+			return "virtual/test";
+		}
 
 		@Override
 		public WebResourceInfo getByName(String name) {

@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.archboy.clobaframe.setting.SettingProvider;
 import org.archboy.clobaframe.setting.global.GlobalSettingProvider;
 import org.archboy.clobaframe.setting.support.Utils;
 import org.slf4j.Logger;
@@ -36,7 +37,7 @@ public class DefaultGlobalSettingProvider implements GlobalSettingProvider {
 	
 	@Override
 	public int getOrder() {
-		return 10;
+		return SettingProvider.PRIORITY_LOWER;
 	}
 
 	@Override
@@ -47,22 +48,23 @@ public class DefaultGlobalSettingProvider implements GlobalSettingProvider {
 		
 		Resource resource = resourceLoader.getResource(defaultGlobalSettingFileName);
 		if (!resource.exists()) {
-			logger.warn("Default global setting [{}] not found.", resource.getFilename());
-		}else{
-			logger.info("Loading default global setting [{}]", resource.getFilename());
-			
-			InputStream in = null;
-			try{
-				in = resource.getInputStream();
-				return Utils.readProperties(in);
-			}catch(IOException e) {
-				// ignore
-				logger.error("Load default global setting [{}] failed: {}", resource.getFilename(), e.getMessage());
-			}finally {
-				IOUtils.closeQuietly(in);
-			}
+			logger.error("Default global setting [{}] not found.", resource.getFilename());
+			return new LinkedHashMap<String, Object>();
+		}
+
+		logger.info("Loading default global setting [{}]", resource.getFilename());
+
+		InputStream in = null;
+		try{
+			in = resource.getInputStream();
+			return Utils.readProperties(in);
+		}catch(IOException e) {
+			throw new RuntimeException(
+					String.format("Load default global setting [%s] failed.", 
+					resource.getFilename()), e);
+		}finally {
+			IOUtils.closeQuietly(in);
 		}
 		
-		return new LinkedHashMap<String, Object>();
 	}
 }

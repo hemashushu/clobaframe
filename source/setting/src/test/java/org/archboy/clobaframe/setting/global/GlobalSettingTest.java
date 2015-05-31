@@ -93,7 +93,7 @@ public class GlobalSettingTest {
 		
 		@Override
 		public int getOrder() {
-			return 5;
+			return PRIORITY_NORMAL;
 		}
 
 		@Override
@@ -129,7 +129,7 @@ public class GlobalSettingTest {
 		
 		@Override
 		public int getOrder() {
-			return 1;
+			return PRIORITY_HIGH;
 		}
 
 		@Override

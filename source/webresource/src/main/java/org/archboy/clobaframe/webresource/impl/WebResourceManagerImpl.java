@@ -10,7 +10,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.archboy.clobaframe.webresource.CacheableWebResourceInfo;
 import org.archboy.clobaframe.webresource.CacheableWebResourceInfoUpdateListener;
-import org.archboy.clobaframe.webresource.WebResourceRepositorySet;
+import org.archboy.clobaframe.webresource.WebResourceProviderSet;
 import org.archboy.clobaframe.webresource.LocationStrategy;
 import org.archboy.clobaframe.webresource.ResourceCache;
 import org.archboy.clobaframe.webresource.VersionStrategy;
@@ -46,7 +46,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	private LocationStrategy locationStrategy; 
 	
 	@Inject
-	private WebResourceRepositorySet webResourceRepositorySet;
+	private WebResourceProviderSet webResourceProviderSet;
 	
 	private List<String> compressibleWebResourceMimeTypes; 
 	private List<String> minifyWebResourceMimeTypes; 
@@ -117,7 +117,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 		}
 		
 		// then load from repository set
-		resourceInfo = webResourceRepositorySet.getByName(name);
+		resourceInfo = webResourceProviderSet.getByName(name);
 		
 		if (resourceInfo == null) {
 			return null;
@@ -180,7 +180,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 
 	@Override
 	public WebResourceInfo getOriginalResource(String name) {
-		return webResourceRepositorySet.getByName(name);
+		return webResourceProviderSet.getByName(name);
 	}
 
 	@Override
@@ -206,7 +206,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	
 	@Override
 	public Collection<WebResourceInfo> getAllOriginalResource() {
-		return webResourceRepositorySet.getAll();
+		return webResourceProviderSet.getAll();
 	}
 
 	@Override

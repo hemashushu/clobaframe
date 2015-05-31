@@ -16,8 +16,8 @@ import javax.inject.Named;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
-import org.archboy.clobaframe.webresource.WebResourceRepository;
-import org.archboy.clobaframe.webresource.WebResourceRepositorySet;
+import org.archboy.clobaframe.webresource.WebResourceProvider;
+import org.archboy.clobaframe.webresource.WebResourceProviderSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +29,7 @@ import org.springframework.core.io.ResourceLoader;
  * @author yang
  */
 @Named
-public class ConcatenateWebResourceRepository implements WebResourceRepository {
+public class ConcatenateWebResourceProvider implements WebResourceProvider {
 
 	private static final String DEFAULT_CONCATENATE_CONFIG = "";
 	
@@ -40,14 +40,14 @@ public class ConcatenateWebResourceRepository implements WebResourceRepository {
 	private ResourceLoader resourceLoader;
 	
 	@Inject
-	private WebResourceRepositorySet webResourceRepositorySet;
+	private WebResourceProviderSet webResourceProviderSet;
 
 	private ObjectMapper objectMapper = new ObjectMapper();
 	
 	// the concatenate web resource
 	private Map<String, List<String>> concatenates = new HashMap<String, List<String>>();
 
-	private final Logger logger = LoggerFactory.getLogger(ConcatenateWebResourceRepository.class);
+	private final Logger logger = LoggerFactory.getLogger(ConcatenateWebResourceProvider.class);
 	
 	@Override
 	public String getName() {
@@ -66,10 +66,12 @@ public class ConcatenateWebResourceRepository implements WebResourceRepository {
 		}
 		
 		Resource resource = resourceLoader.getResource(concatenateConfig);
+		
+		// Do not throws exception because the web application maybe 
+		// there is no concatenate config.
 		if (!resource.exists()){
-			throw new FileNotFoundException(String.format(
-					"Can not find the concatenate config file [%s].",
-					concatenateConfig));
+			logger.error("Can not find the concatenate config file [{}].", concatenateConfig);
+			return;
 		}
 
 		//Properties properties = new Properties();
@@ -103,7 +105,7 @@ public class ConcatenateWebResourceRepository implements WebResourceRepository {
 		
 		List<WebResourceInfo> webResourceInfos = new ArrayList<WebResourceInfo>(names.size());
 		for(String n : names){
-			webResourceInfos.add(webResourceRepositorySet.getByName(n));
+			webResourceInfos.add(webResourceProviderSet.getByName(n));
 		}
 		return new DefaultConcatenateWebResourceInfo(webResourceInfos, name);
 	}

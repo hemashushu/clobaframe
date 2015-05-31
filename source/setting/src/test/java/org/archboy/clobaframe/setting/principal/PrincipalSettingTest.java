@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.archboy.clobaframe.setting.SettingProvider;
 import org.archboy.clobaframe.setting.support.Utils;
 import org.junit.After;
 import static org.junit.Assert.*;
@@ -135,7 +136,7 @@ public class PrincipalSettingTest {
 		
 		@Override
 		public int getOrder() {
-			return 10;
+			return SettingProvider.PRIORITY_LOWER;
 		}
 
 		@Override
@@ -179,7 +180,7 @@ public class PrincipalSettingTest {
 		
 		@Override
 		public int getOrder() {
-			return 1;
+			return SettingProvider.PRIORITY_HIGH;
 		}
 
 		@Override
@@ -244,7 +245,7 @@ public class PrincipalSettingTest {
 		
 		@Override
 		public int getOrder() {
-			return 1;
+			return SettingProvider.PRIORITY_HIGH;
 		}
 
 		@Override

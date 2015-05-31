@@ -13,7 +13,7 @@ public class SystemPropertiesSettingProvider implements ApplicationSettingProvid
 
 	@Override
 	public int getOrder() {
-		return 8;
+		return PRIORITY_NORMAL;
 	}
 
 	@Override

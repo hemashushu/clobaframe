@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import javax.inject.Named;
+import org.apache.commons.lang3.StringUtils;
 import org.archboy.clobaframe.blobstore.BlobResourceRepository;
 import org.archboy.clobaframe.blobstore.Blobstore;
 import org.slf4j.Logger;
@@ -26,9 +27,9 @@ import org.springframework.util.Assert;
  * @author yang
  */
 @Named
-public class LocalBlobstore implements Blobstore {
+public class LocalBlobstore implements Blobstore, Closeable {
 
-	private static final String DEFAULT_LOCAL_PATH = "file:${java.io.tmpdir}/${clobaframe.setting.appName}/blobstore";
+	private static final String DEFAULT_LOCAL_PATH = ""; //"file:${java.io.tmpdir}/${clobaframe.setting.appName}/blobstore";
 	private static final boolean DEFAULT_AUTO_CREATE_ROOT_FOLDER = true;
 	
 	@Value("${clobaframe.blobstore.local.path:" + DEFAULT_LOCAL_PATH + "}")
@@ -48,23 +49,24 @@ public class LocalBlobstore implements Blobstore {
 	private final Logger logger = LoggerFactory.getLogger(LocalBlobstore.class);
 	
 	@PostConstruct
-	public void init() {
+	public void init() throws IOException {
+		if (StringUtils.isEmpty(localPath)){
+			return;
+		}
+		
 		// check the repository directory.
 		Resource resource = resourceLoader.getResource(localPath);
+		rootDir = resource.getFile();
 		
-		try{
-			rootDir = resource.getFile();
-			
-			if (!rootDir.exists() && autoCreateRootFolder){
-				rootDir.mkdirs();
-			}
-		}catch(IOException e){
-			logger.error("Can not open local blobstore [{}].", localPath);
+		// make dir
+		if (!rootDir.exists() && autoCreateRootFolder){
+			rootDir.mkdirs();
 		}
 	}
 
 	@PreDestroy
-	public void destroy() throws Exception {
+	@Override
+	public void close() throws IOException {
 		for(BlobResourceRepository r : repositories.values()){
 			try{
 				((Closeable)r).close();

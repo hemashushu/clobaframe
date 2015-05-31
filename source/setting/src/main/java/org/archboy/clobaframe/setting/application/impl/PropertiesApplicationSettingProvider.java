@@ -32,7 +32,7 @@ public class PropertiesApplicationSettingProvider implements ApplicationSettingP
 	
 	@Override
 	public int getOrder() {
-		return 10;
+		return PRIORITY_LOWER;
 	}
 
 	@Override
