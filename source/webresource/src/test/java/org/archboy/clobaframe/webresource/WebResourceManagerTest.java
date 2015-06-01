@@ -104,7 +104,7 @@ public class WebResourceManagerTest {
 		assertEquals(webResource1, webResourceByVersionName1);
 		
 		// test the content
-		assertResourceContentEquals(webResource2, "sample/web/test.png");
+		assertResourceContentEquals(webResource2, "webapp/resources/test.png");
 
 		// test location transform
 		InputStream in1 = webResource1.getContent();
