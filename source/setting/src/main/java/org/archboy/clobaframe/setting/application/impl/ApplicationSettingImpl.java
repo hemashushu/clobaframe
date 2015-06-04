@@ -9,6 +9,8 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.logging.Level;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.archboy.clobaframe.setting.support.Utils;
@@ -29,35 +31,56 @@ import org.springframework.core.io.ResourceLoader;
  */
 public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoaderAware, InitializingBean {
 
-	private static final String DEFAULT_ROOT_CONFIG_FILE_NAME = ""; // "classpath:root.properties";
-	private static final String DEFAULT_APP_NAME = "clobaframe";
-	private static final String DEFAULT_DATA_FOLDER = "${java.io.tmpdir}/${clobaframe.setting.appName}";
-	private static final boolean DEFAULT_AUTO_CREATE_DATA_FOLDER = false;
-	private static final String DEFAULT_SETTING_FILE_NAME = ""; //"classpath:application.properties";
-	private static final String DEFAULT_CUSTOM_SETTING_FILE_NAME = ""; //"settings.json";
-	private static final String DEFAULT_EXTRA_SETTING_FILE_NAME = ""; //"extra.json";
+	private static final String ROOT_KEY_APP_NAME = "clobaframe.setting.appName";
+	private static final String ROOT_KEY_ROOT_CONFIG_FILE_NAME = "clobaframe.setting.rootConfigFileName";
+	private static final String ROOT_KEY_CONFIG_FOLDER = "clobaframe.setting.configFolder";
+	private static final String ROOT_KEY_AUTO_CREATE_CONFIG_FOLDER = "clobaframe.setting.autoCreateConfigFolder";
+	private static final String ROOT_KEY_DEFAULT_SETTING_FILE_NAME = "clobaframe.setting.defaultSettingFileName";
+	private static final String ROOT_KEY_CUSTOM_SETTING_FILE_NAME = "clobaframe.setting.customSettingFileName";
+	private static final String ROOT_KEY_EXTRA_SETTING_FILE_NAME = "clobaframe.setting.extraSettingFileName";
 
-	private String rootConfigFileName = DEFAULT_ROOT_CONFIG_FILE_NAME;
-	private String appName = DEFAULT_APP_NAME;
+//	private static final String DEFAULT_ROOT_CONFIG_FILE_NAME = ""; // "classpath:root.properties";
+//	private static final String DEFAULT_APP_NAME = "clobaframe";
+//	private static final String DEFAULT_DATA_FOLDER = "${java.io.tmpdir}/${clobaframe.setting.appName}";
+//	private static final boolean DEFAULT_AUTO_CREATE_DATA_FOLDER = false;
+//	private static final String DEFAULT_SETTING_FILE_NAME = ""; //"classpath:application.properties";
+//	private static final String DEFAULT_CUSTOM_SETTING_FILE_NAME = ""; //"settings.json";
+//	private static final String DEFAULT_EXTRA_SETTING_FILE_NAME = ""; //"extra.json";
+
+	private String rootConfigFileName; // = DEFAULT_ROOT_CONFIG_FILE_NAME;
+	private String appName; // = DEFAULT_APP_NAME;
 	
 	/**
-	 * folder that store application running necessary files.
-	 * in linux it's ~/.local/share
-	 * in osx ~/Library/Application Support
-	 * in windows ~\Application Data\Local|Roaming
+	 * System wide config folder and user local config folder.
+	 * 
+	 * System wide:
+	 * linux and osx: /etc
+	 * windows: %SystemDrive%\ProgramData\
+	 * 
+	 * User local:
+	 * linux: ~/.local/share
+	 * osx: ~/Library/Application Support
+	 * windows: ~\Application Data\Local|Roaming
 	 */
-	private String dataFolder = DEFAULT_DATA_FOLDER;
-	private boolean autoCreateDataFolder = DEFAULT_AUTO_CREATE_DATA_FOLDER;
-	private String defaultSettingFileName = DEFAULT_SETTING_FILE_NAME;
-	private String customSettingFileName = DEFAULT_CUSTOM_SETTING_FILE_NAME;
-	private String extraSettingFileName = DEFAULT_EXTRA_SETTING_FILE_NAME;
 	
+//	private String dataFolder; // = DEFAULT_DATA_FOLDER;
+//	private boolean autoCreateDataFolder; // = DEFAULT_AUTO_CREATE_DATA_FOLDER;
+//	private String defaultSettingFileName; // = DEFAULT_SETTING_FILE_NAME;
+//	private String customSettingFileName; // = DEFAULT_CUSTOM_SETTING_FILE_NAME;
+//	private String extraSettingFileName; // = DEFAULT_EXTRA_SETTING_FILE_NAME;
+	
+	private Map<String, Object> rootSetting = new LinkedHashMap<String, Object>();
 	private Map<String, Object> setting = new LinkedHashMap<String, Object>();
 	
 	/**
-	 * Other in-jar-package settings resource.
+	 * Root setting values.
 	 */
-	private Resource[] locations;
+	private Properties properties;
+	
+	/**
+	 * Other build-in (in-jar-package) settings.
+	 */
+	private String[] locations;
 	
 	private ResourceLoader resourceLoader;
 	private List<ApplicationSettingProvider> applicationSettingProviders;
@@ -76,6 +99,7 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 		return appName;
 	}
 	
+	@Override
 	public void setRootConfigFileName(String rootConfigFileName) {
 		this.rootConfigFileName = rootConfigFileName;
 	}
@@ -86,29 +110,51 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 	}
 
 	@Override
-	public void setResourceLoader(ResourceLoader resourceLoader) {
-		this.resourceLoader = resourceLoader;
+	public void setProperties(Properties properties){
+		this.properties = properties;
 	}
-
+	
 	@Override
-	public void setLocations(Resource... locations) {
+	public void setLocations(String... locations) {
 		this.locations = locations;
 	}
 	
 	@Override
+	public void setResourceLoader(ResourceLoader resourceLoader) {
+		this.resourceLoader = resourceLoader;
+	}
+	
+	@Override
 	public void afterPropertiesSet() throws Exception {
-		loadRootConfig();
-		rebuildBaseSetting();
-		initComponents();
+		//rootSetting.clear();
+		rootSetting.put(ROOT_KEY_APP_NAME, appName);
+		rootSetting.put(ROOT_KEY_ROOT_CONFIG_FILE_NAME, rootConfigFileName);
+		
+		loadRootConfigFromProperties();
+		loadRootConfigFromFile();
+		
+		// merge root setting into application setting
+		setting = Utils.merge(setting, rootSetting);
+		
+		initProviders();
 		executePostSetting();
 	}
 	
-	private void loadRootConfig() throws IOException{
-		if (StringUtils.isEmpty(rootConfigFileName)){
+	private void loadRootConfigFromProperties() {
+		if (properties != null && !properties.isEmpty()) {
+			rootSetting = Utils.merge(rootSetting, properties);
+			System.out.println(rootSetting);
+		}
+	}
+	
+	private void loadRootConfigFromFile() throws IOException{
+		String fileName = (String)rootSetting.get(ROOT_KEY_ROOT_CONFIG_FILE_NAME);
+		
+		if (StringUtils.isEmpty(fileName)){
 			return;
 		}
 		
-		Resource resource = resourceLoader.getResource(rootConfigFileName);
+		Resource resource = resourceLoader.getResource(fileName);
 		if (!resource.exists()) {
 			throw new FileNotFoundException(
 					String.format(
@@ -116,51 +162,61 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 							resource.getFilename()));
 		}
 		
-		Map<String, Object> rootSetting = null;
+		Map<String, Object> map = null;
 		InputStream in = null;
 		try{
 			in = resource.getInputStream();
-			rootSetting = Utils.readProperties(in);
+			map = Utils.readProperties(in);
 		//}catch(IOException e) {
 		//	logger.error("Load root application configuration failed: {}", e.getMessage());
 		}finally {
 			IOUtils.closeQuietly(in);
 		}
 		
-		if (rootSetting == null || rootSetting.isEmpty()) {
+		if (map == null || map.isEmpty()) {
 			return;
 		}
 		
-		this.appName = getRootConfigValue(rootSetting, "clobaframe.setting.appName", appName);
-		this.dataFolder = getRootConfigValue(rootSetting, "clobaframe.setting.dataFolder", DEFAULT_DATA_FOLDER);
-		this.autoCreateDataFolder = Boolean.parseBoolean(getRootConfigValue(rootSetting, "clobaframe.setting.autoCreateDataFolder", Boolean.toString(DEFAULT_AUTO_CREATE_DATA_FOLDER)));
-		this.defaultSettingFileName = getRootConfigValue(rootSetting, "clobaframe.setting.defaultSettingFileName", DEFAULT_SETTING_FILE_NAME);
-		this.customSettingFileName = getRootConfigValue(rootSetting, "clobaframe.setting.customSettingFileName", DEFAULT_CUSTOM_SETTING_FILE_NAME);
-		this.extraSettingFileName = getRootConfigValue(rootSetting, "clobaframe.setting.extraSettingFileName", DEFAULT_EXTRA_SETTING_FILE_NAME);
+//		this.appName = getRootConfigValue(rootSetting, "clobaframe.setting.appName", appName);
+//		this.dataFolder = getRootConfigValue(rootSetting, "clobaframe.setting.dataFolder", DEFAULT_DATA_FOLDER);
+//		this.autoCreateDataFolder = Boolean.parseBoolean(getRootConfigValue(rootSetting, "clobaframe.setting.autoCreateDataFolder", Boolean.toString(DEFAULT_AUTO_CREATE_DATA_FOLDER)));
+//		this.defaultSettingFileName = getRootConfigValue(rootSetting, "clobaframe.setting.defaultSettingFileName", DEFAULT_SETTING_FILE_NAME);
+//		this.customSettingFileName = getRootConfigValue(rootSetting, "clobaframe.setting.customSettingFileName", DEFAULT_CUSTOM_SETTING_FILE_NAME);
+//		this.extraSettingFileName = getRootConfigValue(rootSetting, "clobaframe.setting.extraSettingFileName", DEFAULT_EXTRA_SETTING_FILE_NAME);
+		
+		rootSetting = Utils.merge(rootSetting, map);
 	}
 	
-	private String getRootConfigValue(Map<String, Object> rootSetting, String key, String defaultValue) {
-		String value = (String)rootSetting.get(key);
-		return (value == null ? defaultValue : value);
-	}
+//	private String getRootConfigValue(Map<String, Object> rootSetting, String key, String defaultValue) {
+//		String value = (String)rootSetting.get(key);
+//		return (value == null ? defaultValue : value);
+//	}
 	
-	private void rebuildBaseSetting() {
-		// put the base settings.
-		setting.clear();
-		setting.put("clobaframe.setting.appName", appName);
-		setting.put("clobaframe.setting.dataFolder", dataFolder);
-		setting.put("clobaframe.setting.autoCreatedataFolder", autoCreateDataFolder);
-		setting.put("clobaframe.setting.defaultSettingFileName", defaultSettingFileName);
-		setting.put("clobaframe.setting.customSettingFileName", customSettingFileName);
-		setting.put("clobaframe.setting.extraSettingFileName", extraSettingFileName);
-	}
+//	private void buildRootSetting() {
+//		// put the base settings.
+//		//setting.clear();
+//		setting.put("clobaframe.setting.appName", appName);
+//		setting.put("clobaframe.setting.dataFolder", dataFolder);
+//		setting.put("clobaframe.setting.autoCreatedataFolder", autoCreateDataFolder);
+//		setting.put("clobaframe.setting.defaultSettingFileName", defaultSettingFileName);
+//		setting.put("clobaframe.setting.customSettingFileName", customSettingFileName);
+//		setting.put("clobaframe.setting.extraSettingFileName", extraSettingFileName);
+//	}
 	
-	private void initComponents(){
+	private void initProviders(){
+		// build the temp setting, for resolve the default setting and other build-in (in-jar-package) settings filename
+		Map<String, Object> tempSetting = new LinkedHashMap<String, Object>();
+		tempSetting = Utils.merge(tempSetting, rootSetting);
+		tempSetting = Utils.merge(tempSetting, new EnvironmentVariablesSettingProvider().getAll());
+		tempSetting = Utils.merge(tempSetting, new SystemPropertiesSettingProvider().getAll());
+		
 		// add setting provider, from lower priority to higher priority.
 		applicationSettingProviders = new ArrayList<ApplicationSettingProvider>();
 		
+		String defaultSettingFileName = (String)tempSetting.get(ROOT_KEY_DEFAULT_SETTING_FILE_NAME);
 		if (StringUtils.isNotEmpty(defaultSettingFileName)){
-			applicationSettingProviders.add(new PropertiesApplicationSettingProvider(resourceLoader, defaultSettingFileName));
+			String fileName = (String)Utils.resolvePlaceholder(tempSetting, defaultSettingFileName);
+			applicationSettingProviders.add(new PropertiesApplicationSettingProvider(resourceLoader, fileName));
 		}
 		
 		applicationSettingProviders.add(new EnvironmentVariablesSettingProvider());
@@ -168,8 +224,9 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 		
 		// add other in-app application setting providers
 		if (locations != null) {
-			for(Resource resource : locations){
-				applicationSettingProviders.add(new PropertiesApplicationSettingProvider(resource));
+			for(String location : locations){
+				String fileName = (String)Utils.resolvePlaceholder(tempSetting, location);
+				applicationSettingProviders.add(new PropertiesApplicationSettingProvider(resourceLoader, fileName));
 			}
 		}
 		
@@ -179,25 +236,26 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 			setting = Utils.merge(setting, map);
 		}
 		
-		// get the data dir and file name
-		String dataFolderValue = (String)Utils.resolvePlaceholder(setting, dataFolder);
-		String customFileNameValue = (String)Utils.resolvePlaceholder(setting, customSettingFileName);
-		String extraFileNameValue = (String)Utils.resolvePlaceholder(setting, extraSettingFileName);
+		// get the custom config and the extra config
+		String configFolder = (String)Utils.resolvePlaceholder(setting, setting.get(ROOT_KEY_CONFIG_FOLDER));
+		String autoCreateConfigFolder = (String)Utils.resolvePlaceholder(setting, setting.get(ROOT_KEY_AUTO_CREATE_CONFIG_FOLDER));
+		String customFileName = (String)Utils.resolvePlaceholder(setting, setting.get(ROOT_KEY_CUSTOM_SETTING_FILE_NAME));
+		String extraFileName = (String)Utils.resolvePlaceholder(setting, setting.get(ROOT_KEY_EXTRA_SETTING_FILE_NAME));
 
 		// try to create data folder
-		if (autoCreateDataFolder) {
-			File file = new File(dataFolderValue);
+		if (StringUtils.isNotEmpty(autoCreateConfigFolder) && Boolean.valueOf(autoCreateConfigFolder)) {
+			File file = new File(configFolder);
 			if (file.exists() && file.isDirectory()){
-				// continue
+				// the specify folder already exists
 			}else if (file.isFile()) {
-				// file exist
-				logger.error("Application data folder duplicate name with a file [{}].", file.getAbsolutePath());
+				// duplicate name file exists
+				logger.error("Application config folder duplicate name with a file [{}].", file.getAbsolutePath());
 			}else{
 				try{
-					logger.info("Creating application data folder [{}].", file.getAbsolutePath());
+					logger.info("Creating application config folder [{}].", file.getAbsolutePath());
 					file.mkdirs();
 				}catch(Exception e){
-					logger.error("Fail to create application data folder [{}].", file.getAbsolutePath());
+					logger.error("Fail to create application config folder [{}].", file.getAbsolutePath());
 				}
 			}
 		}
@@ -205,12 +263,12 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 		// add user custom application setting providers
 		List<ApplicationSettingProvider> customApplicationSettingProviders = new ArrayList<ApplicationSettingProvider>();
 		
-		if (StringUtils.isNotEmpty(customFileNameValue)){
-			customApplicationSettingProviders.add(new JsonApplicationSettingProvider(dataFolderValue, customFileNameValue));
+		if (StringUtils.isNotEmpty(customFileName)){
+			customApplicationSettingProviders.add(new JsonApplicationSettingProvider(configFolder, customFileName));
 		}
 		
-		if (StringUtils.isNotEmpty(extraFileNameValue)){
-			customApplicationSettingProviders.add(new JsonApplicationSettingProvider(dataFolderValue, extraFileNameValue));
+		if (StringUtils.isNotEmpty(extraFileName)){
+			customApplicationSettingProviders.add(new JsonApplicationSettingProvider(configFolder, extraFileName));
 		}
 
 		// merge all custom settings.
@@ -223,8 +281,8 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 		applicationSettingProviders.addAll(customApplicationSettingProviders);
 		
 		// set setting repository
-		if (StringUtils.isNotEmpty(customFileNameValue)){
-			applicationSettingRepository = new JsonApplicationSettingRepository(dataFolderValue, customFileNameValue);
+		if (StringUtils.isNotEmpty(customFileName)){
+			applicationSettingRepository = new JsonApplicationSettingRepository(configFolder, customFileName);
 		}
 		
 	}
@@ -287,13 +345,17 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 	
 	@Override
 	public void refresh(){
+		// clear setting
+		setting.clear();
 		
-		rebuildBaseSetting();
+		// merge root setting
+		setting = Utils.merge(setting, rootSetting);
 
-		// merge all settings.
+		// merge all provider setting.
 		for(ApplicationSettingProvider provider : applicationSettingProviders){
 			Map<String, Object> map = provider.getAll();
 			setting = Utils.merge(setting, map);
 		}
 	}
+
 }

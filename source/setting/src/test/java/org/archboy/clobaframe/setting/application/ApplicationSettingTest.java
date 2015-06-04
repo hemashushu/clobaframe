@@ -50,8 +50,14 @@ public class ApplicationSettingTest {
 	@Test
 	public void testGetValue(){
 		
+		// test manager
 		assertEquals("clobaframe", applicationSetting.getApplicationName());
 		
+		// test root setting
+		assertEquals("foo", applicationSetting.get("clobaframe.setting.test.root.withinFile"));
+		assertEquals("bar", applicationSetting.get("clobaframe.setting.test.root.withinProperties"));
+		
+		// test default setting and other buildin settings.
 		String testFoo = (String)applicationSetting.getValue("test.foo");
 		String testBar = (String)applicationSetting.getValue("test.bar");
 		String testCom = (String)applicationSetting.getValue("test.com");

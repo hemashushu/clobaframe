@@ -14,10 +14,10 @@ import org.springframework.util.Assert;
  */
 public class DefaultTextResourceInfo implements TextResourceInfo {
 	
-	private String mimeType;
-	private Date lastModified;
-	private Charset charset;
-	private byte[] content;
+	protected String mimeType;
+	protected Date lastModified;
+	protected Charset charset;
+	protected byte[] content;
 
 	public DefaultTextResourceInfo(String text, Charset charset, String mimeType, Date lastModified) {
 		Assert.hasText(text);

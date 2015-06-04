@@ -9,8 +9,8 @@ import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
 
 public class DefaultFileBaseResourceInfo implements FileBaseResourceInfo {
 
-	private File file;
-	private String mimeType;
+	protected File file;
+	protected String mimeType;
 
 	public DefaultFileBaseResourceInfo(File file, String mimeType) {
 		this.file = file;

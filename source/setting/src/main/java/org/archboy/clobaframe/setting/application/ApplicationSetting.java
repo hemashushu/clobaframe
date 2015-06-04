@@ -1,6 +1,7 @@
 package org.archboy.clobaframe.setting.application;
 
 import java.util.Collection;
+import java.util.Properties;
 import org.archboy.clobaframe.setting.CacheableSetting;
 import org.springframework.core.io.Resource;
 
@@ -35,11 +36,24 @@ public interface ApplicationSetting extends CacheableSetting {
 	String getApplicationName();
 	
 	/**
+	 * Root properties.
+	 * 
+	 * @param properties 
+	 */
+	void setProperties(Properties properties);
+	
+	/**
+	 * Set the root properties by the in-package properties file.
+	 * @param rootConfigFileName 
+	 */
+	void setRootConfigFileName(String rootConfigFileName);
+	
+	/**
 	 * Other in-jar-package setting resources.
 	 * 
 	 * @param locations 
 	 */
-	void setLocations(Resource... locations);
+	void setLocations(String... locations);
 	
 	/**
 	 * 

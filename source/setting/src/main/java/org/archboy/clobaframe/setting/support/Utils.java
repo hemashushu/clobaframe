@@ -144,6 +144,17 @@ public class Utils {
 		return result;
 	}
 	
+	public static Map<String, Object> merge(
+			Map<String, Object> source, Properties properties) {
+		Map<String, Object> append = new LinkedHashMap<String, Object>();
+		
+		for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+			append.put((String)entry.getKey(), entry.getValue());
+		}
+		
+		return merge(source, append);
+	}
+	
 	/**
 	 * Merge the new value into target map.
 	 * @param source

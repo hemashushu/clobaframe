@@ -13,9 +13,9 @@ import org.springframework.util.Assert;
  */
 public class ByteArrayResourceInfo implements ResourceInfo {
 
-	private String mimeType;
-	private Date lastModified;
-	private byte[] content;
+	protected String mimeType;
+	protected Date lastModified;
+	protected byte[] content;
 
 	public ByteArrayResourceInfo(byte[] content,
 			String mimeType,

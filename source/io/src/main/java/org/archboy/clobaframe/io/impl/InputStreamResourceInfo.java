@@ -12,10 +12,10 @@ import org.springframework.util.Assert;
  */
 public class InputStreamResourceInfo implements ResourceInfo {
 
-	private long contentLength;
-	private String mimeType;
-	private Date lastModified;
-	private InputStream inputStream;
+	protected long contentLength;
+	protected String mimeType;
+	protected Date lastModified;
+	protected InputStream inputStream;
 	
 	private boolean consumed;
 

@@ -26,11 +26,11 @@ public class LocalWebResourceInfoFactory implements FileBaseResourceInfoFactory 
 		String mimeType = getMimeType(file);
 		
 		LocalWebResourceInfo webResourceInfo = new LocalWebResourceInfo(
-				file, name, mimeType);
+				file, mimeType, name);
 		return webResourceInfo;
 	}
 	
-	private String getMimeType(File file){
+	protected String getMimeType(File file){
 		String fileName = file.getName();
 		return mimeTypeDetector.getByExtensionName(fileName);
 	}

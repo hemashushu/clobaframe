@@ -15,11 +15,16 @@ import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
 public class FileBaseResourceInfoFactoryImpl implements FileBaseResourceInfoFactory {
 	
 	@Inject
-	private MimeTypeDetector mimeTypeDetector;
+	protected MimeTypeDetector mimeTypeDetector;
 	
 	@Override
 	public FileBaseResourceInfo make(File file) {
-		String mimeType = mimeTypeDetector.getByExtensionName(file.getName());
+		String mimeType = getMimeType(file);
 		return new DefaultFileBaseResourceInfo(file, mimeType);
+	}
+	
+	protected String getMimeType(File file){
+		String fileName = file.getName();
+		return mimeTypeDetector.getByExtensionName(fileName);
 	}
 }
