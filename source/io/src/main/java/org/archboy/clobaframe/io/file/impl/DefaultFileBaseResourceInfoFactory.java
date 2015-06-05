@@ -11,11 +11,13 @@ import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
  *
  * @author yang
  */
-@Named
-public class FileBaseResourceInfoFactoryImpl implements FileBaseResourceInfoFactory {
+public class DefaultFileBaseResourceInfoFactory implements FileBaseResourceInfoFactory {
 	
-	@Inject
 	protected MimeTypeDetector mimeTypeDetector;
+
+	public DefaultFileBaseResourceInfoFactory(MimeTypeDetector mimeTypeDetector) {
+		this.mimeTypeDetector = mimeTypeDetector;
+	}
 	
 	@Override
 	public FileBaseResourceInfo make(File file) {

@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import javax.inject.Inject;
 import org.apache.commons.io.IOUtils;
+import org.archboy.clobaframe.io.impl.DefaultResourceInfoFactory;
 import org.archboy.clobaframe.io.impl.DefaultTextResourceInfo;
 import org.junit.After;
 import org.junit.Before;
@@ -23,8 +24,8 @@ import static org.junit.Assert.*;
 @ContextConfiguration(locations = { "/applicationContext.xml" })
 public class CacheableResourceInfoWrapperTest {
 
-	@Inject
-	private ResourceInfoFactory resourceInfoFactory;
+	//@Inject
+	private ResourceInfoFactory resourceInfoFactory = new DefaultResourceInfoFactory();
 	
 	@Inject
 	private CacheableResourceInfoWrapper cacheableResourceInfoWrapper;

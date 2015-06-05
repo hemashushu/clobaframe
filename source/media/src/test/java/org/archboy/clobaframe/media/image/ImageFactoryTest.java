@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import javax.inject.Inject;
+import org.archboy.clobaframe.io.MimeTypeDetector;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ContextConfiguration;
@@ -26,6 +27,7 @@ import org.archboy.clobaframe.io.ResourceInfo;
 import static org.junit.Assert.*;
 import org.archboy.clobaframe.io.TemporaryResources;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
+import org.archboy.clobaframe.io.file.impl.DefaultFileBaseResourceInfoFactory;
 import org.archboy.clobaframe.io.impl.DefaultTemporaryResources;
 import org.archboy.clobaframe.media.MetaData;
 
@@ -43,12 +45,16 @@ public class ImageFactoryTest {
 	private MediaFactory mediaFactory;
 
 	@Inject
+	private MimeTypeDetector mimeTypeDetector;
+	
+	//@Inject
 	private FileBaseResourceInfoFactory fileBaseResourceInfoFactory;
 	
 	private TemporaryResources temporaryResources = new DefaultTemporaryResources();
 	
 	@Before
 	public void setUp() throws Exception {
+		fileBaseResourceInfoFactory = new DefaultFileBaseResourceInfoFactory(mimeTypeDetector);
 	}
 
 	@After

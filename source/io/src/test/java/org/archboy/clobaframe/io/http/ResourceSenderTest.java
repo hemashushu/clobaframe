@@ -31,7 +31,9 @@ import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.archboy.clobaframe.io.MimeTypeDetector;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
+import org.archboy.clobaframe.io.file.impl.DefaultFileBaseResourceInfoFactory;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.springframework.core.io.Resource;
@@ -68,10 +70,15 @@ public class ResourceSenderTest {
 	private ResourceLoader resourceLoader;
 
 	@Inject
+	private MimeTypeDetector mimeTypeDetector;
+	
+	//@Inject
 	private FileBaseResourceInfoFactory fileBaseResourceInfoFactory;
 
 	@Before
 	public void setUp() throws Exception {
+		fileBaseResourceInfoFactory = new DefaultFileBaseResourceInfoFactory(mimeTypeDetector);
+		
 		// start jetty http server
 		server = new Server(18080);
 		

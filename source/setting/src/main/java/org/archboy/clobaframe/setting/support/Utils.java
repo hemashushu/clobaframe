@@ -116,7 +116,10 @@ public class Utils {
 				}
 			}
 			
-			matcher.appendReplacement(builder, ((String)replaceValue).replace("$", "\\$"));
+			String v = (String)replaceValue;
+			v = v.replace("\\", "\\\\"); // the windows file path seperator conflict with the regular express escape character.
+			v = v.replace("$", "\\$"); // the regular replace character.
+			matcher.appendReplacement(builder, v);
 		}
 		
 		matcher.appendTail(builder);

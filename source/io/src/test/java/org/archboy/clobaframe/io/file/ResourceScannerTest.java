@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import javax.inject.Inject;
+import org.archboy.clobaframe.io.MimeTypeDetector;
 import org.archboy.clobaframe.io.ResourceInfo;
+import org.archboy.clobaframe.io.file.impl.DefaultFileBaseResourceInfoFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,6 +32,9 @@ public class ResourceScannerTest {
 	private ResourceLoader resourceLoader;
 	
 	@Inject
+	private MimeTypeDetector mimeTypeDetector;
+	
+	//@Inject
 	private FileBaseResourceInfoFactory fileBaseResourceInfoFactory;
 
 	@Inject
@@ -37,7 +42,7 @@ public class ResourceScannerTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		//
+		fileBaseResourceInfoFactory = new DefaultFileBaseResourceInfoFactory(mimeTypeDetector);
 	}
 
 	@After

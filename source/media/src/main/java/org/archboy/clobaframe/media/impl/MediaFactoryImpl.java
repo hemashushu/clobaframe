@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.media.Media;
 import org.archboy.clobaframe.media.MediaFactory;
@@ -21,10 +22,13 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Value;
 import javax.inject.Named;
+import org.archboy.clobaframe.io.MimeTypeDetector;
 import org.archboy.clobaframe.io.ResourceInfoFactory;
 import org.archboy.clobaframe.io.TemporaryResources;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfoWrapper;
+import org.archboy.clobaframe.io.file.impl.DefaultFileBaseResourceInfoFactory;
+import org.archboy.clobaframe.io.impl.DefaultResourceInfoFactory;
 import org.springframework.util.Assert;
 
 /**
@@ -42,10 +46,13 @@ public class MediaFactoryImpl implements MediaFactory{
 
 	private final Logger logger = LoggerFactory.getLogger(MediaFactoryImpl.class);
 
-	@Inject
-	private ResourceInfoFactory resourceInfoFactory; // = new DefaultResourceInfoFactory();
+	//@Inject
+	private ResourceInfoFactory resourceInfoFactory = new DefaultResourceInfoFactory();
 	
 	@Inject
+	private MimeTypeDetector mimeTypeDetector;
+	
+	//@Inject
 	private FileBaseResourceInfoFactory fileBaseResourceInfoFactory;
 	
 	@Inject
@@ -53,6 +60,11 @@ public class MediaFactoryImpl implements MediaFactory{
 	
 	@Inject
 	private List<MediaLoader> mediaLoaders;
+	
+	@PostConstruct
+	public void init(){
+		fileBaseResourceInfoFactory = new DefaultFileBaseResourceInfoFactory(mimeTypeDetector);
+	}
 	
 	@Override
 	public Media make(byte[] data, String mimeType, Date lastModified, TemporaryResources temporaryResources) throws IOException {

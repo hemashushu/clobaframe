@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.util.Date;
 import javax.inject.Inject;
 import org.apache.commons.io.IOUtils;
+import org.archboy.clobaframe.io.MimeTypeDetector;
+import org.archboy.clobaframe.io.file.impl.DefaultFileBaseResourceInfoFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,11 +37,14 @@ public class FileBaseResourceInfoFactoryTest {
 	private ResourceLoader resourceLoader;
 		
 	@Inject
+	private MimeTypeDetector mimeTypeDetector;
+	
+	//@Inject
 	private FileBaseResourceInfoFactory fileBaseResourceInfoFactory;
 	
 	@Before
 	public void setUp() throws Exception {
-		//
+		fileBaseResourceInfoFactory = new DefaultFileBaseResourceInfoFactory(mimeTypeDetector);
 	}
 
 	@After

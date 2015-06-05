@@ -13,8 +13,7 @@ import org.springframework.util.Assert;
  *
  * @author yang
  */
-@Named
-public class ResourceInfoFactoryImpl implements ResourceInfoFactory {
+public class DefaultResourceInfoFactory implements ResourceInfoFactory {
 
 	@Override
 	public ResourceInfo make(byte[] content, String mimeType, Date lastModified) {

@@ -18,6 +18,7 @@ import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.ResourceInfoFactory;
 import org.archboy.clobaframe.io.http.ResourceSender;
+import org.archboy.clobaframe.io.impl.DefaultResourceInfoFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -47,8 +48,8 @@ public class ResourceSenderImpl implements ResourceSender {
 	@Inject
 	private ResourceLoader resourceLoader;
 	
-	@Inject
-	private ResourceInfoFactory resourceInfoFactory;
+	//@Inject
+	private ResourceInfoFactory resourceInfoFactory = new DefaultResourceInfoFactory();
 	
 	private ObjectMapper objectMapper = new ObjectMapper();
 	

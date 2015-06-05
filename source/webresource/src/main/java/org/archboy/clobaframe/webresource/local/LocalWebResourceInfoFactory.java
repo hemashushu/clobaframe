@@ -5,18 +5,18 @@ import org.archboy.clobaframe.io.MimeTypeDetector;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
+import org.archboy.clobaframe.io.file.impl.DefaultFileBaseResourceInfoFactory;
 
 /**
  *
  * @author yang
  */
-public class LocalWebResourceInfoFactory implements FileBaseResourceInfoFactory {
+public class LocalWebResourceInfoFactory extends DefaultFileBaseResourceInfoFactory implements FileBaseResourceInfoFactory {
 
-	private MimeTypeDetector mimeTypeDetector;
 	private LocalWebResourceNameStrategy resourceNameStrategy;
 
 	public LocalWebResourceInfoFactory(MimeTypeDetector mimeTypeDetector, LocalWebResourceNameStrategy resourceNameStrategy) {
-		this.mimeTypeDetector = mimeTypeDetector;
+		super(mimeTypeDetector);
 		this.resourceNameStrategy = resourceNameStrategy;
 	}
 	
@@ -25,14 +25,6 @@ public class LocalWebResourceInfoFactory implements FileBaseResourceInfoFactory 
 		String name = resourceNameStrategy.getName(file);
 		String mimeType = getMimeType(file);
 		
-		LocalWebResourceInfo webResourceInfo = new LocalWebResourceInfo(
-				file, mimeType, name);
-		return webResourceInfo;
+		return new LocalWebResourceInfo(file, mimeType, name);
 	}
-	
-	protected String getMimeType(File file){
-		String fileName = file.getName();
-		return mimeTypeDetector.getByExtensionName(fileName);
-	}
-	
 }

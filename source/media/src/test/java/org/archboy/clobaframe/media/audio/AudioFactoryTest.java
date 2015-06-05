@@ -2,17 +2,14 @@ package org.archboy.clobaframe.media.audio;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import javax.inject.Inject;
 import org.archboy.clobaframe.io.TemporaryResources;
-import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
 import org.archboy.clobaframe.io.impl.DefaultTemporaryResources;
 import org.archboy.clobaframe.media.MediaFactory;
 import org.archboy.clobaframe.media.MetaData;
-import org.archboy.clobaframe.media.image.Image;
 import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
