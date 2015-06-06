@@ -41,6 +41,11 @@ public class WebResourceManagerTest {
 	@Inject
 	private ResourceLoader resourceLoader;
 
+	private static final TextWebResourceInfo info1 = new TextWebResourceInfo("l1.css", "text/css", "p {}");
+	private static final TextWebResourceInfo info2a = new TextWebResourceInfo("l2a.css", "text/css", "@import url('l1.css') \n h1 {}");
+	private static final TextWebResourceInfo info2b = new TextWebResourceInfo("l2b.css", "text/css", "h2 {}");
+	private static final TextWebResourceInfo info3 = new TextWebResourceInfo("l3.css", "text/css", "@import url('l2a.css') \n body {}");
+
 	private final Logger logger = LoggerFactory.getLogger(WebResourceManagerTest.class);
 
 	@Before
@@ -134,46 +139,6 @@ public class WebResourceManagerTest {
 		// test get none-exists resource
 		assertNull(webResourceManager.getResource("none-exists"));
 	}
-
-	private static final TextWebResourceInfo info1 = new TextWebResourceInfo("l1.css", "text/css", "p {}");
-	private static final TextWebResourceInfo info2a = new TextWebResourceInfo("l2a.css", "text/css", "@import url('l1.css') \n h1 {}");
-	private static final TextWebResourceInfo info2b = new TextWebResourceInfo("l2b.css", "text/css", "h2 {}");
-	private static final TextWebResourceInfo info3 = new TextWebResourceInfo("l3.css", "text/css", "@import url('l2a.css') \n body {}");
-	
-	@Named
-	public static class TestVirtualWebResourceSource implements VirtualWebResourceSource {
-
-		@Override
-		public String getName() {
-			return "virtual/test";
-		}
-
-		@Override
-		public WebResourceInfo getByName(String name) {
-			if (name.equals("l3.css")){
-				return info3;
-			}else if (name.equals("l2a.css")){
-				return info2a;
-			}else if (name.equals("l2b.css")){
-				return info2b;
-			}else if (name.equals("l1.css")){
-				return info1;
-			}else{
-				return null;
-			}
-		}
-
-		@Override
-		public Collection<WebResourceInfo> getAll() {
-			return Arrays.asList(
-					getByName("l1.css"),
-					getByName("l2a.css"),
-					getByName("l2b.css"),
-					getByName("l3.css"));
-		}
-
-	};
-	
 	
 	@Test
 	public void testGetVirtualResource() throws IOException {
@@ -306,4 +271,38 @@ public class WebResourceManagerTest {
 		return resource.getFile();
 	}	
 
+	@Named
+	public static class TestingVirtualWebResourceSource implements VirtualWebResourceSource {
+
+		@Override
+		public String getName() {
+			return "virtual/test";
+		}
+
+		@Override
+		public WebResourceInfo getByName(String name) {
+			if (name.equals("l3.css")){
+				return info3;
+			}else if (name.equals("l2a.css")){
+				return info2a;
+			}else if (name.equals("l2b.css")){
+				return info2b;
+			}else if (name.equals("l1.css")){
+				return info1;
+			}else{
+				return null;
+			}
+		}
+
+		@Override
+		public Collection<WebResourceInfo> getAll() {
+			return Arrays.asList(
+					getByName("l1.css"),
+					getByName("l2a.css"),
+					getByName("l2b.css"),
+					getByName("l3.css"));
+		}
+
+	};
+	
 }

@@ -52,7 +52,7 @@ public class WebResourceSenderTest {
 		server.setHandler(context);
 
 		ServletHolder servletHolder1 = new ServletHolder(
-				new WebResourceSenderServlet(resourceSender));
+				new TestingWebResourceSenderServlet(resourceSender));
 		context.addServlet(servletHolder1,"/resource/*");
 
 		server.start();
@@ -132,13 +132,13 @@ public class WebResourceSenderTest {
 	/**
 	 * HttpServlet implementations for testing.
 	 */
-	public class WebResourceSenderServlet extends HttpServlet {
+	public static class TestingWebResourceSenderServlet extends HttpServlet {
 
 		private static final long serialVersionUID = 1L;
 
 		private WebResourceSender webResourceSender;
 
-		public WebResourceSenderServlet(WebResourceSender webResourceSender) {
+		public TestingWebResourceSenderServlet(WebResourceSender webResourceSender) {
 			this.webResourceSender = webResourceSender;
 		}
 

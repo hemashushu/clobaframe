@@ -157,7 +157,7 @@ public class PrincipalSettingTest {
 	}
 	
 	@Named
-	public static class InMemoryUserSettingRepository implements PrincipalSettingProvider, PrincipalSettingRepository {
+	public static class TestingUserSettingRepository implements PrincipalSettingProvider, PrincipalSettingRepository {
 
 		private Map<String, Object> setting1 = new LinkedHashMap<String, Object>();
 		private Map<String, Object> setting2 = new LinkedHashMap<String, Object>();
@@ -223,7 +223,7 @@ public class PrincipalSettingTest {
 	}
 	
 	@Named
-	public static class InMemoryGroupSettingRepository implements PrincipalSettingProvider, PrincipalSettingRepository {
+	public static class TestingGroupSettingRepository implements PrincipalSettingProvider, PrincipalSettingRepository {
 
 		private Map<String, Object> setting1 = new LinkedHashMap<String, Object>();
 		private Map<String, Object> setting2 = new LinkedHashMap<String, Object>();

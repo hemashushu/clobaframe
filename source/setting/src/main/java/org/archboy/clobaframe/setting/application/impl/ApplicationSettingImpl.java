@@ -143,7 +143,6 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 	private void loadRootConfigFromProperties() {
 		if (properties != null && !properties.isEmpty()) {
 			rootSetting = Utils.merge(rootSetting, properties);
-			System.out.println(rootSetting);
 		}
 	}
 	

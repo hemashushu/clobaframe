@@ -82,12 +82,12 @@ public class GlobalSettingTest {
 	}
 	
 	@Named
-	public static class TestingInstanceSettingProvider implements GlobalSettingProvider {
+	public static class TestingGlobalSettingProvider implements GlobalSettingProvider {
 
 		@Inject
 		private ResourceLoader resourceLoader;
 
-		public TestingInstanceSettingProvider() {
+		public TestingGlobalSettingProvider() {
 			super();
 		}
 		
@@ -123,7 +123,7 @@ public class GlobalSettingTest {
 	}
 	
 	@Named
-	public static class InMemoryInstanceSettingRepository implements GlobalSettingProvider, GlobalSettingRepository {
+	public static class TestingGlobalSettingRepository implements GlobalSettingProvider, GlobalSettingRepository {
 
 		protected Map<String, Object> setting = new LinkedHashMap<String, Object>();
 		
