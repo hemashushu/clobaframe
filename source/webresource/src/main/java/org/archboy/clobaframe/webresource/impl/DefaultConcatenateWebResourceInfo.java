@@ -8,14 +8,14 @@ import java.util.Date;
 import java.util.List;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
-import org.archboy.clobaframe.webresource.AbstractWebResourceInfo;
+import org.archboy.clobaframe.webresource.AbstractServerWebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 
 /**
  *
  * @author yang
  */
-public class DefaultConcatenateWebResourceInfo extends AbstractWebResourceInfo {
+public class DefaultConcatenateWebResourceInfo extends AbstractServerWebResourceInfo {
 
 	private List<WebResourceInfo> webResourceInfos;
 	private String name;
@@ -30,10 +30,15 @@ public class DefaultConcatenateWebResourceInfo extends AbstractWebResourceInfo {
 		this.mimeType = webResourceInfos.get(0).getMimeType();
 		
 		for(WebResourceInfo info : webResourceInfos) {
-			addType(DefaultConcatenateWebResourceInfo.class, info);
+			appendType(getType(), info);
 		}
 	}
 
+	@Override
+	public int getType() {
+		return TYPE_CONCATENATE;
+	}
+	
 	@Override
 	public String getContentHash() {
 		// only hash all source hash values, not hash the source content itself, to increase compute speed.

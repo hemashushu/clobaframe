@@ -13,7 +13,7 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.Date;
 import org.apache.commons.io.IOUtils;
-import org.archboy.clobaframe.webresource.AbstractWebResourceInfo;
+import org.archboy.clobaframe.webresource.AbstractServerWebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceManager;
 import org.mozilla.javascript.ErrorReporter;
@@ -27,7 +27,7 @@ import org.springframework.util.Assert;
  *
  * @author yang
  */
-public class DefaultMinifyWebResourceInfo extends AbstractWebResourceInfo {
+public class DefaultMinifyWebResourceInfo extends AbstractServerWebResourceInfo {
 
 	private WebResourceInfo webResourceInfo;
 	private String lastContentHash;
@@ -41,10 +41,15 @@ public class DefaultMinifyWebResourceInfo extends AbstractWebResourceInfo {
 	public DefaultMinifyWebResourceInfo(WebResourceInfo webResourceInfo) {
 		Assert.notNull(webResourceInfo);
 		this.webResourceInfo = webResourceInfo;
-		addType(DefaultMinifyWebResourceInfo.class, webResourceInfo);
+		appendType(getType(), webResourceInfo);
 		rebuild();
 	}
 
+	@Override
+	public int getType() {
+		return TYPE_MINIFY;
+	}
+	
 	@Override
 	public String getContentHash() {
 		return webResourceInfo.getContentHash();

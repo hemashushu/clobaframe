@@ -104,11 +104,11 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	}
 
 	/**
-	 * 
+	 * Cache, compress, minify etc. the web resource.
 	 * @param name
 	 * @return NULL if the specify resource not found.
 	 */
-	private WebResourceInfo postHandleResource(String name) {
+	protected WebResourceInfo serveResource(String name) {
 		
 		// load from in-momery cache first
 		WebResourceInfo resourceInfo = resourceCache.get(name);
@@ -157,7 +157,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 			// insert the update listener into the child resources
 			if (childResourceNames != null){
 				for(String n : childResourceNames) {
-					WebResourceInfo r = postHandleResource(n);
+					WebResourceInfo r = serveResource(n);
 					if (r != null && r instanceof CacheableWebResourceInfo) {
 						((CacheableWebResourceInfo)r).addUpdateListener((CacheableWebResourceInfoUpdateListener)resourceInfo);
 					}
@@ -174,12 +174,12 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	}
 	
 	@Override
-	public WebResourceInfo getResource(String name) {
-		return postHandleResource(name);
+	public WebResourceInfo getServerResource(String name) {
+		return serveResource(name);
 	}
 
 	@Override
-	public WebResourceInfo getOriginalResource(String name) {
+	public WebResourceInfo getResource(String name) {
 		return webResourceProviderSet.getByName(name);
 	}
 
@@ -190,13 +190,13 @@ public class WebResourceManagerImpl implements WebResourceManager {
 
 	@Override
 	public String getLocation(String name) {
-		WebResourceInfo resource = getResource(name);
+		WebResourceInfo resource = getServerResource(name);
 		return resource == null ? null : getLocation(resource);
 	}
 
 	@Override
 	public void refresh(String name) {
-		WebResourceInfo resource = postHandleResource(name);
+		WebResourceInfo resource = serveResource(name);
 		if (resource != null) {
 			if (resource instanceof CacheableWebResourceInfo) {
 				((CacheableWebResourceInfo)resource).refresh();
@@ -205,14 +205,14 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	}
 	
 	@Override
-	public Collection<WebResourceInfo> getAllOriginalResource() {
+	public Collection<WebResourceInfo> getAll() {
 		return webResourceProviderSet.getAll();
 	}
 
 	@Override
-	public WebResourceInfo getResourceByVersionName(String versionName) {
+	public WebResourceInfo getServerResourceByVersionName(String versionName) {
 		String name = locationStrategy.fromVersionName(versionName);
-		return (name == null ? null : getResource(name));
+		return (name == null ? null : getServerResource(name));
 	}
 	
 }

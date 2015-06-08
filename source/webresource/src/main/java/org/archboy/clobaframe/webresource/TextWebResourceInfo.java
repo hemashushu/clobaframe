@@ -32,7 +32,6 @@ public class TextWebResourceInfo extends AbstractWebResourceInfo implements Text
 		this.mimeType = mimeType;
 		this.charset = charset;
 		
-		addType(TextWebResourceInfo.class);
 		updateContent(text, lastModified);
 	}
 	

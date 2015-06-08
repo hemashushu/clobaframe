@@ -9,9 +9,10 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.archboy.clobaframe.io.http.CacheResourceSender;
-import org.archboy.clobaframe.webresource.AbstractWebResourceInfo;
+import org.archboy.clobaframe.webresource.AbstractServerWebResourceInfo;
 import org.archboy.clobaframe.webresource.CacheableWebResourceInfo;
 import org.archboy.clobaframe.webresource.CompressibleWebResourceInfo;
+import org.archboy.clobaframe.webresource.ServerWebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceManager;
 import org.archboy.clobaframe.webresource.WebResourceSender;
@@ -39,7 +40,7 @@ public class WebResourceSenderImpl implements WebResourceSender{
 		Assert.notNull(request);
 		Assert.notNull(response);
 		
-		WebResourceInfo webResourceInfo = webResourceManager.getResource(resourceName);
+		WebResourceInfo webResourceInfo = webResourceManager.getServerResource(resourceName);
 		if (webResourceInfo == null) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND,
 				"Resource not found");
@@ -52,9 +53,9 @@ public class WebResourceSenderImpl implements WebResourceSender{
 		Map<String, Object> headers = new HashMap<String, Object>();
 		
 		if (webResourceInfo instanceof CompressibleWebResourceInfo ||
-			(webResourceInfo instanceof AbstractWebResourceInfo &&
-				((AbstractWebResourceInfo)webResourceInfo).getTypes()
-					.contains(CompressibleWebResourceInfo.class))){
+			(webResourceInfo instanceof AbstractServerWebResourceInfo &&
+				((AbstractServerWebResourceInfo)webResourceInfo).getInheritTypes()
+					.contains(ServerWebResourceInfo.TYPE_COMPRESS))){
 			// it's compressed resource already.
 			headers.put("Content-Encoding", "gzip");
 		}
@@ -72,7 +73,7 @@ public class WebResourceSenderImpl implements WebResourceSender{
 		Assert.notNull(request);
 		Assert.notNull(response);
 		
-		WebResourceInfo webResourceInfo = webResourceManager.getResourceByVersionName(versionName);
+		WebResourceInfo webResourceInfo = webResourceManager.getServerResourceByVersionName(versionName);
 		if (webResourceInfo == null){
 			response.sendError(HttpServletResponse.SC_NOT_FOUND,
 					"Resource not found");

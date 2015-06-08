@@ -67,7 +67,7 @@ public class WebResourceSenderTest {
 	@Test
 	public void testSend() throws FileNotFoundException {
 
-		WebResourceInfo webResource1 = resourceManager.getResource("test.png");
+		WebResourceInfo webResource1 = resourceManager.getServerResource("test.png");
 
 		CloseableHttpClient client = HttpClients.createDefault();
 

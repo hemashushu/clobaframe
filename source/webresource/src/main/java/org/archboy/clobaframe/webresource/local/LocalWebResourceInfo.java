@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.archboy.clobaframe.io.file.impl.DefaultFileBaseResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 
@@ -36,5 +39,39 @@ public class LocalWebResourceInfo extends DefaultFileBaseResourceInfo implements
 	@Override
 	public String getName() {
 		return name;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null){
+			return false;
+		}
+
+		if (obj == this){
+			return true;
+		}
+
+		if(obj.getClass() != getClass()){
+			return false;
+		}
+
+		WebResourceInfo other = (WebResourceInfo)obj;
+		return new EqualsBuilder()
+				.append(getName(), other.getName())
+				.isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder()
+				.append(getName())
+				.toHashCode();
+	}
+
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this)
+				.append("name", getName())
+				.toString();
 	}
 }

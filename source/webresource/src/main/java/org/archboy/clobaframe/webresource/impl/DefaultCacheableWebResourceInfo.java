@@ -7,13 +7,13 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.io.IOUtils;
-import org.archboy.clobaframe.webresource.AbstractWebResourceInfo;
+import org.archboy.clobaframe.webresource.AbstractServerWebResourceInfo;
 import org.archboy.clobaframe.webresource.CacheableWebResourceInfo;
 import org.archboy.clobaframe.webresource.CacheableWebResourceInfoUpdateListener;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.springframework.util.Assert;
 
-public class DefaultCacheableWebResourceInfo extends AbstractWebResourceInfo implements CacheableWebResourceInfo, CacheableWebResourceInfoUpdateListener {
+public class DefaultCacheableWebResourceInfo extends AbstractServerWebResourceInfo implements CacheableWebResourceInfo, CacheableWebResourceInfoUpdateListener {
 
 	private long cacheMilliSeconds;
 	private long lastCheckingTime;
@@ -42,11 +42,16 @@ public class DefaultCacheableWebResourceInfo extends AbstractWebResourceInfo imp
 		this.cacheMilliSeconds = (cacheSeconds == -1 ? -1 : cacheSeconds * 1000);
 		this.resourceUpdateListeners = new HashSet<CacheableWebResourceInfoUpdateListener>();
 		
-		addType(CacheableWebResourceInfo.class, webResourceInfo);
+		appendType(getType(), webResourceInfo);
 		
 		// first time rebuild
 		rebuild();
 		this.lastCheckingTime = System.currentTimeMillis();
+	}
+
+	@Override
+	public int getType() {
+		return TYPE_CACHE;
 	}
 
 	@Override

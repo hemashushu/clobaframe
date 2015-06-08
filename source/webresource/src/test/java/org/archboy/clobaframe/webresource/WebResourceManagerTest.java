@@ -71,12 +71,12 @@ public class WebResourceManagerTest {
 //		};
 		
 		for (String name : names) {
-			WebResourceInfo webResourceInfo = webResourceManager.getResource(name);
+			WebResourceInfo webResourceInfo = webResourceManager.getServerResource(name);
 			assertTrue(webResourceInfo.getContentLength() > 0);
 		}
 		
 		List<String> nameList1 = new ArrayList<String>();
-		Collection<WebResourceInfo> resourcesByManager1 = webResourceManager.getAllOriginalResource();
+		Collection<WebResourceInfo> resourcesByManager1 = webResourceManager.getAll();
 		for(WebResourceInfo resourceInfo : resourcesByManager1){
 			nameList1.add(resourceInfo.getName());
 		}
@@ -87,10 +87,10 @@ public class WebResourceManagerTest {
 	}
 
 	@Test
-	public void testGetResource() throws IOException {
+	public void testGetServerResource() throws IOException {
 		// test get a resource
-		WebResourceInfo webResource1 = webResourceManager.getResource("test.css");
-		WebResourceInfo webResource2 = webResourceManager.getResource("test.png");
+		WebResourceInfo webResource1 = webResourceManager.getServerResource("test.css");
+		WebResourceInfo webResource2 = webResourceManager.getServerResource("test.png");
 
 		assertNotNull(webResource1.getContentHash());
 		assertTrue(webResource1.getContentLength() > 0);
@@ -105,7 +105,7 @@ public class WebResourceManagerTest {
 	
 		// test get by version name
 		String versionName1 = location1.substring(location1.lastIndexOf('/') + 1);
-		WebResourceInfo webResourceByVersionName1 = webResourceManager.getResourceByVersionName(versionName1);
+		WebResourceInfo webResourceByVersionName1 = webResourceManager.getServerResourceByVersionName(versionName1);
 		assertEquals(webResource1, webResourceByVersionName1);
 		
 		// test the content
@@ -125,7 +125,7 @@ public class WebResourceManagerTest {
 		}
 
 		// test location transform, with relative path
-		WebResourceInfo webResource3 = webResourceManager.getResource("css/test2.css");
+		WebResourceInfo webResource3 = webResourceManager.getServerResource("css/test2.css");
 		InputStream in2 = webResource3.getContent();
 		String text2 = IOUtils.toString(in2);
 		in2.close();
@@ -137,19 +137,19 @@ public class WebResourceManagerTest {
 		}
 
 		// test get none-exists resource
-		assertNull(webResourceManager.getResource("none-exists"));
+		assertNull(webResourceManager.getServerResource("none-exists"));
 	}
 	
 	@Test
 	public void testGetVirtualResource() throws IOException {
 		
-		WebResourceInfo webResourceInfo1 = webResourceManager.getResource("l1.css");
-		assertTextResourceContentEquals(webResourceInfo1, "p {}");
+		WebResourceInfo webResourceInfo1 = webResourceManager.getResource("l2b.css");
+		assertTextResourceContentEquals(webResourceInfo1, "h2 {}");
 		
 		String[] names = new String[]{"l1.css", "l2a.css", "l2b.css", "l3.css"};
 
 		List<String> nameList1 = new ArrayList<String>();
-		Collection<WebResourceInfo> resourcesByManager1 = webResourceManager.getAllOriginalResource();
+		Collection<WebResourceInfo> resourcesByManager1 = webResourceManager.getAll();
 		for(WebResourceInfo resourceInfo : resourcesByManager1){
 			nameList1.add(resourceInfo.getName());
 		}
@@ -160,7 +160,7 @@ public class WebResourceManagerTest {
 	}
 	
 	@Test
-	public void testGetChainUpdate() throws IOException {
+	public void testChainUpdate() throws IOException {
 		
 		String location1 = webResourceManager.getLocation("l3.css");
 		String location2 = webResourceManager.getLocation("l2a.css");
@@ -207,12 +207,12 @@ public class WebResourceManagerTest {
 	
 	@Test
 	public void testGetConcatenateResource() throws IOException {
-		WebResourceInfo webResource1 = webResourceManager.getResource("css/concat-34.css");
-		WebResourceInfo webResource2 = webResourceManager.getResource("css/concat-345.css");
+		WebResourceInfo webResource1 = webResourceManager.getServerResource("css/concat-34.css");
+		WebResourceInfo webResource2 = webResourceManager.getServerResource("css/concat-345.css");
 
-		String text1 = IOUtils.toString( webResourceManager.getResource("css/test3.css").getContent());
-		String text2 = IOUtils.toString( webResourceManager.getResource("css/test4.css").getContent());
-		String text3 = IOUtils.toString( webResourceManager.getResource("css/test5.css").getContent());
+		String text1 = IOUtils.toString( webResourceManager.getServerResource("css/test3.css").getContent());
+		String text2 = IOUtils.toString( webResourceManager.getServerResource("css/test4.css").getContent());
+		String text3 = IOUtils.toString( webResourceManager.getServerResource("css/test5.css").getContent());
 		
 		// test the content
 		assertTextResourceContentEquals(webResource1, text1 + "\n" + text2);

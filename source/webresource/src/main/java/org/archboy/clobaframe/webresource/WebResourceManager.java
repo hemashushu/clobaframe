@@ -49,21 +49,21 @@ public interface WebResourceManager {
 	 * @param name
 	 * @return NULL when the specify name can not be found.
 	 */
-	WebResourceInfo getResource(String name);
+	WebResourceInfo getServerResource(String name);
 
 	/**
 	 *
 	 * @param versionName The name that combines with resource name and version.
 	 * @return NULL when the specify name can not be found.
 	 */
-	WebResourceInfo getResourceByVersionName(String versionName);
+	WebResourceInfo getServerResourceByVersionName(String versionName);
 
 	/**
 	 * Get the un-transform, un-compressed, un-minified, un-cached web resource.
 	 * @param name
 	 * @return NULL when the specify name can not be found.
 	 */
-	WebResourceInfo getOriginalResource(String name);
+	WebResourceInfo getResource(String name);
 	
 	/**
 	 * Get all original web resources.
@@ -71,7 +71,7 @@ public interface WebResourceManager {
 	 * 
 	 * @return 
 	 */
-	Collection<WebResourceInfo> getAllOriginalResource();
+	Collection<WebResourceInfo> getAll();
 	
 	/**
 	 * Get the location (URL) of the specify resource.

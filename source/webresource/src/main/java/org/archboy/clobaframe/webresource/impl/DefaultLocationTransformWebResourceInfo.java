@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.archboy.clobaframe.webresource.AbstractWebResourceInfo;
+import org.archboy.clobaframe.webresource.AbstractServerWebResourceInfo;
 import org.archboy.clobaframe.webresource.LocationTransformResourceInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ import org.springframework.util.Assert;
  *
  * @author yang
  */
-public class DefaultLocationTransformWebResourceInfo extends AbstractWebResourceInfo implements LocationTransformResourceInfo {
+public class DefaultLocationTransformWebResourceInfo extends AbstractServerWebResourceInfo implements LocationTransformResourceInfo {
 
 	private final Logger logger = LoggerFactory.getLogger(DefaultLocationTransformWebResourceInfo.class);
 
@@ -57,11 +57,16 @@ public class DefaultLocationTransformWebResourceInfo extends AbstractWebResource
 		this.webResourceManager = webResourceManager;
 		this.webResourceInfo = webResourceInfo;
 		
-		addType(LocationTransformResourceInfo.class, webResourceInfo);
+		appendType(getType(), webResourceInfo);
 		
 		rebuild();
 	}
 
+	@Override
+	public int getType() {
+		return TYPE_LOCATION_TRANSFORM;
+	}
+	
 	@Override
 	public String getContentHash() {
 		rebuild();

@@ -59,13 +59,13 @@ public class WebResourceMinifyTest {
 		
 		// check original resource
 		for (int idx=0; idx<names1.length; idx++) {
-			WebResourceInfo webResourceInfo = webResourceManager.getOriginalResource(names1[idx]);
+			WebResourceInfo webResourceInfo = webResourceManager.getResource(names1[idx]);
 			assertResourceContentEquals(webResourceInfo, files1[idx]);
 		}
 		
 		// check minified content length
 		for (int idx=0; idx<names1.length; idx++) {
-			WebResourceInfo webResourceInfo = webResourceManager.getResource(names1[idx]);
+			WebResourceInfo webResourceInfo = webResourceManager.getServerResource(names1[idx]);
 			assertTrue(webResourceInfo.getContentLength() < getFileContent(files1[idx]).length);
 		}
 		
@@ -76,7 +76,7 @@ public class WebResourceMinifyTest {
 		};
 		
 		for (String name : emptyResourceNames1) {
-			WebResourceInfo webResourceInfo = webResourceManager.getResource(name);
+			WebResourceInfo webResourceInfo = webResourceManager.getServerResource(name);
 			assertTrue(webResourceInfo.getContentLength() == 0);
 		}
 		
