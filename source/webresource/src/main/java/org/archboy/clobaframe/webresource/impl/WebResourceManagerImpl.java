@@ -12,7 +12,7 @@ import org.archboy.clobaframe.webresource.CacheableWebResourceInfo;
 import org.archboy.clobaframe.webresource.CacheableWebResourceInfoUpdateListener;
 import org.archboy.clobaframe.webresource.WebResourceProviderSet;
 import org.archboy.clobaframe.webresource.LocationStrategy;
-import org.archboy.clobaframe.webresource.ResourceCache;
+import org.archboy.clobaframe.webresource.WebResourceCache;
 import org.archboy.clobaframe.webresource.VersionStrategy;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceManager;
@@ -35,7 +35,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	private static final int DEFAULT_SERVER_CACHE_SECONDS = 10 * 60;
 
 	
-	private ResourceCache resourceCache;
+	private WebResourceCache resourceCache;
 
 	@Value("${clobaframe.webresource.locationStrategy:" + DEFAULT_LOCATION_STRATEGY + "}")
 	private String locationStrategyName;
@@ -86,7 +86,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 		
 		logger.info("Using [{}] web resource location strategy.", locationStrategyName);
 		
-		resourceCache = new InMemoryResourceCache();
+		resourceCache = new InMemoryWebResourceCache();
 		
 		compressibleWebResourceMimeTypes = new ArrayList<String>();
 		compressibleWebResourceMimeTypes.add(MIME_TYPE_STYLE_SHEET);

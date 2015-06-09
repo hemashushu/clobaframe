@@ -52,7 +52,6 @@ public class MediaFactoryImpl implements MediaFactory{
 	@Inject
 	private MimeTypeDetector mimeTypeDetector;
 	
-	//@Inject
 	private FileBaseResourceInfoFactory fileBaseResourceInfoFactory;
 	
 	@Inject

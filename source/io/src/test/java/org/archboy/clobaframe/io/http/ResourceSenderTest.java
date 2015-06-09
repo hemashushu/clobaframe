@@ -71,14 +71,9 @@ public class ResourceSenderTest {
 
 	@Inject
 	private MimeTypeDetector mimeTypeDetector;
-	
-	//@Inject
-	private FileBaseResourceInfoFactory fileBaseResourceInfoFactory;
 
 	@Before
 	public void setUp() throws Exception {
-		fileBaseResourceInfoFactory = new DefaultFileBaseResourceInfoFactory(mimeTypeDetector);
-		
 		// start jetty http server
 		server = new Server(18080);
 		
@@ -360,6 +355,8 @@ public class ResourceSenderTest {
 
 		private static final long serialVersionUID = 1L;
 
+		private FileBaseResourceInfoFactory fileBaseResourceInfoFactory = new DefaultFileBaseResourceInfoFactory(mimeTypeDetector);
+		
 		@Override
 		protected void doGet(HttpServletRequest request, HttpServletResponse response)
 				throws ServletException, IOException {

@@ -2,7 +2,7 @@ package org.archboy.clobaframe.webresource.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.archboy.clobaframe.webresource.ResourceCache;
+import org.archboy.clobaframe.webresource.WebResourceCache;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 
 /**
@@ -10,7 +10,7 @@ import org.archboy.clobaframe.webresource.WebResourceInfo;
  * 
  * @author yang
  */
-public class InMemoryResourceCache implements ResourceCache {
+public class InMemoryWebResourceCache implements WebResourceCache {
 
 	private Map<String, WebResourceInfo> resources = new HashMap<String, WebResourceInfo>();
 	

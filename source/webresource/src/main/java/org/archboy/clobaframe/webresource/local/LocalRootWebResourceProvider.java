@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import javax.inject.Named;
+import org.apache.commons.lang3.StringUtils;
 import org.archboy.clobaframe.io.MimeTypeDetector;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
@@ -23,7 +24,7 @@ import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceProvider;
 
 @Named
-public class LocalWebResourceProvider implements WebResourceProvider{
+public class LocalRootWebResourceProvider implements WebResourceProvider{
 
 	@Inject
 	private ResourceLoader resourceLoader;
@@ -33,23 +34,23 @@ public class LocalWebResourceProvider implements WebResourceProvider{
 	
 	// local resource path, usually relative to the 'src/main/webapp' folder.
 	// to using this repository, the web application war package must be expended when running.
-	private static final String DEFAULT_LOCAL_PATH = "resources/default";
-	private static final String DEFAULT_RESOURCE_NAME_PREFIX = "";
+	private static final String DEFAULT_LOCAL_PATH = ""; //"resources/root";
+	private static final String DEFAULT_RESOURCE_NAME_PREFIX = "root/";
 	
-	@Value("${clobaframe.webresource.repository.local.path:" + DEFAULT_LOCAL_PATH + "}")
+	@Value("${clobaframe.webresource.repository.localRoot.path:" + DEFAULT_LOCAL_PATH + "}")
 	private String localPath;
 	
-	@Value("${clobaframe.webresource.repository.local.namePrefix:" + DEFAULT_RESOURCE_NAME_PREFIX + "}")
+	@Value("${clobaframe.webresource.repository.localRoot.namePrefix:" + DEFAULT_RESOURCE_NAME_PREFIX + "}")
 	private String resourceNamePrefix;
 	
 	//private File baseDir;
 	private LocalResourceProvider localResourceProvider;
 			
-	private final Logger logger = LoggerFactory.getLogger(LocalWebResourceProvider.class);
+	private final Logger logger = LoggerFactory.getLogger(LocalRootWebResourceProvider.class);
 
 	@Override
 	public String getName() {
-		return "local";
+		return "localRoot";
 	}
 
 	@Override
@@ -59,6 +60,10 @@ public class LocalWebResourceProvider implements WebResourceProvider{
 
 	@PostConstruct
 	public void init() {
+		if (StringUtils.isEmpty(localPath)) {
+			return;
+		}
+		
 		Resource resource = resourceLoader.getResource(localPath);
 		
 		try{
@@ -83,12 +88,20 @@ public class LocalWebResourceProvider implements WebResourceProvider{
 
 	@Override
 	public WebResourceInfo getByName(String name) {
+		if (StringUtils.isEmpty(localPath)) {
+			return null;
+		}
+		
 		return (WebResourceInfo)localResourceProvider.getByName(name);
 	}
 
 	@Override
 	public Collection<WebResourceInfo> getAll() {
 		List<WebResourceInfo> webResourceInfos = new ArrayList<WebResourceInfo>();
+		
+		if (StringUtils.isEmpty(localPath)) {
+			return webResourceInfos;
+		}
 		
 		Collection<FileBaseResourceInfo> fileBaseResourceInfos = localResourceProvider.getAll();
 		for(FileBaseResourceInfo fileBaseResourceInfo : fileBaseResourceInfos) {

@@ -26,8 +26,8 @@ public class WebResourceProviderSetImpl implements WebResourceProviderSet {
 	@Override
 	public WebResourceInfo getByName(String name) {
 		WebResourceInfo webResourceInfo = null;
-		for (WebResourceProvider resourceRepository : webResourceProviders){
-			webResourceInfo = resourceRepository.getByName(name);
+		for (WebResourceProvider webResourceProvider : webResourceProviders){
+			webResourceInfo = webResourceProvider.getByName(name);
 			if (webResourceInfo != null) {
 				break;
 			}

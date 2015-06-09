@@ -53,8 +53,8 @@ public class WebResourceMinifyTest {
 		};
 		
 		String[] files1 = new String[]{
-			"webapp/resources/test.css",
-			"webapp/resources/css/test2.css"
+			"webapp/resources/default/test.css",
+			"webapp/resources/default/css/test2.css"
 		};
 		
 		// check original resource

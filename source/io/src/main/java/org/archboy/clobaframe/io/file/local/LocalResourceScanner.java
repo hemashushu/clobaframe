@@ -1,14 +1,16 @@
-package org.archboy.clobaframe.io.file;
+package org.archboy.clobaframe.io.file.local;
 
 import java.io.File;
 import java.util.Collection;
 import org.archboy.clobaframe.io.ResourceInfo;
+import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
+import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
 
 /**
  *
  * @author yang
  */
-public interface ResourceScanner {
+public interface LocalResourceScanner {
 	
 	/**
 	 * 
@@ -16,7 +18,7 @@ public interface ResourceScanner {
 	 * @param fileBaseResourceInfoFactory
 	 * @return 
 	 */
-	Collection<ResourceInfo> scan(
+	Collection<FileBaseResourceInfo> scan(
 			File basePath,
 			FileBaseResourceInfoFactory fileBaseResourceInfoFactory);
 }

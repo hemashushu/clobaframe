@@ -39,12 +39,9 @@ public class FileBaseResourceInfoFactoryTest {
 	@Inject
 	private MimeTypeDetector mimeTypeDetector;
 	
-	//@Inject
-	private FileBaseResourceInfoFactory fileBaseResourceInfoFactory;
-	
 	@Before
 	public void setUp() throws Exception {
-		fileBaseResourceInfoFactory = new DefaultFileBaseResourceInfoFactory(mimeTypeDetector);
+		//
 	}
 
 	@After
@@ -57,6 +54,7 @@ public class FileBaseResourceInfoFactoryTest {
 		File file = getFileByName(sampleFile);
 		byte[] data = getFileContent(sampleFile);
 		
+		FileBaseResourceInfoFactory fileBaseResourceInfoFactory = new DefaultFileBaseResourceInfoFactory(mimeTypeDetector);
 		FileBaseResourceInfo resourceInfo = fileBaseResourceInfoFactory.make(file);
 		assertNotNull(resourceInfo);
 		

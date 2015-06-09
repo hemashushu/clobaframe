@@ -1,4 +1,4 @@
-package org.archboy.clobaframe.io.file.impl;
+package org.archboy.clobaframe.io.file.local;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -7,22 +7,21 @@ import java.util.List;
 import java.util.Stack;
 import javax.inject.Named;
 import org.archboy.clobaframe.io.ResourceInfo;
+import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
-import org.archboy.clobaframe.io.file.ResourceScanner;
 
 /**
  *
  * @author yang
  */
-@Named
-public class ResourceScannerImpl implements ResourceScanner {
+public class DefaultLocalResourceScanner implements LocalResourceScanner {
 
 	@Override
-	public Collection<ResourceInfo> scan(
+	public Collection<FileBaseResourceInfo> scan(
 			File basePath, 
 			FileBaseResourceInfoFactory fileBaseResourceInfoFactory) {
 
-		List<ResourceInfo> resourceInfos = new ArrayList<ResourceInfo>();
+		List<FileBaseResourceInfo> resourceInfos = new ArrayList<FileBaseResourceInfo>();
 
 		Stack<File> dirs = new Stack<File>();
 		dirs.push(basePath);
@@ -34,7 +33,7 @@ public class ResourceScannerImpl implements ResourceScanner {
 				if (file.isDirectory()) {
 					dirs.push(file);
 				} else {
-					ResourceInfo resourceInfo = fileBaseResourceInfoFactory.make(file);
+					FileBaseResourceInfo resourceInfo = fileBaseResourceInfoFactory.make(file);
 					resourceInfos.add(resourceInfo);
 				}
 			}

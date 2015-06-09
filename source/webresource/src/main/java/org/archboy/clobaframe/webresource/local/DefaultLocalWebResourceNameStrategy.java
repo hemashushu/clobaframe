@@ -1,7 +1,10 @@
 package org.archboy.clobaframe.webresource.local;
 
 import java.io.File;
+import org.apache.commons.lang3.StringUtils;
+import org.archboy.clobaframe.io.file.local.DefaultLocalFileNameStrategy;
 import org.archboy.clobaframe.webresource.local.LocalWebResourceNameStrategy;
+import org.springframework.util.Assert;
 
 /**
  * Return resource name by file relate to the base path.
@@ -15,22 +18,33 @@ import org.archboy.clobaframe.webresource.local.LocalWebResourceNameStrategy;
  * 
  * @author yang
  */
-public class DefaultLocalWebResourceNameStrategy implements LocalWebResourceNameStrategy {
+public class DefaultLocalWebResourceNameStrategy extends DefaultLocalFileNameStrategy implements LocalWebResourceNameStrategy {
+	
+	private String namePrefix;
 	
 	private int basePathLength;
-
-	public DefaultLocalWebResourceNameStrategy(File basePath) {
+	private int namePrefixLength;
+	
+	public DefaultLocalWebResourceNameStrategy(File basePath, String namePrefix) {
+		super(basePath);
 		// the base path length plus 1 to exclude the resource file name path
 		// '/' prefix character.
 		this.basePathLength = basePath.getPath().length() + 1; 
+		
+		this.namePrefix = namePrefix == null ? StringUtils.EMPTY : namePrefix;
+		this.namePrefixLength = namePrefix.length();
 	}
 
 	@Override
 	public String getName(File file) {
 		String name = file.getPath().substring(basePathLength);
-		return name.replace('\\', '/');
+		return namePrefix + name.replace('\\', '/');
 	}
-	
-	
+
+	@Override
+	public File getFile(String name) {
+		String baseName = name.substring(namePrefixLength);
+		return super.getFile(baseName);
+	}
 	
 }

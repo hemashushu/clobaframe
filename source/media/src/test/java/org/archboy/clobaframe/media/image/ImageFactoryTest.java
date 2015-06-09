@@ -47,7 +47,6 @@ public class ImageFactoryTest {
 	@Inject
 	private MimeTypeDetector mimeTypeDetector;
 	
-	//@Inject
 	private FileBaseResourceInfoFactory fileBaseResourceInfoFactory;
 	
 	private TemporaryResources temporaryResources = new DefaultTemporaryResources();

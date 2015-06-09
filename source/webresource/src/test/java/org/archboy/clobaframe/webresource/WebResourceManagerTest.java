@@ -67,8 +67,6 @@ public class WebResourceManagerTest {
 			"fonts/fontawesome-webfont.eot","fonts/fontawesome-webfont.svg","fonts/fontawesome-webfont.ttf","fonts/fontawesome-webfont.woff",
 			"image/info-32.png", "image/success-16.png", "image/warn-16.png" //,
 		};
-//			"css/concat-34.css", "css/concat-345.css"
-//		};
 		
 		for (String name : names) {
 			WebResourceInfo webResourceInfo = webResourceManager.getServerResource(name);
@@ -86,6 +84,34 @@ public class WebResourceManagerTest {
 		}
 	}
 
+	@Test
+	public void testGetAllRootResources() throws FileNotFoundException {
+		// test get all resources
+
+		String[] names = new String[]{
+			"root/apple-touch-icon-120x120.png", 
+			"root/favicon-16x16.ico", 
+			"root/favicon-16x16.png",
+			"root/launcher-icon-192x192.png", 
+			"root/robots.txt"
+		};
+		
+		for (String name : names) {
+			WebResourceInfo webResourceInfo = webResourceManager.getServerResource(name);
+			assertTrue(webResourceInfo.getContentLength() > 0);
+		}
+		
+		List<String> nameList1 = new ArrayList<String>();
+		Collection<WebResourceInfo> resourcesByManager1 = webResourceManager.getAll();
+		for(WebResourceInfo resourceInfo : resourcesByManager1){
+			nameList1.add(resourceInfo.getName());
+		}
+		
+		for(String name : names) {
+			assertTrue(nameList1.contains(name));
+		}
+	}
+	
 	@Test
 	public void testGetServerResource() throws IOException {
 		// test get a resource
@@ -109,7 +135,7 @@ public class WebResourceManagerTest {
 		assertEquals(webResource1, webResourceByVersionName1);
 		
 		// test the content
-		assertResourceContentEquals(webResource2, "webapp/resources/test.png");
+		assertResourceContentEquals(webResource2, "webapp/resources/default/test.png");
 
 		// test location transform
 		InputStream in1 = webResource1.getContent();
