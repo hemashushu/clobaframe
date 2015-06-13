@@ -22,6 +22,9 @@ import org.archboy.clobaframe.io.file.local.LocalResourceProvider;
 import org.archboy.clobaframe.io.file.local.LocalResourceScanner;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceProvider;
+import org.archboy.clobaframe.webresource.local.DefaultLocalWebResourceNameStrategy;
+import org.archboy.clobaframe.webresource.local.LocalWebResourceInfoFactory;
+import org.archboy.clobaframe.webresource.local.LocalWebResourceNameStrategy;
 
 @Named
 public class LocalRootWebResourceProvider implements WebResourceProvider{
