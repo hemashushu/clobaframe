@@ -58,14 +58,14 @@ public class WebResourceManagerTest {
 	}
 
 	@Test
-	public void testGetAllResources() throws FileNotFoundException {
-		// test get all resources
+	public void testGetAllBaseResources() throws FileNotFoundException {
+		// test get all base resources
 
 		String[] names = new String[]{
 			"test.css", "test.js", "test.png",
 			"css/test2.css", "css/test3.css", "css/test4.css", "css/test5.css",
 			"fonts/fontawesome-webfont.eot","fonts/fontawesome-webfont.svg","fonts/fontawesome-webfont.ttf","fonts/fontawesome-webfont.woff",
-			"image/info-32.png", "image/success-16.png", "image/warn-16.png" //,
+			"image/info-32.png", "image/success-16.png", "image/warn-16.png"
 		};
 		
 		for (String name : names) {
@@ -82,18 +82,25 @@ public class WebResourceManagerTest {
 		for(String name : names) {
 			assertTrue(nameList1.contains(name));
 		}
+		
+		assertNull(webResourceManager.getResource("test-none-exists.css"));
+		assertNull(webResourceManager.getResource("css/test-none-exists.css"));
+		
+		assertNull(webResourceManager.getServerResource("test-none-exists.css"));
+		assertNull(webResourceManager.getServerResource("css/test-none-exists.css"));
 	}
 
 	@Test
-	public void testGetAllRootResources() throws FileNotFoundException {
-		// test get all resources
+	public void testGetAllOtherResources() throws FileNotFoundException {
+		// test get other resources
 
 		String[] names = new String[]{
 			"root/apple-touch-icon-120x120.png", 
 			"root/favicon-16x16.ico", 
 			"root/favicon-16x16.png",
 			"root/launcher-icon-192x192.png", 
-			"root/robots.txt"
+			"root/robots.txt",
+			"theme/dark.css"
 		};
 		
 		for (String name : names) {
@@ -110,6 +117,12 @@ public class WebResourceManagerTest {
 		for(String name : names) {
 			assertTrue(nameList1.contains(name));
 		}
+		
+		assertNull(webResourceManager.getResource("root/root-none-exists.css"));
+		assertNull(webResourceManager.getResource("theme/theme-none-exists.css"));
+		
+		assertNull(webResourceManager.getServerResource("root/test-none-exists.css"));
+		assertNull(webResourceManager.getServerResource("theme/test-none-exists.css"));
 	}
 	
 	@Test

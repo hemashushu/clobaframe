@@ -1,5 +1,6 @@
 package org.archboy.clobaframe.webresource;
 
+import org.archboy.clobaframe.io.NamedResourceInfo;
 import org.archboy.clobaframe.io.ResourceInfo;
 
 /**
@@ -10,15 +11,9 @@ import org.archboy.clobaframe.io.ResourceInfo;
  * @author yang
  *
  */
-public interface WebResourceInfo extends ResourceInfo{
+public interface WebResourceInfo extends NamedResourceInfo{
 
-	/**
-	 * The resource name, include relative path.
-	 * E.g. "common.css", "index.js", "css/main.css".
-	 * 
-	 * @return
-	 */
-	String getName();
+	
 
 	/**
 	 * Content hash.

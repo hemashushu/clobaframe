@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import javax.inject.Named;
+import org.apache.commons.lang3.StringUtils;
 import org.archboy.clobaframe.io.MimeTypeDetector;
 import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
@@ -33,17 +34,21 @@ public class LocalWebResourceProvider implements WebResourceProvider{
 	
 	// local resource path, usually relative to the 'src/main/webapp' folder.
 	// to using this repository, the web application war package must be expended when running.
-	private static final String DEFAULT_LOCAL_PATH = "resources/default";
+	private static final String DEFAULT_LOCAL_PATH = ""; // "resources/default";
 	private static final String DEFAULT_RESOURCE_NAME_PREFIX = "";
+	private static final String DEFAULT_OTHER_RESOURCE_PATH_AND_NAME_PREFIX = "";
 	
 	@Value("${clobaframe.webresource.repository.local.path:" + DEFAULT_LOCAL_PATH + "}")
 	private String localPath;
 	
-	@Value("${clobaframe.webresource.repository.local.namePrefix:" + DEFAULT_RESOURCE_NAME_PREFIX + "}")
+	@Value("${clobaframe.webresource.repository.local.resourceNamePrefix:" + DEFAULT_RESOURCE_NAME_PREFIX + "}")
 	private String resourceNamePrefix;
 	
+	@Value("${clobaframe.webresource.repository.local.otherResourcePathAndNamePrefix:" + DEFAULT_OTHER_RESOURCE_PATH_AND_NAME_PREFIX + "}")
+	private String otherResourcePathAndNamePrefix;
+	
 	//private File baseDir;
-	private LocalResourceProvider localResourceProvider;
+	private List<LocalResourceProvider> localResourceProviders = new ArrayList<LocalResourceProvider>();
 			
 	private final Logger logger = LoggerFactory.getLogger(LocalWebResourceProvider.class);
 
@@ -59,7 +64,27 @@ public class LocalWebResourceProvider implements WebResourceProvider{
 
 	@PostConstruct
 	public void init() {
-		Resource resource = resourceLoader.getResource(localPath);
+		// add base local resource path
+		if (StringUtils.isNotEmpty(localPath)) {
+			addLocalResource(localPath, resourceNamePrefix);
+		}
+		
+		// add other local resource path
+		if (StringUtils.isNotEmpty(otherResourcePathAndNamePrefix)){
+			String[] lines = otherResourcePathAndNamePrefix.split(";");
+			for(String line : lines){
+				int pos = line.indexOf("|");
+				if (pos > 0) {
+					addLocalResource(line.substring(0, pos), line.substring(pos + 1));
+				}else{
+					addLocalResource(line, null);
+				}
+			}
+		}
+	}
+	
+	private void addLocalResource(String path, String namePrefix) {
+		Resource resource = resourceLoader.getResource(path);
 		
 		try{
 			File basePath = resource.getFile();
@@ -68,13 +93,15 @@ public class LocalWebResourceProvider implements WebResourceProvider{
 			// WAR package.
 			if (!basePath.exists()){
 				logger.error("Can not find the web resource folder [{}], please ensure " +
-						"unpackage the WAR if you are running web application.", localPath);
+						"unpackage the WAR if you are running web application.", path);
 				return;
 			}
 			
-			LocalWebResourceNameStrategy localWebResourceNameStrategy = new DefaultLocalWebResourceNameStrategy(basePath, resourceNamePrefix);
+			LocalWebResourceNameStrategy localWebResourceNameStrategy = new DefaultLocalWebResourceNameStrategy(basePath, namePrefix);
 			LocalWebResourceInfoFactory localWebResourceInfoFactory = new LocalWebResourceInfoFactory(mimeTypeDetector, localWebResourceNameStrategy);
-			localResourceProvider = new DefaultLocalResourceProvider(basePath, localWebResourceInfoFactory, localWebResourceNameStrategy);
+			LocalResourceProvider localResourceProvider = new DefaultLocalResourceProvider(basePath, localWebResourceInfoFactory, localWebResourceNameStrategy);
+			
+			localResourceProviders.add(localResourceProvider);
 			
 		}catch(IOException e){
 			logger.error("Load local web resource repository error, {}", e.getMessage());
@@ -83,16 +110,25 @@ public class LocalWebResourceProvider implements WebResourceProvider{
 
 	@Override
 	public WebResourceInfo getByName(String name) {
-		return (WebResourceInfo)localResourceProvider.getByName(name);
+		for(LocalResourceProvider localResourceProvider : localResourceProviders) {
+			WebResourceInfo webResourceInfo = (WebResourceInfo)localResourceProvider.getByName(name);
+			if (webResourceInfo != null) {
+				return webResourceInfo;
+			}
+		}
+		
+		return null;
 	}
 
 	@Override
 	public Collection<WebResourceInfo> getAll() {
 		List<WebResourceInfo> webResourceInfos = new ArrayList<WebResourceInfo>();
 		
-		Collection<FileBaseResourceInfo> fileBaseResourceInfos = localResourceProvider.getAll();
-		for(FileBaseResourceInfo fileBaseResourceInfo : fileBaseResourceInfos) {
-			webResourceInfos.add((WebResourceInfo)fileBaseResourceInfo);
+		for(LocalResourceProvider localResourceProvider : localResourceProviders) {
+			Collection<FileBaseResourceInfo> fileBaseResourceInfos = localResourceProvider.getAll();
+			for(FileBaseResourceInfo fileBaseResourceInfo : fileBaseResourceInfos) {
+				webResourceInfos.add((WebResourceInfo)fileBaseResourceInfo);
+			}
 		}
 		
 		return webResourceInfos;
