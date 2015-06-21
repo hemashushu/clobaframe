@@ -1,6 +1,7 @@
 package org.archboy.clobaframe.io.file.local;
 
 import java.io.File;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -16,6 +17,7 @@ public class DefaultLocalFileNameStrategy implements LocalFileNameStrategy {
 	
 	@Override
 	public File getFile(String name) {
+		Assert.hasText(name);
 		return new File(basePath, name);
 	}
 	

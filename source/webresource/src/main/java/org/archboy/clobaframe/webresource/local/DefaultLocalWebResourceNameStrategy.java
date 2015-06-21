@@ -27,8 +27,8 @@ public class DefaultLocalWebResourceNameStrategy extends DefaultLocalFileNameStr
 	
 	public DefaultLocalWebResourceNameStrategy(File basePath, String namePrefix) {
 		super(basePath);
-		// the base path length plus 1 to exclude the resource file name path
-		// '/' prefix character.
+		// the base path length plus 1 to exclude the resource 
+		// file name path '/' prefix character.
 		this.basePathLength = basePath.getPath().length() + 1; 
 		
 		this.namePrefix = namePrefix == null ? StringUtils.EMPTY : namePrefix;
@@ -43,6 +43,8 @@ public class DefaultLocalWebResourceNameStrategy extends DefaultLocalFileNameStr
 
 	@Override
 	public File getFile(String name) {
+		Assert.hasText(name);
+		Assert.isTrue(name.length() > namePrefixLength);
 		String baseName = name.substring(namePrefixLength);
 		return super.getFile(baseName);
 	}

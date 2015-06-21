@@ -6,25 +6,23 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.PostConstruct;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import javax.inject.Named;
 import org.apache.commons.lang3.StringUtils;
 import org.archboy.clobaframe.io.MimeTypeDetector;
-import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfo;
 import org.archboy.clobaframe.io.file.local.DefaultLocalResourceProvider;
 import org.archboy.clobaframe.io.file.local.LocalResourceProvider;
-import org.archboy.clobaframe.io.file.local.LocalResourceScanner;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 
 @Named
-public class LocalWebResourceProvider implements WebResourceProvider{
+public class LocalMultipleWebResourceProvider implements WebResourceProvider {
 
 	@Inject
 	private ResourceLoader resourceLoader;
@@ -46,12 +44,11 @@ public class LocalWebResourceProvider implements WebResourceProvider{
 	
 	@Value("${clobaframe.webresource.repository.local.otherResourcePathAndNamePrefix:" + DEFAULT_OTHER_RESOURCE_PATH_AND_NAME_PREFIX + "}")
 	private String otherResourcePathAndNamePrefix;
-	
-	//private File baseDir;
-	private List<LocalResourceProvider> localResourceProviders = new ArrayList<LocalResourceProvider>();
-			
-	private final Logger logger = LoggerFactory.getLogger(LocalWebResourceProvider.class);
 
+	private List<LocalResourceProvider> localResourceProviders = new ArrayList<LocalResourceProvider>();
+	
+	private final Logger logger = LoggerFactory.getLogger(LocalMultipleWebResourceProvider.class);
+	
 	@Override
 	public String getName() {
 		return "local";
@@ -82,8 +79,8 @@ public class LocalWebResourceProvider implements WebResourceProvider{
 			}
 		}
 	}
-	
-	private void addLocalResource(String path, String namePrefix) {
+
+	protected void addLocalResource(String path, String namePrefix) {
 		Resource resource = resourceLoader.getResource(path);
 		
 		try{

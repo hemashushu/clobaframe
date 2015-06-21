@@ -36,15 +36,13 @@ import org.junit.Test;
 public class WebResourceManagerTest {
 
 	@Inject
+	private WebResourceProviderSet webResourceProviderSet;
+	
+	@Inject
 	private WebResourceManager webResourceManager;
 	
 	@Inject
 	private ResourceLoader resourceLoader;
-
-	private static final TextWebResourceInfo info1 = new TextWebResourceInfo("l1.css", "text/css", "p {}");
-	private static final TextWebResourceInfo info2a = new TextWebResourceInfo("l2a.css", "text/css", "@import url('l1.css') \n h1 {}");
-	private static final TextWebResourceInfo info2b = new TextWebResourceInfo("l2b.css", "text/css", "h2 {}");
-	private static final TextWebResourceInfo info3 = new TextWebResourceInfo("l3.css", "text/css", "@import url('l2a.css') \n body {}");
 
 	private final Logger logger = LoggerFactory.getLogger(WebResourceManagerTest.class);
 
@@ -100,7 +98,7 @@ public class WebResourceManagerTest {
 			"root/favicon-16x16.png",
 			"root/launcher-icon-192x192.png", 
 			"root/robots.txt",
-			"theme/dark.css"
+			"other/dark.css"
 		};
 		
 		for (String name : names) {
@@ -119,10 +117,10 @@ public class WebResourceManagerTest {
 		}
 		
 		assertNull(webResourceManager.getResource("root/root-none-exists.css"));
-		assertNull(webResourceManager.getResource("theme/theme-none-exists.css"));
+		assertNull(webResourceManager.getResource("other/other-none-exists.css"));
 		
 		assertNull(webResourceManager.getServerResource("root/test-none-exists.css"));
-		assertNull(webResourceManager.getServerResource("theme/test-none-exists.css"));
+		assertNull(webResourceManager.getServerResource("other/other-none-exists.css"));
 	}
 	
 	@Test
@@ -180,12 +178,20 @@ public class WebResourceManagerTest {
 	}
 	
 	@Test
-	public void testGetVirtualResource() throws IOException {
+	public void testGetDynamicResource() throws IOException {
 		
-		WebResourceInfo webResourceInfo1 = webResourceManager.getResource("l2b.css");
-		assertTextResourceContentEquals(webResourceInfo1, "h2 {}");
+		assertNull(webResourceManager.getResource("d3.css"));
+		assertNull(webResourceManager.getResource("d2.css"));
+		assertNull(webResourceManager.getResource("d1.css"));
 		
-		String[] names = new String[]{"l1.css", "l2a.css", "l2b.css", "l3.css"};
+		// add provider
+		WebResourceProvider webResourceProvider1 = new TestingDynamicWebResourceProvider();
+		webResourceProviderSet.addProvider(webResourceProvider1);
+		
+		WebResourceInfo webResourceInfo1 = webResourceManager.getResource("d2.css");
+		assertTextResourceContentEquals(webResourceInfo1, "div {}");
+		
+		String[] names1 = new String[]{"d1.css", "d2.css", "d3.css"};
 
 		List<String> nameList1 = new ArrayList<String>();
 		Collection<WebResourceInfo> resourcesByManager1 = webResourceManager.getAll();
@@ -193,9 +199,16 @@ public class WebResourceManagerTest {
 			nameList1.add(resourceInfo.getName());
 		}
 		
-		for(String name : names) {
+		for(String name : names1) {
 			assertTrue(nameList1.contains(name));
 		}
+		
+		// remove provider
+		webResourceProviderSet.removeProvider(webResourceProvider1.getName());
+		
+		assertNull(webResourceManager.getResource("d3.css"));
+		assertNull(webResourceManager.getResource("d2.css"));
+		assertNull(webResourceManager.getResource("d1.css"));
 	}
 	
 	@Test
@@ -211,7 +224,7 @@ public class WebResourceManagerTest {
 		calendar.add(Calendar.HOUR_OF_DAY, 1);
 		Date date1 = calendar.getTime();
 		
-		info2a.updateContent("@import url('l1.css') \n h1,h3 {}", date1);
+		TestingChainUpdateWebResourceProvider.info2a.updateContent("@import url('l1.css') \n h1,h3 {}", date1);
 		
 		assertEquals(location1, webResourceManager.getLocation("l3.css"));
 		assertEquals(location2, webResourceManager.getLocation("l2a.css"));
@@ -229,7 +242,7 @@ public class WebResourceManagerTest {
 		// update l1.css
 		calendar.add(Calendar.HOUR_OF_DAY, 2);
 		Date date2 = calendar.getTime();
-		info1.updateContent("div {}", date2);
+		TestingChainUpdateWebResourceProvider.info1.updateContent("div {}", date2);
 		
 		webResourceManager.refresh("l1.css");
 		
@@ -310,12 +323,57 @@ public class WebResourceManagerTest {
 		return resource.getFile();
 	}	
 
+	public static class TestingDynamicWebResourceProvider implements WebResourceProvider {
+
+		private WebResourceInfo d3 = new TextWebResourceInfo("d3.css", "text/css", "p {}");
+		private WebResourceInfo d2 = new TextWebResourceInfo("d2.css", "text/css", "div {}");
+		private WebResourceInfo d1 = new TextWebResourceInfo("d1.css", "text/css", "body {}");
+		
+		@Override
+		public String getName() {
+			return "dynamic-test";
+		}
+
+		@Override
+		public WebResourceInfo getByName(String name) {
+			if (name.equals("d3.css")){
+				return d3;
+			}else if (name.equals("d2.css")){
+				return d2;
+			}else if (name.equals("d1.css")){
+				return d1;
+			}else{
+				return null;
+			}
+		}
+
+		@Override
+		public Collection<WebResourceInfo> getAll() {
+			return Arrays.asList(
+					getByName("d3.css"),
+					getByName("d2.css"),
+					getByName("d1.css"));
+		}
+
+		@Override
+		public int getOrder() {
+			return PRIORITY_NORMAL;
+		}
+
+	};
+	
 	@Named
-	public static class TestingVirtualWebResourceSource implements VirtualWebResourceSource {
+	public static class TestingChainUpdateWebResourceProvider implements WebResourceProvider {
+
+		// for chain update test.
+		public static final TextWebResourceInfo info1 = new TextWebResourceInfo("l1.css", "text/css", "p {}");
+		public static final TextWebResourceInfo info2a = new TextWebResourceInfo("l2a.css", "text/css", "@import url('l1.css') \n h1 {}");
+		public static final TextWebResourceInfo info2b = new TextWebResourceInfo("l2b.css", "text/css", "h2 {}");
+		public static final TextWebResourceInfo info3 = new TextWebResourceInfo("l3.css", "text/css", "@import url('l2a.css') \n body {}");
 
 		@Override
 		public String getName() {
-			return "virtual/test";
+			return "chain-update-test";
 		}
 
 		@Override
@@ -340,6 +398,11 @@ public class WebResourceManagerTest {
 					getByName("l2a.css"),
 					getByName("l2b.css"),
 					getByName("l3.css"));
+		}
+
+		@Override
+		public int getOrder() {
+			return PRIORITY_NORMAL;
 		}
 
 	};

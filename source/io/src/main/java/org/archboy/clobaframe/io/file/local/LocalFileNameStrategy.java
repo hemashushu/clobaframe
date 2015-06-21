@@ -9,7 +9,13 @@ import java.io.File;
  */
 public interface LocalFileNameStrategy {
 	
-	File getFile(String name);
+	/**
+	 * 
+	 * @param name
+	 * @return 
+	 * @throws IllegalArgumentException When the name arg is illegal or 
+	 * can not get a file.
+	 */
+	File getFile(String name) throws IllegalArgumentException;
 	
-	//String getName(File file);
 }

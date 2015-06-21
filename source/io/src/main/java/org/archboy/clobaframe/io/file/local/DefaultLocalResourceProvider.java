@@ -24,15 +24,24 @@ public class DefaultLocalResourceProvider implements LocalResourceProvider {
 		this.localFileNameStrategy = localFileNameStrategy;
 	}
 	
+	@Override
 	public FileBaseResourceInfo getByName(String name) {
-		File file = localFileNameStrategy.getFile(name); // new File(baseDir, name);
-		if (!file.exists()) {
+		File file = null;
+		
+		try{
+			file = localFileNameStrategy.getFile(name);
+		}catch(IllegalArgumentException e){
 			return null;
 		}
 		
+		if (!file.exists()) {
+			return null;
+		}
+
 		return fileBaseResourceInfoFactory.make(file);
 	}
 
+	@Override
 	public Collection<FileBaseResourceInfo> getAll() {
 		LocalResourceScanner resourceScanner = new DefaultLocalResourceScanner();
 		return resourceScanner.scan(

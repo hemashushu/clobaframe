@@ -142,7 +142,7 @@ public class ImageFactoryTest {
 	@Test
 	public void testMakeImageFromURL() throws MalformedURLException, IOException {
 		// can be safetly replace this image url.
-		URL url = new URL("http://upload.wikimedia.org/wikipedia/en/b/bc/Wiki.png");
+		URL url = new URL("https://upload.wikimedia.org/wikipedia/en/b/bc/Wiki.png");
 		Image image1 = (Image)mediaFactory.make(url, temporaryResources);
 		assertEquals(Image.Format.PNG, image1.getFormat());
 		assertTrue(image1.getWidth() > 1);

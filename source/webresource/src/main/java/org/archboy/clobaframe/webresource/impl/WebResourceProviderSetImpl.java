@@ -1,17 +1,16 @@
 package org.archboy.clobaframe.webresource.impl;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.archboy.clobaframe.webresource.WebResourceProviderSet;
 import org.archboy.clobaframe.webresource.WebResourceProvider;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -35,11 +34,6 @@ public class WebResourceProviderSetImpl implements WebResourceProviderSet {
 		return webResourceInfo;
 	}
 
-//	@Override
-//	public Collection<WebResourceProvider> getResourceRepositories() {
-//		return resourceRepositories;
-//	}
-
 	@Override
 	public Collection<WebResourceInfo> getAll() {
 		Set<WebResourceInfo> resourceInfos = new HashSet<WebResourceInfo>();
@@ -54,4 +48,25 @@ public class WebResourceProviderSetImpl implements WebResourceProviderSet {
 		return resourceInfos;
 	}
 
+	@Override
+	public void addProvider(WebResourceProvider webResourceProvider) {
+		if (webResourceProviders == null) {
+			webResourceProviders = new ArrayList<WebResourceProvider>();
+		}
+		
+		webResourceProviders.add(webResourceProvider);
+	}
+
+	@Override
+	public void removeProvider(String providerName) {
+		Assert.notNull(providerName);
+		
+		for (int idx = webResourceProviders.size() - 1; idx >= 0; idx--){
+			WebResourceProvider provider = webResourceProviders.get(idx);
+			if (providerName.equals(provider.getName())){
+				webResourceProviders.remove(idx);
+				break;
+			}
+		}
+	}
 }

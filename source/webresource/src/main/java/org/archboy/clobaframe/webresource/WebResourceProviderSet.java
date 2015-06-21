@@ -8,7 +8,17 @@ import java.util.Collection;
  */
 public interface WebResourceProviderSet {
 
-	//Collection<WebResourceProvider> getResourceRepositories();
+	/**
+	 * Add source.
+	 * @param webResourceProvider
+	 */
+	void addProvider(WebResourceProvider webResourceProvider);
+	
+	/**
+	 * Remove source.
+	 * @param providerName 
+	 */
+	void removeProvider(String providerName);
 	
 	/**
 	 * 
