@@ -54,7 +54,7 @@ public class LocalResourceScannerTest {
 		FileBaseResourceInfoFactory fileBaseResourceInfoFactory = new DefaultFileBaseResourceInfoFactory(mimeTypeDetector);
 		LocalResourceScanner localResourceScanner = new DefaultLocalResourceScanner();
 		
-		Collection<FileBaseResourceInfo> resourceInfos1 = localResourceScanner.scan(basePath, fileBaseResourceInfoFactory);
+		Collection<FileBaseResourceInfo> resourceInfos1 = localResourceScanner.list(basePath, fileBaseResourceInfoFactory);
 		
 		assertContainsFile(resourceInfos1, getFileByName("sample/data/test.js"));
 		assertContainsFile(resourceInfos1, getFileByName("sample/data/test.css"));

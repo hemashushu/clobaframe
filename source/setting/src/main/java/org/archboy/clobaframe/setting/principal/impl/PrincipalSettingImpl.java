@@ -39,11 +39,11 @@ public class PrincipalSettingImpl implements PrincipalSetting {
 	}
 
 	@Override
-	public Map<String, Object> getAll(Principal profile) {
+	public Map<String, Object> list(Principal profile) {
 		Map<String, Object> setting = new LinkedHashMap<String, Object>();
 		for(PrincipalSettingProvider provider : principalSettingProviders) {
 			if (provider.support(profile)) {
-				setting = Utils.merge(setting, provider.getAll(profile));
+				setting = Utils.merge(setting, provider.list(profile));
 			}
 		}
 		return setting;

@@ -33,7 +33,6 @@ public class GlobalSettingImpl implements GlobalSetting {
 	@PostConstruct
 	@Override
 	public void refresh(){
-		
 		// clear setting
 		setting.clear();
 		
@@ -41,10 +40,11 @@ public class GlobalSettingImpl implements GlobalSetting {
 			return;
 		}
 		
-		// merge all providers setting
+		// merge all providers setting in the reverse priority,
+		// so the higher priority can override the lower one.
 		for(int idx = globalSettingProviders.size() -1; idx >=0; idx--){
 			GlobalSettingProvider provider = globalSettingProviders.get(idx);
-			Map<String, Object> map = provider.getAll();
+			Map<String, Object> map = provider.list();
 			setting = Utils.merge(setting, map);
 		}
 	}
@@ -67,7 +67,7 @@ public class GlobalSettingImpl implements GlobalSetting {
 	}
 
 	@Override
-	public Map<String, Object> getAll() {
+	public Map<String, Object> list() {
 		return setting;
 	}
 
@@ -78,6 +78,7 @@ public class GlobalSettingImpl implements GlobalSetting {
 		}
 		
 		globalSettingRepository.update(key, value);
+		setting = Utils.merge(setting, key, value);
 	}
 
 	@Override
@@ -87,5 +88,6 @@ public class GlobalSettingImpl implements GlobalSetting {
 		}
 		
 		globalSettingRepository.update(items);
+		setting = Utils.merge(setting, items);
 	}
 }

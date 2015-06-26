@@ -45,7 +45,7 @@ public interface Setting {
 	 * 
 	 * @return Never return null.
 	 */
-	Map<String, Object> getAll();
+	Map<String, Object> list();
 	
 	/**
 	 * Update or add an item.

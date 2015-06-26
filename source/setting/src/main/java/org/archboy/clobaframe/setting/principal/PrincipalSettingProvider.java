@@ -23,7 +23,7 @@ public interface PrincipalSettingProvider extends PrincipalSpecial, Ordered {
 	 * @param principal 
 	 * @return Never return null.
 	 */
-	Map<String, Object> getAll(Principal principal);
+	Map<String, Object> list(Principal principal);
 
 	
 }

@@ -1,16 +1,22 @@
 package org.archboy.clobaframe.setting;
 
 /**
- * Cacheable setting manager.
+ * Cache-able setting manager.
  * 
- * All item's value would be load once and store in the memory (as cache).
+ * All item's value would be load from providers once and store in the memory (as cache).
  * 
  * @author yang
  */
 public interface CacheableSetting extends Setting {
 
 	/**
-	 * Clear the cache and reload all item's value.
+	 * Clear the cache and reload all item's value from providers.
+	 * 
+	 * Invoke this method only when the setting source was changed by the
+	 * external tools, for example, the read-only (to application) properties file
+	 * was modified by user manually.
+	 * 
+	 * The method {@link Setting#set()} will auto refresh the setting values.
 	 */
 	void refresh();
 }

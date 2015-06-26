@@ -18,14 +18,14 @@ public abstract class AbstractServerWebResourceInfo extends AbstractWebResourceI
 
 	protected void appendType(int type, WebResourceInfo inheritInfo) {
 		if (inheritInfo instanceof ServerWebResourceInfo) {
-			types.addAll(((ServerWebResourceInfo)inheritInfo).getInheritTypes());
+			types.addAll(((ServerWebResourceInfo)inheritInfo).listInheritTypes());
 		}
 		
 		types.add(type);
 	}
 	
 	@Override
-	public Collection<Integer> getInheritTypes() {
+	public Collection<Integer> listInheritTypes() {
 		return types;
 	}
 

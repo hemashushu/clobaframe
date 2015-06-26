@@ -42,9 +42,9 @@ public class DefaultLocalResourceProvider implements LocalResourceProvider {
 	}
 
 	@Override
-	public Collection<FileBaseResourceInfo> getAll() {
+	public Collection<FileBaseResourceInfo> list() {
 		LocalResourceScanner resourceScanner = new DefaultLocalResourceScanner();
-		return resourceScanner.scan(
+		return resourceScanner.list(
 				basePath, fileBaseResourceInfoFactory);
 	}
 }

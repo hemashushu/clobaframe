@@ -72,7 +72,7 @@ public class WebResourceManagerTest {
 		}
 		
 		List<String> nameList1 = new ArrayList<String>();
-		Collection<WebResourceInfo> resourcesByManager1 = webResourceManager.getAll();
+		Collection<WebResourceInfo> resourcesByManager1 = webResourceManager.list();
 		for(WebResourceInfo resourceInfo : resourcesByManager1){
 			nameList1.add(resourceInfo.getName());
 		}
@@ -107,7 +107,7 @@ public class WebResourceManagerTest {
 		}
 		
 		List<String> nameList1 = new ArrayList<String>();
-		Collection<WebResourceInfo> resourcesByManager1 = webResourceManager.getAll();
+		Collection<WebResourceInfo> resourcesByManager1 = webResourceManager.list();
 		for(WebResourceInfo resourceInfo : resourcesByManager1){
 			nameList1.add(resourceInfo.getName());
 		}
@@ -194,7 +194,7 @@ public class WebResourceManagerTest {
 		String[] names1 = new String[]{"d1.css", "d2.css", "d3.css"};
 
 		List<String> nameList1 = new ArrayList<String>();
-		Collection<WebResourceInfo> resourcesByManager1 = webResourceManager.getAll();
+		Collection<WebResourceInfo> resourcesByManager1 = webResourceManager.list();
 		for(WebResourceInfo resourceInfo : resourcesByManager1){
 			nameList1.add(resourceInfo.getName());
 		}
@@ -348,7 +348,7 @@ public class WebResourceManagerTest {
 		}
 
 		@Override
-		public Collection<WebResourceInfo> getAll() {
+		public Collection<WebResourceInfo> list() {
 			return Arrays.asList(
 					getByName("d3.css"),
 					getByName("d2.css"),
@@ -392,7 +392,7 @@ public class WebResourceManagerTest {
 		}
 
 		@Override
-		public Collection<WebResourceInfo> getAll() {
+		public Collection<WebResourceInfo> list() {
 			return Arrays.asList(
 					getByName("l1.css"),
 					getByName("l2a.css"),

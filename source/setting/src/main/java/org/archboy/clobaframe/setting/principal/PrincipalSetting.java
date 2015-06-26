@@ -23,7 +23,7 @@ public interface PrincipalSetting {
 	 * @param principal
 	 * @return 
 	 */
-	Map<String, Object> getAll(Principal principal);
+	Map<String, Object> list(Principal principal);
 	
 	/**
 	 * 

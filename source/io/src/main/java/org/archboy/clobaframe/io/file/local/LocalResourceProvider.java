@@ -16,5 +16,5 @@ public interface LocalResourceProvider {
 	 */
 	FileBaseResourceInfo getByName(String name);
 
-	Collection<FileBaseResourceInfo> getAll();
+	Collection<FileBaseResourceInfo> list();
 }

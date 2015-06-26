@@ -97,7 +97,7 @@ public class GlobalSettingTest {
 		}
 
 		@Override
-		public Map<String, Object> getAll() {
+		public Map<String, Object> list() {
 			try{
 				File file = getFileByName("global-layer2.json");
 				InputStream in = new FileInputStream(file);
@@ -133,7 +133,7 @@ public class GlobalSettingTest {
 		}
 
 		@Override
-		public Map<String, Object> getAll() {
+		public Map<String, Object> list() {
 			return setting;
 		}
 		

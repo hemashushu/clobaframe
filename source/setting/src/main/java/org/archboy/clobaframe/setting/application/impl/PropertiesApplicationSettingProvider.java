@@ -36,7 +36,7 @@ public class PropertiesApplicationSettingProvider implements ApplicationSettingP
 	}
 
 	@Override
-	public Map<String, Object> getAll() {
+	public Map<String, Object> list() {
 		if (!resource.exists()) {
 			logger.warn("Setting resource [{}] not found.", resource.getFilename());
 		}else{

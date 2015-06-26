@@ -26,7 +26,7 @@ public class JsonApplicationSettingRepository extends JsonApplicationSettingProv
 
 	@Override
 	public void update(Map<String, Object> item) {
-		Map<String, Object> map = Utils.merge(getAll(), item);
+		Map<String, Object> map = Utils.merge(list(), item);
 		
 		// save
 		OutputStream out = null;

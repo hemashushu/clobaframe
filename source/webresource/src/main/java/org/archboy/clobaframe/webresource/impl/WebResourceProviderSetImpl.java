@@ -35,13 +35,14 @@ public class WebResourceProviderSetImpl implements WebResourceProviderSet {
 	}
 
 	@Override
-	public Collection<WebResourceInfo> getAll() {
+	public Collection<WebResourceInfo> list() {
 		Set<WebResourceInfo> resourceInfos = new HashSet<WebResourceInfo>();
 		
 		// list resource in the revert repository priority order
+		// so the higher priority can override the lower one.
 		for (int idx = webResourceProviders.size() -1; idx>=0; idx--){
 			WebResourceProvider resourceRepository = webResourceProviders.get(idx);
-			Collection<WebResourceInfo> ns = resourceRepository.getAll(); 
+			Collection<WebResourceInfo> ns = resourceRepository.list(); 
 			resourceInfos.addAll(ns);
 		}
 		

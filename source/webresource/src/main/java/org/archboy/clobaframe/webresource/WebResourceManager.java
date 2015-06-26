@@ -12,9 +12,9 @@ import java.util.List;
  * 
  * manager --T-- repository set --T-- repository 1
  *           |                    |-- repository 2
- *           |-- cache            |-- virtual repository --T-- provider 1
- *                                |                        |-- provider 2
- *                                |                        |-- provider 3
+ *           |-- cache            
+ * 
+ * 
  * 
  * @author yang
  *
@@ -71,7 +71,7 @@ public interface WebResourceManager {
 	 * 
 	 * @return 
 	 */
-	Collection<WebResourceInfo> getAll();
+	Collection<WebResourceInfo> list();
 	
 	/**
 	 * Get the location (URL) of the specify resource.

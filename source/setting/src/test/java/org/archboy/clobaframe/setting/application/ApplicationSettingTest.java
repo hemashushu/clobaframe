@@ -84,7 +84,7 @@ public class ApplicationSettingTest {
 		assertEquals("${test.foo} ${user.name}", applicationSetting.get("test.com"));
 		
 		// test get all
-		Map<String, Object> all = applicationSetting.getAll();
+		Map<String, Object> all = applicationSetting.list();
 		assertTrue(all.containsKey("test.foo"));
 		assertTrue(all.containsKey("test.bar"));
 		assertTrue(all.containsKey("test.com"));

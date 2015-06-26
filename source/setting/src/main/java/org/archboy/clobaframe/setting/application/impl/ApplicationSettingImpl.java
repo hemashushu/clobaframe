@@ -130,17 +130,14 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 		rootSetting.put(ROOT_KEY_APP_NAME, appName);
 		rootSetting.put(ROOT_KEY_ROOT_CONFIG_FILE_NAME, rootConfigFileName);
 		
-		loadRootConfigFromProperties();
+		loadRootConfigFromBeanDefine();
 		loadRootConfigFromFile();
-		
-		// merge root setting into application setting
-		setting = Utils.merge(setting, rootSetting);
 		
 		initProviders();
 		executePostSetting();
 	}
 	
-	private void loadRootConfigFromProperties() {
+	private void loadRootConfigFromBeanDefine() {
 		if (properties != null && !properties.isEmpty()) {
 			rootSetting = Utils.merge(rootSetting, properties);
 		}
@@ -206,8 +203,8 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 		// build the temp setting, for resolve the default setting and other build-in (in-jar-package) settings filename
 		Map<String, Object> tempSetting = new LinkedHashMap<String, Object>();
 		tempSetting = Utils.merge(tempSetting, rootSetting);
-		tempSetting = Utils.merge(tempSetting, new EnvironmentVariablesSettingProvider().getAll());
-		tempSetting = Utils.merge(tempSetting, new SystemPropertiesSettingProvider().getAll());
+		tempSetting = Utils.merge(tempSetting, new EnvironmentVariablesSettingProvider().list());
+		tempSetting = Utils.merge(tempSetting, new SystemPropertiesSettingProvider().list());
 		
 		// add setting provider, from lower priority to higher priority.
 		applicationSettingProviders = new ArrayList<ApplicationSettingProvider>();
@@ -229,9 +226,13 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 			}
 		}
 		
-		// merge all settings.
+		// merge root setting into application setting
+		setting.clear();
+		setting = Utils.merge(setting, rootSetting);
+		
+		// merge all provider settings.
 		for(ApplicationSettingProvider provider : applicationSettingProviders){
-			Map<String, Object> map = provider.getAll();
+			Map<String, Object> map = provider.list();
 			setting = Utils.merge(setting, map);
 		}
 		
@@ -241,7 +242,7 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 		String customFileName = (String)Utils.resolvePlaceholder(setting, setting.get(ROOT_KEY_CUSTOM_SETTING_FILE_NAME));
 		String extraFileName = (String)Utils.resolvePlaceholder(setting, setting.get(ROOT_KEY_EXTRA_SETTING_FILE_NAME));
 
-		// try to create data folder
+		// try to create config folder
 		if (StringUtils.isNotEmpty(autoCreateConfigFolder) && Boolean.valueOf(autoCreateConfigFolder)) {
 			File file = new File(configFolder);
 			if (file.exists() && file.isDirectory()){
@@ -272,7 +273,7 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 
 		// merge all custom settings.
 		for(ApplicationSettingProvider provider : customApplicationSettingProviders){
-			Map<String, Object> map = provider.getAll();
+			Map<String, Object> map = provider.list();
 			setting = Utils.merge(setting, map);
 		}
 		
@@ -326,6 +327,7 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 		}
 		
 		applicationSettingRepository.update(key, value);
+		setting = Utils.merge(setting, key, value);
 	}
 
 	@Override
@@ -335,10 +337,11 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 		}
 		
 		applicationSettingRepository.update(items);
+		setting = Utils.merge(setting, items);
 	}
 
 	@Override
-	public Map<String, Object> getAll() {
+	public Map<String, Object> list() {
 		return setting;
 	}
 	
@@ -352,7 +355,7 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 
 		// merge all provider setting.
 		for(ApplicationSettingProvider provider : applicationSettingProviders){
-			Map<String, Object> map = provider.getAll();
+			Map<String, Object> map = provider.list();
 			setting = Utils.merge(setting, map);
 		}
 	}

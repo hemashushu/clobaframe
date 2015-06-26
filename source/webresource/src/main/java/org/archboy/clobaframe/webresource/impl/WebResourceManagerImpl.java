@@ -137,7 +137,7 @@ public class WebResourceManagerImpl implements WebResourceManager {
 		// transform url location
 		if (resourceInfo.getMimeType().equals(MIME_TYPE_STYLE_SHEET)) {
 			resourceInfo = new DefaultLocationTransformWebResourceInfo(this, resourceInfo);
-			childResourceNames = ((DefaultLocationTransformWebResourceInfo)resourceInfo).getChildResourceNames();
+			childResourceNames = ((DefaultLocationTransformWebResourceInfo)resourceInfo).listChildResourceNames();
 		}
 		
 		// minify
@@ -205,8 +205,8 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	}
 	
 	@Override
-	public Collection<WebResourceInfo> getAll() {
-		return webResourceProviderSet.getAll();
+	public Collection<WebResourceInfo> list() {
+		return webResourceProviderSet.list();
 	}
 
 	@Override

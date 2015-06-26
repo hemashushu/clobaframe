@@ -54,7 +54,7 @@ public class WebResourceSenderImpl implements WebResourceSender{
 		
 		if (webResourceInfo instanceof CompressibleWebResourceInfo ||
 			(webResourceInfo instanceof AbstractServerWebResourceInfo &&
-				((AbstractServerWebResourceInfo)webResourceInfo).getInheritTypes()
+				((AbstractServerWebResourceInfo)webResourceInfo).listInheritTypes()
 					.contains(ServerWebResourceInfo.TYPE_COMPRESS))){
 			// it's compressed resource already.
 			headers.put("Content-Encoding", "gzip");

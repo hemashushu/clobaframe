@@ -16,7 +16,7 @@ public class EnvironmentVariablesSettingProvider implements ApplicationSettingPr
 	}
 
 	@Override
-	public Map<String, Object> getAll() {
+	public Map<String, Object> list() {
 		Map<String, Object> map = new LinkedHashMap<String, Object>();
 		Map<String, String> env = System.getenv();
 		for(Map.Entry<String, String> entry : env.entrySet()) {

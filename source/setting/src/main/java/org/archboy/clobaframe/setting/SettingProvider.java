@@ -22,6 +22,6 @@ public interface SettingProvider extends Ordered {
 	 * 
 	 * @return Never return null.
 	 */
-	Map<String, Object> getAll();
+	Map<String, Object> list();
 	
 }

@@ -17,7 +17,7 @@ public class SystemPropertiesSettingProvider implements ApplicationSettingProvid
 	}
 
 	@Override
-	public Map<String, Object> getAll() {
+	public Map<String, Object> list() {
 		Map<String, Object> map = new LinkedHashMap<String, Object>();
 		Properties properties = System.getProperties();
 		for(Map.Entry<Object, Object> entry : properties.entrySet()) {

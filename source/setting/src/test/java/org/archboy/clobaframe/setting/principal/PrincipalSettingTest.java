@@ -145,7 +145,7 @@ public class PrincipalSettingTest {
 		}
 
 		@Override
-		public Map<String, Object> getAll(Principal profile) {
+		public Map<String, Object> list(Principal profile) {
 			return setting1;
 		}
 
@@ -194,7 +194,7 @@ public class PrincipalSettingTest {
 		}
 
 		@Override
-		public Map<String, Object> getAll(Principal profile) {
+		public Map<String, Object> list(Principal profile) {
 			Map<String, Object> s = settings.get((String)profile.getId());
 			return (s == null ? new LinkedHashMap<String, Object>() : s);
 		}
@@ -259,7 +259,7 @@ public class PrincipalSettingTest {
 		}
 
 		@Override
-		public Map<String, Object> getAll(Principal profile) {
+		public Map<String, Object> list(Principal profile) {
 			Map<String, Object> s = settings.get((String)profile.getId());
 			return (s == null ? new LinkedHashMap<String, Object>() : s);
 		}

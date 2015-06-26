@@ -16,6 +16,10 @@ public interface ServerWebResourceInfo extends WebResourceInfo {
 	
 	int getType();
 	
-	Collection<Integer> getInheritTypes();
+	/**
+	 * 
+	 * @return 
+	 */
+	Collection<Integer> listInheritTypes();
 	
 }

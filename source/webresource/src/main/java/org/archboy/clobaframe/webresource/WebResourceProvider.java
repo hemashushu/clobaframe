@@ -45,5 +45,5 @@ public interface WebResourceProvider extends Ordered {
 	 * 
 	 * @return EMPTY when no resources.
 	 */
-	Collection<WebResourceInfo> getAll();
+	Collection<WebResourceInfo> list();
 }

@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 @Named
-public class LocalMultipleWebResourceProvider implements WebResourceProvider {
+public class MultiPathLocalWebResourceProvider implements WebResourceProvider {
 
 	@Inject
 	private ResourceLoader resourceLoader;
@@ -47,7 +47,7 @@ public class LocalMultipleWebResourceProvider implements WebResourceProvider {
 
 	private List<LocalResourceProvider> localResourceProviders = new ArrayList<LocalResourceProvider>();
 	
-	private final Logger logger = LoggerFactory.getLogger(LocalMultipleWebResourceProvider.class);
+	private final Logger logger = LoggerFactory.getLogger(MultiPathLocalWebResourceProvider.class);
 	
 	@Override
 	public String getName() {
@@ -118,11 +118,11 @@ public class LocalMultipleWebResourceProvider implements WebResourceProvider {
 	}
 
 	@Override
-	public Collection<WebResourceInfo> getAll() {
+	public Collection<WebResourceInfo> list() {
 		List<WebResourceInfo> webResourceInfos = new ArrayList<WebResourceInfo>();
 		
 		for(LocalResourceProvider localResourceProvider : localResourceProviders) {
-			Collection<FileBaseResourceInfo> fileBaseResourceInfos = localResourceProvider.getAll();
+			Collection<FileBaseResourceInfo> fileBaseResourceInfos = localResourceProvider.list();
 			for(FileBaseResourceInfo fileBaseResourceInfo : fileBaseResourceInfos) {
 				webResourceInfos.add((WebResourceInfo)fileBaseResourceInfo);
 			}

@@ -17,7 +17,7 @@ import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
 public class DefaultLocalResourceScanner implements LocalResourceScanner {
 
 	@Override
-	public Collection<FileBaseResourceInfo> scan(
+	public Collection<FileBaseResourceInfo> list(
 			File basePath, 
 			FileBaseResourceInfoFactory fileBaseResourceInfoFactory) {
 

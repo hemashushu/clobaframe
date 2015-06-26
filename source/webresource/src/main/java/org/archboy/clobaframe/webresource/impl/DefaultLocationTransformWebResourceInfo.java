@@ -273,7 +273,7 @@ public class DefaultLocationTransformWebResourceInfo extends AbstractServerWebRe
 	}
 
 	@Override
-	public Collection<String> getChildResourceNames() {
+	public Collection<String> listChildResourceNames() {
 		return childResourceNames;
 	}
 

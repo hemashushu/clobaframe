@@ -62,7 +62,7 @@ public class LocalResourceProviderTest {
 		assertEquals(getFileByName("sample/data/css/test2.css"), localResourceProvider.getByName("css/test2.css").getFile());
 		assertEquals(getFileByName("sample/data/image/success-16.png"), localResourceProvider.getByName("image/success-16.png").getFile());
 		
-		Collection<FileBaseResourceInfo> resourceInfos1 = localResourceProvider.getAll();
+		Collection<FileBaseResourceInfo> resourceInfos1 = localResourceProvider.list();
 		
 		assertContainsFile(resourceInfos1, getFileByName("sample/data/test.js"));
 		assertContainsFile(resourceInfos1, getFileByName("sample/data/test.css"));

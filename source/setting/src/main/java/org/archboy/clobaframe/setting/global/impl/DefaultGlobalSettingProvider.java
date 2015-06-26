@@ -41,7 +41,7 @@ public class DefaultGlobalSettingProvider implements GlobalSettingProvider {
 	}
 
 	@Override
-	public Map<String, Object> getAll() {
+	public Map<String, Object> list() {
 		if (StringUtils.isEmpty(defaultGlobalSettingFileName)){
 			return new LinkedHashMap<String, Object>();
 		}

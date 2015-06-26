@@ -111,7 +111,7 @@ public class ConcatenateWebResourceProvider implements WebResourceProvider {
 	}
 
 	@Override
-	public Collection<WebResourceInfo> getAll() {
+	public Collection<WebResourceInfo> list() {
 		List<WebResourceInfo> resourceInfos = new ArrayList<WebResourceInfo>();
 		
 		for (String name : concatenates.keySet()) {

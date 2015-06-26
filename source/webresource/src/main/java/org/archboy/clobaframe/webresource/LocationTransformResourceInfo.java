@@ -12,5 +12,5 @@ public interface LocationTransformResourceInfo extends WebResourceInfo {
 	 * 
 	 * @return 
 	 */
-	Collection<String> getChildResourceNames();
+	Collection<String> listChildResourceNames();
 }

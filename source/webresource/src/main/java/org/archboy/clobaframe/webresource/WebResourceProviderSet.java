@@ -31,5 +31,5 @@ public interface WebResourceProviderSet {
 	 * 
 	 * @return EMPTY when no resources.
 	 */
-	Collection<WebResourceInfo> getAll();
+	Collection<WebResourceInfo> list();
 }
