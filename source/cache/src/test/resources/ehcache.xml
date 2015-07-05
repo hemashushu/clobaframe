@@ -14,7 +14,11 @@ Details see:
          updateCheck="false" monitoring="autodetect"
          dynamicConfig="true" name="cache">
 
-	<diskStore path="java.io.tmpdir/clobaframe"/>
+	<!-- consider using System.properties, for details:
+		http://ehcache.org/apidocs/2.6.9/net/sf/ehcache/config/DiskStoreConfiguration.html
+	-->
+	<!-- <diskStore path="java.io.tmpdir/clobaframe"/> -->
+	<diskStore path="${java.io.tmpdir}/clobaframe"/>
 
 	<!-- RMI Replicated Caching -->
 	<!--

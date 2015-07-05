@@ -23,13 +23,13 @@ public class ComparatorFactory {
 			@SuppressWarnings("unchecked")
 			@Override
 			public int compare(T o1, T o2) {
-				Object value1 = Support.getPropertyValue(o1, key);
-				Object value2 = Support.getPropertyValue(o2, key);
+				Object value1 = Utils.getPropertyValue(o1, key);
+				Object value2 = Utils.getPropertyValue(o2, key);
 				int result = 0;
 				if (value1 == null){
 					result = (value2 == null ? 0 : -1);
 				}else{
-					result = (value2 == null ? 1 : Support.compareValue(value1, value2));
+					result = (value2 == null ? 1 : Utils.compareValue(value1, value2));
 				}
 				return (ascOrder ? result : -result);
 			}

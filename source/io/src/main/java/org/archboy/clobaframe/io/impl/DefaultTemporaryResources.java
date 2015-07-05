@@ -25,9 +25,13 @@ public class DefaultTemporaryResources implements TemporaryResources {
 	public DefaultTemporaryResources() {
 	}
 
+	public DefaultTemporaryResources(File temporaryDirectory) {
+		this.temporaryDirectory = temporaryDirectory;
+	}
+
 	@Override
-    public void setTemporaryFileDirectory(File tmp) {
-        this.temporaryDirectory = tmp;
+    public void setTemporaryFileDirectory(File temporaryDirectory) {
+        this.temporaryDirectory = temporaryDirectory;
     }
 
 	@Override

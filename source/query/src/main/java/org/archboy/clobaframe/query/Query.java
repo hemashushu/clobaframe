@@ -117,7 +117,7 @@ public interface Query<T> {
 	T first();
 
 	/**
-	 * Return the ViewModel object with specify keys.
+	 * Return the ObjectMap object with specify keys.
 	 * 
 	 * Example: 
 	 * [
@@ -136,5 +136,5 @@ public interface Query<T> {
 	 * @param keys
 	 * @return
 	 */
-	List<ViewModel> select(String... keys);
+	List<ObjectMap> select(String... keys);
 }

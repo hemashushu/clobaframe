@@ -11,7 +11,7 @@ http://www.springframework.org/schema/context/spring-context-4.1.xsd">
 
 	<!-- application settings -->
 	<bean id="applicationSetting"
-		  class="org.archboy.clobaframe.setting.application.impl.ApplicationSettingImpl">
+		  class="org.archboy.clobaframe.setting.common.application.impl.ApplicationSettingImpl">
 		<property name="locations">
 			<list>
 				<value>classpath:clobaframe.properties</value>
@@ -20,7 +20,7 @@ http://www.springframework.org/schema/context/spring-context-4.1.xsd">
 	</bean>
 			
 	<bean id="propertyPlaceholderConfigurer"
-		  class="org.archboy.clobaframe.setting.application.config.PropertyPlaceholderConfigurer">
+		  class="org.archboy.clobaframe.setting.common.application.config.PropertyPlaceholderConfigurer">
 		<property name="applicationSetting" ref="applicationSetting"/>
 		<property name="ignoreUnresolvablePlaceholders" value="true"/>
 	</bean>

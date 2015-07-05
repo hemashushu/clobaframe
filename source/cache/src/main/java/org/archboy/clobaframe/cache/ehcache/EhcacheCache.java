@@ -27,7 +27,24 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 /**
- *
+ * About the ehcache configuration file.
+ * 
+ * the diskStore path can use the System.properties.
+ * for details, see: http://ehcache.org/apidocs/2.6.9/net/sf/ehcache/config/DiskStoreConfiguration.html
+ * 
+ * Legacy e.g. 
+ * java.io.tmpdir/ehcache/ = /var/tmp/ehcache/.
+ * 
+ * user.home - the user's home directory
+ * user.dir - the current working directory
+ * java.io.tmpdir - the default temp file path
+ * ehcache.disk.store.dir - a system property you would normally specify on the command line, e.g. java -Dehcache.disk.store.dir=/u01/myapp/diskdir
+ * 
+ * or
+ * 
+ * use System properties, e.g.
+ * ${java.io.tmpdir}/clobaframe
+ * 
  * @author yang
  */
 @Named

@@ -1,2 +1,0 @@
-Consider using (Apache Commons Configuration)[http://commons.apache.org/proper/commons-configuration/] 
-to read/write the properties file.
