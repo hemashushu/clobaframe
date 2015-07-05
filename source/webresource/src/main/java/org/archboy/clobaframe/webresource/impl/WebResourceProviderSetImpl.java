@@ -22,6 +22,10 @@ public class WebResourceProviderSetImpl implements WebResourceProviderSet {
 	@Inject
 	private List<WebResourceProvider> webResourceProviders;
 
+	public void setWebResourceProviders(List<WebResourceProvider> webResourceProviders) {
+		this.webResourceProviders = webResourceProviders;
+	}
+	
 	@Override
 	public WebResourceInfo getByName(String name) {
 		WebResourceInfo webResourceInfo = null;

@@ -14,6 +14,7 @@ import org.archboy.clobaframe.setting.support.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
@@ -22,9 +23,9 @@ import org.springframework.core.io.ResourceLoader;
  * @author yang
  */
 @Named
-public class DefaultGlobalSettingProvider implements GlobalSettingProvider {
+public class DefaultGlobalSettingProvider implements GlobalSettingProvider, ResourceLoaderAware {
 
-	@Inject
+	//@Inject
 	private ResourceLoader resourceLoader;
 
 	//private static final String DEFAULT_GLOBAL_SETTING_FILE_NAME = "classpath:global.properties";
@@ -34,6 +35,15 @@ public class DefaultGlobalSettingProvider implements GlobalSettingProvider {
 	private String defaultGlobalSettingFileName;
 	
 	private final Logger logger = LoggerFactory.getLogger(DefaultGlobalSettingProvider.class);
+
+	public void setDefaultGlobalSettingFileName(String defaultGlobalSettingFileName) {
+		this.defaultGlobalSettingFileName = defaultGlobalSettingFileName;
+	}
+
+	@Override
+	public void setResourceLoader(ResourceLoader resourceLoader) {
+		this.resourceLoader = resourceLoader;
+	}
 	
 	@Override
 	public int getOrder() {

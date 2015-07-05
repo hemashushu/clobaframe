@@ -18,7 +18,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class MailSenderTest {
 
 	@Inject
-	//@Named("defaultMailSender")
 	private MailSenderManager mailSenderManager;
 
 	@Before

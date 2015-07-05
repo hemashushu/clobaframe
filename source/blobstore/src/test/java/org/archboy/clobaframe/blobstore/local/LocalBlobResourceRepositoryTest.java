@@ -30,7 +30,6 @@ import static org.junit.Assert.*;
 public class LocalBlobResourceRepositoryTest {
 
 	@Inject
-	//@Named("defaultBlobstore")
 	private BlobstoreManager blobstoreManager;
 	
 	private BlobResourceInfoFactory blobResourceInfoFactory = new DefaultBlobResourceInfoFactory();

@@ -19,7 +19,9 @@ import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.ResourceInfoFactory;
 import org.archboy.clobaframe.io.http.ResourceSender;
 import org.archboy.clobaframe.io.impl.DefaultResourceInfoFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
@@ -29,7 +31,7 @@ import org.springframework.core.io.ResourceLoader;
  *
  */
 @Named
-public class ResourceSenderImpl implements ResourceSender {
+public class ResourceSenderImpl implements ResourceSender, ResourceLoaderAware, InitializingBean {
 
 	private static final boolean DEFAULT_ENABLE_GZIP = false;
 	// only the content length large than this value would be compress
@@ -45,18 +47,35 @@ public class ResourceSenderImpl implements ResourceSender {
 	@Value("${clobaframe.io.http.gzip.mimeTypeList:" + DEFAULT_COMPRESSIBLE_MIME_TYPE_LIST + "}")
 	private String compressibleMimeTypeList;
 		
-	@Inject
+	//@Inject
 	private ResourceLoader resourceLoader;
 	
-	//@Inject
 	private ResourceInfoFactory resourceInfoFactory = new DefaultResourceInfoFactory();
 	
 	private ObjectMapper objectMapper = new ObjectMapper();
 	
 	private ResourceSender resourceSender;
-	
-	@PostConstruct
-	public void init() throws IOException{
+
+	public void setEnableGzip(boolean enableGzip) {
+		this.enableGzip = enableGzip;
+	}
+
+	public void setMinCompressSize(int minCompressSize) {
+		this.minCompressSize = minCompressSize;
+	}
+
+	public void setCompressibleMimeTypeList(String compressibleMimeTypeList) {
+		this.compressibleMimeTypeList = compressibleMimeTypeList;
+	}
+
+	@Override
+	public void setResourceLoader(ResourceLoader resourceLoader) {
+		this.resourceLoader = resourceLoader;
+	}
+
+	//@PostConstruct
+	@Override
+	public void afterPropertiesSet() throws Exception {
 		resourceSender = new DefaultResourceSender();
 		
 		if (enableGzip) {

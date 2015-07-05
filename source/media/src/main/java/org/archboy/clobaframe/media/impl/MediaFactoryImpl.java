@@ -29,6 +29,7 @@ import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfoWrapper;
 import org.archboy.clobaframe.io.file.impl.DefaultFileBaseResourceInfoFactory;
 import org.archboy.clobaframe.io.impl.DefaultResourceInfoFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
@@ -36,7 +37,7 @@ import org.springframework.util.Assert;
  * @author yang
  */
 @Named
-public class MediaFactoryImpl implements MediaFactory{
+public class MediaFactoryImpl implements MediaFactory, InitializingBean{
 
 	// default 32 MB
 	private static final long DEFAULT_MAX_HANDLE_SIZE_BYTE = 32L * 1024 * 1024;
@@ -46,22 +47,39 @@ public class MediaFactoryImpl implements MediaFactory{
 
 	private final Logger logger = LoggerFactory.getLogger(MediaFactoryImpl.class);
 
-	//@Inject
 	private ResourceInfoFactory resourceInfoFactory = new DefaultResourceInfoFactory();
+
+	private FileBaseResourceInfoFactory fileBaseResourceInfoFactory;
 	
 	@Inject
 	private MimeTypeDetector mimeTypeDetector;
-	
-	private FileBaseResourceInfoFactory fileBaseResourceInfoFactory;
 	
 	@Inject
 	private FileBaseResourceInfoWrapper fileBaseResourceInfoWrapper;
 	
 	@Inject
 	private List<MediaLoader> mediaLoaders;
-	
-	@PostConstruct
-	public void init(){
+
+	public void setMaxHandleSizeByte(long maxHandleSizeByte) {
+		this.maxHandleSizeByte = maxHandleSizeByte;
+	}
+
+	public void setMimeTypeDetector(MimeTypeDetector mimeTypeDetector) {
+		this.mimeTypeDetector = mimeTypeDetector;
+	}
+
+	public void setFileBaseResourceInfoWrapper(FileBaseResourceInfoWrapper fileBaseResourceInfoWrapper) {
+		this.fileBaseResourceInfoWrapper = fileBaseResourceInfoWrapper;
+	}
+
+	public void setMediaLoaders(List<MediaLoader> mediaLoaders) {
+		this.mediaLoaders = mediaLoaders;
+	}
+
+	//@PostConstruct
+	@Override
+	public void afterPropertiesSet() throws Exception {
+
 		fileBaseResourceInfoFactory = new DefaultFileBaseResourceInfoFactory(mimeTypeDetector);
 	}
 	

@@ -19,12 +19,14 @@ import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.Resource;
 
 @Named
-public class MultiPathLocalWebResourceProvider implements WebResourceProvider {
+public class MultiPathLocalWebResourceProvider implements WebResourceProvider, ResourceLoaderAware, InitializingBean {
 
-	@Inject
+	//@Inject
 	private ResourceLoader resourceLoader;
 
 	@Inject
@@ -48,6 +50,27 @@ public class MultiPathLocalWebResourceProvider implements WebResourceProvider {
 	private List<LocalResourceProvider> localResourceProviders = new ArrayList<LocalResourceProvider>();
 	
 	private final Logger logger = LoggerFactory.getLogger(MultiPathLocalWebResourceProvider.class);
+
+	public void setMimeTypeDetector(MimeTypeDetector mimeTypeDetector) {
+		this.mimeTypeDetector = mimeTypeDetector;
+	}
+
+	public void setLocalPath(String localPath) {
+		this.localPath = localPath;
+	}
+
+	public void setResourceNamePrefix(String resourceNamePrefix) {
+		this.resourceNamePrefix = resourceNamePrefix;
+	}
+
+	public void setOtherResourcePathAndNamePrefix(String otherResourcePathAndNamePrefix) {
+		this.otherResourcePathAndNamePrefix = otherResourcePathAndNamePrefix;
+	}
+
+	@Override
+	public void setResourceLoader(ResourceLoader resourceLoader) {
+		this.resourceLoader = resourceLoader;
+	}
 	
 	@Override
 	public String getName() {
@@ -59,8 +82,9 @@ public class MultiPathLocalWebResourceProvider implements WebResourceProvider {
 		return PRIORITY_NORMAL;
 	}
 
-	@PostConstruct
-	public void init() {
+	//@PostConstruct
+	@Override
+	public void afterPropertiesSet() throws Exception {
 		// add base local resource path
 		if (StringUtils.isNotEmpty(localPath)) {
 			addLocalResource(localPath, resourceNamePrefix);

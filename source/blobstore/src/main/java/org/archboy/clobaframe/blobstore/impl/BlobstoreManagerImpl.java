@@ -22,6 +22,14 @@ public class BlobstoreManagerImpl implements BlobstoreManager {
 	
 	@Inject
 	private List<Blobstore> blobstores;
+
+	public void setDefaultBlobstoreName(String defaultBlobstoreName) {
+		this.defaultBlobstoreName = defaultBlobstoreName;
+	}
+
+	public void setBlobstores(List<Blobstore> blobstores) {
+		this.blobstores = blobstores;
+	}
 	
 	@Override
 	public Blobstore getBlobstore(String name) {

@@ -24,6 +24,14 @@ public class PrincipalSettingImpl implements PrincipalSetting {
 	@Autowired(required = false)
 	private List<PrincipalSettingRepository> principalSettingRepositorys;
 
+	public void setPrincipalSettingProviders(List<PrincipalSettingProvider> principalSettingProviders) {
+		this.principalSettingProviders = principalSettingProviders;
+	}
+
+	public void setPrincipalSettingRepositorys(List<PrincipalSettingRepository> principalSettingRepositorys) {
+		this.principalSettingRepositorys = principalSettingRepositorys;
+	}
+
 	@Override
 	public Object get(Principal profile, String key) {
 		for(PrincipalSettingProvider provider : principalSettingProviders) {

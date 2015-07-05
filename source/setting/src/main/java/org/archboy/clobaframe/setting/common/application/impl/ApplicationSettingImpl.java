@@ -53,7 +53,7 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 	private static final String ROOT_KEY_EXTRA_SETTING_FILE_NAME = "clobaframe.setting.extraSettingFileName";
 
 	private String rootConfigFileName;
-	private String appName;
+	private String applicationName;
 	
 	private Map<String, Object> rootSetting = new LinkedHashMap<String, Object>();
 	private Map<String, Object> setting = new LinkedHashMap<String, Object>();
@@ -69,6 +69,7 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 	private String[] locations;
 	
 	private ResourceLoader resourceLoader;
+	
 	private List<ApplicationSettingProvider> applicationSettingProviders;
 	private ApplicationSettingRepository applicationSettingRepository;
 	private Collection<PostApplicationSetting> postApplicationSettings;
@@ -77,12 +78,12 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 
 	@Override
 	public void setApplicationName(String name) {
-		this.appName = name;
+		this.applicationName = name;
 	}
 
 	@Override
 	public String getApplicationName() {
-		return appName;
+		return applicationName;
 	}
 	
 	@Override
@@ -113,7 +114,7 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		//rootSetting.clear();
-		rootSetting.put(ROOT_KEY_APP_NAME, appName);
+		rootSetting.put(ROOT_KEY_APP_NAME, applicationName);
 		rootSetting.put(ROOT_KEY_ROOT_CONFIG_FILE_NAME, rootConfigFileName);
 		
 		loadRootConfigFromBeanDefine();

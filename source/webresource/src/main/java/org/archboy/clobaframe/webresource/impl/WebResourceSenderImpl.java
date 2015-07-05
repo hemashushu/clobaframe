@@ -32,6 +32,14 @@ public class WebResourceSenderImpl implements WebResourceSender{
 	@Inject
 	private WebResourceManager webResourceManager;
 
+	public void setCacheResourceSender(CacheResourceSender cacheResourceSender) {
+		this.cacheResourceSender = cacheResourceSender;
+	}
+
+	public void setWebResourceManager(WebResourceManager webResourceManager) {
+		this.webResourceManager = webResourceManager;
+	}
+
 	@Override
 	public void send(String resourceName, HttpServletRequest request,
 			HttpServletResponse response) throws IOException {

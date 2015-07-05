@@ -23,6 +23,14 @@ public class CacheManagerImpl implements CacheManager {
 	@Inject
 	private List<Cache> caches;
 
+	public void setDefaultCacheName(String defaultCacheName) {
+		this.defaultCacheName = defaultCacheName;
+	}
+
+	public void setCaches(List<Cache> caches) {
+		this.caches = caches;
+	}
+	
 	@Override
 	public Cache getDefault(){
 		return getCache(defaultCacheName);

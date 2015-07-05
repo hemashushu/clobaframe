@@ -22,7 +22,10 @@ import org.archboy.clobaframe.cache.Cache.Policy;
 import org.archboy.clobaframe.cache.Expiration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
@@ -48,7 +51,8 @@ import org.springframework.core.io.ResourceLoader;
  * @author yang
  */
 @Named
-public class EhcacheCache implements org.archboy.clobaframe.cache.Cache, Closeable {
+public class EhcacheCache implements org.archboy.clobaframe.cache.Cache, 
+		ResourceLoaderAware, InitializingBean, DisposableBean {
 
 	private static final String DEFAULT_CACHE_REGION_NAME = "common";
 	private static final String DEFAULT_CACHE_CONFIGURATION_FILE = ""; //"classpath:ehcache.xml";
@@ -59,16 +63,30 @@ public class EhcacheCache implements org.archboy.clobaframe.cache.Cache, Closeab
 	@Value("${clobaframe.cache.ehcache.configuration:" + DEFAULT_CACHE_CONFIGURATION_FILE + "}")
 	private String cacheConfigurationFile;
 
-	@Inject
+	//@Inject
 	private ResourceLoader resourceLoader;
 
 	private CacheManager cacheManager;
 	private Cache cache;
 
 	private final Logger logger = LoggerFactory.getLogger(EhcacheCache.class);
-			
-	@PostConstruct
-	public void init() throws IOException {
+
+	public void setCacheRegionName(String cacheRegionName) {
+		this.cacheRegionName = cacheRegionName;
+	}
+
+	public void setCacheConfigurationFile(String cacheConfigurationFile) {
+		this.cacheConfigurationFile = cacheConfigurationFile;
+	}
+
+	@Override
+	public void setResourceLoader(ResourceLoader resourceLoader) {
+		this.resourceLoader = resourceLoader;
+	}
+
+	//@PostConstruct
+	@Override
+	public void afterPropertiesSet() throws Exception {
 		if (StringUtils.isEmpty(cacheConfigurationFile)){
 			return;
 		}
@@ -90,9 +108,9 @@ public class EhcacheCache implements org.archboy.clobaframe.cache.Cache, Closeab
 		}
 	}
 
-	@PreDestroy
+	//@PreDestroy
 	@Override
-	public void close() throws IOException{
+	public void destroy() throws Exception {
 		if (cacheManager != null){
 			cacheManager.shutdown();
 		}

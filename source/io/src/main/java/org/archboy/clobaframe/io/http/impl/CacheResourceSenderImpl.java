@@ -22,6 +22,10 @@ public class CacheResourceSenderImpl implements CacheResourceSender {
 
 	@Inject
 	private ResourceSender resourceSender;
+
+	public void setResourceSender(ResourceSender resourceSender) {
+		this.resourceSender = resourceSender;
+	}
 	
 	@Override
 	public void send(ResourceInfo resourceInfo, 

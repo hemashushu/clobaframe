@@ -17,6 +17,9 @@ import org.archboy.clobaframe.blobstore.BlobResourceRepository;
 import org.archboy.clobaframe.blobstore.Blobstore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ResourceLoaderAware;
 import org.springframework.util.Assert;
 
 /**
@@ -27,7 +30,7 @@ import org.springframework.util.Assert;
  * @author yang
  */
 @Named
-public class LocalBlobstore implements Blobstore, Closeable {
+public class LocalBlobstore implements Blobstore, InitializingBean, DisposableBean, ResourceLoaderAware {
 
 	private static final String DEFAULT_LOCAL_PATH = ""; //"file:${java.io.tmpdir}/${clobaframe.setting.appName}/blobstore";
 	private static final boolean DEFAULT_AUTO_CREATE_ROOT_FOLDER = true;
@@ -38,7 +41,7 @@ public class LocalBlobstore implements Blobstore, Closeable {
 	@Value("${clobaframe.blobstore.local.autoCreateRootFolder:" + DEFAULT_AUTO_CREATE_ROOT_FOLDER + "}")
 	private boolean autoCreateRootFolder;
 
-	@Inject
+	//@Inject
 	private ResourceLoader resourceLoader;
 
 	// local blobstore root dir
@@ -47,9 +50,23 @@ public class LocalBlobstore implements Blobstore, Closeable {
 	private Map<String, BlobResourceRepository> repositories = new HashMap<String, BlobResourceRepository>();
 	
 	private final Logger logger = LoggerFactory.getLogger(LocalBlobstore.class);
+
+	public void setLocalPath(String localPath) {
+		this.localPath = localPath;
+	}
+
+	public void setAutoCreateRootFolder(boolean autoCreateRootFolder) {
+		this.autoCreateRootFolder = autoCreateRootFolder;
+	}
 	
-	@PostConstruct
-	public void init() throws IOException {
+	@Override
+	public void setResourceLoader(ResourceLoader resourceLoader) {
+		this.resourceLoader = resourceLoader;
+	}
+	
+	//@PostConstruct
+	@Override
+	public void afterPropertiesSet() throws Exception {
 		if (StringUtils.isEmpty(localPath)){
 			return;
 		}
@@ -64,9 +81,9 @@ public class LocalBlobstore implements Blobstore, Closeable {
 		}
 	}
 
-	@PreDestroy
+	//@PreDestroy
 	@Override
-	public void close() throws IOException {
+	public void destroy() throws Exception {
 		for(BlobResourceRepository r : repositories.values()){
 			try{
 				((Closeable)r).close();

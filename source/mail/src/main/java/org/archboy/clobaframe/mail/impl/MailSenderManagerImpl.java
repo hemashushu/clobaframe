@@ -27,7 +27,14 @@ public class MailSenderManagerImpl implements MailSenderManager {
 
 	private final Logger logger = LoggerFactory.getLogger(MailSenderManagerImpl.class);
 
-	//@Bean(name = "defaultMailSender")
+	public void setDefaultMailSenderName(String defaultMailSenderName) {
+		this.defaultMailSenderName = defaultMailSenderName;
+	}
+
+	public void setMailSenders(List<AbstractMailSender> mailSenders) {
+		this.mailSenders = mailSenders;
+	}
+
 	@Override
 	public MailSender getDefault() {
 		return getMailSender(defaultMailSenderName);

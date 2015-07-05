@@ -11,6 +11,7 @@ import org.archboy.clobaframe.setting.support.Utils;
 import org.archboy.clobaframe.setting.common.global.GlobalSetting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -18,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author yang
  */
 @Named
-public class GlobalSettingImpl implements GlobalSetting {
+public class GlobalSettingImpl implements GlobalSetting, InitializingBean {
 	
 	private Map<String, Object> setting = new LinkedHashMap<String, Object>();
 	
@@ -29,8 +30,21 @@ public class GlobalSettingImpl implements GlobalSetting {
 	private GlobalSettingRepository globalSettingRepository;
 	
 	private final Logger logger = LoggerFactory.getLogger(GlobalSettingImpl.class);
+
+	public void setGlobalSettingProviders(List<GlobalSettingProvider> globalSettingProviders) {
+		this.globalSettingProviders = globalSettingProviders;
+	}
+
+	public void setGlobalSettingRepository(GlobalSettingRepository globalSettingRepository) {
+		this.globalSettingRepository = globalSettingRepository;
+	}
+
+	//@PostConstruct
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		refresh();
+	}
 	
-	@PostConstruct
 	@Override
 	public void refresh(){
 		// clear setting

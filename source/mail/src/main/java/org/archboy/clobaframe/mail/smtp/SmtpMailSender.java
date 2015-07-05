@@ -18,6 +18,8 @@ import javax.inject.Named;
 import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.mail.SendMailException;
 import org.archboy.clobaframe.mail.impl.AbstractMailSender;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.Assert;
@@ -29,7 +31,7 @@ import org.springframework.util.StringUtils;
  * @author yang
  */
 @Named
-public class SmtpMailSender extends AbstractMailSender {
+public class SmtpMailSender extends AbstractMailSender implements ResourceLoaderAware, InitializingBean {
 
 	private static final int DEFAULT_PORT = 25; // smtp standard port, the port with TLS usually is 587.
 	private static final boolean DEFAULT_TLS = false; // do not use TLS by default.
@@ -48,13 +50,23 @@ public class SmtpMailSender extends AbstractMailSender {
 	@Value("${clobaframe.mail.smtp.config:" + DEFAULT_SMTP_CONFIG + "}")
 	private String smtpConfig;
 	
-	@Inject
+	//@Inject
 	private ResourceLoader resourceLoader;
 	
 	private final Logger logger = LoggerFactory.getLogger(SmtpMailSender.class);
 
-	@PostConstruct
-	public void init() throws IOException{
+	public void setSmtpConfig(String smtpConfig) {
+		this.smtpConfig = smtpConfig;
+	}
+
+	@Override
+	public void setResourceLoader(ResourceLoader resourceLoader) {
+		this.resourceLoader = resourceLoader;
+	}
+
+	//@PostConstruct
+	@Override
+	public void afterPropertiesSet() throws Exception {
 		if (StringUtils.isEmpty(smtpConfig)) {
 			return;
 		}

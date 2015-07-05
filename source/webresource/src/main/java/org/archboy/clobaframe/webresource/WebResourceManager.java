@@ -10,9 +10,9 @@ import java.util.List;
  *
  * A web resource manager will includes one web resource repository set.
  * 
- * manager --T-- repository set --T-- repository 1
- *           |                    |-- repository 2
- *           |-- cache            
+ * manager --T-- provider set --T-- provider 1
+ *           |                  |-- provider 2
+ *           |-- cache          |-- concatenate provider  
  * 
  * 
  * 

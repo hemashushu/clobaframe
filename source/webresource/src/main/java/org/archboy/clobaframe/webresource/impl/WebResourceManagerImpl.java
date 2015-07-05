@@ -18,6 +18,7 @@ import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 
 /**
@@ -26,7 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
  *
  */
 @Named
-public class WebResourceManagerImpl implements WebResourceManager {
+public class WebResourceManagerImpl implements WebResourceManager, InitializingBean {
 
 	private static final String DEFAULT_LOCATION_STRATEGY = "default";
 	private static final boolean DEFAULT_CAN_MINIFY = false;
@@ -34,7 +35,6 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	private static final boolean DEFAULT_CAN_SERVER_CACHE = true;
 	private static final int DEFAULT_SERVER_CACHE_SECONDS = 10 * 60;
 
-	
 	private WebResourceCache resourceCache;
 
 	@Value("${clobaframe.webresource.locationStrategy:" + DEFAULT_LOCATION_STRATEGY + "}")
@@ -68,10 +68,38 @@ public class WebResourceManagerImpl implements WebResourceManager {
 	// keep the current post-handling resources name.
 	// to prevent infinite loop
 	private Stack<String> buildingResourceNames = new Stack<String>();
-	
-	@PostConstruct
-	public void init(){
-		
+
+	public void setLocationStrategys(List<LocationStrategy> locationStrategys) {
+		this.locationStrategys = locationStrategys;
+	}
+
+	public void setLocationStrategyName(String locationStrategyName) {
+		this.locationStrategyName = locationStrategyName;
+	}
+
+	public void setWebResourceProviderSet(WebResourceProviderSet webResourceProviderSet) {
+		this.webResourceProviderSet = webResourceProviderSet;
+	}
+
+	public void setCanMinify(boolean canMinify) {
+		this.canMinify = canMinify;
+	}
+
+	public void setCanCompress(boolean canCompress) {
+		this.canCompress = canCompress;
+	}
+
+	public void setCanServerCache(boolean canServerCache) {
+		this.canServerCache = canServerCache;
+	}
+
+	public void setCacheSeconds(int cacheSeconds) {
+		this.cacheSeconds = cacheSeconds;
+	}
+
+	//@PostConstruct
+	@Override
+	public void afterPropertiesSet() throws Exception {
 		for(LocationStrategy strategy : locationStrategys) {
 			if (strategy.getName().equals(locationStrategyName)) {
 				this.locationStrategy = strategy;
