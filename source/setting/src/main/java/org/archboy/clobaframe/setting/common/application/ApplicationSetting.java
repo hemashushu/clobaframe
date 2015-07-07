@@ -18,6 +18,25 @@ import org.archboy.clobaframe.setting.common.CacheableSetting;
  * 5. custom settings, mutable. (persists in application data folder, JSON format)
  * 6. extra custom settings, immutable/readonly. (persist in application data folder, JSON format)
  * 
+ * About config folder and application data folder.
+ * 
+ * System wide config folder:
+ * linux and osx: /etc/APP_NAME
+ * windows: %SystemDrive%\ProgramData\APP_NAME
+ * 
+ * User local config folder:
+ * linux: ~/.local/share/APP_NAME or ~/.APP_NAME
+ * osx: ~/Library/Application Support/APP_NAME
+ * osx sandbox: ~/Library/Containers/APP_BUNDLE_ID/Data/Library/Application Support/APP_NAME
+ * windows: ~\Application Data\Local|Roaming\APP_NAME
+ *
+ * System wide application data folder:
+ * linux: /var/lib/APP_NAME
+ * windows: %SystemDrive%\ProgramData\APP_NAME
+ * 
+ * User local application data folder:
+ * Same as user local application config folder.
+ * 
  * @author yang
  */
 public interface ApplicationSetting extends CacheableSetting {

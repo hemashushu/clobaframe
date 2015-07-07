@@ -11,6 +11,8 @@ import org.archboy.clobaframe.setting.support.Utils;
 import org.archboy.clobaframe.setting.common.application.ApplicationSettingRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 
 /**
  *
@@ -24,6 +26,14 @@ public class JsonApplicationSettingRepository extends JsonApplicationSettingProv
 		super(dataFolder, fileName);
 	}
 
+	public JsonApplicationSettingRepository(ResourceLoader resourceLoader, String fileName) {
+		super(resourceLoader, fileName);
+	}
+
+	public JsonApplicationSettingRepository(Resource resource) {
+		super(resource);
+	}
+	
 	@Override
 	public void update(Map<String, Object> item) {
 		Map<String, Object> map = Utils.merge(list(), item);
