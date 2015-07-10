@@ -54,13 +54,16 @@ import org.springframework.core.io.ResourceLoader;
 public class EhcacheCache implements org.archboy.clobaframe.cache.Cache, 
 		ResourceLoaderAware, InitializingBean, DisposableBean {
 
-	private static final String DEFAULT_CACHE_REGION_NAME = "common";
-	private static final String DEFAULT_CACHE_CONFIGURATION_FILE = ""; //"classpath:ehcache.xml";
+	public static final String DEFAULT_CACHE_REGION_NAME = "common";
+	public static final String DEFAULT_CACHE_CONFIGURATION_FILE = ""; //"classpath:ehcache.xml";
 
-	@Value("${clobaframe.cache.ehcache.region:" + DEFAULT_CACHE_REGION_NAME + "}")
+	public static final String SETTING_KEY_CACHE_REGION_NAME = "clobaframe.cache.ehcache.region";
+	public static final String SETTING_KEY_CACHE_CONFIGURATION_FILE = "clobaframe.cache.ehcache.configuration";
+	
+	@Value("${" + SETTING_KEY_CACHE_REGION_NAME + ":" + DEFAULT_CACHE_REGION_NAME + "}")
 	private String cacheRegionName;
 
-	@Value("${clobaframe.cache.ehcache.configuration:" + DEFAULT_CACHE_CONFIGURATION_FILE + "}")
+	@Value("${" + SETTING_KEY_CACHE_CONFIGURATION_FILE + ":" + DEFAULT_CACHE_CONFIGURATION_FILE + "}")
 	private String cacheConfigurationFile;
 
 	//@Inject

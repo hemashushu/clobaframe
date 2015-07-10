@@ -22,10 +22,13 @@ import org.springframework.util.Assert;
 @Named
 public class DefaultLocationStrategy implements LocationStrategy, InitializingBean {
 
-	private static final String DEFAULT_VERSION_STRATEGY_NAME = "default";
-	private static final String DEFAULT_BASE_LOCATION = "/resource/";
+	public static final String DEFAULT_VERSION_STRATEGY_NAME = "default";
+	public static final String DEFAULT_BASE_LOCATION = "/resource/";
 	
-	@Value("${clobaframe.webresource.versionStrategy:" + DEFAULT_VERSION_STRATEGY_NAME + "}")
+	public static final String SETTING_KEY_VERSION_STRATEGY_NAME = "clobaframe.webresource.versionStrategy";
+	public static final String SETTING_KEY_BASE_LOCATION = "clobaframe.webresource.baseLocation";
+	
+	@Value("${" + SETTING_KEY_VERSION_STRATEGY_NAME + ":" + DEFAULT_VERSION_STRATEGY_NAME + "}")
 	private String versionStrategyName;
 		
 	@Inject
@@ -34,7 +37,7 @@ public class DefaultLocationStrategy implements LocationStrategy, InitializingBe
 	// fields
 	private VersionStrategy versionStrategy;
 	
-	@Value("${clobaframe.webresource.baseLocation:" + DEFAULT_BASE_LOCATION + "}")
+	@Value("${" + SETTING_KEY_BASE_LOCATION + ":" + DEFAULT_BASE_LOCATION + "}")
 	private String baseLocation;
 
 	private final Logger logger = LoggerFactory.getLogger(DefaultLocationStrategy.class);

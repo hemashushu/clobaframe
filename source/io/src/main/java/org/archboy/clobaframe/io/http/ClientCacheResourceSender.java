@@ -10,7 +10,7 @@ import org.archboy.clobaframe.io.ResourceInfo;
  *
  * @author yang
  */
-public interface CacheResourceSender {
+public interface ClientCacheResourceSender {
 	
 	public static final int ONE_YEAR_SECONDS = 31536000;
 	public static final int ONE_MONTH_SECONDS = 2592000;

@@ -15,9 +15,11 @@ import org.springframework.util.Assert;
 @Named
 public class CacheManagerImpl implements CacheManager {
 
-	private static final String DEFAULT_CACHE_NAME = "null";
+	public static final String DEFAULT_CACHE_NAME = "null";
 
-	@Value("${clobaframe.cache.default:" + DEFAULT_CACHE_NAME + "}")
+	public static final String SETTING_KEY_DEFAULT_CACHE_NAME = "clobaframe.cache.default";
+	
+	@Value("${" + SETTING_KEY_DEFAULT_CACHE_NAME + ":" + DEFAULT_CACHE_NAME + "}")
 	private String defaultCacheName;
 
 	@Inject

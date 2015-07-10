@@ -25,14 +25,16 @@ import org.springframework.core.io.ResourceLoader;
 @Named
 public class DefaultGlobalSettingProvider implements GlobalSettingProvider, ResourceLoaderAware {
 
+	public static final String NAME = "defaultGlobalSetting";
+	
 	//@Inject
 	private ResourceLoader resourceLoader;
 
 	//private static final String DEFAULT_GLOBAL_SETTING_FILE_NAME = "classpath:global.properties";
-	private static final String DEFAULT_GLOBAL_SETTING_FILE_NAME = "";
+	public static final String DEFAULT_GLOBAL_SETTING_FILE_NAME = "";
 	
 	@Value("${clobaframe.setting.defaultGlobalSettingFileName:" + DEFAULT_GLOBAL_SETTING_FILE_NAME + "}")
-	private String defaultGlobalSettingFileName;
+	public String defaultGlobalSettingFileName;
 	
 	private final Logger logger = LoggerFactory.getLogger(DefaultGlobalSettingProvider.class);
 
@@ -43,6 +45,11 @@ public class DefaultGlobalSettingProvider implements GlobalSettingProvider, Reso
 	@Override
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;
+	}
+
+	@Override
+	public String getName() {
+		return NAME;
 	}
 	
 	@Override

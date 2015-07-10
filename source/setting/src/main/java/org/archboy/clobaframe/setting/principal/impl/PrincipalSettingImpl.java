@@ -1,15 +1,20 @@
 package org.archboy.clobaframe.setting.principal.impl;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Named;
+import org.archboy.clobaframe.setting.common.SettingProvider;
+import org.archboy.clobaframe.setting.common.application.ApplicationSettingProvider;
 import org.archboy.clobaframe.setting.principal.Principal;
 import org.archboy.clobaframe.setting.principal.PrincipalSetting;
 import org.archboy.clobaframe.setting.principal.PrincipalSettingProvider;
 import org.archboy.clobaframe.setting.principal.PrincipalSettingRepository;
 import org.archboy.clobaframe.setting.support.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -32,6 +37,57 @@ public class PrincipalSettingImpl implements PrincipalSetting {
 		this.principalSettingRepositorys = principalSettingRepositorys;
 	}
 
+	@Override
+	public void addProvider(PrincipalSettingProvider settingProvider) {
+		
+		if (principalSettingProviders == null) {
+			principalSettingProviders = new ArrayList<PrincipalSettingProvider>();
+		}
+		
+		principalSettingProviders.add(settingProvider);
+		principalSettingProviders.sort(new Comparator<PrincipalSettingProvider>() {
+
+			@Override
+			public int compare(PrincipalSettingProvider o1, PrincipalSettingProvider o2) {
+				return o1.getOrder() - o2.getOrder();
+			}
+		});
+	}
+
+	@Override
+	public void removeProvider(String providerName) {
+		Assert.notNull(providerName);
+		for (int idx=principalSettingProviders.size() -1; idx>=0; idx--){
+			PrincipalSettingProvider provider = principalSettingProviders.get(idx);
+			if (providerName.equals(provider.getName())){
+				principalSettingProviders.remove(idx);
+				break;
+			}
+		}
+	}
+	
+	@Override
+	public void addRepository(PrincipalSettingRepository settingRepository) {		
+		
+		if (principalSettingRepositorys == null) {
+			principalSettingRepositorys = new ArrayList<PrincipalSettingRepository>();
+		}
+		
+		principalSettingRepositorys.add(settingRepository);
+	}
+
+	@Override
+	public void removeRepository(String repositoryName) {
+		Assert.notNull(repositoryName);
+		for (int idx=principalSettingRepositorys.size() -1; idx>=0; idx--){
+			PrincipalSettingRepository provider = principalSettingRepositorys.get(idx);
+			if (repositoryName.equals(provider.getName())){
+				principalSettingRepositorys.remove(idx);
+				break;
+			}
+		}
+	}
+	
 	@Override
 	public Object get(Principal profile, String key) {
 		for(PrincipalSettingProvider provider : principalSettingProviders) {

@@ -10,6 +10,13 @@ import org.springframework.core.Ordered;
 public interface PrincipalSettingProvider extends PrincipalSpecial, Ordered {
 
 	/**
+	 * The provider name.
+	 * Optional.
+	 * @return 
+	 */
+	String getName();
+	
+	/**
 	 * 
 	 * @param principal
 	 * @param key

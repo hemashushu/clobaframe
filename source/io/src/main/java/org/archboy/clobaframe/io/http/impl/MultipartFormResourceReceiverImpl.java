@@ -23,11 +23,13 @@ import org.springframework.util.Assert;
 @Named
 public class MultipartFormResourceReceiverImpl implements MultipartFormResourceReceiver {
 
-	// default 12 MByte
-	private static final long DEFAULT_MAX_UPLOAD_SIZE_BYTE = 12L * 1024 * 1024;
+	// default 10 MByte
+	public static final long DEFAULT_MAX_UPLOAD_SIZE_BYTE = 10L * 1024 * 1024;
 
-	@Value("${clobaframe.io.maxUploadSize:" + DEFAULT_MAX_UPLOAD_SIZE_BYTE + "}")
-	private long maxUploadSizeByte;
+	public static final String SETTING_KEY_MAX_UPLOAD_SIZE_BYTE = "clobaframe.io.maxUploadSize";
+	
+	@Value("${" + SETTING_KEY_MAX_UPLOAD_SIZE_BYTE + ":" + DEFAULT_MAX_UPLOAD_SIZE_BYTE + "}")
+	private long maxUploadSizeByte = DEFAULT_MAX_UPLOAD_SIZE_BYTE;
 
 	public void setMaxUploadSizeByte(long maxUploadSizeByte) {
 		this.maxUploadSizeByte = maxUploadSizeByte;

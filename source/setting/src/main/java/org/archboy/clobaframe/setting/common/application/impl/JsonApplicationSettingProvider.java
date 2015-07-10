@@ -38,6 +38,12 @@ public class JsonApplicationSettingProvider implements ApplicationSettingProvide
 	}
 
 	@Override
+	public String getName() {
+		// return resource file name as provider name.
+		return resource.getFilename();
+	}
+
+	@Override
 	public int getOrder() {
 		return PRIORITY_HIGH;
 	}

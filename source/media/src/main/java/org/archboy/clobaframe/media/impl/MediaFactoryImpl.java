@@ -40,10 +40,12 @@ import org.springframework.util.Assert;
 public class MediaFactoryImpl implements MediaFactory, InitializingBean{
 
 	// default 32 MB
-	private static final long DEFAULT_MAX_HANDLE_SIZE_BYTE = 32L * 1024 * 1024;
+	public static final long DEFAULT_MAX_HANDLE_SIZE_BYTE = 32L * 1024 * 1024;
 	
-	@Value("${clobaframe.media.maxHandleSize:" + DEFAULT_MAX_HANDLE_SIZE_BYTE + "}")
-	private long maxHandleSizeByte;
+	public static final String SETTING_KEY_MAX_HANDLE_SIZE_BYTE = "clobaframe.media.maxHandleSize";
+	
+	@Value("${" + SETTING_KEY_MAX_HANDLE_SIZE_BYTE + ":" + DEFAULT_MAX_HANDLE_SIZE_BYTE + "}")
+	private long maxHandleSizeByte = DEFAULT_MAX_HANDLE_SIZE_BYTE;
 
 	private final Logger logger = LoggerFactory.getLogger(MediaFactoryImpl.class);
 

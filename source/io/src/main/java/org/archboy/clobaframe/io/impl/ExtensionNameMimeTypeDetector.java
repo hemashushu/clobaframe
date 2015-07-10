@@ -20,6 +20,7 @@ import org.archboy.clobaframe.io.MimeTypeDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -37,10 +38,19 @@ public class ExtensionNameMimeTypeDetector implements MimeTypeDetector, Resource
 	private static final String UNKNOWN_MIME_TYPE = "application/octet-stream";
 	
 	// the default mime type list file is from Apache httpd
-	private static final String mimeTypeListFile = "classpath:org/archboy/clobaframe/io/mime.types";
+	public static final String DEFAULT_MIME_TYPE_LIST_FILE = "classpath:org/archboy/clobaframe/io/mime.types";
 	
 	// the custom mime type list
-	private static final String extraMimeTypeListFile = "classpath:org/archboy/clobaframe/io/extra.mime.types.json";
+	public static final String DEFAULT_EXTRA_MIME_TYPE_LIST_FILE = "classpath:org/archboy/clobaframe/io/extra.mime.types.json";
+	
+	public static final String SETTING_KEY_MIME_TYPE_LIST_FILE = "clobaframe.io.mimeTypeListFile";
+	public static final String SETTING_KEY_EXTRA_MIME_TYPE_LIST_FILE = "clobaframe.io.extraMimeTypeListFile";
+	
+	@Value("${" + SETTING_KEY_MIME_TYPE_LIST_FILE + ":" + DEFAULT_MIME_TYPE_LIST_FILE + "}")
+	private String mimeTypeListFile = DEFAULT_MIME_TYPE_LIST_FILE;
+	
+	@Value("${" + SETTING_KEY_EXTRA_MIME_TYPE_LIST_FILE + ":" + DEFAULT_EXTRA_MIME_TYPE_LIST_FILE + "}")
+	private String extraMimeTypeListFile = DEFAULT_EXTRA_MIME_TYPE_LIST_FILE;
 	
 	//@Inject
 	private ResourceLoader resourceLoader;
@@ -54,6 +64,14 @@ public class ExtensionNameMimeTypeDetector implements MimeTypeDetector, Resource
 		this.resourceLoader = resourceLoader;
 	}
 
+	public void setMimeTypeListFile(String mimeTypeListFile) {
+		this.mimeTypeListFile = mimeTypeListFile;
+	}
+
+	public void setExtraMimeTypeListFile(String extraMimeTypeListFile) {
+		this.extraMimeTypeListFile = extraMimeTypeListFile;
+	}
+	
 	//@PostConstruct
 	@Override
 	public void afterPropertiesSet() throws Exception {

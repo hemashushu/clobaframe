@@ -17,9 +17,11 @@ import org.springframework.util.Assert;
 @Named
 public class MailSenderManagerImpl implements MailSenderManager {
 
-	private static final String DEFAULT_MAIL_SENDER_NAME = "null";
+	public static final String DEFAULT_MAIL_SENDER_NAME = "null";
 
-	@Value("${clobaframe.mail.default:" + DEFAULT_MAIL_SENDER_NAME + "}")
+	public static final String SETTING_KEY_MAIL_SENDER_NAME = "clobaframe.mail.default";
+	
+	@Value("${" + SETTING_KEY_MAIL_SENDER_NAME + ":" + DEFAULT_MAIL_SENDER_NAME + "}")
 	private String defaultMailSenderName;
 
 	@Inject

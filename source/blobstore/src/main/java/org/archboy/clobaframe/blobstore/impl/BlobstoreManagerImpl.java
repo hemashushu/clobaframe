@@ -15,9 +15,11 @@ import org.springframework.util.Assert;
 @Named
 public class BlobstoreManagerImpl implements BlobstoreManager {
 
-	private static final String DEFAULT_BLOBSTORE_NAME = "local";
-
-	@Value("${clobaframe.blobstore.default:" + DEFAULT_BLOBSTORE_NAME + "}")
+	public static final String DEFAULT_BLOBSTORE_NAME = "local";
+	
+	public static final String SETTING_KEY_DEFAULT_BLOBSTORE_NAME = "clobaframe.blobstore.default";
+	
+	@Value("${" + SETTING_KEY_DEFAULT_BLOBSTORE_NAME + ":" + DEFAULT_BLOBSTORE_NAME + "}")
 	private String defaultBlobstoreName;
 	
 	@Inject

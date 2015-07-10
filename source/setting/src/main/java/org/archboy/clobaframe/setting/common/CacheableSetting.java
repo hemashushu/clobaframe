@@ -12,7 +12,9 @@ public interface CacheableSetting extends Setting {
 	/**
 	 * Clear the cache and reload all item's value from providers.
 	 * 
-	 * Invoke this method only when the setting source was changed by the
+	 * Invoke this method only:
+	 * 1. add/remove provider.
+	 * 2. the setting source was changed by the
 	 * external tools, for example, the read-only (to application) properties file
 	 * was modified by user manually.
 	 * 

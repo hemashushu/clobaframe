@@ -54,7 +54,7 @@ public class GlobalSettingTest {
 		
 		// test  // override by 'global-layer2.json'
 		
-		assertEquals("global-layer2", globalSetting.getValue("test.layer"));
+		assertEquals("layerOk", globalSetting.getValue("test.layer"));
 		assertEquals(Boolean.TRUE, globalSetting.getValue("test.other"));
 		
 		// test none-exists
@@ -87,10 +87,11 @@ public class GlobalSettingTest {
 		@Inject
 		private ResourceLoader resourceLoader;
 
-		public TestingGlobalSettingProvider() {
-			super();
+		@Override
+		public String getName() {
+			return "testingGlobalSetting";
 		}
-		
+
 		@Override
 		public int getOrder() {
 			return PRIORITY_NORMAL;
@@ -126,6 +127,11 @@ public class GlobalSettingTest {
 	public static class TestingGlobalSettingRepository implements GlobalSettingProvider, GlobalSettingRepository {
 
 		protected Map<String, Object> setting = new LinkedHashMap<String, Object>();
+
+		@Override
+		public String getName() {
+			return "testingGlobalSettingRepository";
+		}
 		
 		@Override
 		public int getOrder() {

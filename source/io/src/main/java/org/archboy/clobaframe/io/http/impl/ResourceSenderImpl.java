@@ -33,19 +33,29 @@ import org.springframework.core.io.ResourceLoader;
 @Named
 public class ResourceSenderImpl implements ResourceSender, ResourceLoaderAware, InitializingBean {
 
-	private static final boolean DEFAULT_ENABLE_GZIP = false;
+	public static final String SETTING_KEY_ENABLE_GZIP = "clobaframe.io.http.gzip";
+	public static final String SETTING_KEY_MIN_COMPRESS_SIZE = "clobaframe.io.http.gzip.minCompressSize";
+	public static final String SETTING_KEY_COMPRESSIBLE_MIME_TYPE_LIST = "clobaframe.io.http.gzip.mimeTypeList";
+	
+	public static final boolean DEFAULT_ENABLE_GZIP = false;
 	// only the content length large than this value would be compress
-	private static final int DEFAULT_MIN_COMPRESS_SIZE = 1024;
-	private static final String DEFAULT_COMPRESSIBLE_MIME_TYPE_LIST = "classpath:org/archboy/clobaframe/io/compressibleMimeType.json";
+	public static final int DEFAULT_MIN_COMPRESS_SIZE = 1024;
+	public static final String DEFAULT_COMPRESSIBLE_MIME_TYPE_LIST = "classpath:org/archboy/clobaframe/io/compressibleMimeType.json";
 	
-	@Value("${clobaframe.io.http.gzip:"+ DEFAULT_ENABLE_GZIP + "}")
-	private boolean enableGzip;
+	@Value("${" + SETTING_KEY_ENABLE_GZIP + ":"+ DEFAULT_ENABLE_GZIP + "}")
+	private boolean enableGzip = DEFAULT_ENABLE_GZIP;
 
-	@Value("${clobaframe.io.http.gzip.minCompressSize:" + DEFAULT_MIN_COMPRESS_SIZE +"}")
-	private int minCompressSize;
+	@Value("${" + SETTING_KEY_MIN_COMPRESS_SIZE + ":" + DEFAULT_MIN_COMPRESS_SIZE +"}")
+	private int minCompressSize = DEFAULT_MIN_COMPRESS_SIZE;
 	
-	@Value("${clobaframe.io.http.gzip.mimeTypeList:" + DEFAULT_COMPRESSIBLE_MIME_TYPE_LIST + "}")
-	private String compressibleMimeTypeList;
+	/**
+	 * IoC auto inject the setting value.
+	 * SETTING_KEY_COMPRESSIBLE_MIME_TYPE_LIST for setting key.
+	 * DEFAULT_COMPRESSIBLE_MIME_TYPE_LIST for default setting value if the key does not exist or unset.
+	 * compressibleMimeTypeList = DEFAULT_COMPRESSIBLE_MIME_TYPE_LIST for non-IoC application.
+	 */
+	@Value("${" + SETTING_KEY_COMPRESSIBLE_MIME_TYPE_LIST + ":" + DEFAULT_COMPRESSIBLE_MIME_TYPE_LIST + "}")
+	private String compressibleMimeTypeList = DEFAULT_COMPRESSIBLE_MIME_TYPE_LIST;
 		
 	//@Inject
 	private ResourceLoader resourceLoader;

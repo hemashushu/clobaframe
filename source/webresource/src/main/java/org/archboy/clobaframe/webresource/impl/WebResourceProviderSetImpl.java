@@ -2,6 +2,7 @@ package org.archboy.clobaframe.webresource.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -60,6 +61,13 @@ public class WebResourceProviderSetImpl implements WebResourceProviderSet {
 		}
 		
 		webResourceProviders.add(webResourceProvider);
+		webResourceProviders.sort(new Comparator<WebResourceProvider>() {
+
+			@Override
+			public int compare(WebResourceProvider o1, WebResourceProvider o2) {
+				return o1.getOrder() - o2.getOrder();
+			}
+		});
 	}
 
 	@Override

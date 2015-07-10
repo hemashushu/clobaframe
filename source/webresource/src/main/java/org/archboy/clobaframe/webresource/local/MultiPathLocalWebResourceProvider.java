@@ -34,17 +34,21 @@ public class MultiPathLocalWebResourceProvider implements WebResourceProvider, R
 	
 	// local resource path, usually relative to the 'src/main/webapp' folder.
 	// to using this repository, the web application war package must be expended when running.
-	private static final String DEFAULT_LOCAL_PATH = ""; // "resources/default";
-	private static final String DEFAULT_RESOURCE_NAME_PREFIX = "";
-	private static final String DEFAULT_OTHER_RESOURCE_PATH_AND_NAME_PREFIX = "";
+	public static final String DEFAULT_LOCAL_PATH = ""; // "resources/default";
+	public static final String DEFAULT_RESOURCE_NAME_PREFIX = "";
+	public static final String DEFAULT_OTHER_RESOURCE_PATH_AND_NAME_PREFIX = "";
 	
-	@Value("${clobaframe.webresource.repository.local.path:" + DEFAULT_LOCAL_PATH + "}")
+	public static final String SETTING_KEY_LOCAL_PATH = "clobaframe.webresource.repository.local.path";
+	public static final String SETTING_KEY_RESOURCE_NAME_PREFIX = "clobaframe.webresource.repository.local.resourceNamePrefix";
+	public static final String SETTING_KEY_OTHER_RESOURCE_PATH_AND_NAME_PREFIX = "clobaframe.webresource.repository.local.otherResourcePathAndNamePrefix";
+	
+	@Value("${" + SETTING_KEY_LOCAL_PATH + ":" + DEFAULT_LOCAL_PATH + "}")
 	private String localPath;
 	
-	@Value("${clobaframe.webresource.repository.local.resourceNamePrefix:" + DEFAULT_RESOURCE_NAME_PREFIX + "}")
+	@Value("${" + SETTING_KEY_RESOURCE_NAME_PREFIX + ":" + DEFAULT_RESOURCE_NAME_PREFIX + "}")
 	private String resourceNamePrefix;
 	
-	@Value("${clobaframe.webresource.repository.local.otherResourcePathAndNamePrefix:" + DEFAULT_OTHER_RESOURCE_PATH_AND_NAME_PREFIX + "}")
+	@Value("${" + SETTING_KEY_OTHER_RESOURCE_PATH_AND_NAME_PREFIX + ":" + DEFAULT_OTHER_RESOURCE_PATH_AND_NAME_PREFIX + "}")
 	private String otherResourcePathAndNamePrefix;
 
 	private List<LocalResourceProvider> localResourceProviders = new ArrayList<LocalResourceProvider>();

@@ -1,6 +1,7 @@
 package org.archboy.clobaframe.setting.common.application;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 import org.junit.After;
@@ -8,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import javax.inject.Inject;
+import static org.archboy.clobaframe.setting.common.SettingProvider.PRIORITY_NORMAL;
 import org.archboy.clobaframe.setting.common.application.impl.ApplicationSettingImpl;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -39,7 +41,7 @@ public class ApplicationSettingWithoutIOCTest {
 		
 		// set properties
 		Properties properties = new Properties();
-		properties.put("clobaframe.setting.test.root.withinProperties", "bar");
+		properties.put("clobaframe.setting.test.root.prop", "rootPropOk");
 		appSetting.setProperties(properties);
 		
 		// set locations
@@ -72,8 +74,8 @@ public class ApplicationSettingWithoutIOCTest {
 		assertEquals("clobaframe", applicationSetting.getApplicationName());
 		
 		// test root setting
-		assertEquals("foo", applicationSetting.get("clobaframe.setting.test.root.withinFile"));
-		assertEquals("bar", applicationSetting.get("clobaframe.setting.test.root.withinProperties"));
+		assertEquals("rootFileOk", applicationSetting.get("clobaframe.setting.test.root.file"));
+		assertEquals("rootPropOk", applicationSetting.get("clobaframe.setting.test.root.prop"));
 		
 		// test default setting and other buildin settings.
 		String testFoo = (String)applicationSetting.getValue("test.foo");
@@ -114,10 +116,25 @@ public class ApplicationSettingWithoutIOCTest {
 		assertEquals("ok", applicationSetting.get("test.other"));
 		
 		// test layer
-		assertEquals("application-layer2", applicationSetting.get("test.layer"));
+		assertEquals("layerOk", applicationSetting.get("test.layer"));
+		
+		// test post setting
+		assertEquals("ok", applicationSetting.get("test.postSetting"));
 		
 		// test inject
-		assertEquals("ok", applicationSetting.get("foo.inject"));
+		assertNull(applicationSetting.get("test.inject"));
+		
+		ApplicationSettingProvider provider2 = new TestingInjectSettingProvider();
+		applicationSetting.addProvider(provider2);
+		
+		assertNull(applicationSetting.get("test.inject"));
+		applicationSetting.refresh();
+		assertEquals("injectOk", applicationSetting.get("test.inject"));
+		
+		applicationSetting.removeProvider(provider2.getName());
+		assertEquals("injectOk", applicationSetting.get("test.inject"));
+		applicationSetting.refresh();
+		assertNull(applicationSetting.get("test.inject"));
 
 	}
 	
@@ -147,7 +164,29 @@ public class ApplicationSettingWithoutIOCTest {
 
 		@Override
 		public void execute(Map<String, Object> settings) throws Exception {
-			settings.put("foo.inject", "ok");
+			settings.put("test.postSetting", "ok");
 		}
 	}
+	
+	public static class TestingInjectSettingProvider implements ApplicationSettingProvider {
+
+		@Override
+		public String getName() {
+			return "testInjectSetting";
+		}
+
+		@Override
+		public Map<String, Object> list() {
+			Map<String, Object> map = new LinkedHashMap<String, Object>();
+			map.put("test.inject", "injectOk");
+			return map;
+		}
+
+		@Override
+		public int getOrder() {
+			return PRIORITY_NORMAL;
+		}
+		
+	}
+
 }

@@ -9,7 +9,7 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.archboy.clobaframe.io.ResourceInfo;
-import org.archboy.clobaframe.io.http.CacheResourceSender;
+import org.archboy.clobaframe.io.http.ClientCacheResourceSender;
 import org.archboy.clobaframe.io.http.ResourceSender;
 import org.springframework.util.StringUtils;
 
@@ -18,7 +18,7 @@ import org.springframework.util.StringUtils;
  * @author yang
  */
 @Named
-public class CacheResourceSenderImpl implements CacheResourceSender {
+public class ClientCacheResourceSenderImpl implements ClientCacheResourceSender {
 
 	@Inject
 	private ResourceSender resourceSender;

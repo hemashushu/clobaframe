@@ -133,6 +133,11 @@ public class PrincipalSettingTest {
 			setting1.put("entry", "index");
 			setting1.put("color", "white");
 		}
+
+		@Override
+		public String getName() {
+			return "userDefaultSetting";
+		}
 		
 		@Override
 		public int getOrder() {
@@ -176,6 +181,11 @@ public class PrincipalSettingTest {
 			
 //			profileSetting.addProfileSettingProvider(this);
 //			profileSetting.addProfileSettingRepository(this);
+		}
+
+		@Override
+		public String getName() {
+			return "testingUserSettingRepository";
 		}
 		
 		@Override
@@ -241,6 +251,11 @@ public class PrincipalSettingTest {
 			
 //			profileSetting.addProfileSettingProvider(this);
 //			profileSetting.addProfileSettingRepository(this);
+		}
+
+		@Override
+		public String getName() {
+			return "tesingGroupSettingRepository";
 		}
 		
 		@Override

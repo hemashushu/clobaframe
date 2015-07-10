@@ -29,15 +29,21 @@ import org.springframework.beans.factory.annotation.Value;
 @Named
 public class WebResourceManagerImpl implements WebResourceManager, InitializingBean {
 
-	private static final String DEFAULT_LOCATION_STRATEGY = "default";
-	private static final boolean DEFAULT_CAN_MINIFY = false;
-	private static final boolean DEFAULT_CAN_COMPRESS = true;
-	private static final boolean DEFAULT_CAN_SERVER_CACHE = true;
-	private static final int DEFAULT_SERVER_CACHE_SECONDS = 10 * 60;
+	public static final String DEFAULT_LOCATION_STRATEGY = "default";
+	public static final boolean DEFAULT_CAN_MINIFY = false;
+	public static final boolean DEFAULT_CAN_COMPRESS = true;
+	public static final boolean DEFAULT_CAN_SERVER_CACHE = true;
+	public static final int DEFAULT_SERVER_CACHE_SECONDS = 10 * 60;
 
+	public static final String SETTING_KEY_LOCATION_STRATEGY = "clobaframe.webresource.locationStrategy";
+	public static final String SETTING_KEY_CAN_MINIFY = "clobaframe.webresource.minify";
+	public static final String SETTING_KEY_CAN_COMPRESS = "clobaframe.webresource.compress";
+	public static final String SETTING_KEY_CAN_SERVER_CACHE = "clobaframe.webresource.serverCache";
+	public static final String SETTING_KEY_SERVER_CACHE_SECONDS = "clobaframe.webresource.serverCacheSeconds";
+	
 	private WebResourceCache resourceCache;
 
-	@Value("${clobaframe.webresource.locationStrategy:" + DEFAULT_LOCATION_STRATEGY + "}")
+	@Value("${" + SETTING_KEY_LOCATION_STRATEGY + ":" + DEFAULT_LOCATION_STRATEGY + "}")
 	private String locationStrategyName;
 	
 	@Inject
@@ -51,17 +57,17 @@ public class WebResourceManagerImpl implements WebResourceManager, InitializingB
 	private List<String> compressibleWebResourceMimeTypes; 
 	private List<String> minifyWebResourceMimeTypes; 
 	
-	@Value("${clobaframe.webresource.minify:" + DEFAULT_CAN_MINIFY + "}")
-	private boolean canMinify;
+	@Value("${" + SETTING_KEY_CAN_MINIFY + ":" + DEFAULT_CAN_MINIFY + "}")
+	private boolean canMinify = DEFAULT_CAN_MINIFY;
 	
-	@Value("${clobaframe.webresource.compress:" + DEFAULT_CAN_COMPRESS + "}")
-	private boolean canCompress;
+	@Value("${" + SETTING_KEY_CAN_COMPRESS + ":" + DEFAULT_CAN_COMPRESS + "}")
+	private boolean canCompress = DEFAULT_CAN_COMPRESS;
 	
-	@Value("${clobaframe.webresource.serverCache:" + DEFAULT_CAN_SERVER_CACHE + "}")
-	private boolean canServerCache;
+	@Value("${" + SETTING_KEY_CAN_SERVER_CACHE + ":" + DEFAULT_CAN_SERVER_CACHE + "}")
+	private boolean canServerCache = DEFAULT_CAN_SERVER_CACHE;
 	
-	@Value("${clobaframe.webresource.serverCacheSeconds:" + DEFAULT_SERVER_CACHE_SECONDS + "}")
-	private int cacheSeconds;
+	@Value("${" + SETTING_KEY_SERVER_CACHE_SECONDS + ":" + DEFAULT_SERVER_CACHE_SECONDS + "}")
+	private int cacheSeconds = DEFAULT_SERVER_CACHE_SECONDS;
 	
 	private final Logger logger = LoggerFactory.getLogger(WebResourceManagerImpl.class);
 

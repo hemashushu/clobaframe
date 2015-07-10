@@ -52,7 +52,7 @@ public class CacheResourceSenderTest {
 	private Server server;
 	
 	@Inject
-	private CacheResourceSender cacheResourceSender;
+	private ClientCacheResourceSender cacheResourceSender;
 
 	@Inject
 	private ResourceLoader resourceLoader;
@@ -146,7 +146,7 @@ public class CacheResourceSenderTest {
 			
 			String sampleFile = sampleFileDirectory + "/" + filename;
 			ResourceInfo resourceInfo = fileBaseResourceInfoFactory.make(getFileByName(sampleFile));
-			cacheResourceSender.send(resourceInfo, CacheResourceSender.CACHE_CONTROL_PUBLIC, cacheSeconds, null, request, response);
+			cacheResourceSender.send(resourceInfo, ClientCacheResourceSender.CACHE_CONTROL_PUBLIC, cacheSeconds, null, request, response);
 		}
 	}
 }

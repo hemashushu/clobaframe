@@ -1,10 +1,14 @@
 package org.archboy.clobaframe.setting.common.global.impl;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.inject.Named;
+import org.archboy.clobaframe.setting.common.SettingProvider;
+import org.archboy.clobaframe.setting.common.application.ApplicationSettingProvider;
 import org.archboy.clobaframe.setting.common.global.GlobalSettingProvider;
 import org.archboy.clobaframe.setting.common.global.GlobalSettingRepository;
 import org.archboy.clobaframe.setting.support.Utils;
@@ -13,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -45,6 +50,36 @@ public class GlobalSettingImpl implements GlobalSetting, InitializingBean {
 		refresh();
 	}
 	
+	@Override
+	public void addProvider(SettingProvider settingProvider) {
+		Assert.isInstanceOf(GlobalSettingProvider.class, settingProvider);
+		
+		if (globalSettingProviders == null) {
+			globalSettingProviders = new ArrayList<GlobalSettingProvider>();
+		}
+		
+		globalSettingProviders.add((GlobalSettingProvider)settingProvider);
+		globalSettingProviders.sort(new Comparator<GlobalSettingProvider>() {
+
+			@Override
+			public int compare(GlobalSettingProvider o1, GlobalSettingProvider o2) {
+				return o1.getOrder() - o2.getOrder();
+			}
+		});
+	}
+
+	@Override
+	public void removeProvider(String providerName) {
+		Assert.notNull(providerName);
+		for (int idx=globalSettingProviders.size() -1; idx>=0; idx--){
+			GlobalSettingProvider provider = globalSettingProviders.get(idx);
+			if (providerName.equals(provider.getName())){
+				globalSettingProviders.remove(idx);
+				break;
+			}
+		}
+	}
+		
 	@Override
 	public void refresh(){
 		// clear setting

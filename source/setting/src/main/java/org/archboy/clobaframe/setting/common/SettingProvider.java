@@ -19,6 +19,13 @@ public interface SettingProvider extends Ordered {
 	public static final int PRIORITY_LOWER = 100;
 	
 	/**
+	 * The provider name.
+	 * Optional.
+	 * @return 
+	 */
+	String getName();
+	
+	/**
 	 * 
 	 * @return Never return null.
 	 */

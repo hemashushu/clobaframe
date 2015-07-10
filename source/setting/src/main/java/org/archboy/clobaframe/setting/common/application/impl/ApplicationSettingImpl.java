@@ -6,12 +6,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.archboy.clobaframe.setting.common.SettingProvider;
 import org.archboy.clobaframe.setting.support.Utils;
 import org.archboy.clobaframe.setting.common.application.ApplicationSetting;
 import org.archboy.clobaframe.setting.common.application.ApplicationSettingProvider;
@@ -23,6 +25,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -32,14 +35,14 @@ import org.springframework.core.io.ResourceLoader;
  */
 public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoaderAware, InitializingBean {
 
-	private static final String ROOT_KEY_APPLICATION_NAME = "clobaframe.setting.applicationName";
-	private static final String ROOT_KEY_ROOT_CONFIG_FILE_NAME = "clobaframe.setting.rootConfigFileName";
-	private static final String ROOT_KEY_DATA_FOLDER = "clobaframe.setting.dataFolder";
-	private static final String ROOT_KEY_AUTO_CREATE_DATA_FOLDER = "clobaframe.setting.autoCreateDataFolder";
-	private static final String ROOT_KEY_DEFAULT_SETTING_FILE_NAME = "clobaframe.setting.defaultSettingFileName";
-	private static final String ROOT_KEY_CUSTOM_SETTING_FILE_NAME = "clobaframe.setting.customSettingFileName";
-	private static final String ROOT_KEY_EXTRA_SETTING_FILE_NAME = "clobaframe.setting.extraSettingFileName";
-	private static final String ROOT_KEY_SAVING_SETTING_FILE_NAME = "clobaframe.setting.savingSettingFileName";
+	public static final String ROOT_KEY_APPLICATION_NAME = "clobaframe.setting.applicationName";
+	public static final String ROOT_KEY_ROOT_CONFIG_FILE_NAME = "clobaframe.setting.rootConfigFileName";
+	public static final String ROOT_KEY_DATA_FOLDER = "clobaframe.setting.dataFolder";
+	public static final String ROOT_KEY_AUTO_CREATE_DATA_FOLDER = "clobaframe.setting.autoCreateDataFolder";
+	public static final String ROOT_KEY_DEFAULT_SETTING_FILE_NAME = "clobaframe.setting.defaultSettingFileName";
+	public static final String ROOT_KEY_CUSTOM_SETTING_FILE_NAME = "clobaframe.setting.customSettingFileName";
+	public static final String ROOT_KEY_EXTRA_SETTING_FILE_NAME = "clobaframe.setting.extraSettingFileName";
+	public static final String ROOT_KEY_SAVING_SETTING_FILE_NAME = "clobaframe.setting.savingSettingFileName";
 
 	private String rootConfigFileName;
 	private String applicationName;
@@ -99,7 +102,7 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;
 	}
-	
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		//rootSetting.clear();
@@ -108,6 +111,36 @@ public class ApplicationSettingImpl implements ApplicationSetting, ResourceLoade
 		
 		initProviders();
 		executePostSetting();
+	}
+
+	@Override
+	public void addProvider(SettingProvider settingProvider) {
+		Assert.isInstanceOf(ApplicationSettingProvider.class, settingProvider);
+		
+		if (applicationSettingProviders == null) {
+			applicationSettingProviders = new ArrayList<ApplicationSettingProvider>();
+		}
+		
+		applicationSettingProviders.add((ApplicationSettingProvider)settingProvider);
+		applicationSettingProviders.sort(new Comparator<ApplicationSettingProvider>() {
+
+			@Override
+			public int compare(ApplicationSettingProvider o1, ApplicationSettingProvider o2) {
+				return o1.getOrder() - o2.getOrder();
+			}
+		});
+	}
+
+	@Override
+	public void removeProvider(String providerName) {
+		Assert.notNull(providerName);
+		for (int idx=applicationSettingProviders.size() -1; idx>=0; idx--){
+			ApplicationSettingProvider provider = applicationSettingProviders.get(idx);
+			if (providerName.equals(provider.getName())){
+				applicationSettingProviders.remove(idx);
+				break;
+			}
+		}
 	}
 	
 	private void loadRootConfigFromBeanDefine() {

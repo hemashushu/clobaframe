@@ -29,6 +29,12 @@ public class PropertiesApplicationSettingProvider implements ApplicationSettingP
 	public PropertiesApplicationSettingProvider(Resource resource) {
 		this.resource = resource;
 	}
+
+	@Override
+	public String getName() {
+		// return resource file name as provider name.
+		return resource.getFilename();
+	}
 	
 	@Override
 	public int getOrder() {

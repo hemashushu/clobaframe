@@ -11,6 +11,13 @@ import org.archboy.clobaframe.setting.common.application.ApplicationSettingProvi
  */
 public class SystemPropertiesSettingProvider implements ApplicationSettingProvider {
 
+	public static final String NAME = "systemProperties";
+
+	@Override
+	public String getName() {
+		return NAME;
+	}
+	
 	@Override
 	public int getOrder() {
 		return PRIORITY_NORMAL;

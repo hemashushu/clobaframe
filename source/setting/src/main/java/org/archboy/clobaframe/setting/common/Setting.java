@@ -9,6 +9,10 @@ import java.util.Map;
  */
 public interface Setting {
 
+	void addProvider(SettingProvider settingProvider);
+	
+	void removeProvider(String providerName);
+	
 	/**
 	 * Get the item value and resolve the placeholder.
 	 * 

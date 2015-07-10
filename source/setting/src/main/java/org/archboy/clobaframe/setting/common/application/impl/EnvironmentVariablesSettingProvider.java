@@ -10,6 +10,13 @@ import org.archboy.clobaframe.setting.common.application.ApplicationSettingProvi
  */
 public class EnvironmentVariablesSettingProvider implements ApplicationSettingProvider {
 
+	public static final String NAME = "environmentVariables";
+	
+	@Override
+	public String getName() {
+		return NAME;
+	}
+
 	@Override
 	public int getOrder() {
 		return PRIORITY_LOW;

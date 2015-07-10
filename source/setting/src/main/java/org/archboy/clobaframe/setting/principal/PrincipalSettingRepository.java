@@ -9,6 +9,13 @@ import java.util.Map;
 public interface PrincipalSettingRepository extends PrincipalSpecial {
 	
 	/**
+	 * The repository name.
+	 * Optional.
+	 * @return 
+	 */
+	String getName();
+	
+	/**
 	 * 
 	 * @param principal
 	 * @param item 

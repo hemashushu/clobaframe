@@ -33,9 +33,11 @@ import org.springframework.core.io.ResourceLoader;
 @Named
 public class ConcatenateWebResourceProvider implements WebResourceProvider, ResourceLoaderAware, InitializingBean {
 
-	private static final String DEFAULT_CONCATENATE_CONFIG = "";
+	public static final String DEFAULT_CONCATENATE_CONFIG = "";
 	
-	@Value("${clobaframe.webresource.concatenateConfig:" + DEFAULT_CONCATENATE_CONFIG + "}")
+	public static final String SETTING_KEY_CONCATENATE_CONFIG = "clobaframe.webresource.concatenateConfig";
+	
+	@Value("${" + SETTING_KEY_CONCATENATE_CONFIG + ":" + DEFAULT_CONCATENATE_CONFIG + "}")
 	private String concatenateConfig;
 	
 	//@Inject
@@ -62,10 +64,6 @@ public class ConcatenateWebResourceProvider implements WebResourceProvider, Reso
 
 	public void setWebResourceProviderSet(WebResourceProviderSet webResourceProviderSet) {
 		this.webResourceProviderSet = webResourceProviderSet;
-	}
-	
-	public void register(WebResourceProviderSet webResourceProviderSet) {
-		webResourceProviderSet.addProvider(this);
 	}
 	
 	@Override
@@ -123,10 +121,18 @@ public class ConcatenateWebResourceProvider implements WebResourceProvider, Reso
 			return null;
 		}
 		
-		List<WebResourceInfo> webResourceInfos = new ArrayList<WebResourceInfo>(names.size());
+		List<WebResourceInfo> webResourceInfos = new ArrayList<WebResourceInfo>();
 		for(String n : names){
-			webResourceInfos.add(webResourceProviderSet.getByName(n));
+			WebResourceInfo webResourceInfo = webResourceProviderSet.getByName(n);
+			if (webResourceInfo != null) {
+				webResourceInfos.add(webResourceInfo);
+			}
 		}
+		
+		if (webResourceInfos.isEmpty()){
+			return null;
+		}
+		
 		return new DefaultConcatenateWebResourceInfo(webResourceInfos, name);
 	}
 

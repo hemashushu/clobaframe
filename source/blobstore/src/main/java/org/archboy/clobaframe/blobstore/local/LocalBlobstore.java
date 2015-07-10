@@ -32,13 +32,16 @@ import org.springframework.util.Assert;
 @Named
 public class LocalBlobstore implements Blobstore, InitializingBean, DisposableBean, ResourceLoaderAware {
 
-	private static final String DEFAULT_LOCAL_PATH = ""; //"file:${java.io.tmpdir}/${clobaframe.setting.appName}/blobstore";
-	private static final boolean DEFAULT_AUTO_CREATE_ROOT_FOLDER = true;
+	public static final String DEFAULT_LOCAL_PATH = ""; //"file:${java.io.tmpdir}/${clobaframe.setting.appName}/blobstore";
+	public static final boolean DEFAULT_AUTO_CREATE_ROOT_FOLDER = true;
 	
-	@Value("${clobaframe.blobstore.local.path:" + DEFAULT_LOCAL_PATH + "}")
+	public static final String SETTING_KEY_LOCAL_PATH = "clobaframe.blobstore.local.path";
+	public static final String SETTING_KEY_AUTO_CREATE_ROOT_FOLDER = "clobaframe.blobstore.local.autoCreateRootFolder";
+	
+	@Value("${" + SETTING_KEY_LOCAL_PATH + ":" + DEFAULT_LOCAL_PATH + "}")
 	private String localPath;
 	
-	@Value("${clobaframe.blobstore.local.autoCreateRootFolder:" + DEFAULT_AUTO_CREATE_ROOT_FOLDER + "}")
+	@Value("${" + SETTING_KEY_AUTO_CREATE_ROOT_FOLDER + ":" + DEFAULT_AUTO_CREATE_ROOT_FOLDER + "}")
 	private boolean autoCreateRootFolder;
 
 	//@Inject

@@ -8,7 +8,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.archboy.clobaframe.io.http.CacheResourceSender;
+import org.archboy.clobaframe.io.http.ClientCacheResourceSender;
 import org.archboy.clobaframe.webresource.AbstractServerWebResourceInfo;
 import org.archboy.clobaframe.webresource.CacheableWebResourceInfo;
 import org.archboy.clobaframe.webresource.CompressibleWebResourceInfo;
@@ -27,12 +27,12 @@ import org.springframework.util.Assert;
 public class WebResourceSenderImpl implements WebResourceSender{
 
 	@Inject
-	private CacheResourceSender cacheResourceSender;
+	private ClientCacheResourceSender cacheResourceSender;
 
 	@Inject
 	private WebResourceManager webResourceManager;
 
-	public void setCacheResourceSender(CacheResourceSender cacheResourceSender) {
+	public void setCacheResourceSender(ClientCacheResourceSender cacheResourceSender) {
 		this.cacheResourceSender = cacheResourceSender;
 	}
 
@@ -69,8 +69,8 @@ public class WebResourceSenderImpl implements WebResourceSender{
 		}
 		
 		cacheResourceSender.send(webResourceInfo,
-				CacheResourceSender.CACHE_CONTROL_PUBLIC,
-				CacheResourceSender.THREE_MONTH_SECONDS, headers, request, response);
+				ClientCacheResourceSender.CACHE_CONTROL_PUBLIC,
+				ClientCacheResourceSender.THREE_MONTH_SECONDS, headers, request, response);
 	}
 
 	@Override
