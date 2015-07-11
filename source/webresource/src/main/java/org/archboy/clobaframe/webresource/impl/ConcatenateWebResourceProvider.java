@@ -2,8 +2,6 @@ package org.archboy.clobaframe.webresource.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,9 +18,7 @@ import org.archboy.clobaframe.webresource.WebResourceProvider;
 import org.archboy.clobaframe.webresource.WebResourceProviderSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
@@ -31,7 +27,8 @@ import org.springframework.core.io.ResourceLoader;
  * @author yang
  */
 @Named
-public class ConcatenateWebResourceProvider implements WebResourceProvider, ResourceLoaderAware, InitializingBean {
+public class ConcatenateWebResourceProvider implements WebResourceProvider {
+	//, ResourceLoaderAware, InitializingBean {
 
 	public static final String DEFAULT_CONCATENATE_CONFIG = "";
 	
@@ -40,7 +37,7 @@ public class ConcatenateWebResourceProvider implements WebResourceProvider, Reso
 	@Value("${" + SETTING_KEY_CONCATENATE_CONFIG + ":" + DEFAULT_CONCATENATE_CONFIG + "}")
 	private String concatenateConfig;
 	
-	//@Inject
+	@Inject
 	private ResourceLoader resourceLoader;
 	
 	@Inject
@@ -57,7 +54,7 @@ public class ConcatenateWebResourceProvider implements WebResourceProvider, Reso
 		this.concatenateConfig = concatenateConfig;
 	}
 
-	@Override
+	//@Override
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;
 	}
@@ -76,9 +73,9 @@ public class ConcatenateWebResourceProvider implements WebResourceProvider, Reso
 		return PRIORITY_HIGHEST;
 	}
 
-	//@PostConstruct
-	@Override
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	//@Override
+	public void init() throws Exception {
 		if (StringUtils.isEmpty(concatenateConfig)){
 			return;
 		}

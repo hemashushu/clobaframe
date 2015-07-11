@@ -19,9 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.archboy.clobaframe.io.MimeTypeDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.Assert;
@@ -31,7 +29,8 @@ import org.springframework.util.Assert;
  * @author yang
  */
 @Named
-public class ExtensionNameMimeTypeDetector implements MimeTypeDetector, ResourceLoaderAware, InitializingBean {
+public class ExtensionNameMimeTypeDetector implements MimeTypeDetector {
+	//, ResourceLoaderAware, InitializingBean {
 
 	private Map<String, String> mimeTypes = new HashMap<String, String>();
 	
@@ -52,14 +51,14 @@ public class ExtensionNameMimeTypeDetector implements MimeTypeDetector, Resource
 	@Value("${" + SETTING_KEY_EXTRA_MIME_TYPE_LIST_FILE + ":" + DEFAULT_EXTRA_MIME_TYPE_LIST_FILE + "}")
 	private String extraMimeTypeListFile = DEFAULT_EXTRA_MIME_TYPE_LIST_FILE;
 	
-	//@Inject
+	@Inject
 	private ResourceLoader resourceLoader;
 	
 	private ObjectMapper objectMapper = new ObjectMapper();
 	
 	private final Logger logger = LoggerFactory.getLogger(ExtensionNameMimeTypeDetector.class);
 
-	@Override
+	//@Override
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;
 	}
@@ -72,9 +71,9 @@ public class ExtensionNameMimeTypeDetector implements MimeTypeDetector, Resource
 		this.extraMimeTypeListFile = extraMimeTypeListFile;
 	}
 	
-	//@PostConstruct
-	@Override
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	//@Override
+	public void init() throws Exception {
 		loadMimeTypesList(mimeTypeListFile);
 		loadExtraMimeTypesList(extraMimeTypeListFile);
 	}

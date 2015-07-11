@@ -29,7 +29,6 @@ import org.archboy.clobaframe.io.file.FileBaseResourceInfoFactory;
 import org.archboy.clobaframe.io.file.FileBaseResourceInfoWrapper;
 import org.archboy.clobaframe.io.file.impl.DefaultFileBaseResourceInfoFactory;
 import org.archboy.clobaframe.io.impl.DefaultResourceInfoFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
@@ -37,7 +36,7 @@ import org.springframework.util.Assert;
  * @author yang
  */
 @Named
-public class MediaFactoryImpl implements MediaFactory, InitializingBean{
+public class MediaFactoryImpl implements MediaFactory { //, InitializingBean{
 
 	// default 32 MB
 	public static final long DEFAULT_MAX_HANDLE_SIZE_BYTE = 32L * 1024 * 1024;
@@ -78,9 +77,9 @@ public class MediaFactoryImpl implements MediaFactory, InitializingBean{
 		this.mediaLoaders = mediaLoaders;
 	}
 
-	//@PostConstruct
-	@Override
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	//@Override
+	public void init() throws Exception {
 
 		fileBaseResourceInfoFactory = new DefaultFileBaseResourceInfoFactory(mimeTypeDetector);
 	}

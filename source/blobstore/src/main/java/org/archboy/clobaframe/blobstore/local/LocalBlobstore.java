@@ -17,9 +17,6 @@ import org.archboy.clobaframe.blobstore.BlobResourceRepository;
 import org.archboy.clobaframe.blobstore.Blobstore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ResourceLoaderAware;
 import org.springframework.util.Assert;
 
 /**
@@ -30,7 +27,7 @@ import org.springframework.util.Assert;
  * @author yang
  */
 @Named
-public class LocalBlobstore implements Blobstore, InitializingBean, DisposableBean, ResourceLoaderAware {
+public class LocalBlobstore implements Blobstore { //, InitializingBean, DisposableBean, ResourceLoaderAware {
 
 	public static final String DEFAULT_LOCAL_PATH = ""; //"file:${java.io.tmpdir}/${clobaframe.setting.appName}/blobstore";
 	public static final boolean DEFAULT_AUTO_CREATE_ROOT_FOLDER = true;
@@ -44,7 +41,7 @@ public class LocalBlobstore implements Blobstore, InitializingBean, DisposableBe
 	@Value("${" + SETTING_KEY_AUTO_CREATE_ROOT_FOLDER + ":" + DEFAULT_AUTO_CREATE_ROOT_FOLDER + "}")
 	private boolean autoCreateRootFolder;
 
-	//@Inject
+	@Inject
 	private ResourceLoader resourceLoader;
 
 	// local blobstore root dir
@@ -62,14 +59,14 @@ public class LocalBlobstore implements Blobstore, InitializingBean, DisposableBe
 		this.autoCreateRootFolder = autoCreateRootFolder;
 	}
 	
-	@Override
+	//@Override
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;
 	}
 	
-	//@PostConstruct
-	@Override
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	//@Override
+	public void init() throws Exception {
 		if (StringUtils.isEmpty(localPath)){
 			return;
 		}
@@ -84,9 +81,9 @@ public class LocalBlobstore implements Blobstore, InitializingBean, DisposableBe
 		}
 	}
 
-	//@PreDestroy
-	@Override
-	public void destroy() throws Exception {
+	@PreDestroy
+	//@Override
+	public void close() throws Exception {
 		for(BlobResourceRepository r : repositories.values()){
 			try{
 				((Closeable)r).close();

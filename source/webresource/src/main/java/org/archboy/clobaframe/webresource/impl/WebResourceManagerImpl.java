@@ -1,6 +1,5 @@
 package org.archboy.clobaframe.webresource.impl;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -13,12 +12,10 @@ import org.archboy.clobaframe.webresource.CacheableWebResourceInfoUpdateListener
 import org.archboy.clobaframe.webresource.WebResourceProviderSet;
 import org.archboy.clobaframe.webresource.LocationStrategy;
 import org.archboy.clobaframe.webresource.WebResourceCache;
-import org.archboy.clobaframe.webresource.VersionStrategy;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.archboy.clobaframe.webresource.WebResourceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 
 /**
@@ -27,7 +24,8 @@ import org.springframework.beans.factory.annotation.Value;
  *
  */
 @Named
-public class WebResourceManagerImpl implements WebResourceManager, InitializingBean {
+public class WebResourceManagerImpl implements WebResourceManager {
+	//, InitializingBean {
 
 	public static final String DEFAULT_LOCATION_STRATEGY = "default";
 	public static final boolean DEFAULT_CAN_MINIFY = false;
@@ -103,9 +101,9 @@ public class WebResourceManagerImpl implements WebResourceManager, InitializingB
 		this.cacheSeconds = cacheSeconds;
 	}
 
-	//@PostConstruct
-	@Override
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	//@Override
+	public void init() throws Exception {
 		for(LocationStrategy strategy : locationStrategys) {
 			if (strategy.getName().equals(locationStrategyName)) {
 				this.locationStrategy = strategy;

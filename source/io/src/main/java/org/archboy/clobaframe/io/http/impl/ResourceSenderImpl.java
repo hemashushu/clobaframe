@@ -19,9 +19,7 @@ import org.archboy.clobaframe.io.ResourceInfo;
 import org.archboy.clobaframe.io.ResourceInfoFactory;
 import org.archboy.clobaframe.io.http.ResourceSender;
 import org.archboy.clobaframe.io.impl.DefaultResourceInfoFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
@@ -31,7 +29,8 @@ import org.springframework.core.io.ResourceLoader;
  *
  */
 @Named
-public class ResourceSenderImpl implements ResourceSender, ResourceLoaderAware, InitializingBean {
+public class ResourceSenderImpl implements ResourceSender {
+	//, ResourceLoaderAware, InitializingBean {
 
 	public static final String SETTING_KEY_ENABLE_GZIP = "clobaframe.io.http.gzip";
 	public static final String SETTING_KEY_MIN_COMPRESS_SIZE = "clobaframe.io.http.gzip.minCompressSize";
@@ -57,7 +56,7 @@ public class ResourceSenderImpl implements ResourceSender, ResourceLoaderAware, 
 	@Value("${" + SETTING_KEY_COMPRESSIBLE_MIME_TYPE_LIST + ":" + DEFAULT_COMPRESSIBLE_MIME_TYPE_LIST + "}")
 	private String compressibleMimeTypeList = DEFAULT_COMPRESSIBLE_MIME_TYPE_LIST;
 		
-	//@Inject
+	@Inject
 	private ResourceLoader resourceLoader;
 	
 	private ResourceInfoFactory resourceInfoFactory = new DefaultResourceInfoFactory();
@@ -78,14 +77,14 @@ public class ResourceSenderImpl implements ResourceSender, ResourceLoaderAware, 
 		this.compressibleMimeTypeList = compressibleMimeTypeList;
 	}
 
-	@Override
+	//@Override
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;
 	}
 
-	//@PostConstruct
-	@Override
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	//@Override
+	public void init() throws Exception {
 		resourceSender = new DefaultResourceSender();
 		
 		if (enableGzip) {

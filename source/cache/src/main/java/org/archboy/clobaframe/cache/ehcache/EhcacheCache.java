@@ -1,8 +1,6 @@
 package org.archboy.clobaframe.cache.ehcache;
 
-import java.io.Closeable;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,10 +20,7 @@ import org.archboy.clobaframe.cache.Cache.Policy;
 import org.archboy.clobaframe.cache.Expiration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
@@ -51,8 +46,8 @@ import org.springframework.core.io.ResourceLoader;
  * @author yang
  */
 @Named
-public class EhcacheCache implements org.archboy.clobaframe.cache.Cache, 
-		ResourceLoaderAware, InitializingBean, DisposableBean {
+public class EhcacheCache implements org.archboy.clobaframe.cache.Cache { //, 
+		//ResourceLoaderAware, InitializingBean, DisposableBean {
 
 	public static final String DEFAULT_CACHE_REGION_NAME = "common";
 	public static final String DEFAULT_CACHE_CONFIGURATION_FILE = ""; //"classpath:ehcache.xml";
@@ -66,7 +61,7 @@ public class EhcacheCache implements org.archboy.clobaframe.cache.Cache,
 	@Value("${" + SETTING_KEY_CACHE_CONFIGURATION_FILE + ":" + DEFAULT_CACHE_CONFIGURATION_FILE + "}")
 	private String cacheConfigurationFile;
 
-	//@Inject
+	@Inject
 	private ResourceLoader resourceLoader;
 
 	private CacheManager cacheManager;
@@ -82,14 +77,14 @@ public class EhcacheCache implements org.archboy.clobaframe.cache.Cache,
 		this.cacheConfigurationFile = cacheConfigurationFile;
 	}
 
-	@Override
+	//@Override
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;
 	}
 
-	//@PostConstruct
-	@Override
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	//@Override
+	public void init() throws Exception {
 		if (StringUtils.isEmpty(cacheConfigurationFile)){
 			return;
 		}
@@ -111,9 +106,9 @@ public class EhcacheCache implements org.archboy.clobaframe.cache.Cache,
 		}
 	}
 
-	//@PreDestroy
-	@Override
-	public void destroy() throws Exception {
+	@PreDestroy
+	//@Override
+	public void close() throws Exception {
 		if (cacheManager != null){
 			cacheManager.shutdown();
 		}

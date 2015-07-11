@@ -1,7 +1,7 @@
 package org.archboy.clobaframe.setting.principal;
 
 import java.util.Map;
-import org.archboy.clobaframe.setting.common.SettingProvider;
+import org.archboy.clobaframe.setting.SettingProvider;
 
 /**
  * The principal special setting manager.

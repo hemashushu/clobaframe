@@ -9,7 +9,6 @@ import org.archboy.clobaframe.webresource.VersionStrategy;
 import org.archboy.clobaframe.webresource.WebResourceInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.Assert;
 
@@ -20,7 +19,7 @@ import org.springframework.util.Assert;
  * @author yang
  */
 @Named
-public class DefaultLocationStrategy implements LocationStrategy, InitializingBean {
+public class DefaultLocationStrategy implements LocationStrategy { //, InitializingBean {
 
 	public static final String DEFAULT_VERSION_STRATEGY_NAME = "default";
 	public static final String DEFAULT_BASE_LOCATION = "/resource/";
@@ -54,9 +53,9 @@ public class DefaultLocationStrategy implements LocationStrategy, InitializingBe
 		this.versionStrategyName = versionStrategyName;
 	}
 
-	//@PostConstruct
-	@Override
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	//@Override
+	public void init() throws Exception {
 	
 		for(VersionStrategy strategy : versionStrategys) {
 			if (strategy.getName().equals(versionStrategyName)) {

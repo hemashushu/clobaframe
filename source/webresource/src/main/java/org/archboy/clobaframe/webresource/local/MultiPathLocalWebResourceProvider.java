@@ -24,9 +24,10 @@ import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.Resource;
 
 @Named
-public class MultiPathLocalWebResourceProvider implements WebResourceProvider, ResourceLoaderAware, InitializingBean {
+public class MultiPathLocalWebResourceProvider implements WebResourceProvider {
+	//, ResourceLoaderAware, InitializingBean {
 
-	//@Inject
+	@Inject
 	private ResourceLoader resourceLoader;
 
 	@Inject
@@ -71,7 +72,7 @@ public class MultiPathLocalWebResourceProvider implements WebResourceProvider, R
 		this.otherResourcePathAndNamePrefix = otherResourcePathAndNamePrefix;
 	}
 
-	@Override
+	//@Override
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;
 	}
@@ -86,9 +87,9 @@ public class MultiPathLocalWebResourceProvider implements WebResourceProvider, R
 		return PRIORITY_NORMAL;
 	}
 
-	//@PostConstruct
-	@Override
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	//@Override
+	public void init() throws Exception {
 		// add base local resource path
 		if (StringUtils.isNotEmpty(localPath)) {
 			addLocalResource(localPath, resourceNamePrefix);
