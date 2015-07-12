@@ -14,8 +14,8 @@ import org.archboy.clobaframe.cache.CacheManager;
 import org.archboy.clobaframe.cache.Expiration;
 import static org.junit.Assert.*;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/applicationContext.xml" })
+//@RunWith(SpringJUnit4ClassRunner.class)
+//@ContextConfiguration(locations = { "/applicationContext.xml" })
 public class CacheTest {
 
 	@Inject

@@ -77,7 +77,9 @@ public class DefaultBeanFactory implements BeanFactory {
 		Assert.notNull(resourceLoader);
 		Assert.notNull(applicationSetting);
 
-		String fileName = (String)applicationSetting.getValue(SETTING_KEY_BEAN_DEFINE_FILE_NAME);
+		String fileName = (String)applicationSetting.getValue(
+				SETTING_KEY_BEAN_DEFINE_FILE_NAME);
+		
 		if (StringUtils.isEmpty(fileName)){
 			return;
 		}
@@ -85,7 +87,9 @@ public class DefaultBeanFactory implements BeanFactory {
 		this.resourceLoader = resourceLoader;
 		this.beanDefineFileName = fileName;
 		this.placeholderValueResolver = new ApplicationSettingPlaceholderValueResolver(applicationSetting);
-		this.requiredPlaceholderValue = (Boolean)applicationSetting.getValue(SETTING_KEY_REQUIRED_PLACEHOLDER_VALUE, DEFAULT_REQUIRED_PLACEHOLDER_VALUE);
+		this.requiredPlaceholderValue = (Boolean)applicationSetting.getValue(
+				SETTING_KEY_REQUIRED_PLACEHOLDER_VALUE, 
+				DEFAULT_REQUIRED_PLACEHOLDER_VALUE);
 		
 		init();
 	}
@@ -97,10 +101,10 @@ public class DefaultBeanFactory implements BeanFactory {
 		}
 		
 		Collection<String> defineClassNames = getDefineClassNames(resource);
-		this.beans = buildBeans(defineClassNames);
+		this.beans = buildUninitBeans(defineClassNames);
 	}
 
-	private List<Bean> buildBeans(Collection<String> defineClassNames) throws 
+	private List<Bean> buildUninitBeans(Collection<String> defineClassNames) throws 
 			ClassNotFoundException, InstantiationException, IllegalAccessException {
 		
 		List<Bean> uninitBeans = new ArrayList<Bean>();
@@ -109,7 +113,7 @@ public class DefaultBeanFactory implements BeanFactory {
 			Class<?> clazz = Class.forName(defineClassName);
 			Object object = clazz.newInstance();
 			
-			Class<?>[] classes = clazz.getDeclaredClasses();
+			Class<?>[] interfaces = clazz.getInterfaces();
 			Method initMethod = null;
 			Method closeMethod = null;
 			
@@ -121,7 +125,7 @@ public class DefaultBeanFactory implements BeanFactory {
 				}
 			}
 			
-			Bean bean = new Bean(clazz, object, classes, initMethod, closeMethod, false);
+			Bean bean = new Bean(clazz, object, interfaces, initMethod, closeMethod, false);
 			uninitBeans.add(bean);
 		}
 		
@@ -165,7 +169,7 @@ public class DefaultBeanFactory implements BeanFactory {
 			if (bean.getClazz().equals(clazz)){
 				matchBeans.add(bean);
 			}else{
-				for(Class<?> c : bean.getDeclareClasses()){
+				for(Class<?> c : bean.getInterfaces()){
 					if (clazz.equals(c)) {
 						matchBeans.add(bean);
 					}
@@ -179,8 +183,8 @@ public class DefaultBeanFactory implements BeanFactory {
 			for(Bean bean : matchBeans) {
 				if (!bean.isInited()) {
 					initBean(bean);
-					objects.add((T)bean.getObject());
 				}
+				objects.add((T)bean.getObject());
 			}
 		}catch(Exception e){
 			throw new RuntimeException("Can not initialize bean.", e);
@@ -197,22 +201,28 @@ public class DefaultBeanFactory implements BeanFactory {
 		for(Field field : clazz.getDeclaredFields()){
 			
 			if (field.getAnnotation(Inject.class) != null) {
-				Class<?> dataType = field.getDeclaringClass();
+				Class<?> dataType = field.getType();
 				Object targetObject = getBean(dataType);
+				field.setAccessible(true);
+				
 				if (targetObject == null) {
 					throw new ClassNotFoundException(dataType.getName());
 				}
+
 				field.set(obj, targetObject);
 				continue;
 			}
 			
 			Autowired autowired = field.getAnnotation(Autowired.class);
 			if (autowired != null) {
-				Class<?> dataType = field.getDeclaringClass();
+				Class<?> dataType = field.getType();
 				Object targetObject = getBean(dataType);
+				field.setAccessible(true);
+				
 				if (targetObject == null && autowired.required()) {
 					throw new ClassNotFoundException(dataType.getName());
 				}
+				
 				field.set(obj, targetObject);
 				continue;
 			}
@@ -221,9 +231,11 @@ public class DefaultBeanFactory implements BeanFactory {
 			if (value != null) {
 				String placeholder = value.value();
 				Object targetValue = null;
+				field.setAccessible(true);
+				
 				Matcher matcher = placeholderPattern.matcher(placeholder);
 				if (matcher.matches()) {
-					if (matcher.hashCode() == 3){
+					if (matcher.groupCount()== 3){
 						targetValue  = placeholderValueResolver.getValue(matcher.group(1), matcher.group(3));
 					}else{
 						targetValue  = placeholderValueResolver.getValue(matcher.group(1));
@@ -240,7 +252,7 @@ public class DefaultBeanFactory implements BeanFactory {
 					}
 				}
 				
-				Class<?> dataType = field.getDeclaringClass();
+				Class<?> dataType = field.getType();
 				if (dataType.equals(String.class)) {
 					field.set(obj, targetValue.toString());
 				}else if(dataType.equals(Integer.class)){

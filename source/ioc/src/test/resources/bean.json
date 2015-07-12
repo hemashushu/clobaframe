@@ -1,0 +1,6 @@
+[
+	"org.archboy.clobaframe.ioc.bean.DefaultFood",
+	"org.archboy.clobaframe.ioc.bean.Cat",
+	"org.archboy.clobaframe.ioc.bean.Dog",
+	"org.archboy.clobaframe.ioc.bean.Duck",
+	"org.archboy.clobaframe.ioc.bean.Status"]

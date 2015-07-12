@@ -23,6 +23,7 @@ import org.archboy.clobaframe.setting.application.ApplicationSettingRepository;
 import org.archboy.clobaframe.setting.application.PostApplicationSetting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.Assert;
@@ -45,14 +46,19 @@ public class DefaultApplicationSetting implements ApplicationSetting {
 	public static final String ROOT_KEY_EXTRA_SETTING_FILE_NAME = "clobaframe.setting.extraSettingFileName";
 	public static final String ROOT_KEY_SAVING_SETTING_FILE_NAME = "clobaframe.setting.savingSettingFileName";
 
-	private String rootConfigFileName;
-	private String applicationName;
-	
 	private Map<String, Object> rootSetting = new LinkedHashMap<String, Object>();
 	private Map<String, Object> setting = new LinkedHashMap<String, Object>();
+
+	// a base setting value.
+	private String applicationName;
+	
+	// an other base setting value.
+	private String rootConfigFileName;
 	
 	/**
-	 * Root setting values.
+	 * Base root setting values.
+	 * these values can overwrite the 'applicationName' and 'rootConfigFileName',
+	 * and can be overwrote by the values that resisted in the root configuration file.
 	 */
 	private Properties properties;
 	
@@ -69,7 +75,7 @@ public class DefaultApplicationSetting implements ApplicationSetting {
 	private Collection<PostApplicationSetting> postApplicationSettings;
 	
 	private final Logger logger = LoggerFactory.getLogger(DefaultApplicationSetting.class);
-
+	
 	@Override
 	public void setApplicationName(String name) {
 		this.applicationName = name;
@@ -105,11 +111,37 @@ public class DefaultApplicationSetting implements ApplicationSetting {
 		this.resourceLoader = resourceLoader;
 	}
 
+	public DefaultApplicationSetting() {
+	}
+
+	public DefaultApplicationSetting(ResourceLoader resourceLoader, 
+			String applicationName,
+			Properties properties, 
+			String rootConfigFileName, 
+			Collection<PostApplicationSetting> postApplicationSettings,
+			String... locations) throws Exception {
+		this.resourceLoader = resourceLoader;
+		this.applicationName = applicationName;
+		this.properties = properties;
+		this.rootConfigFileName = rootConfigFileName;
+		this.postApplicationSettings = postApplicationSettings;
+		this.locations = locations;
+		init();
+	}
+	
+	public DefaultApplicationSetting(ResourceLoader resourceLoader, 
+			Properties properties, 
+			String... locations) throws Exception {
+		this.resourceLoader = resourceLoader;
+		this.properties = properties;
+		this.locations = locations;
+		init();
+	}
+	
 	@PostConstruct
 	public void init() throws Exception {
 		loadRootConfigFromBeanDefine();
 		loadRootConfigFromFile();
-		
 		initProviders();
 		executePostSetting();
 	}
@@ -229,7 +261,7 @@ public class DefaultApplicationSetting implements ApplicationSetting {
 		String customFileName = (String)Utils.resolvePlaceholder(setting, setting.get(ROOT_KEY_CUSTOM_SETTING_FILE_NAME));
 		String extraFileName = (String)Utils.resolvePlaceholder(setting, setting.get(ROOT_KEY_EXTRA_SETTING_FILE_NAME));
 		String savingFileName = (String)Utils.resolvePlaceholder(setting, setting.get(ROOT_KEY_SAVING_SETTING_FILE_NAME));
-
+		
 		// try to create data folder
 		if (StringUtils.isNotEmpty(autoCreateDataFolder) && Boolean.valueOf(autoCreateDataFolder)) {
 			File file = new File(dataFolder);
@@ -252,11 +284,11 @@ public class DefaultApplicationSetting implements ApplicationSetting {
 		List<ApplicationSettingProvider> customApplicationSettingProviders = new ArrayList<ApplicationSettingProvider>();
 		
 		if (StringUtils.isNotEmpty(customFileName)){
-			customApplicationSettingProviders.add(new JsonApplicationSettingProvider(resourceLoader, customFileName));
+			customApplicationSettingProviders.add(new JsonApplicationSettingProvider(new FileSystemResource(customFileName)));
 		}
 		
 		if (StringUtils.isNotEmpty(extraFileName)){
-			customApplicationSettingProviders.add(new JsonApplicationSettingProvider(resourceLoader, extraFileName));
+			customApplicationSettingProviders.add(new JsonApplicationSettingProvider(new FileSystemResource(extraFileName)));
 		}
 
 		// merge all custom settings.
@@ -270,7 +302,7 @@ public class DefaultApplicationSetting implements ApplicationSetting {
 		
 		// set setting repository
 		if (StringUtils.isNotEmpty(savingFileName)){
-			applicationSettingRepository = new JsonApplicationSettingRepository(resourceLoader, savingFileName);
+			applicationSettingRepository = new JsonApplicationSettingRepository(new FileSystemResource(savingFileName));
 		}
 		
 	}

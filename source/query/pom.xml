@@ -74,8 +74,7 @@
 		</dependency>
 
 		<!-- Spring Core -->
-		
-		<dependency>
+<!--		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
 		</dependency>
@@ -88,7 +87,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
-		</dependency>
+		</dependency>-->
 		
 		<!-- Jackson JSON Mapper -->
 		<!-- need by clobaframe-query -->
@@ -96,6 +95,13 @@
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-annotations</artifactId>
 		</dependency>
+
+		<!-- Clobaframe -->
+		<dependency>
+			<groupId>org.archboy.clobaframe</groupId>
+			<artifactId>clobaframe-setting</artifactId>
+			<version>${project.version}</version>
+		</dependency>	
 
 	</dependencies>
 </project>

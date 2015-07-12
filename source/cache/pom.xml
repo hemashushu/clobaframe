@@ -61,7 +61,7 @@
 		</dependency>
 		
 		<!-- Spring Core -->
-		<dependency>
+<!--		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
 		</dependency>
@@ -74,13 +74,13 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
-		</dependency>
+		</dependency>-->
 
 		<!-- Spring Test support -->
-		<dependency>
+<!--		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
-		</dependency>
+		</dependency>-->
 
 		<!-- Apache Commons -->
 		<!-- need by clobaframe-cache -->

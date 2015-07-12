@@ -13,15 +13,15 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 public class Bean {
 	private Class<?> clazz;
 	private Object object;
-	private Class<?>[] declareClasses;
+	private Class<?>[] interfaces;
 	private Method initMethod;
 	private Method closeMethod;
 	private boolean inited;
 	
-	public Bean(Class<?> clazz, Object object, Class<?>[] declareClasses, Method initMethod, Method closeMethod, boolean inited) {
+	public Bean(Class<?> clazz, Object object, Class<?>[] interfaces, Method initMethod, Method closeMethod, boolean inited) {
 		this.clazz = clazz;
 		this.object = object;
-		this.declareClasses = declareClasses;
+		this.interfaces = interfaces;
 		this.initMethod = initMethod;
 		this.closeMethod = closeMethod;
 		this.inited = inited;
@@ -35,8 +35,8 @@ public class Bean {
 		return object;
 	}
 
-	public Class<?>[] getDeclareClasses() {
-		return declareClasses;
+	public Class<?>[] getInterfaces() {
+		return interfaces;
 	}
 
 	public Method getInitMethod() {

@@ -25,8 +25,12 @@ public class ApplicationSettingTest {
 	
 	private ApplicationSetting applicationSetting;
 	
+	private long start, span;
+	
 	@Before
 	public void setUp() throws Exception {
+		start = System.currentTimeMillis();
+		
 		// build the application instance
 		DefaultApplicationSetting appSetting = new DefaultApplicationSetting();
 		
@@ -59,7 +63,8 @@ public class ApplicationSettingTest {
 
 	@After
 	public void tearDown() throws Exception {
-		//
+		span = System.currentTimeMillis() - start;
+		logger.info("Time: {} ms", span);
 	}
 
 	@Test
