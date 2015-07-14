@@ -54,13 +54,41 @@
 			<artifactId>junit</artifactId>
 		</dependency>
 
+		<!-- Apache Commons -->
+		<!-- need by clobaframe-ioc -->
+<!--		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>-->
+		
+		<!-- need by clobaframe-ioc -->
+<!--		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>-->
+
+		<!-- Jackson JSON Mapper -->
+<!--		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>-->
+		
 		<!-- Clobaframe -->
+		
+		<!-- Clobaframe-IoC indeed depend on "clobaframe-common" or "clobaframe-common-spring-repackage",
+		by the dependency of clobaframe-setting, it's much more easy to switch project to non-spring,
+		to do this, just exclude "clobaframe-common" from "clobaframe-setting" and 
+		then add "clobaframe-common-spring-repackage". -->
 		<dependency>
 			<groupId>org.archboy.clobaframe</groupId>
 			<artifactId>clobaframe-setting</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-			
 
 	</dependencies>
 </project>

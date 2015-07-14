@@ -32,6 +32,7 @@
 
 	<modules>
 		<module>common</module>
+		<module>common-spring-repackage</module>
 		<module>ioc</module>
 		<module>setting</module>
 		<module>query</module>
@@ -123,7 +124,6 @@
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-core</artifactId>
 				<version>${org.springframework-version}</version>
-				<scope>test</scope>
 				<exclusions>
 					<!-- Exclude Commons Logging -->
 					<exclusion>
@@ -137,14 +137,12 @@
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-context</artifactId>
 				<version>${org.springframework-version}</version>
-				<scope>test</scope>
 			</dependency>
 
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-beans</artifactId>
 				<version>${org.springframework-version}</version>
-				<scope>test</scope>
 			</dependency>
 
 			<!-- Spring Test support -->

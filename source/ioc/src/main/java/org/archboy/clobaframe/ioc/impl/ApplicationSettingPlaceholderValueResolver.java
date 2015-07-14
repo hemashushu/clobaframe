@@ -1,6 +1,7 @@
 package org.archboy.clobaframe.ioc.impl;
 
 import org.archboy.clobaframe.ioc.PlaceholderValueResolver;
+import org.archboy.clobaframe.ioc.PlaceholderValueResolver;
 import org.archboy.clobaframe.setting.application.ApplicationSetting;
 
 /**
@@ -8,6 +9,11 @@ import org.archboy.clobaframe.setting.application.ApplicationSetting;
  * @author yang
  */
 public class ApplicationSettingPlaceholderValueResolver implements PlaceholderValueResolver {
+
+	public static final boolean DEFAULT_REQUIRED_PLACEHOLDER_VALUE = true;
+	
+	public static final String SETTING_KEY_BEAN_DEFINE_FILE_NAME = "clobaframe.ioc.beanDefineFileName";
+	public static final String SETTING_KEY_REQUIRED_PLACEHOLDER_VALUE = "clobaframe.ioc.requiredPlaceholderValue";
 
 	private ApplicationSetting applicationSetting;
 	

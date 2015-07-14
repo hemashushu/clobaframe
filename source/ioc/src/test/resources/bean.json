@@ -3,4 +3,6 @@
 	"org.archboy.clobaframe.ioc.bean.Cat",
 	"org.archboy.clobaframe.ioc.bean.Dog",
 	"org.archboy.clobaframe.ioc.bean.Duck",
-	"org.archboy.clobaframe.ioc.bean.Status"]
+	"org.archboy.clobaframe.ioc.bean.RubberDuck",
+	"org.archboy.clobaframe.ioc.bean.Status",
+	"org.archboy.clobaframe.ioc.bean.Zoo"]

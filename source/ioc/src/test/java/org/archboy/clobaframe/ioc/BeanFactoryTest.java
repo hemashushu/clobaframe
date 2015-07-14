@@ -1,6 +1,9 @@
 package org.archboy.clobaframe.ioc;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -14,7 +17,11 @@ import java.util.Map;
 import org.archboy.clobaframe.ioc.bean.Animal;
 import org.archboy.clobaframe.ioc.bean.DefaultFood;
 import org.archboy.clobaframe.ioc.bean.Food;
+import org.archboy.clobaframe.ioc.bean.RubberDuck;
 import org.archboy.clobaframe.ioc.bean.Status;
+import org.archboy.clobaframe.ioc.bean.Zoo;
+import org.archboy.clobaframe.ioc.impl.ApplicationSettingPlaceholderValueResolver;
+import org.archboy.clobaframe.ioc.impl.Bean;
 import org.archboy.clobaframe.ioc.impl.DefaultBeanFactory;
 import org.archboy.clobaframe.setting.application.ApplicationSetting;
 import org.archboy.clobaframe.setting.application.impl.DefaultApplicationSetting;
@@ -36,6 +43,8 @@ public class BeanFactoryTest {
 	private BeanFactory beanFactory;
 	private Status status;
 
+	private boolean factoryCloseEventFired = false;
+	
 	private long start, span;
 	
 	private final Logger logger = LoggerFactory.getLogger(BeanFactoryTest.class);
@@ -47,28 +56,57 @@ public class BeanFactoryTest {
 //		t.tearDown();
 //	}
 	
+	private Collection<Bean> beans1;
+	private List<Bean> beans2;
+	
 	@Before
 	public void setUp() throws Exception {
 		start = System.currentTimeMillis();
 		
 		ResourceLoader resourceLoader = new DefaultResourceLoader();
 		
-//		ApplicationSetting applicationSetting = new DefaultApplicationSetting(
-//				resourceLoader, null, "classpath:application.properties");
-		
 		ApplicationSetting applicationSetting = new DefaultApplicationSetting(
-				resourceLoader, null, null,
-				"classpath:root.properties", 
-				null, (String[])null);
-		
+				resourceLoader, "classpath:application.properties");
+
 		beanFactory = new DefaultBeanFactory(resourceLoader, applicationSetting);
+		
+//		ApplicationSetting applicationSetting = new DefaultApplicationSetting(
+//				resourceLoader, null, null,
+//				"classpath:root.properties", 
+//				null, (String[])null);
+//		
+//		String beanDefineFileName = (String)applicationSetting.getValue(
+//				ApplicationSettingPlaceholderValueResolver.SETTING_KEY_BEAN_DEFINE_FILE_NAME);
+//		
+//		boolean requiredPlaceholderValue = (Boolean)applicationSetting.getValue(
+//				ApplicationSettingPlaceholderValueResolver.SETTING_KEY_REQUIRED_PLACEHOLDER_VALUE, 
+//				ApplicationSettingPlaceholderValueResolver.DEFAULT_REQUIRED_PLACEHOLDER_VALUE);
+//		
+//		PlaceholderValueResolver valueResolver = new ApplicationSettingPlaceholderValueResolver(applicationSetting);
+//		
+//		beanFactory = new DefaultBeanFactory(
+//				resourceLoader, valueResolver, 
+//				beanDefineFileName, requiredPlaceholderValue,
+//				Arrays.asList(resourceLoader, applicationSetting));
+		
+		beanFactory.addCloseEventListener(new BeanFactoryCloseEventListener() {
+			@Override
+			public void onClose() {
+				factoryCloseEventFired = true;
+			}
+		});
 	}
 
 	@After
 	public void tearDown() throws Exception {
 		beanFactory.close();
+		
 		if (!"sleep".equals(status.getType())){
 			throw new IllegalArgumentException("@PreDestory does not work.");
+		}
+		
+		if (!factoryCloseEventFired) {
+			throw new IllegalArgumentException("Factory close event does not work.");
 		}
 		
 		span = System.currentTimeMillis() - start;
@@ -85,6 +123,14 @@ public class BeanFactoryTest {
 		Food food = beanFactory.getBean(Food.class);
 		assertNotNull(food);
 		assertEquals(DefaultFood.class, food.getClass());
+		
+		RubberDuck rubberDuck = beanFactory.getBean(RubberDuck.class);
+		assertNotNull(rubberDuck);
+		assertEquals("rubberDuck", rubberDuck.getName());
+		
+		// test get the prebuild bean
+		assertNotNull(beanFactory.getBean(ResourceLoader.class));
+		assertNotNull(beanFactory.getBean(ApplicationSetting.class));
 		
 		// test get beans
 		Collection<Animal> animals = beanFactory.listBeans(Animal.class);
@@ -108,6 +154,16 @@ public class BeanFactoryTest {
 					assertEquals("active", status.getType());
 					break;
 			}
+		}
+		
+		// test collection inject
+		Zoo zoo = beanFactory.getBean(Zoo.class);
+		assertNotNull(zoo);
+		assertEquals(3, zoo.getAnimals().size());
+		
+		Collection<String> animalNames = Arrays.asList("cat", "dog", "duck");
+		for (Animal animal : zoo.getAnimals()){
+			assertTrue(animalNames.contains(animal.getName()));
 		}
 	}
 }

@@ -112,6 +112,7 @@ public class DefaultApplicationSetting implements ApplicationSetting {
 	}
 
 	public DefaultApplicationSetting() {
+		// full manual invoke setter and init method.
 	}
 
 	public DefaultApplicationSetting(ResourceLoader resourceLoader, 
@@ -138,11 +139,18 @@ public class DefaultApplicationSetting implements ApplicationSetting {
 		init();
 	}
 	
+	public DefaultApplicationSetting(ResourceLoader resourceLoader, 
+			String... locations) throws Exception {
+		this.resourceLoader = resourceLoader;
+		this.locations = locations;
+		init();
+	}
+	
 	@PostConstruct
 	public void init() throws Exception {
 		loadRootConfigFromBeanDefine();
 		loadRootConfigFromFile();
-		initProviders();
+		loadProviders();
 		executePostSetting();
 	}
 
@@ -218,7 +226,7 @@ public class DefaultApplicationSetting implements ApplicationSetting {
 		rootSetting = Utils.merge(rootSetting, map);
 	}
 
-	private void initProviders(){
+	private void loadProviders(){
 		// build the temp setting, for resolve the default setting and other build-in (in-jar-package) settings filename
 		Map<String, Object> tempSetting = new LinkedHashMap<String, Object>();
 		tempSetting = Utils.merge(tempSetting, rootSetting);

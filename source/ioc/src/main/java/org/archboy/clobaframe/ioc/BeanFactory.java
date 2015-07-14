@@ -36,4 +36,6 @@ public interface BeanFactory {
 	<T> T getBean(Class<T> clazz);
 	
 	void close() throws Exception;
+	
+	void addCloseEventListener(BeanFactoryCloseEventListener eventListener);
 }
