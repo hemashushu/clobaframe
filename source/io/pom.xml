@@ -65,7 +65,7 @@
 		</dependency>
 		
 		<!-- Spring Core -->
-		<dependency>
+<!--		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
 		</dependency>
@@ -78,7 +78,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
-		</dependency>
+		</dependency>-->
 
 		<!-- Spring Test support -->
 		<dependency>
@@ -88,16 +88,16 @@
 
 		<!-- Apache Commons -->
 		<!-- need by clobaframe-io -->
-		<dependency>
+<!--		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-		</dependency>
+		</dependency>-->
 
 		<!-- need by clobaframe-io -->
-		<dependency>
+<!--		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-		</dependency>
+		</dependency>-->
 
 		<!-- need by clobaframe-io -->
 		<dependency>
@@ -207,7 +207,7 @@
 		-->
 		
 		<!-- Jackson JSON Mapper -->
-		<dependency>
+<!--		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
 		</dependency>
@@ -215,7 +215,7 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-		</dependency>
+		</dependency>-->
 		
 		<!-- clobaframe -->
 		<dependency>

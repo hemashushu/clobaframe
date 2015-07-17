@@ -11,6 +11,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  * @author yang
  */
 public class Bean {
+	private String id;
 	private Class<?> clazz;
 	private Object object;
 	private Class<?>[] interfaces;
@@ -18,13 +19,18 @@ public class Bean {
 	private Method closeMethod;
 	private boolean inited;
 	
-	public Bean(Class<?> clazz, Object object, Class<?>[] interfaces, Method initMethod, Method closeMethod, boolean inited) {
+	public Bean(String id, Class<?> clazz, Object object, Class<?>[] interfaces, Method initMethod, Method closeMethod, boolean inited) {
+		this.id = id;
 		this.clazz = clazz;
 		this.object = object;
 		this.interfaces = interfaces;
 		this.initMethod = initMethod;
 		this.closeMethod = closeMethod;
 		this.inited = inited;
+	}
+
+	public String getId() {
+		return id;
 	}
 
 	public Class<?> getClazz() {
@@ -71,6 +77,7 @@ public class Bean {
 
 		Bean other = (Bean)obj;
 		return new EqualsBuilder()
+				.append(getId(), other.getId())
 				.append(getClazz(), other.getClazz())
 				.isEquals();
 	}
@@ -78,6 +85,7 @@ public class Bean {
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder()
+				.append(getId())
 				.append(getClazz())
 				.toHashCode();
 	}
@@ -85,6 +93,7 @@ public class Bean {
 	@Override
 	public String toString() {
 		return new ToStringBuilder(this)
+				.append("id", getId())
 				.append("class", getClazz())
 				.toString();
 	}

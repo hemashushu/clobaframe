@@ -1,5 +1,7 @@
 package org.archboy.clobaframe.webresource;
 
+import org.archboy.clobaframe.io.NamedResourceInfo;
+
 /**
  *
  * @author yang
@@ -15,12 +17,22 @@ public interface LocationStrategy {
 	
 	/**
 	 * 
-	 * @param webResourceInfo
+	 * @param resourceInfo
 	 * @return 
 	 */
-	String getLocation(WebResourceInfo webResourceInfo);
+	String getLocation(NamedResourceInfo resourceInfo);
 	
-	String getVersionName(WebResourceInfo webResourceInfo);
+	/**
+	 * 
+	 * @param resourceInfo
+	 * @return 
+	 */
+	String getVersionName(NamedResourceInfo resourceInfo);
 	
+	/**
+	 * 
+	 * @param versionName
+	 * @return 
+	 */
 	String fromVersionName(String versionName);
 }

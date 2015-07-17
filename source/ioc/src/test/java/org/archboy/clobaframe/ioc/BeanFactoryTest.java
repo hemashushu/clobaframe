@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import org.archboy.clobaframe.ioc.bean.Animal;
 import org.archboy.clobaframe.ioc.bean.DefaultFood;
+import org.archboy.clobaframe.ioc.bean.Dog;
 import org.archboy.clobaframe.ioc.bean.Food;
 import org.archboy.clobaframe.ioc.bean.RubberDuck;
 import org.archboy.clobaframe.ioc.bean.Status;
@@ -56,20 +57,14 @@ public class BeanFactoryTest {
 //		t.tearDown();
 //	}
 	
-	private Collection<Bean> beans1;
-	private List<Bean> beans2;
-	
 	@Before
 	public void setUp() throws Exception {
 		start = System.currentTimeMillis();
-		
-		ResourceLoader resourceLoader = new DefaultResourceLoader();
-		
-		ApplicationSetting applicationSetting = new DefaultApplicationSetting(
-				resourceLoader, "classpath:application.properties");
 
-		beanFactory = new DefaultBeanFactory(resourceLoader, applicationSetting);
+		beanFactory = new DefaultBeanFactory("classpath:application.properties");
 		
+//		ResourceLoader resourceLoader = new DefaultResourceLoader();
+//		
 //		ApplicationSetting applicationSetting = new DefaultApplicationSetting(
 //				resourceLoader, null, null,
 //				"classpath:root.properties", 
@@ -115,15 +110,26 @@ public class BeanFactoryTest {
 
 	@Test
 	public void testGet() throws Exception {
-		// test get bean
+		// test get bean by class
 		status = beanFactory.getBean(Status.class);
 		assertNotNull(status);
-		assertNull(status.getType());
+		assertEquals(Status.class, status.getClass());
 		
 		Food food = beanFactory.getBean(Food.class);
 		assertNotNull(food);
 		assertEquals(DefaultFood.class, food.getClass());
 		
+		// get by id
+		Food foodById = (Food)beanFactory.getBean("food");
+		assertNotNull(foodById);
+		assertEquals(food, foodById);
+		
+		// get by auto id
+		Dog dog = beanFactory.getBean(Dog.class);
+		Dog dogById = (Dog)beanFactory.getBean("dog");
+		assertEquals(dog, dogById);
+		
+		// get by class and check properties
 		RubberDuck rubberDuck = beanFactory.getBean(RubberDuck.class);
 		assertNotNull(rubberDuck);
 		assertEquals("rubberDuck", rubberDuck.getName());

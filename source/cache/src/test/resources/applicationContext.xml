@@ -9,9 +9,21 @@ http://www.springframework.org/schema/context/spring-context-4.1.xsd">
 
 	<context:component-scan base-package="org.archboy.clobaframe" />
 
-	<!-- application settings -->
+	<!-- using spring placeholder configurer -->
+	<!--
+	<bean id="propertyPlaceholderConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:clobaframe.properties</value>
+			</list>
+		</property>
+	</bean>
+	-->
+	
+	<!-- using clobaframe application settings -->
 	<bean id="applicationSetting"
-		  class="org.archboy.clobaframe.setting.application.impl.ApplicationSettingImpl">
+		  class="org.archboy.clobaframe.setting.application.impl.DefaultApplicationSetting">
 		<property name="locations">
 			<list>
 				<value>classpath:clobaframe.properties</value>

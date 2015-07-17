@@ -4,9 +4,10 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.archboy.clobaframe.io.NamedResourceInfo;
 import org.archboy.clobaframe.webresource.LocationStrategy;
 import org.archboy.clobaframe.webresource.VersionStrategy;
-import org.archboy.clobaframe.webresource.WebResourceInfo;
+import org.archboy.clobaframe.webresource.ContentHashResourceInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,8 +25,8 @@ public class DefaultLocationStrategy implements LocationStrategy { //, Initializ
 	public static final String DEFAULT_VERSION_STRATEGY_NAME = "default";
 	public static final String DEFAULT_BASE_LOCATION = "/resource/";
 	
-	public static final String SETTING_KEY_VERSION_STRATEGY_NAME = "clobaframe.webresource.versionStrategy";
-	public static final String SETTING_KEY_BASE_LOCATION = "clobaframe.webresource.baseLocation";
+	public static final String SETTING_KEY_VERSION_STRATEGY_NAME = "clobaframe.resource.versionStrategy";
+	public static final String SETTING_KEY_BASE_LOCATION = "clobaframe.resource.baseLocation";
 	
 	@Value("${" + SETTING_KEY_VERSION_STRATEGY_NAME + ":" + DEFAULT_VERSION_STRATEGY_NAME + "}")
 	private String versionStrategyName;
@@ -73,8 +74,8 @@ public class DefaultLocationStrategy implements LocationStrategy { //, Initializ
 	}
 	
 	@Override
-	public String getLocation(WebResourceInfo webResourceInfo) {
-		String versionName = getVersionName(webResourceInfo);
+	public String getLocation(NamedResourceInfo resourceInfo) {
+		String versionName = getVersionName(resourceInfo);
 		return baseLocation + versionName;
 	}
 
@@ -84,9 +85,9 @@ public class DefaultLocationStrategy implements LocationStrategy { //, Initializ
 	}
 
 	@Override
-	public String getVersionName(WebResourceInfo webResourceInfo) {
-		Assert.notNull(webResourceInfo);
-		return versionStrategy.getVersionName(webResourceInfo);
+	public String getVersionName(NamedResourceInfo resourceInfo) {
+		Assert.notNull(resourceInfo);
+		return versionStrategy.getVersionName(resourceInfo);
 	}
 
 	@Override

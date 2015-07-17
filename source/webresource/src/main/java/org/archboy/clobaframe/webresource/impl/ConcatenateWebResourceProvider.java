@@ -13,9 +13,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.archboy.clobaframe.webresource.WebResourceInfo;
-import org.archboy.clobaframe.webresource.WebResourceProvider;
-import org.archboy.clobaframe.webresource.WebResourceProviderSet;
+import org.archboy.clobaframe.io.NamedResourceInfo;
+import org.archboy.clobaframe.webresource.ContentHashResourceInfo;
+import org.archboy.clobaframe.webresource.ResourceProvider;
+import org.archboy.clobaframe.webresource.ResourceProviderSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,12 +28,12 @@ import org.springframework.core.io.ResourceLoader;
  * @author yang
  */
 @Named
-public class ConcatenateWebResourceProvider implements WebResourceProvider {
+public class ConcatenateWebResourceProvider implements ResourceProvider {
 	//, ResourceLoaderAware, InitializingBean {
 
 	public static final String DEFAULT_CONCATENATE_CONFIG = "";
 	
-	public static final String SETTING_KEY_CONCATENATE_CONFIG = "clobaframe.webresource.concatenateConfig";
+	public static final String SETTING_KEY_CONCATENATE_CONFIG = "clobaframe.resource.concatenateConfig";
 	
 	@Value("${" + SETTING_KEY_CONCATENATE_CONFIG + ":" + DEFAULT_CONCATENATE_CONFIG + "}")
 	private String concatenateConfig;
@@ -41,7 +42,7 @@ public class ConcatenateWebResourceProvider implements WebResourceProvider {
 	private ResourceLoader resourceLoader;
 	
 	@Inject
-	private WebResourceProviderSet webResourceProviderSet;
+	private ResourceProviderSet resourceProviderSet;
 
 	private ObjectMapper objectMapper = new ObjectMapper();
 	
@@ -59,8 +60,8 @@ public class ConcatenateWebResourceProvider implements WebResourceProvider {
 		this.resourceLoader = resourceLoader;
 	}
 
-	public void setWebResourceProviderSet(WebResourceProviderSet webResourceProviderSet) {
-		this.webResourceProviderSet = webResourceProviderSet;
+	public void setResourceProviderSet(ResourceProviderSet resourceProviderSet) {
+		this.resourceProviderSet = resourceProviderSet;
 	}
 	
 	@Override
@@ -111,34 +112,34 @@ public class ConcatenateWebResourceProvider implements WebResourceProvider {
 	}
 	
 	@Override
-	public WebResourceInfo getByName(String name) {
+	public NamedResourceInfo getByName(String name) {
 		List<String> names = concatenates.get(name);
 		
 		if (names == null || names.isEmpty()){
 			return null;
 		}
 		
-		List<WebResourceInfo> webResourceInfos = new ArrayList<WebResourceInfo>();
+		List<NamedResourceInfo> resourceInfos = new ArrayList<NamedResourceInfo>();
 		for(String n : names){
-			WebResourceInfo webResourceInfo = webResourceProviderSet.getByName(n);
-			if (webResourceInfo != null) {
-				webResourceInfos.add(webResourceInfo);
+			NamedResourceInfo resourceInfo = resourceProviderSet.getByName(n);
+			if (resourceInfo != null) {
+				resourceInfos.add(resourceInfo);
 			}
 		}
 		
-		if (webResourceInfos.isEmpty()){
+		if (resourceInfos.isEmpty()){
 			return null;
 		}
 		
-		return new DefaultConcatenateWebResourceInfo(webResourceInfos, name);
+		return new DefaultConcatenateResourceInfo(resourceInfos, name);
 	}
 
 	@Override
-	public Collection<WebResourceInfo> list() {
-		List<WebResourceInfo> resourceInfos = new ArrayList<WebResourceInfo>();
+	public Collection<NamedResourceInfo> list() {
+		List<NamedResourceInfo> resourceInfos = new ArrayList<NamedResourceInfo>();
 		
 		for (String name : concatenates.keySet()) {
-			WebResourceInfo resourceInfo = getByName(name);
+			NamedResourceInfo resourceInfo = getByName(name);
 			if (resourceInfo != null) {
 				resourceInfos.add(resourceInfo);
 			}

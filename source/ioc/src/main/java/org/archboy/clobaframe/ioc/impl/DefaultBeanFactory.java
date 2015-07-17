@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
@@ -24,8 +26,10 @@ import org.archboy.clobaframe.ioc.BeanFactory;
 import org.archboy.clobaframe.ioc.BeanFactoryCloseEventListener;
 import org.archboy.clobaframe.ioc.PlaceholderValueResolver;
 import org.archboy.clobaframe.setting.application.ApplicationSetting;
+import org.archboy.clobaframe.setting.application.impl.DefaultApplicationSetting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.Assert;
@@ -36,7 +40,7 @@ import org.springframework.util.Assert;
  */
 public class DefaultBeanFactory implements BeanFactory {
 
-	private static final String placeholderRegex = "^\\$\\{([\\w\\.-]+)(\\:([\\w\\.-]+))?\\}$";
+	private static final String placeholderRegex = "^\\$\\{([\\w\\.-]+)(\\:([\\w\\.-]*))?\\}$";
 	private static final Pattern placeholderPattern = Pattern.compile(placeholderRegex);
 	
 	private ResourceLoader resourceLoader;
@@ -50,9 +54,17 @@ public class DefaultBeanFactory implements BeanFactory {
 	
 	private Collection<BeanFactoryCloseEventListener> closeEventListeners = new ArrayList<BeanFactoryCloseEventListener>();
 	
+	// keep the current initializing bean id
+	// to prevent infinite loop
+	private Stack<String> initializingBeanIds = new Stack<String>();
+	
 	private ObjectMapper objectMapper = new ObjectMapper();
 	
-	private TypeReference<List<String>> typeReference = new TypeReference<List<String>>() {};
+	private TypeReference<List<Map<String, Object>>> typeReference = new TypeReference<List<Map<String, Object>>>() {};
+	
+	public DefaultBeanFactory(){
+		// for manual build.
+	}
 	
 	/**
 	 * 
@@ -75,11 +87,10 @@ public class DefaultBeanFactory implements BeanFactory {
 		Assert.notNull(placeholderValueResolver);
 		
 		this.beanDefineFileName = beanDefineFileName;
-		this.resourceLoader = resourceLoader;
 		this.placeholderValueResolver = placeholderValueResolver;
 		this.requiredPlaceholderValue = requiredPlaceholderValue;
 		this.prebuildObjects = prebuildObjects;
-		
+		this.resourceLoader = resourceLoader;
 		init();
 	}
 	
@@ -90,7 +101,6 @@ public class DefaultBeanFactory implements BeanFactory {
 		Assert.notNull(resourceLoader);
 		Assert.notNull(applicationSetting);
 
-		this.resourceLoader = resourceLoader;
 		this.beanDefineFileName = (String)applicationSetting.getValue(
 				ApplicationSettingPlaceholderValueResolver.SETTING_KEY_BEAN_DEFINE_FILE_NAME);
 		this.placeholderValueResolver = new ApplicationSettingPlaceholderValueResolver(applicationSetting);
@@ -98,19 +108,55 @@ public class DefaultBeanFactory implements BeanFactory {
 				ApplicationSettingPlaceholderValueResolver.SETTING_KEY_REQUIRED_PLACEHOLDER_VALUE,
 				ApplicationSettingPlaceholderValueResolver.DEFAULT_REQUIRED_PLACEHOLDER_VALUE);
 		this.prebuildObjects = Arrays.asList(resourceLoader, applicationSetting);
+		this.resourceLoader = resourceLoader;
 		
 		init();
 	}
 
+	public DefaultBeanFactory(String... applicationConfigFileName) throws Exception{
+		Assert.notNull(applicationConfigFileName);
+		
+		ResourceLoader resourceLoader = new DefaultResourceLoader();
+		ApplicationSetting applicationSetting = new DefaultApplicationSetting(
+				resourceLoader, null, applicationConfigFileName);
+		
+		this.beanDefineFileName = (String)applicationSetting.getValue(
+				ApplicationSettingPlaceholderValueResolver.SETTING_KEY_BEAN_DEFINE_FILE_NAME);
+		this.placeholderValueResolver = new ApplicationSettingPlaceholderValueResolver(applicationSetting);
+		this.requiredPlaceholderValue = (Boolean)applicationSetting.getValue(
+				ApplicationSettingPlaceholderValueResolver.SETTING_KEY_REQUIRED_PLACEHOLDER_VALUE,
+				ApplicationSettingPlaceholderValueResolver.DEFAULT_REQUIRED_PLACEHOLDER_VALUE);
+		this.prebuildObjects = Arrays.asList(resourceLoader, applicationSetting);
+		this.resourceLoader = resourceLoader;
+		
+		init();
+	}
+
+	public void setBeanDefineFileName(String beanDefineFileName) {
+		this.beanDefineFileName = beanDefineFileName;
+	}
+
+	public void setRequiredPlaceholderValue(boolean requiredPlaceholderValue) {
+		this.requiredPlaceholderValue = requiredPlaceholderValue;
+	}
+
+	public void setPlaceholderValueResolver(PlaceholderValueResolver placeholderValueResolver) {
+		this.placeholderValueResolver = placeholderValueResolver;
+	}
+
+	public void setPrebuildObjects(Collection<Object> prebuildObjects) {
+		this.prebuildObjects = prebuildObjects;
+	}
 	
 	@Override
 	public void addCloseEventListener(BeanFactoryCloseEventListener eventListener) {
 		closeEventListeners.add(eventListener);
 	}
 	
-	private void init() throws Exception {
+	public void init() throws Exception {
+		loadPreBuildObject(this);
 		loadPreBuildObjects();
-		loadBeanDefine();
+		loadBeanDefine(resourceLoader);
 	}
 	
 	private void loadPreBuildObjects() {
@@ -119,16 +165,19 @@ public class DefaultBeanFactory implements BeanFactory {
 		}
 		
 		for (Object object : prebuildObjects) {
-			Class<?> clazz = object.getClass();
-			
-			Class<?>[] interfaces = clazz.getInterfaces();
-			
-			Bean bean = new Bean(clazz, object, interfaces, null, null, false);
-			beans.add(bean);
+			loadPreBuildObject(object);
 		}
 	}
 	
-	private void loadBeanDefine() throws Exception {
+	private void loadPreBuildObject(Object object) {
+		Class<?> clazz = object.getClass();
+		Class<?>[] interfaces = clazz.getInterfaces();
+		String id = StringUtils.uncapitalize(clazz.getSimpleName());
+		Bean bean = new Bean(id, clazz, object, interfaces, null, null, true);
+		beans.add(bean);
+	}
+	
+	private void loadBeanDefine(ResourceLoader resourceLoader) throws Exception {
 		if (StringUtils.isEmpty(beanDefineFileName)) {
 			return;
 		}
@@ -138,18 +187,24 @@ public class DefaultBeanFactory implements BeanFactory {
 			throw new FileNotFoundException(beanDefineFileName);
 		}
 		
-		Collection<String> defineClassNames = getDefineClassNames(resource);
+		Collection<Map<String, Object>> defineClassNames = getDefineClassNames(resource);
 		List<Bean> uninitBeans = buildUninitBeans(defineClassNames);
 		beans.addAll(uninitBeans);
 	}
 
-	private List<Bean> buildUninitBeans(Collection<String> defineClassNames) throws 
+	private List<Bean> buildUninitBeans(Collection<Map<String, Object>> defineClassNames) throws 
 			ClassNotFoundException, InstantiationException, IllegalAccessException {
 		
 		List<Bean> uninitBeans = new ArrayList<Bean>();
 		
-		for (String defineClassName : defineClassNames) {
-			Class<?> clazz = Class.forName(defineClassName);
+		for (Map<String, Object> defineClassName : defineClassNames) {
+			Class<?> clazz = Class.forName((String)defineClassName.get("class"));
+			String id = (String)defineClassName.get("id");
+			
+			if (StringUtils.isEmpty(id)) {
+				id = StringUtils.uncapitalize(clazz.getSimpleName());
+			}
+			
 			Object object = clazz.newInstance();
 			
 			Class<?>[] interfaces = clazz.getInterfaces();
@@ -164,15 +219,15 @@ public class DefaultBeanFactory implements BeanFactory {
 				}
 			}
 			
-			Bean bean = new Bean(clazz, object, interfaces, initMethod, closeMethod, false);
+			Bean bean = new Bean(id, clazz, object, interfaces, initMethod, closeMethod, false);
 			uninitBeans.add(bean);
 		}
 		
 		return uninitBeans;
 	}
 	
-	private Collection<String> getDefineClassNames(Resource resource) throws IOException {
-		List<String> defineClassNames = null;
+	private Collection<Map<String, Object>> getDefineClassNames(Resource resource) throws IOException {
+		List<Map<String, Object>> defineClassNames = null;
 		InputStream in = null;
 		try{
 			in = resource.getInputStream();
@@ -183,6 +238,28 @@ public class DefaultBeanFactory implements BeanFactory {
 		return defineClassNames;
 	}
 
+	@Override
+	public Object getBean(String id) {
+		Assert.hasText(id);
+		for(Bean bean : beans){
+			if (id.equals(bean.getId())){
+				if (!bean.isInited()){
+					try{
+						initBean(bean);
+					}catch(ClassNotFoundException | 
+							IllegalAccessException | 
+							IllegalArgumentException | 
+							InvocationTargetException e){
+						throw new RuntimeException("Can not initialize bean.", e);
+					}
+				}
+				return bean.getObject();
+			}
+		}
+		
+		return null;
+	}
+	
 	@Override
 	public <T> T getBean(Class<T> clazz) {
 		Assert.notNull(clazz);
@@ -225,7 +302,10 @@ public class DefaultBeanFactory implements BeanFactory {
 				}
 				objects.add((T)bean.getObject());
 			}
-		}catch(Exception e){
+		}catch(ClassNotFoundException | 
+				IllegalAccessException | 
+				IllegalArgumentException | 
+				InvocationTargetException e){
 			throw new RuntimeException("Can not initialize bean.", e);
 		}
 		
@@ -234,6 +314,13 @@ public class DefaultBeanFactory implements BeanFactory {
 	
 	private void initBean(Bean bean) throws 
 			ClassNotFoundException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+		
+		if (!initializingBeanIds.empty() && initializingBeanIds.contains(bean.getId())){
+			return;
+		}
+		
+		initializingBeanIds.push(bean.getId());
+		
 		Class<?> clazz = bean.getClazz();
 		Object obj = bean.getObject();
 		
@@ -293,7 +380,9 @@ public class DefaultBeanFactory implements BeanFactory {
 					targetValue = placeholder;
 				}
 				
-				if (targetValue == null) {
+				if (targetValue == null || 
+						(targetValue instanceof String && 
+						targetValue.equals(StringUtils.EMPTY))) {
 					if (requiredPlaceholderValue) {
 						throw new IllegalArgumentException("Can not find the value of placeholder " + placeholder);
 					}else{
@@ -338,6 +427,8 @@ public class DefaultBeanFactory implements BeanFactory {
 		}
 		
 		bean.finishInited();
+		
+		initializingBeanIds.pop();
 	}
 	
 	@Override

@@ -30,19 +30,6 @@
 	</properties>
 
 	<dependencies>
-		<!-- Clobaframe -->
-		<dependency>
-			<groupId>org.archboy.clobaframe</groupId>
-			<artifactId>clobaframe-setting</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.archboy.clobaframe</groupId>
-			<artifactId>clobaframe-io</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
 		<!-- Logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -77,7 +64,7 @@
 		</dependency>
 		
 		<!-- Spring Core -->
-		<dependency>
+<!--		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
 		</dependency>
@@ -90,7 +77,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
-		</dependency>
+		</dependency>-->
 
 		<!-- Spring Test support -->
 		<dependency>
@@ -100,16 +87,16 @@
 
 		<!-- Apache Commons -->
 		<!-- need by clobaframe-webresource, clobaframe-io -->
-		<dependency>
+<!--		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-		</dependency>
+		</dependency>-->
 
 		<!-- need by clobaframe-webresource, clobaframe-io -->
-		<dependency>
+<!--		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-		</dependency>
+		</dependency>-->
 
 		<!-- need by clobaframe-webresource, http-client -->
 		<dependency>
@@ -151,7 +138,7 @@
 
 		<!-- Jackson JSON Mapper -->
 		<!-- need by clobaframe-webresource -->
-		<dependency>
+<!--		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
 		</dependency>
@@ -159,7 +146,7 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-		</dependency>
+		</dependency>-->
 		
 		<!--
 		<dependency>
@@ -207,5 +194,19 @@
 			<version>v20150315</version>
 		</dependency>
 		-->
+
+		<!-- Clobaframe -->
+		<dependency>
+			<groupId>org.archboy.clobaframe</groupId>
+			<artifactId>clobaframe-setting</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.archboy.clobaframe</groupId>
+			<artifactId>clobaframe-io</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 	</dependencies>
 </project>

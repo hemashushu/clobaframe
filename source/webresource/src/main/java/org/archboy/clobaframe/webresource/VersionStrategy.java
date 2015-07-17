@@ -1,5 +1,7 @@
 package org.archboy.clobaframe.webresource;
 
+import org.archboy.clobaframe.io.NamedResourceInfo;
+
 /**
  *
  * @author yang
@@ -16,10 +18,10 @@ public interface VersionStrategy {
 	/**
 	 * Get the resource name combine with the version string.
 	 * 
-	 * @param webResourceInfo
+	 * @param resourceInfo
 	 * @return 
 	 */
-	String getVersionName(WebResourceInfo webResourceInfo);
+	String getVersionName(NamedResourceInfo resourceInfo);
 	
 	/**
 	 * Revert version name into resource name.

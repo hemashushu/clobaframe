@@ -1,8 +1,9 @@
 package org.archboy.clobaframe.webresource.impl;
 
 import javax.inject.Named;
+import org.archboy.clobaframe.io.NamedResourceInfo;
 import org.archboy.clobaframe.webresource.VersionStrategy;
-import org.archboy.clobaframe.webresource.WebResourceInfo;
+import org.archboy.clobaframe.webresource.ContentHashResourceInfo;
 
 /**
  *
@@ -17,7 +18,7 @@ public class NullVersionStrategy implements VersionStrategy {
 	}
 	
 	@Override
-	public String getVersionName(WebResourceInfo webResourceInfo) {
+	public String getVersionName(NamedResourceInfo webResourceInfo) {
 		return webResourceInfo.getName();
 	}
 

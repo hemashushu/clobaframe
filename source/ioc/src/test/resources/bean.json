@@ -1,8 +1,16 @@
 [
-	"org.archboy.clobaframe.ioc.bean.DefaultFood",
-	"org.archboy.clobaframe.ioc.bean.Cat",
-	"org.archboy.clobaframe.ioc.bean.Dog",
-	"org.archboy.clobaframe.ioc.bean.Duck",
-	"org.archboy.clobaframe.ioc.bean.RubberDuck",
-	"org.archboy.clobaframe.ioc.bean.Status",
-	"org.archboy.clobaframe.ioc.bean.Zoo"]
+	{"id":"food",
+		"class":"org.archboy.clobaframe.ioc.bean.DefaultFood"},
+	{"id":"cat",
+		"class":"org.archboy.clobaframe.ioc.bean.Cat"},
+	{"comment":"No explicit id, for testing.",
+		"class":"org.archboy.clobaframe.ioc.bean.Dog"},
+	{"id":"duck",
+		"class":"org.archboy.clobaframe.ioc.bean.Duck"},
+	{"id":"rubberDuck",
+		"class":"org.archboy.clobaframe.ioc.bean.RubberDuck"},
+	{"id":"status",
+		"class":"org.archboy.clobaframe.ioc.bean.Status"},
+	{"id":"zoo",
+		"class":"org.archboy.clobaframe.ioc.bean.Zoo"}
+]

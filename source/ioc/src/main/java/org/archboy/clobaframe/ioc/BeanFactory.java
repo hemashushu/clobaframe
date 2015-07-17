@@ -33,6 +33,8 @@ public interface BeanFactory {
 	
 	<T> Collection<T> listBeans(Class<T> clazz);
 	
+	Object getBean(String id);
+	
 	<T> T getBean(Class<T> clazz);
 	
 	void close() throws Exception;

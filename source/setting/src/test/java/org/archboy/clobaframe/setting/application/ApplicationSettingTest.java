@@ -56,7 +56,7 @@ public class ApplicationSettingTest {
 		appSetting.setResourceLoader(resourceLoader);
 		
 		// init
-		appSetting.init();
+		appSetting.afterPropertiesSet();
 		
 		this.applicationSetting = appSetting;
 	}

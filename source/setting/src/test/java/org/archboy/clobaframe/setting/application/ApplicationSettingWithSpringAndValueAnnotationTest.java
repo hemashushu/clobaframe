@@ -44,13 +44,9 @@ public class ApplicationSettingWithSpringAndValueAnnotationTest {
 	
 	@Test
 	public void testValueAnnotation(){
-		/**
-		 * it seems there is a bug, see applicationContext.xml for details.
-		 */
-		
-		//assertEquals("hello", placeholderTestFoo);
-		//assertEquals("${test.none-exist}", placeholderTestNoneExist);
-		//assertEquals(DEFAULT_TEST_PLACEHOLDER_VALUE, placeholderTestNoneExistWithDefaultValue);
+		assertEquals("hello", placeholderTestFoo);
+		assertEquals("${test.none-exist}", placeholderTestNoneExist);
+		assertEquals(DEFAULT_TEST_PLACEHOLDER_VALUE, placeholderTestNoneExistWithDefaultValue);
 	}
 	
 }

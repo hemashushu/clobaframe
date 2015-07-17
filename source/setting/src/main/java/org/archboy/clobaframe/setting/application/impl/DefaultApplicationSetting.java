@@ -23,6 +23,9 @@ import org.archboy.clobaframe.setting.application.ApplicationSettingRepository;
 import org.archboy.clobaframe.setting.application.PostApplicationSetting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ResourceLoaderAware;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -34,8 +37,7 @@ import org.springframework.util.Assert;
  * to read/write the properties file.
  * @author yang
  */
-public class DefaultApplicationSetting implements ApplicationSetting {
-	//, ResourceLoaderAware, InitializingBean {
+public class DefaultApplicationSetting implements ApplicationSetting, ResourceLoaderAware, InitializingBean {
 
 	public static final String ROOT_KEY_APPLICATION_NAME = "clobaframe.setting.applicationName";
 	public static final String ROOT_KEY_ROOT_CONFIG_FILE_NAME = "clobaframe.setting.rootConfigFileName";
@@ -67,7 +69,6 @@ public class DefaultApplicationSetting implements ApplicationSetting {
 	 */
 	private String[] locations;
 	
-	@Inject
 	private ResourceLoader resourceLoader;
 	
 	private List<ApplicationSettingProvider> applicationSettingProviders;
@@ -106,13 +107,13 @@ public class DefaultApplicationSetting implements ApplicationSetting {
 		this.locations = locations;
 	}
 	
-	//@Override
+	@Override
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;
 	}
 
 	public DefaultApplicationSetting() {
-		// full manual invoke setter and init method.
+		// for manual build.
 	}
 
 	public DefaultApplicationSetting(ResourceLoader resourceLoader, 
@@ -127,7 +128,7 @@ public class DefaultApplicationSetting implements ApplicationSetting {
 		this.rootConfigFileName = rootConfigFileName;
 		this.postApplicationSettings = postApplicationSettings;
 		this.locations = locations;
-		init();
+		afterPropertiesSet();
 	}
 	
 	public DefaultApplicationSetting(ResourceLoader resourceLoader, 
@@ -136,18 +137,19 @@ public class DefaultApplicationSetting implements ApplicationSetting {
 		this.resourceLoader = resourceLoader;
 		this.properties = properties;
 		this.locations = locations;
-		init();
+		afterPropertiesSet();
 	}
 	
-	public DefaultApplicationSetting(ResourceLoader resourceLoader, 
-			String... locations) throws Exception {
-		this.resourceLoader = resourceLoader;
+	public DefaultApplicationSetting(String... locations) throws Exception {
+		this.resourceLoader = new DefaultResourceLoader();
 		this.locations = locations;
-		init();
+		afterPropertiesSet();
 	}
 	
-	@PostConstruct
-	public void init() throws Exception {
+	//@PostConstruct
+	
+	@Override
+	public void afterPropertiesSet() throws Exception {
 		loadRootConfigFromBeanDefine();
 		loadRootConfigFromFile();
 		loadProviders();

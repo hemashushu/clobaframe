@@ -1,0 +1,7 @@
+[
+	{"id":"cacheManager",
+		"class":"org.archboy.clobaframe.cache.impl.CacheManagerImpl"},
+	{"id":"nullCache",
+		"class":"org.archboy.clobaframe.cache.impl.NullCache"},
+	{"id":"ehcacheCache",
+		"class":"org.archboy.clobaframe.cache.ehcache.EhcacheCache"}]

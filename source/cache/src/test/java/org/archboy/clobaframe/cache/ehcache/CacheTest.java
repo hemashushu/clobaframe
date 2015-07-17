@@ -12,21 +12,30 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.archboy.clobaframe.cache.Cache;
 import org.archboy.clobaframe.cache.CacheManager;
 import org.archboy.clobaframe.cache.Expiration;
+import org.archboy.clobaframe.ioc.BeanFactory;
+import org.archboy.clobaframe.ioc.impl.DefaultBeanFactory;
+import org.archboy.clobaframe.setting.application.ApplicationSetting;
+import org.archboy.clobaframe.setting.application.impl.DefaultApplicationSetting;
 import static org.junit.Assert.*;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.ResourceLoader;
 
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration(locations = { "/applicationContext.xml" })
 public class CacheTest {
 
-	@Inject
+	private BeanFactory beanFactory;
 	private CacheManager cacheManager;
 
 	@Before
 	public void setUp() throws Exception {
+		this.beanFactory = new DefaultBeanFactory(
+				"classpath:application.properties", 
+				"classpath:clobaframe.properties");
+		this.cacheManager = beanFactory.getBean(CacheManager.class);
 	}
 
 	@After
 	public void tearDown() throws Exception {
+		beanFactory.close();
 	}
 
 	public void testClearAll() {
