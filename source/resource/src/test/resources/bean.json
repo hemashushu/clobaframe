@@ -1,0 +1,8 @@
+[
+	{"class":"org.archboy.clobaframe.resource.impl.ResourceManagerImpl"},
+	{"class":"org.archboy.clobaframe.resource.impl.DefaultLocationStrategy"},
+	{"class":"org.archboy.clobaframe.resource.impl.DefaultVersionStrategy"},
+	{"class":"org.archboy.clobaframe.resource.impl.ResourceProviderSetImpl"},
+	{"class":"org.archboy.clobaframe.resource.local.MultiPathLocalResourceProvider"},
+	{"class":"org.archboy.clobaframe.io.impl.ExtensionNameMimeTypeDetector"}
+]

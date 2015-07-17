@@ -33,14 +33,14 @@
 	<modules>
 		<module>common</module>
 		<module>common-spring-repackage</module>
-		<module>ioc</module>
 		<module>setting</module>
+		<module>ioc</module>
+		<module>io</module>
+		<module>resource</module>
+		<module>blobstore</module>
 		<module>query</module>
 		<module>cache</module>
-		<module>io</module>
 		<module>media</module>
-		<module>blobstore</module>
-		<module>webresource</module>
 		<module>mail</module>
 		<module>search</module>
 	</modules>

@@ -9,10 +9,10 @@
 		<version>2.6</version>
 	</parent>
 
-	<artifactId>clobaframe-media</artifactId>
+	<artifactId>clobaframe-resource</artifactId>
 	<packaging>jar</packaging>
 
-	<name>clobaframe-media</name>
+	<name>clobaframe-resource</name>
 	<url>https://github.com/ivarptr/clobaframe</url>
 
 	<developers>
@@ -24,6 +24,9 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<!-- for test resource sending -->
+		<org.eclipse.jetty-version>9.2.10.v20150310</org.eclipse.jetty-version>
 	</properties>
 
 	<dependencies>
@@ -38,12 +41,6 @@
 			<artifactId>jcl-over-slf4j</artifactId>
 		</dependency>
 
-<!--
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jul-to-slf4j</artifactId>
-		</dependency>
--->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
@@ -89,98 +86,114 @@
 		</dependency>
 
 		<!-- Apache Commons -->
-		<!-- need by clobaframe-media, clobaframe-io -->
+		<!-- need by clobaframe-webresource, clobaframe-io -->
 <!--		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>-->
 
-		<!-- need by clobaframe-media, clobaframe-io -->
+		<!-- need by clobaframe-webresource, clobaframe-io -->
 <!--		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 		</dependency>-->
 
-		<!-- Image processor -->
-		<!-- need by clobaframe-media -->
-<!--		<dependency>
-			<groupId>com.mortennobel</groupId>
-			<artifactId>java-image-scaling</artifactId>
-			<version>0.8.5</version>
-		</dependency>-->
-
-		<!-- image crop, scaling -->
+		<!-- need by clobaframe-webresource, http-client -->
 		<dependency>
-			<groupId>org.imgscalr</groupId>
-			<artifactId>imgscalr-lib</artifactId>
-			<version>4.2</version>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
 		</dependency>
 
-		<!-- image flip and rotate -->
-		<dependency>
-			<groupId>com.jhlabs</groupId>
-			<artifactId>filters</artifactId>
-			<version>2.0.235</version>
-		</dependency>
-		
-		<!-- for supporting ICC jpeg, and image scaling -->
-		<dependency>
-			<groupId>com.twelvemonkeys.imageio</groupId>
-			<artifactId>imageio-jpeg</artifactId>
-			<version>3.0.2</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.twelvemonkeys.common</groupId>
-			<artifactId>common-image</artifactId>
-			<version>3.0.2</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.twelvemonkeys.servlet</groupId>
-			<artifactId>servlet</artifactId>
-			<version>3.0.2</version>
-		</dependency>
-		
-		<!-- Image meta data -->
-		<!-- need by clobaframe-media -->
-		<dependency>
-			<groupId>com.drewnoakes</groupId>
-			<artifactId>metadata-extractor</artifactId>
-			<version>2.6.2</version>
-		</dependency>		
-
-		<!-- Mp3 meta data -->
-		<dependency>
-			<groupId>com.mpatric</groupId>
-			<artifactId>mp3agic</artifactId>
-			<version>0.8.2</version>
-		</dependency>
-
-		<!-- M4a meta data -->
-		<!-- This parser is depend on the file extension name, so it can not parser
-		the temporary resources. -->
-		<!--
-		<dependency>
-			<groupId>org.jaudiotagger</groupId>
-			<artifactId>jaudiotagger</artifactId>
-			<version>2.0.1</version>
-		</dependency>
-		-->
-
-		<!-- Mp4 meta data -->
-		<dependency>
-			<groupId>com.googlecode.mp4parser</groupId> 
-			<artifactId>isoparser</artifactId> 
-			<version>1.0.1</version> 
-		</dependency>
-		
-		<!-- javax servlet for test -->
-		<!-- need by clobaframe-io -->
+		<!-- javax servlet -->
+		<!-- need by clobaframe-webresource, clobaframe-io -->
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>servlet-api</artifactId>
 		</dependency>
+
+		<!-- Apache http components for test -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+			<version>4.3.2</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.3.3</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- Jackson JSON Mapper -->
+		<!-- need by clobaframe-webresource -->
+<!--		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>-->
+		
+		<!--
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
+			<version>4.3.3</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-logging</artifactId>
+					<groupId>commons-logging</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		-->
+		
+		<!-- Jetty for test -->
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>${org.eclipse.jetty-version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-servlet</artifactId>
+			<version>${org.eclipse.jetty-version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- javascript and style sheet minify -->
+		<dependency>            
+			<groupId>com.yahoo.platform.yui</groupId>
+			<artifactId>yuicompressor</artifactId>
+			<version>2.4.7</version>
+			<!-- 2.4.8 has an error while the javascript file is empty (only comments or new-line symbols) -->
+		</dependency>
+		
+		<!-- javascript optimizer -->
+		<!--
+		<dependency>
+			<groupId>com.google.javascript</groupId>
+			<artifactId>closure-compiler</artifactId>
+			<version>v20150315</version>
+		</dependency>
+		-->
 
 		<!-- Clobaframe -->
 		<dependency>
@@ -195,5 +208,12 @@
 			<version>${project.version}</version>
 		</dependency>
 		
+		<!-- Clobaframe for test -->
+		<dependency>
+			<groupId>org.archboy.clobaframe</groupId>
+			<artifactId>clobaframe-ioc</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 	</dependencies>
 </project>

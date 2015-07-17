@@ -73,9 +73,9 @@ public class BeanFactoryTest {
 //		String beanDefineFileName = (String)applicationSetting.getValue(
 //				ApplicationSettingPlaceholderValueResolver.SETTING_KEY_BEAN_DEFINE_FILE_NAME);
 //		
-//		boolean requiredPlaceholderValue = (Boolean)applicationSetting.getValue(
+//		boolean requiredPlaceholderValue = Boolean.parseBoolean(applicationSetting.getValue(
 //				ApplicationSettingPlaceholderValueResolver.SETTING_KEY_REQUIRED_PLACEHOLDER_VALUE, 
-//				ApplicationSettingPlaceholderValueResolver.DEFAULT_REQUIRED_PLACEHOLDER_VALUE);
+//				ApplicationSettingPlaceholderValueResolver.DEFAULT_REQUIRED_PLACEHOLDER_VALUE).toString());
 //		
 //		PlaceholderValueResolver valueResolver = new ApplicationSettingPlaceholderValueResolver(applicationSetting);
 //		

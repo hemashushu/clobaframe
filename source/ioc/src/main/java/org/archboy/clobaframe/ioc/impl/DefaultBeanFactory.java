@@ -40,7 +40,7 @@ import org.springframework.util.Assert;
  */
 public class DefaultBeanFactory implements BeanFactory {
 
-	private static final String placeholderRegex = "^\\$\\{([\\w\\.-]+)(\\:([\\w\\.-]*))?\\}$";
+	private static final String placeholderRegex = "^\\$\\{([\\w\\.-]+)(\\:([\\w\\.\\:\\/-]*))?\\}$";
 	private static final Pattern placeholderPattern = Pattern.compile(placeholderRegex);
 	
 	private ResourceLoader resourceLoader;
@@ -104,9 +104,9 @@ public class DefaultBeanFactory implements BeanFactory {
 		this.beanDefineFileName = (String)applicationSetting.getValue(
 				ApplicationSettingPlaceholderValueResolver.SETTING_KEY_BEAN_DEFINE_FILE_NAME);
 		this.placeholderValueResolver = new ApplicationSettingPlaceholderValueResolver(applicationSetting);
-		this.requiredPlaceholderValue = (Boolean)applicationSetting.getValue(
+		this.requiredPlaceholderValue = Boolean.parseBoolean(applicationSetting.getValue(
 				ApplicationSettingPlaceholderValueResolver.SETTING_KEY_REQUIRED_PLACEHOLDER_VALUE,
-				ApplicationSettingPlaceholderValueResolver.DEFAULT_REQUIRED_PLACEHOLDER_VALUE);
+				ApplicationSettingPlaceholderValueResolver.DEFAULT_REQUIRED_PLACEHOLDER_VALUE).toString());
 		this.prebuildObjects = Arrays.asList(resourceLoader, applicationSetting);
 		this.resourceLoader = resourceLoader;
 		
@@ -123,9 +123,9 @@ public class DefaultBeanFactory implements BeanFactory {
 		this.beanDefineFileName = (String)applicationSetting.getValue(
 				ApplicationSettingPlaceholderValueResolver.SETTING_KEY_BEAN_DEFINE_FILE_NAME);
 		this.placeholderValueResolver = new ApplicationSettingPlaceholderValueResolver(applicationSetting);
-		this.requiredPlaceholderValue = (Boolean)applicationSetting.getValue(
+		this.requiredPlaceholderValue = Boolean.parseBoolean(applicationSetting.getValue(
 				ApplicationSettingPlaceholderValueResolver.SETTING_KEY_REQUIRED_PLACEHOLDER_VALUE,
-				ApplicationSettingPlaceholderValueResolver.DEFAULT_REQUIRED_PLACEHOLDER_VALUE);
+				ApplicationSettingPlaceholderValueResolver.DEFAULT_REQUIRED_PLACEHOLDER_VALUE).toString());
 		this.prebuildObjects = Arrays.asList(resourceLoader, applicationSetting);
 		this.resourceLoader = resourceLoader;
 		
@@ -250,7 +250,7 @@ public class DefaultBeanFactory implements BeanFactory {
 							IllegalAccessException | 
 							IllegalArgumentException | 
 							InvocationTargetException e){
-						throw new RuntimeException("Can not initialize bean.", e);
+						throw new RuntimeException("Can not initialize bean, message: " + e.getMessage(), e);
 					}
 				}
 				return bean.getObject();

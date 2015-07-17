@@ -103,15 +103,6 @@
 			<artifactId>clobaframe-setting</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
-		<!-- clobaframe for test -->
-		<dependency>
-			<groupId>org.archboy.clobaframe</groupId>
-			<artifactId>clobaframe-ioc</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		
-		
 	</dependencies>
 
 </project>
