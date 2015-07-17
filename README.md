@@ -1,25 +1,33 @@
 Clobaframe
 ==========
-Common components for web application.
-It abstracts the underlay service that runs on cloud platforms,
-such as VPS, Google cloud platform, Amazon web service, enable you to migrate
-web application between variable cloud platforms.
+Common components for desktop and web application.
+Besides provides the base components such as I/O, settings, IoC and resource etc
+that an application need, it also abstracts the underlay service that runs on cloud platforms,
+such as VPS, Google Cloud Platform, Amazon Web Service, make it possible to migrate
+application between these cloud platforms.
 
 __Features:__
 
-* webresource: automaticatly manage the web resources (i.e. image/css/js), includes the web resource version update/compress/css and js minify/server side cache/client side cache control.
-* blobstore: store the big binary object (user uploaded content) to cloud service.
-* media: load/parse/process the image, audio and video file.
+* common: common functions.
+* setting: application settings, writable.
+* ioc: mini IoC to improve the small desktop application start up performance.
+* io: abstract the local file and web I/O stream.
+* resource: automaticatly manage the app/web resources (i.e. image/css/js),   
+  includes the web resource version update/compress/css and js minify/server  
+  side cache/client side cache control.
+* blobstore: store the big binary object (user uploaded content) to local storage or cloud service.
 * query: a SQL like query tool for collections.
 * cache: simplified the cache access.
-* io: abstract the local file and web i/o stream.
+* media: load/parse/process the image, audio and video file.
 * mail: abstract the mail sender.
+* search: full text index.
 
 Unit test
 ---------
-1. Check out source code to any folder.
-2. Install and start the memcached service (optional, only for complete the cache-memcached unit tests).
-3. Run the unit test with Apache Maven:
+1. Install Git, JDK, Apache Maven.
+2. Check out source code to any folder.
+3. Change into the source folder and run the unit test with Apache Maven:
+
 ```
     $ mvn clean test
 ```
@@ -27,6 +35,7 @@ Unit test
 Install library
 ---------------
 Install clobaframe into Apache Maven local repository:
+
 ```
     $ mvn clean javadoc:jar source:jar install
 ```
