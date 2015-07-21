@@ -14,6 +14,8 @@ import org.archboy.clobaframe.setting.global.GlobalSettingProvider;
 import org.archboy.clobaframe.setting.support.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -23,7 +25,7 @@ import org.springframework.core.io.ResourceLoader;
  * @author yang
  */
 @Named
-public class DefaultGlobalSettingProvider implements GlobalSettingProvider {
+public class DefaultGlobalSettingProvider implements GlobalSettingProvider, InitializingBean {
 	//, ResourceLoaderAware {
 
 	public static final String NAME = "defaultGlobalSetting";
@@ -31,7 +33,7 @@ public class DefaultGlobalSettingProvider implements GlobalSettingProvider {
 	@Inject
 	private ResourceLoader resourceLoader;
 
-	@Inject
+	@Autowired(required = false)
 	private ApplicationSetting applicationSetting;
 	
 	//private static final String DEFAULT_GLOBAL_SETTING_FILE_NAME = "classpath:global.properties";
@@ -39,8 +41,8 @@ public class DefaultGlobalSettingProvider implements GlobalSettingProvider {
 	
 	public static final String SETTING_KEY_GLOBAL_SETTING_FILE_NAME = "clobaframe.setting.defaultGlobalSettingFileName";
 	
-	//@Value("${" + SETTING_KEY_GLOBAL_SETTING_FILE_NAME + ":" + DEFAULT_GLOBAL_SETTING_FILE_NAME + "}")
-	//public String defaultGlobalSettingFileName;
+	@Value("${" + SETTING_KEY_GLOBAL_SETTING_FILE_NAME + ":" + DEFAULT_GLOBAL_SETTING_FILE_NAME + "}")
+	public String defaultGlobalSettingFileName;
 	
 	private final Logger logger = LoggerFactory.getLogger(DefaultGlobalSettingProvider.class);
 
@@ -53,6 +55,10 @@ public class DefaultGlobalSettingProvider implements GlobalSettingProvider {
 		this.resourceLoader = resourceLoader;
 	}
 
+	public void setDefaultGlobalSettingFileName(String defaultGlobalSettingFileName) {
+		this.defaultGlobalSettingFileName = defaultGlobalSettingFileName;
+	}
+	
 	@Override
 	public String getName() {
 		return NAME;
@@ -64,11 +70,18 @@ public class DefaultGlobalSettingProvider implements GlobalSettingProvider {
 	}
 
 	@Override
+	public void afterPropertiesSet() throws Exception {
+		if (StringUtils.isEmpty(defaultGlobalSettingFileName)) {
+			if (applicationSetting != null) {
+				defaultGlobalSettingFileName = (String)applicationSetting.getValue(
+						SETTING_KEY_GLOBAL_SETTING_FILE_NAME, 
+						DEFAULT_GLOBAL_SETTING_FILE_NAME);
+			}
+		}
+	}
+
+	@Override
 	public Map<String, Object> list() {
-		String defaultGlobalSettingFileName = (String)applicationSetting.getValue(
-				SETTING_KEY_GLOBAL_SETTING_FILE_NAME, 
-				DEFAULT_GLOBAL_SETTING_FILE_NAME);
-		
 		if (StringUtils.isEmpty(defaultGlobalSettingFileName)){
 			return new LinkedHashMap<String, Object>();
 		}

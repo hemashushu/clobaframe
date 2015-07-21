@@ -1,7 +1,7 @@
 Clobaframe
 ==========
 Common components for desktop and web application.
-Besides provides the base components such as I/O, settings, IoC and resource etc
+Provides the base components such as I/O, settings, IoC and resource etc
 that an application need, it also abstracts the underlay service that runs on cloud platforms,
 such as VPS, Google Cloud Platform, Amazon Web Service, make it possible to migrate
 application between these cloud platforms.

@@ -22,7 +22,6 @@ import org.archboy.clobaframe.ioc.bean.RubberDuck;
 import org.archboy.clobaframe.ioc.bean.Status;
 import org.archboy.clobaframe.ioc.bean.Zoo;
 import org.archboy.clobaframe.ioc.impl.ApplicationSettingPlaceholderValueResolver;
-import org.archboy.clobaframe.ioc.impl.Bean;
 import org.archboy.clobaframe.ioc.impl.DefaultBeanFactory;
 import org.archboy.clobaframe.setting.application.ApplicationSetting;
 import org.archboy.clobaframe.setting.application.impl.DefaultApplicationSetting;
@@ -111,35 +110,35 @@ public class BeanFactoryTest {
 	@Test
 	public void testGet() throws Exception {
 		// test get bean by class
-		status = beanFactory.getBean(Status.class);
+		status = beanFactory.get(Status.class);
 		assertNotNull(status);
 		assertEquals(Status.class, status.getClass());
 		
-		Food food = beanFactory.getBean(Food.class);
+		Food food = beanFactory.get(Food.class);
 		assertNotNull(food);
 		assertEquals(DefaultFood.class, food.getClass());
 		
 		// get by id
-		Food foodById = (Food)beanFactory.getBean("food");
+		Food foodById = (Food)beanFactory.get("food");
 		assertNotNull(foodById);
 		assertEquals(food, foodById);
 		
 		// get by auto id
-		Dog dog = beanFactory.getBean(Dog.class);
-		Dog dogById = (Dog)beanFactory.getBean("dog");
+		Dog dog = beanFactory.get(Dog.class);
+		Dog dogById = (Dog)beanFactory.get("dog");
 		assertEquals(dog, dogById);
 		
 		// get by class and check properties
-		RubberDuck rubberDuck = beanFactory.getBean(RubberDuck.class);
+		RubberDuck rubberDuck = beanFactory.get(RubberDuck.class);
 		assertNotNull(rubberDuck);
 		assertEquals("rubberDuck", rubberDuck.getName());
 		
 		// test get the prebuild bean
-		assertNotNull(beanFactory.getBean(ResourceLoader.class));
-		assertNotNull(beanFactory.getBean(ApplicationSetting.class));
+		assertNotNull(beanFactory.get(ResourceLoader.class));
+		assertNotNull(beanFactory.get(ApplicationSetting.class));
 		
 		// test get beans
-		Collection<Animal> animals = beanFactory.listBeans(Animal.class);
+		Collection<Animal> animals = beanFactory.list(Animal.class);
 		assertEquals(3, animals.size());
 		
 		for(Animal animal : animals){
@@ -163,7 +162,7 @@ public class BeanFactoryTest {
 		}
 		
 		// test collection inject
-		Zoo zoo = beanFactory.getBean(Zoo.class);
+		Zoo zoo = beanFactory.get(Zoo.class);
 		assertNotNull(zoo);
 		assertEquals(3, zoo.getAnimals().size());
 		

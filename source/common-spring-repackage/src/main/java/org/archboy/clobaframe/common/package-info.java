@@ -8,8 +8,8 @@
  * {@link Resource} and {@link ResourceLoader}.
  * {@link Assert}.
  * 
- * This package include all interface implements and relate classes, your project
- * can use this package instead of "clobaframe-common" to reduce the dependencies.
+ * This package include all interface implements and relate classes, a project
+ * can use this package instead of "clobaframe-common" to remove the dependencies of Spring Framework.
  * 
  */
 package org.archboy.clobaframe.common;

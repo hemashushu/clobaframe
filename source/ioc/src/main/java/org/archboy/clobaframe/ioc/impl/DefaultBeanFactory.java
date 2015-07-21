@@ -1,5 +1,6 @@
 package org.archboy.clobaframe.ioc.impl;
 
+import org.archboy.clobaframe.ioc.BeanDefinition;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileNotFoundException;
@@ -22,6 +23,7 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.archboy.clobaframe.ioc.BeanDefinitionBuilder;
 import org.archboy.clobaframe.ioc.BeanFactory;
 import org.archboy.clobaframe.ioc.BeanFactoryCloseEventListener;
 import org.archboy.clobaframe.ioc.PlaceholderValueResolver;
@@ -38,7 +40,7 @@ import org.springframework.util.Assert;
  *
  * @author yang
  */
-public class DefaultBeanFactory implements BeanFactory {
+public class DefaultBeanFactory implements BeanFactory, BeanDefinitionBuilder {
 
 	private static final String placeholderRegex = "^\\$\\{([\\w\\.-]+)(\\:([\\w\\.\\:\\/-]*))?\\}$";
 	private static final Pattern placeholderPattern = Pattern.compile(placeholderRegex);
@@ -48,7 +50,7 @@ public class DefaultBeanFactory implements BeanFactory {
 	private boolean requiredPlaceholderValue;
 	private PlaceholderValueResolver placeholderValueResolver;
 	
-	private List<Bean> beans = new ArrayList<Bean>();
+	private List<BeanDefinition> beans = new ArrayList<BeanDefinition>();
 	
 	private Collection<Object> prebuildObjects; // the object that builded outside this factory.
 	
@@ -172,8 +174,9 @@ public class DefaultBeanFactory implements BeanFactory {
 	private void loadPreBuildObject(Object object) {
 		Class<?> clazz = object.getClass();
 		Class<?>[] interfaces = clazz.getInterfaces();
+		Method[] methods = clazz.getDeclaredMethods();
 		String id = StringUtils.uncapitalize(clazz.getSimpleName());
-		Bean bean = new Bean(id, clazz, object, interfaces, null, null, true);
+		BeanDefinition bean = new BeanDefinition(id, clazz, object, interfaces, methods, null, null, true);
 		beans.add(bean);
 	}
 	
@@ -188,14 +191,14 @@ public class DefaultBeanFactory implements BeanFactory {
 		}
 		
 		Collection<Map<String, Object>> defineClassNames = getDefineClassNames(resource);
-		List<Bean> uninitBeans = buildUninitBeans(defineClassNames);
+		List<BeanDefinition> uninitBeans = buildUninitBeans(defineClassNames);
 		beans.addAll(uninitBeans);
 	}
 
-	private List<Bean> buildUninitBeans(Collection<Map<String, Object>> defineClassNames) throws 
+	private List<BeanDefinition> buildUninitBeans(Collection<Map<String, Object>> defineClassNames) throws 
 			ClassNotFoundException, InstantiationException, IllegalAccessException {
 		
-		List<Bean> uninitBeans = new ArrayList<Bean>();
+		List<BeanDefinition> uninitBeans = new ArrayList<BeanDefinition>();
 		
 		for (Map<String, Object> defineClassName : defineClassNames) {
 			Class<?> clazz = Class.forName((String)defineClassName.get("class"));
@@ -208,18 +211,20 @@ public class DefaultBeanFactory implements BeanFactory {
 			Object object = clazz.newInstance();
 			
 			Class<?>[] interfaces = clazz.getInterfaces();
-			Method initMethod = null;
-			Method closeMethod = null;
+			Method[] methods = clazz.getDeclaredMethods();
 			
-			for(Method m : clazz.getDeclaredMethods()) {
-				if (m.getAnnotation(PostConstruct.class) != null){
-					initMethod = m;
-				}else if (m.getAnnotation(PreDestroy.class) != null){
-					closeMethod = m;
+			String initMethodName = null;
+			String disposeMethodName = null;
+			
+			for(Method method : methods) {
+				if (method.getAnnotation(PostConstruct.class) != null){
+					initMethodName = method.getName();
+				}else if (method.getAnnotation(PreDestroy.class) != null){
+					disposeMethodName = method.getName();
 				}
 			}
 			
-			Bean bean = new Bean(id, clazz, object, interfaces, initMethod, closeMethod, false);
+			BeanDefinition bean = new BeanDefinition(id, clazz, object, interfaces, methods, initMethodName, disposeMethodName, false);
 			uninitBeans.add(bean);
 		}
 		
@@ -239,11 +244,11 @@ public class DefaultBeanFactory implements BeanFactory {
 	}
 
 	@Override
-	public Object getBean(String id) {
+	public Object get(String id) {
 		Assert.hasText(id);
-		for(Bean bean : beans){
+		for(BeanDefinition bean : beans){
 			if (id.equals(bean.getId())){
-				if (!bean.isInited()){
+				if (!bean.isInitialized()){
 					try{
 						initBean(bean);
 					}catch(ClassNotFoundException | 
@@ -259,11 +264,22 @@ public class DefaultBeanFactory implements BeanFactory {
 		
 		return null;
 	}
+
+	@Override
+	public BeanDefinition getDefinition(String id) {
+		Assert.hasText(id);
+		for(BeanDefinition bean : beans){
+			if (id.equals(bean.getId())){
+				return bean;
+			}
+		}
+		return null;
+	}
 	
 	@Override
-	public <T> T getBean(Class<T> clazz) {
+	public <T> T get(Class<T> clazz) {
 		Assert.notNull(clazz);
-		Collection<T> objects = listBeans(clazz);
+		Collection<T> objects = list(clazz);
 		if (objects.isEmpty()) {
 			return null;
 		}
@@ -277,11 +293,11 @@ public class DefaultBeanFactory implements BeanFactory {
 	}
 
 	@Override
-	public <T> Collection<T> listBeans(Class<T> clazz) {
+	public <T> Collection<T> list(Class<T> clazz) {
 		Assert.notNull(clazz);
 		
-		Collection<Bean> matchBeans = new ArrayList<Bean>();
-		for(Bean bean : beans) {
+		Collection<BeanDefinition> matchBeans = new ArrayList<BeanDefinition>();
+		for(BeanDefinition bean : beans) {
 			if (bean.getClazz().equals(clazz)){
 				matchBeans.add(bean);
 			}else{
@@ -296,8 +312,8 @@ public class DefaultBeanFactory implements BeanFactory {
 		Collection<T> objects = new ArrayList<T>();
 		
 		try{
-			for(Bean bean : matchBeans) {
-				if (!bean.isInited()) {
+			for(BeanDefinition bean : matchBeans) {
+				if (!bean.isInitialized()) {
 					initBean(bean);
 				}
 				objects.add((T)bean.getObject());
@@ -312,7 +328,7 @@ public class DefaultBeanFactory implements BeanFactory {
 		return objects;
 	}
 	
-	private void initBean(Bean bean) throws 
+	private void initBean(BeanDefinition bean) throws 
 			ClassNotFoundException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 		
 		if (!initializingBeanIds.empty() && initializingBeanIds.contains(bean.getId())){
@@ -338,7 +354,7 @@ public class DefaultBeanFactory implements BeanFactory {
 					// inject collection field.
 					ParameterizedType pType = (ParameterizedType)field.getGenericType();
 					dataType = (Class<?>)pType.getActualTypeArguments()[0];
-					Collection<?> targetObjects = listBeans(dataType);
+					Collection<?> targetObjects = list(dataType);
 					
 					if (targetObjects.isEmpty()){
 						if (autowired == null || autowired.required()) {
@@ -348,7 +364,7 @@ public class DefaultBeanFactory implements BeanFactory {
 						field.set(obj, targetObjects);
 					}
 				}else{
-					Object targetObject = getBean(dataType);
+					Object targetObject = get(dataType);
 					
 					if (targetObject == null) {
 						if (autowired == null || autowired.required()) {
@@ -421,22 +437,24 @@ public class DefaultBeanFactory implements BeanFactory {
 			}
 		}
 		
-		Method initMethod = bean.getInitMethod();
-		if (initMethod != null) {
+		String initMethodName = bean.getInitMethodName();
+		if (initMethodName != null) {
+			Method initMethod = getMethod(bean.getMethods(), initMethodName);
 			initMethod.invoke(obj);
 		}
 		
-		bean.finishInited();
+		bean.setInitialized(true);
 		
 		initializingBeanIds.pop();
 	}
 	
 	@Override
 	public void close() throws Exception {
-		for(Bean bean : beans) {
-			Method m = bean.getCloseMethod();
-			if (m != null) {
-				m.invoke(bean.getObject());
+		for(BeanDefinition bean : beans) {
+			String disposeMethodName = bean.getDisposeMethodName();
+			if (disposeMethodName != null) {
+				Method disposeMethod = getMethod(bean.getMethods(), disposeMethodName);
+				disposeMethod.invoke(bean.getObject());
 			}
 		}
 		
@@ -444,5 +462,14 @@ public class DefaultBeanFactory implements BeanFactory {
 		for(BeanFactoryCloseEventListener eventListener : closeEventListeners) {
 			eventListener.onClose();
 		}
+	}
+	
+	private Method getMethod(Method[] methods, String name) {
+		for (Method method : methods) {
+			if (name.equals(method.getName())) {
+				return method;
+			}
+		}
+		return null;
 	}
 }

@@ -1,32 +1,38 @@
-package org.archboy.clobaframe.ioc.impl;
+package org.archboy.clobaframe.ioc;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.springframework.util.Assert;
 
 /**
  *
  * @author yang
  */
-public class Bean {
+public class BeanDefinition {
 	private String id;
 	private Class<?> clazz;
 	private Object object;
 	private Class<?>[] interfaces;
-	private Method initMethod;
-	private Method closeMethod;
-	private boolean inited;
+	private Method[] methods; // declared methods
+	private String initMethodName;
+	private String disposeMethodName;
+	private boolean initialized;
 	
-	public Bean(String id, Class<?> clazz, Object object, Class<?>[] interfaces, Method initMethod, Method closeMethod, boolean inited) {
+	public BeanDefinition(String id, Class<?> clazz, Object object, 
+			Class<?>[] interfaces, Method[] methods, 
+			String initMethodName, String disposeMethodName, 
+			boolean initialized) {
 		this.id = id;
 		this.clazz = clazz;
 		this.object = object;
 		this.interfaces = interfaces;
-		this.initMethod = initMethod;
-		this.closeMethod = closeMethod;
-		this.inited = inited;
+		this.methods = methods;
+		this.initMethodName = initMethodName;
+		this.disposeMethodName = disposeMethodName;
+		this.initialized = initialized;
 	}
 
 	public String getId() {
@@ -45,20 +51,25 @@ public class Bean {
 		return interfaces;
 	}
 
-	public Method getInitMethod() {
-		return initMethod;
+	public Method[] getMethods() {
+		return methods;
 	}
 
-	public Method getCloseMethod() {
-		return closeMethod;
+	public String getInitMethodName() {
+		return initMethodName;
 	}
 
-	public boolean isInited() {
-		return inited;
+	public String getDisposeMethodName() {
+		return disposeMethodName;
 	}
 
-	public void finishInited() {
-		this.inited = true;
+	public boolean isInitialized() {
+		return initialized;
+	}
+
+	public void setInitialized(boolean initialized) {
+		Assert.isTrue(initialized);
+		this.initialized = initialized;
 	}
 	
 	@Override
@@ -75,7 +86,7 @@ public class Bean {
 			return false;
 		}
 
-		Bean other = (Bean)obj;
+		BeanDefinition other = (BeanDefinition)obj;
 		return new EqualsBuilder()
 				.append(getId(), other.getId())
 				.append(getClazz(), other.getClazz())

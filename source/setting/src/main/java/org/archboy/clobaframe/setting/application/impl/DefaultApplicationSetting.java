@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Properties;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.archboy.clobaframe.setting.SettingProvider;
@@ -39,15 +40,19 @@ import org.springframework.util.Assert;
  */
 public class DefaultApplicationSetting implements ApplicationSetting, ResourceLoaderAware, InitializingBean {
 
-	public static final String ROOT_KEY_APPLICATION_NAME = "clobaframe.setting.applicationName";
 	public static final String ROOT_KEY_ROOT_CONFIG_FILE_NAME = "clobaframe.setting.rootConfigFileName";
+
+	public static final String ROOT_KEY_APPLICATION_NAME = "clobaframe.setting.applicationName";
 	public static final String ROOT_KEY_DATA_FOLDER = "clobaframe.setting.dataFolder";
 	public static final String ROOT_KEY_AUTO_CREATE_DATA_FOLDER = "clobaframe.setting.autoCreateDataFolder";
 	public static final String ROOT_KEY_DEFAULT_SETTING_FILE_NAME = "clobaframe.setting.defaultSettingFileName";
+	//public static final String ROOT_KEY_OTHER_SETTING_FILE_NAMES = "clobaframe.setting.otherSettingFileNames";
 	public static final String ROOT_KEY_CUSTOM_SETTING_FILE_NAME = "clobaframe.setting.customSettingFileName";
 	public static final String ROOT_KEY_EXTRA_SETTING_FILE_NAME = "clobaframe.setting.extraSettingFileName";
 	public static final String ROOT_KEY_SAVING_SETTING_FILE_NAME = "clobaframe.setting.savingSettingFileName";
 
+	public static final String DEFAULT_ROOT_CONFIG_FILE_NAME = "classpath:root.properties";
+	
 	private Map<String, Object> rootSetting = new LinkedHashMap<String, Object>();
 	private Map<String, Object> setting = new LinkedHashMap<String, Object>();
 
@@ -55,7 +60,7 @@ public class DefaultApplicationSetting implements ApplicationSetting, ResourceLo
 	private String applicationName;
 	
 	// an other base setting value.
-	private String rootConfigFileName;
+	private String rootConfigFileName = DEFAULT_ROOT_CONFIG_FILE_NAME;
 	
 	/**
 	 * Base root setting values.
@@ -113,7 +118,7 @@ public class DefaultApplicationSetting implements ApplicationSetting, ResourceLo
 	}
 
 	public DefaultApplicationSetting() {
-		// for manual build.
+		// for Spring IoC bean xml define.
 	}
 
 	public DefaultApplicationSetting(ResourceLoader resourceLoader, 
@@ -145,8 +150,6 @@ public class DefaultApplicationSetting implements ApplicationSetting, ResourceLo
 		this.locations = locations;
 		afterPropertiesSet();
 	}
-	
-	//@PostConstruct
 	
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -204,10 +207,12 @@ public class DefaultApplicationSetting implements ApplicationSetting, ResourceLo
 		
 		Resource resource = resourceLoader.getResource(fileName);
 		if (!resource.exists()) {
-			throw new FileNotFoundException(
+			//throw new FileNotFoundException(
+			logger.warn(
 					String.format(
 							"Application root setting resource [{}] not found.", 
 							resource.getFilename()));
+			return;
 		}
 		
 		Map<String, Object> map = null;

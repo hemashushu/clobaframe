@@ -31,11 +31,11 @@ import org.springframework.beans.factory.annotation.Value;
  */
 public interface BeanFactory {
 	
-	<T> Collection<T> listBeans(Class<T> clazz);
+	<T> Collection<T> list(Class<T> clazz);
 	
-	Object getBean(String id);
+	Object get(String id);
 	
-	<T> T getBean(Class<T> clazz);
+	<T> T get(Class<T> clazz);
 	
 	void close() throws Exception;
 	

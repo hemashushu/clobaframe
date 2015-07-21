@@ -1,32 +1,16 @@
 package org.archboy.clobaframe.resource;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Named;
-import org.apache.commons.io.IOUtils;
 import org.archboy.clobaframe.io.NamedResourceInfo;
 import org.archboy.clobaframe.ioc.BeanFactory;
 import org.archboy.clobaframe.ioc.impl.DefaultBeanFactory;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -46,7 +30,7 @@ public class ResourceManagerWithIoCTest {
 		this.beanFactory = new DefaultBeanFactory(
 				"classpath:application.properties", 
 				"classpath:clobaframe.properties");
-		this.resourceManager = beanFactory.getBean(ResourceManager.class);
+		this.resourceManager = beanFactory.get(ResourceManager.class);
 	}
 
 	@After
