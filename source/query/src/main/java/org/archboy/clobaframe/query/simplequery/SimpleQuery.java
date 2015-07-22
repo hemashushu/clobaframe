@@ -9,9 +9,9 @@ import java.util.Set;
 import java.util.TreeSet;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
-import org.archboy.clobaframe.query.DefaultObjectMap;
+import org.archboy.clobaframe.common.DefaultObjectMap;
 import org.archboy.clobaframe.query.Query;
-import org.archboy.clobaframe.query.ObjectMap;
+import org.archboy.clobaframe.common.ObjectMap;
 import org.springframework.util.Assert;
 
 /**

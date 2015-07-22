@@ -44,7 +44,7 @@ public class ResourceProviderSetImpl implements ResourceProviderSet {
 	public Collection<NamedResourceInfo> list() {
 		Set<NamedResourceInfo> resourceInfos = new HashSet<NamedResourceInfo>();
 		
-		// list resource in the revert repository priority order
+		// list resource from big (lower) to small (higher) order value,
 		// so the higher priority can override the lower one.
 		for (int idx = resourceProviders.size() -1; idx>=0; idx--){
 			ResourceProvider resourceRepository = resourceProviders.get(idx);
@@ -62,6 +62,8 @@ public class ResourceProviderSetImpl implements ResourceProviderSet {
 		}
 		
 		resourceProviders.add(webResourceProvider);
+		
+		// sort 0-9
 		resourceProviders.sort(new Comparator<ResourceProvider>() {
 
 			@Override

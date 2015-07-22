@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
  *
  * @author yang
  */
+@Special
 public class Dog implements Animal {
 
 	@Inject

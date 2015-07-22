@@ -1,5 +1,6 @@
 package org.archboy.clobaframe.ioc;
 
+import java.lang.annotation.Annotation;
 import java.util.Collection;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -31,13 +32,47 @@ import org.springframework.beans.factory.annotation.Value;
  */
 public interface BeanFactory {
 	
+	/**
+	 * List by class or interface.
+	 * 
+	 * @param <T>
+	 * @param clazz
+	 * @return 
+	 */
 	<T> Collection<T> list(Class<T> clazz);
 	
+	/**
+	 * 
+	 * @param clazz
+	 * @return 
+	 */
+	Collection<Object> listByAnnotation(Class<? extends Annotation> clazz);
+	
+	/**
+	 * 
+	 * @param id
+	 * @return 
+	 */
 	Object get(String id);
 	
+	/**
+	 * Get by class or interface.
+	 * 
+	 * @param <T>
+	 * @param clazz
+	 * @return 
+	 */
 	<T> T get(Class<T> clazz);
 	
+	/**
+	 * 
+	 * @throws Exception 
+	 */
 	void close() throws Exception;
 	
+	/**
+	 * 
+	 * @param eventListener 
+	 */
 	void addCloseEventListener(BeanFactoryCloseEventListener eventListener);
 }

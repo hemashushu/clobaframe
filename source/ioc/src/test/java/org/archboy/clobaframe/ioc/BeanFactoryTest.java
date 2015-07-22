@@ -1,37 +1,23 @@
 package org.archboy.clobaframe.ioc;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import org.archboy.clobaframe.ioc.bean.Animal;
 import org.archboy.clobaframe.ioc.bean.DefaultFood;
 import org.archboy.clobaframe.ioc.bean.Dog;
 import org.archboy.clobaframe.ioc.bean.Food;
 import org.archboy.clobaframe.ioc.bean.RubberDuck;
+import org.archboy.clobaframe.ioc.bean.Special;
 import org.archboy.clobaframe.ioc.bean.Status;
 import org.archboy.clobaframe.ioc.bean.Zoo;
-import org.archboy.clobaframe.ioc.impl.ApplicationSettingPlaceholderValueResolver;
 import org.archboy.clobaframe.ioc.impl.DefaultBeanFactory;
 import org.archboy.clobaframe.setting.application.ApplicationSetting;
-import org.archboy.clobaframe.setting.application.impl.DefaultApplicationSetting;
 import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 
 /**
@@ -62,27 +48,6 @@ public class BeanFactoryTest {
 
 		beanFactory = new DefaultBeanFactory("classpath:application.properties");
 		
-//		ResourceLoader resourceLoader = new DefaultResourceLoader();
-//		
-//		ApplicationSetting applicationSetting = new DefaultApplicationSetting(
-//				resourceLoader, null, null,
-//				"classpath:root.properties", 
-//				null, (String[])null);
-//		
-//		String beanDefineFileName = (String)applicationSetting.getValue(
-//				ApplicationSettingPlaceholderValueResolver.SETTING_KEY_BEAN_DEFINE_FILE_NAME);
-//		
-//		boolean requiredPlaceholderValue = Boolean.parseBoolean(applicationSetting.getValue(
-//				ApplicationSettingPlaceholderValueResolver.SETTING_KEY_REQUIRED_PLACEHOLDER_VALUE, 
-//				ApplicationSettingPlaceholderValueResolver.DEFAULT_REQUIRED_PLACEHOLDER_VALUE).toString());
-//		
-//		PlaceholderValueResolver valueResolver = new ApplicationSettingPlaceholderValueResolver(applicationSetting);
-//		
-//		beanFactory = new DefaultBeanFactory(
-//				resourceLoader, valueResolver, 
-//				beanDefineFileName, requiredPlaceholderValue,
-//				Arrays.asList(resourceLoader, applicationSetting));
-		
 		beanFactory.addCloseEventListener(new BeanFactoryCloseEventListener() {
 			@Override
 			public void onClose() {
@@ -109,7 +74,7 @@ public class BeanFactoryTest {
 
 	@Test
 	public void testGet() throws Exception {
-		// test get bean by class
+		// get by class
 		status = beanFactory.get(Status.class);
 		assertNotNull(status);
 		assertEquals(Status.class, status.getClass());
@@ -123,7 +88,7 @@ public class BeanFactoryTest {
 		assertNotNull(foodById);
 		assertEquals(food, foodById);
 		
-		// get by auto id
+		// get by class that without id define.
 		Dog dog = beanFactory.get(Dog.class);
 		Dog dogById = (Dog)beanFactory.get("dog");
 		assertEquals(dog, dogById);
@@ -133,11 +98,11 @@ public class BeanFactoryTest {
 		assertNotNull(rubberDuck);
 		assertEquals("rubberDuck", rubberDuck.getName());
 		
-		// test get the prebuild bean
+		// get the prebuild bean
 		assertNotNull(beanFactory.get(ResourceLoader.class));
 		assertNotNull(beanFactory.get(ApplicationSetting.class));
 		
-		// test get beans
+		// get by interface
 		Collection<Animal> animals = beanFactory.list(Animal.class);
 		assertEquals(3, animals.size());
 		
@@ -160,6 +125,12 @@ public class BeanFactoryTest {
 					break;
 			}
 		}
+		
+		// get by annotation
+		Collection<Object> specials = beanFactory.listByAnnotation(Special.class);
+		assertEquals(2, specials.size());
+		assertTrue(specials.contains(beanFactory.get(Dog.class)));
+		assertTrue(specials.contains(beanFactory.get(RubberDuck.class)));
 		
 		// test collection inject
 		Zoo zoo = beanFactory.get(Zoo.class);

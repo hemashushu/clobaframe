@@ -1,4 +1,4 @@
-package org.archboy.clobaframe.query;
+package org.archboy.clobaframe.common;
 
 import java.util.Map;
 

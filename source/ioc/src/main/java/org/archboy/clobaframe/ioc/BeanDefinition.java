@@ -1,5 +1,6 @@
 package org.archboy.clobaframe.ioc;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -16,19 +17,22 @@ public class BeanDefinition {
 	private Class<?> clazz;
 	private Object object;
 	private Class<?>[] interfaces;
+	private Annotation[] annotations;
 	private Method[] methods; // declared methods
 	private String initMethodName;
 	private String disposeMethodName;
 	private boolean initialized;
 	
 	public BeanDefinition(String id, Class<?> clazz, Object object, 
-			Class<?>[] interfaces, Method[] methods, 
+			Class<?>[] interfaces, Annotation[] annotations, 
+			Method[] methods, 
 			String initMethodName, String disposeMethodName, 
 			boolean initialized) {
 		this.id = id;
 		this.clazz = clazz;
 		this.object = object;
 		this.interfaces = interfaces;
+		this.annotations = annotations;
 		this.methods = methods;
 		this.initMethodName = initMethodName;
 		this.disposeMethodName = disposeMethodName;
@@ -49,6 +53,10 @@ public class BeanDefinition {
 
 	public Class<?>[] getInterfaces() {
 		return interfaces;
+	}
+
+	public Annotation[] getAnnotations() {
+		return annotations;
 	}
 
 	public Method[] getMethods() {

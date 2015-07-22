@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -23,7 +24,6 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.archboy.clobaframe.ioc.BeanDefinitionBuilder;
 import org.archboy.clobaframe.ioc.BeanFactory;
 import org.archboy.clobaframe.ioc.BeanFactoryCloseEventListener;
 import org.archboy.clobaframe.ioc.PlaceholderValueResolver;
@@ -40,7 +40,7 @@ import org.springframework.util.Assert;
  *
  * @author yang
  */
-public class DefaultBeanFactory implements BeanFactory, BeanDefinitionBuilder {
+public class DefaultBeanFactory implements BeanFactory { //, BeanDefinitionBuilder {
 
 	private static final String placeholderRegex = "^\\$\\{([\\w\\.-]+)(\\:([\\w\\.\\:\\/-]*))?\\}$";
 	private static final Pattern placeholderPattern = Pattern.compile(placeholderRegex);
@@ -50,7 +50,7 @@ public class DefaultBeanFactory implements BeanFactory, BeanDefinitionBuilder {
 	private boolean requiredPlaceholderValue;
 	private PlaceholderValueResolver placeholderValueResolver;
 	
-	private List<BeanDefinition> beans = new ArrayList<BeanDefinition>();
+	private List<BeanDefinition> beanDefinitions = new ArrayList<BeanDefinition>();
 	
 	private Collection<Object> prebuildObjects; // the object that builded outside this factory.
 	
@@ -63,10 +63,6 @@ public class DefaultBeanFactory implements BeanFactory, BeanDefinitionBuilder {
 	private ObjectMapper objectMapper = new ObjectMapper();
 	
 	private TypeReference<List<Map<String, Object>>> typeReference = new TypeReference<List<Map<String, Object>>>() {};
-	
-	public DefaultBeanFactory(){
-		// for manual build.
-	}
 	
 	/**
 	 * 
@@ -174,10 +170,13 @@ public class DefaultBeanFactory implements BeanFactory, BeanDefinitionBuilder {
 	private void loadPreBuildObject(Object object) {
 		Class<?> clazz = object.getClass();
 		Class<?>[] interfaces = clazz.getInterfaces();
+		Annotation[] annotations = clazz.getDeclaredAnnotations();
 		Method[] methods = clazz.getDeclaredMethods();
 		String id = StringUtils.uncapitalize(clazz.getSimpleName());
-		BeanDefinition bean = new BeanDefinition(id, clazz, object, interfaces, methods, null, null, true);
-		beans.add(bean);
+		BeanDefinition bean = new BeanDefinition(id, clazz, object, 
+				interfaces, annotations, 
+				methods, null, null, true);
+		beanDefinitions.add(bean);
 	}
 	
 	private void loadBeanDefine(ResourceLoader resourceLoader) throws Exception {
@@ -192,7 +191,7 @@ public class DefaultBeanFactory implements BeanFactory, BeanDefinitionBuilder {
 		
 		Collection<Map<String, Object>> defineClassNames = getDefineClassNames(resource);
 		List<BeanDefinition> uninitBeans = buildUninitBeans(defineClassNames);
-		beans.addAll(uninitBeans);
+		beanDefinitions.addAll(uninitBeans);
 	}
 
 	private List<BeanDefinition> buildUninitBeans(Collection<Map<String, Object>> defineClassNames) throws 
@@ -212,6 +211,7 @@ public class DefaultBeanFactory implements BeanFactory, BeanDefinitionBuilder {
 			
 			Class<?>[] interfaces = clazz.getInterfaces();
 			Method[] methods = clazz.getDeclaredMethods();
+			Annotation[] annotations = clazz.getDeclaredAnnotations();
 			
 			String initMethodName = null;
 			String disposeMethodName = null;
@@ -224,7 +224,9 @@ public class DefaultBeanFactory implements BeanFactory, BeanDefinitionBuilder {
 				}
 			}
 			
-			BeanDefinition bean = new BeanDefinition(id, clazz, object, interfaces, methods, initMethodName, disposeMethodName, false);
+			BeanDefinition bean = new BeanDefinition(id, clazz, object, 
+					interfaces, annotations, 
+					methods, initMethodName, disposeMethodName, false);
 			uninitBeans.add(bean);
 		}
 		
@@ -246,7 +248,7 @@ public class DefaultBeanFactory implements BeanFactory, BeanDefinitionBuilder {
 	@Override
 	public Object get(String id) {
 		Assert.hasText(id);
-		for(BeanDefinition bean : beans){
+		for(BeanDefinition bean : beanDefinitions){
 			if (id.equals(bean.getId())){
 				if (!bean.isInitialized()){
 					try{
@@ -265,16 +267,16 @@ public class DefaultBeanFactory implements BeanFactory, BeanDefinitionBuilder {
 		return null;
 	}
 
-	@Override
-	public BeanDefinition getDefinition(String id) {
-		Assert.hasText(id);
-		for(BeanDefinition bean : beans){
-			if (id.equals(bean.getId())){
-				return bean;
-			}
-		}
-		return null;
-	}
+//	@Override
+//	public BeanDefinition getDefinition(String id) {
+//		Assert.hasText(id);
+//		for(BeanDefinition bean : beans){
+//			if (id.equals(bean.getId())){
+//				return bean;
+//			}
+//		}
+//		return null;
+//	}
 	
 	@Override
 	public <T> T get(Class<T> clazz) {
@@ -297,7 +299,7 @@ public class DefaultBeanFactory implements BeanFactory, BeanDefinitionBuilder {
 		Assert.notNull(clazz);
 		
 		Collection<BeanDefinition> matchBeans = new ArrayList<BeanDefinition>();
-		for(BeanDefinition bean : beans) {
+		for(BeanDefinition bean : beanDefinitions) {
 			if (bean.getClazz().equals(clazz)){
 				matchBeans.add(bean);
 			}else{
@@ -317,6 +319,38 @@ public class DefaultBeanFactory implements BeanFactory, BeanDefinitionBuilder {
 					initBean(bean);
 				}
 				objects.add((T)bean.getObject());
+			}
+		}catch(ClassNotFoundException | 
+				IllegalAccessException | 
+				IllegalArgumentException | 
+				InvocationTargetException e){
+			throw new RuntimeException("Can not initialize bean.", e);
+		}
+		
+		return objects;
+	}
+
+	@Override
+	public Collection<Object> listByAnnotation(Class<? extends Annotation> clazz) {
+		Assert.notNull(clazz);
+		
+		Collection<BeanDefinition> matchBeans = new ArrayList<BeanDefinition>();
+		for(BeanDefinition bean : beanDefinitions) {
+			for(Annotation c : bean.getAnnotations()){
+				if (clazz.equals(c.annotationType())) {
+					matchBeans.add(bean);
+				}
+			}
+		}
+		
+		Collection<Object> objects = new ArrayList<Object>();
+		
+		try{
+			for(BeanDefinition bean : matchBeans) {
+				if (!bean.isInitialized()) {
+					initBean(bean);
+				}
+				objects.add(bean.getObject());
 			}
 		}catch(ClassNotFoundException | 
 				IllegalAccessException | 
@@ -450,7 +484,7 @@ public class DefaultBeanFactory implements BeanFactory, BeanDefinitionBuilder {
 	
 	@Override
 	public void close() throws Exception {
-		for(BeanDefinition bean : beans) {
+		for(BeanDefinition bean : beanDefinitions) {
 			String disposeMethodName = bean.getDisposeMethodName();
 			if (disposeMethodName != null) {
 				Method disposeMethod = getMethod(bean.getMethods(), disposeMethodName);

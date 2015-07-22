@@ -1,5 +1,7 @@
 package org.archboy.clobaframe.query;
 
+import org.archboy.clobaframe.common.DefaultObjectMap;
+import org.archboy.clobaframe.common.ObjectMap;
 import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
