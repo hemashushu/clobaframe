@@ -9,9 +9,9 @@ import java.util.Set;
 import java.util.TreeSet;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
-import org.archboy.clobaframe.common.DefaultObjectMap;
+import org.archboy.clobaframe.common.collection.DefaultObjectMap;
 import org.archboy.clobaframe.query.Query;
-import org.archboy.clobaframe.common.ObjectMap;
+import org.archboy.clobaframe.common.collection.ObjectMap;
 import org.springframework.util.Assert;
 
 /**
@@ -203,7 +203,7 @@ public class SimpleQuery<T> implements Query<T>{
 		Collections.addAll(names, keys);
 		
 		for (T item : items) {
-			ObjectMap viewModel = DefaultObjectMap.Wrap(item, names);
+			ObjectMap viewModel = Utils.Wrap(item, names);
 			result.add(viewModel);
 		}
 

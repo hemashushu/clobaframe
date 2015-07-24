@@ -1,6 +1,6 @@
 package org.archboy.clobaframe.query;
 
-import org.archboy.clobaframe.common.ObjectMap;
+import org.archboy.clobaframe.common.collection.ObjectMap;
 import java.util.Comparator;
 import java.util.List;
 import org.apache.commons.collections.Predicate;

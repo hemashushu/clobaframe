@@ -1,4 +1,4 @@
-package org.archboy.clobaframe.common;
+package org.archboy.clobaframe.common.collection;
 
 import java.util.Map;
 

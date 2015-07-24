@@ -257,7 +257,10 @@ public class DefaultBeanFactory implements BeanFactory { //, BeanDefinitionBuild
 							IllegalAccessException | 
 							IllegalArgumentException | 
 							InvocationTargetException e){
-						throw new RuntimeException("Can not initialize bean, message: " + e.getMessage(), e);
+						throw new IllegalArgumentException(
+								String.format("Can not initialize bean [%s], message: %s", 
+										bean.getClazz().getName(), e.getMessage()),
+								e);
 					}
 				}
 				return bean.getObject();
@@ -313,18 +316,22 @@ public class DefaultBeanFactory implements BeanFactory { //, BeanDefinitionBuild
 		
 		Collection<T> objects = new ArrayList<T>();
 		
-		try{
-			for(BeanDefinition bean : matchBeans) {
-				if (!bean.isInitialized()) {
+		for(BeanDefinition bean : matchBeans) {
+			if (!bean.isInitialized()) {
+				try{
 					initBean(bean);
+				}catch(ClassNotFoundException | 
+						IllegalAccessException | 
+						IllegalArgumentException |
+						InvocationTargetException e){
+					throw new IllegalArgumentException(
+							String.format("Can not initialize bean [%s], message: %s",
+									bean.getClazz().getName(), e.getMessage()), 
+							e);
 				}
-				objects.add((T)bean.getObject());
 			}
-		}catch(ClassNotFoundException | 
-				IllegalAccessException | 
-				IllegalArgumentException | 
-				InvocationTargetException e){
-			throw new RuntimeException("Can not initialize bean.", e);
+
+			objects.add((T)bean.getObject());
 		}
 		
 		return objects;
@@ -345,18 +352,21 @@ public class DefaultBeanFactory implements BeanFactory { //, BeanDefinitionBuild
 		
 		Collection<Object> objects = new ArrayList<Object>();
 		
-		try{
-			for(BeanDefinition bean : matchBeans) {
-				if (!bean.isInitialized()) {
+		for(BeanDefinition bean : matchBeans) {
+			if (!bean.isInitialized()) {
+				try{			
 					initBean(bean);
+				}catch(ClassNotFoundException | 
+							IllegalAccessException | 
+							IllegalArgumentException |
+							InvocationTargetException e) {
+					throw new IllegalArgumentException(
+							String.format("Can not initialize bean [%s], message: %s",
+									clazz.getName(), e.getMessage()), 
+							e);
 				}
-				objects.add(bean.getObject());
 			}
-		}catch(ClassNotFoundException | 
-				IllegalAccessException | 
-				IllegalArgumentException | 
-				InvocationTargetException e){
-			throw new RuntimeException("Can not initialize bean.", e);
+			objects.add(bean.getObject());
 		}
 		
 		return objects;
@@ -392,7 +402,9 @@ public class DefaultBeanFactory implements BeanFactory { //, BeanDefinitionBuild
 					
 					if (targetObjects.isEmpty()){
 						if (autowired == null || autowired.required()) {
-							throw new IllegalArgumentException("No beans to inject field: " + field.getName());
+							throw new IllegalArgumentException(
+									String.format("There is no match type to inject field [%s#%s]",
+											clazz.getName(), field.getName()));
 						}
 					}else{
 						field.set(obj, targetObjects);
@@ -402,7 +414,9 @@ public class DefaultBeanFactory implements BeanFactory { //, BeanDefinitionBuild
 					
 					if (targetObject == null) {
 						if (autowired == null || autowired.required()) {
-							throw new IllegalArgumentException("No bean to inject field: " + field.getName());
+							throw new IllegalArgumentException(
+									String.format("There is no match type to inject field [%s#%s]",
+											clazz.getName(), field.getName()));
 						}
 					}else{
 						field.set(obj, targetObject);
@@ -434,7 +448,9 @@ public class DefaultBeanFactory implements BeanFactory { //, BeanDefinitionBuild
 						(targetValue instanceof String && 
 						targetValue.equals(StringUtils.EMPTY))) {
 					if (requiredPlaceholderValue) {
-						throw new IllegalArgumentException("Can not find the value of placeholder " + placeholder);
+						throw new IllegalArgumentException(
+								String.format("Can not resolve the placeholder [%s] for field [%s#%s]",
+										placeholder, clazz.getName(), field.getName()));
 					}else{
 						continue;
 					}
@@ -449,7 +465,9 @@ public class DefaultBeanFactory implements BeanFactory { //, BeanDefinitionBuild
 					}else if (targetValue instanceof String) {
 						field.setInt(obj, Integer.parseInt((String)targetValue));
 					}else{
-						throw new ClassCastException("Can not cast the value of placeholder " + placeholder + " to integer." );
+						throw new IllegalArgumentException(
+								String.format("Can not resolve the placeholder [%s] for field [%s#%s], type cast error.",
+										placeholder, clazz.getName(), field.getName()));
 					}
 				}else if(dataType.equals(Long.class)){
 					if (targetValue instanceof Long){
@@ -457,7 +475,9 @@ public class DefaultBeanFactory implements BeanFactory { //, BeanDefinitionBuild
 					}else if (targetValue instanceof String) {
 						field.setLong(obj, Long.parseLong((String)targetValue));
 					}else {
-						throw new ClassCastException("Can not cast the value of placeholder " + placeholder + " to long." );
+						throw new IllegalArgumentException(
+								String.format("Can not resolve the placeholder [%s] for field [%s#%s], type cast error.",
+										placeholder, clazz.getName(), field.getName()));
 					}
 				}else if(dataType.equals(Boolean.class)){
 					if (targetValue instanceof Boolean){

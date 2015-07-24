@@ -1,9 +1,17 @@
 package org.archboy.clobaframe.query.simplequery;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.Map;
+import org.apache.commons.beanutils.DynaBean;
+import org.apache.commons.beanutils.DynaClass;
+import org.apache.commons.beanutils.DynaProperty;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.beanutils.WrapDynaBean;
+import org.archboy.clobaframe.common.collection.DefaultObjectMap;
+import org.archboy.clobaframe.common.collection.ObjectMap;
 import org.archboy.clobaframe.query.QueryException;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -51,5 +59,82 @@ public class Utils {
 							value1.getClass().getName()),
 					ex);
 		}
+	}
+	
+	/**
+	 * Wrap an object info ObjectMap.
+	 * 
+	 * @param object
+	 * @return 
+	 */
+	public static ObjectMap Wrap(Object object){
+		Assert.notNull(object);
+		
+		ObjectMap viewModel = new DefaultObjectMap();
+		
+		// check object type
+		if (object instanceof Map){
+			Map m = (Map)object;
+			for(Object name : m.keySet()){
+				viewModel.add(name.toString(), m.get(name));
+			}
+			return viewModel;
+		}
+
+		// copy all properties (except 'class') to map
+		DynaBean dynaBean = new WrapDynaBean(object);
+		DynaClass dynaClass = dynaBean.getDynaClass();
+		for(DynaProperty property : dynaClass.getDynaProperties()){
+			String key = property.getName();
+			if (key.equals("class")){
+				continue;
+			}
+
+			viewModel.add(key, dynaBean.get(key));
+		}
+		
+		return viewModel;
+	}
+	
+	public static ObjectMap Wrap(Object object, boolean deep){
+		throw new UnsupportedOperationException("Does not supported.");
+	}
+	
+	/**
+	 * Wrap an object into ObjectMap with the specify properties.
+	 * 
+	 * @param object
+	 * @param names
+	 * @return 
+	 */
+	public static ObjectMap Wrap(Object object, Collection<String> names){
+		Assert.notNull(object);
+		Assert.notNull(names);
+		
+		ObjectMap viewModel = new DefaultObjectMap();
+		
+		// check object type
+		if (object instanceof Map){
+			Map m = (Map)object;
+			for(Object name : m.keySet()){
+				String s = name.toString();
+				if (names.contains(s)){
+					viewModel.add(s, m.get(name));
+				}
+			}
+			return viewModel;
+		}
+		
+		// copy all properties (except 'class') to map
+		DynaBean dynaBean = new WrapDynaBean(object);
+		DynaClass dynaClass = dynaBean.getDynaClass();
+		for(DynaProperty property : dynaClass.getDynaProperties()){
+			String key = property.getName();
+			if (names.contains(key)){
+				viewModel.add(key, dynaBean.get(key));
+			}
+		}
+		
+		return viewModel;
 	}
 }
