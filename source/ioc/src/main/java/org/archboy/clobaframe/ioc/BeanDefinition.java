@@ -1,8 +1,10 @@
 package org.archboy.clobaframe.ioc;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.Map;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -18,24 +20,28 @@ public class BeanDefinition {
 	private Object object;
 	private Class<?>[] interfaces;
 	private Annotation[] annotations;
+	private Field[] fields;
 	private Method[] methods; // declared methods
 	private String initMethodName;
 	private String disposeMethodName;
+	private Collection<Map<String, Object>> props;
 	private boolean initialized;
 	
 	public BeanDefinition(String id, Class<?> clazz, Object object, 
-			Class<?>[] interfaces, Annotation[] annotations, 
-			Method[] methods, 
+			Class<?>[] interfaces, Annotation[] annotations, Field[] fields, Method[] methods, 
 			String initMethodName, String disposeMethodName, 
+			Collection<Map<String, Object>> props,
 			boolean initialized) {
 		this.id = id;
 		this.clazz = clazz;
 		this.object = object;
 		this.interfaces = interfaces;
 		this.annotations = annotations;
+		this.fields = fields;
 		this.methods = methods;
 		this.initMethodName = initMethodName;
 		this.disposeMethodName = disposeMethodName;
+		this.props = props;
 		this.initialized = initialized;
 	}
 
@@ -59,6 +65,10 @@ public class BeanDefinition {
 		return annotations;
 	}
 
+	public Field[] getFields() {
+		return fields;
+	}
+
 	public Method[] getMethods() {
 		return methods;
 	}
@@ -71,6 +81,10 @@ public class BeanDefinition {
 		return disposeMethodName;
 	}
 
+	public Collection<Map<String, Object>> getProps() {
+		return props;
+	}
+	
 	public boolean isInitialized() {
 		return initialized;
 	}

@@ -7,13 +7,13 @@ import org.springframework.beans.factory.annotation.Value;
  *
  * @author yang
  */
-@Special
+@Special // for test listing by annotation
 public class Dog implements Animal {
 
-	@Inject
+	@Inject // bean inject
 	private Food food;
 	
-	@Value("${test.dog.color}")
+	@Value("${test.dog.color}") // value inject with placeholder
 	private String color;
 	
 	@Override

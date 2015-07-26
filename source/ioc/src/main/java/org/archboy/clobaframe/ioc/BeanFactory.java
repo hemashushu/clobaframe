@@ -23,7 +23,8 @@ import org.springframework.beans.factory.annotation.Value;
  * 
  * {@link DefaultBeanFactory} can handle the bean inject by class type and the value inject by placeholder.
  * It lookups the {@link Inject} and {@link Autowired} and {@link Value} annotations that on the fields, and 
- * maintains bean life cycle by the {@link PostConstruct} and {@link PreDestroy} annotations.
+ * maintains bean life cycle by the {@link PostConstruct} and {@link PreDestroy} annotations. But does not support
+ * inherit annotation (suck as @Inject and @Value).
  *  
  * All bean class name must be listed on a JSON file that named 'bean.json' or defined 
  * in the application settings with key 'clobaframe.ioc.beanDefineFileName'.

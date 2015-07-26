@@ -124,9 +124,9 @@ public class MultiPathLocalResourceProvider implements ResourceProvider {
 				return;
 			}
 			
-			LocalResourceNameStrategy localWebResourceNameStrategy = new DefaultLocalResourceNameStrategy(basePath, namePrefix);
-			LocalResourceInfoFactory localWebResourceInfoFactory = new LocalResourceInfoFactory(mimeTypeDetector, localWebResourceNameStrategy);
-			LocalResourceProvider localResourceProvider = new DefaultLocalResourceProvider(basePath, localWebResourceInfoFactory, localWebResourceNameStrategy);
+			LocalResourceNameStrategy localResourceNameStrategy = new DefaultLocalResourceNameStrategy(basePath, namePrefix);
+			LocalResourceInfoFactory localResourceInfoFactory = new LocalResourceInfoFactory(mimeTypeDetector, localResourceNameStrategy);
+			LocalResourceProvider localResourceProvider = new DefaultLocalResourceProvider(basePath, localResourceInfoFactory, localResourceNameStrategy);
 			
 			localResourceProviders.add(localResourceProvider);
 			

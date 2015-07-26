@@ -7,7 +7,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *
+ * For test listing by annotation.
+ * 
  * @author yang
  */
 @Target({ElementType.TYPE})

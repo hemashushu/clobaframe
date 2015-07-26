@@ -10,6 +10,7 @@ import org.archboy.clobaframe.setting.application.ApplicationSetting;
  */
 public class ApplicationSettingPlaceholderValueResolver implements PlaceholderValueResolver {
 
+	public static final String DEFAULT_BEAN_DEFINE_FILE_NAME = "classpath:bean.json";
 	public static final boolean DEFAULT_REQUIRED_PLACEHOLDER_VALUE = true;
 	
 	public static final String SETTING_KEY_BEAN_DEFINE_FILE_NAME = "clobaframe.ioc.beanDefineFileName";

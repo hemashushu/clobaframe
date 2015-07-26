@@ -3,14 +3,26 @@
 		"class":"org.archboy.clobaframe.ioc.bean.DefaultFood"},
 	{"id":"cat",
 		"class":"org.archboy.clobaframe.ioc.bean.Cat"},
-	{"comment":"No explicit id, for testing.",
+	{"-comment-":"No explicit id.",
 		"class":"org.archboy.clobaframe.ioc.bean.Dog"},
-	{"id":"duck",
+	{"-comment-":"Define id by @Name.",
 		"class":"org.archboy.clobaframe.ioc.bean.Duck"},
+	{"-comment-":"Inject value and bean by define",
+		"id":"fish",
+		"class":"org.archboy.clobaframe.ioc.bean.Fish",
+		"props":[
+			{"name":"food", "bean":"food"},
+			{"name":"name", "value":"fish"},
+			{"name":"color", "value":"grey"}
+			]},
 	{"id":"rubberDuck",
 		"class":"org.archboy.clobaframe.ioc.bean.RubberDuck"},
 	{"id":"status",
 		"class":"org.archboy.clobaframe.ioc.bean.Status"},
 	{"id":"zoo",
-		"class":"org.archboy.clobaframe.ioc.bean.Zoo"}
+		"class":"org.archboy.clobaframe.ioc.bean.Zoo",
+		"props":[
+			{"name":"owners", "value":["foo", "${os.name}"]},
+			{"name":"pets", "bean":["cat", "dog"]}
+		]}
 ]

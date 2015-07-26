@@ -1,7 +1,7 @@
 package org.archboy.clobaframe.ioc.bean;
 
 /**
- *
+ * For test life cycle of bean factory.
  * @author yang
  */
 public class Status {
