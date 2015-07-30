@@ -1,8 +1,8 @@
 package org.archboy.clobaframe.ioc.impl;
 
-import org.archboy.clobaframe.ioc.BeanDefinition;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +14,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -25,13 +26,23 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.archboy.clobaframe.ioc.BeanFactory;
-import org.archboy.clobaframe.ioc.BeanFactoryCloseEventListener;
+import org.archboy.clobaframe.ioc.BeanFactoryClosedEvent;
 import org.archboy.clobaframe.ioc.PlaceholderValueResolver;
 import org.archboy.clobaframe.setting.application.ApplicationSetting;
 import org.archboy.clobaframe.setting.application.impl.DefaultApplicationSetting;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanNotOfRequiredTypeException;
+import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -41,29 +52,32 @@ import org.springframework.util.Assert;
  *
  * @author yang
  */
-public class DefaultBeanFactory implements BeanFactory { //, BeanDefinitionBuilder {
+public class DefaultBeanFactory implements ListableBeanFactory, Closeable, ApplicationEventPublisher  { //, BeanDefinitionBuilder {
 
 	private static final String placeholderRegex = "^\\$\\{([\\w\\.-]+)(\\:([\\w\\.\\:\\/-]*))?\\}$";
 	private static final Pattern placeholderPattern = Pattern.compile(placeholderRegex);
 	
-	private ResourceLoader resourceLoader;
+	//private ResourceLoader resourceLoader;
 	private String beanDefineFileName;
 	private boolean requiredPlaceholderValue;
 	private PlaceholderValueResolver placeholderValueResolver;
 	
 	private List<BeanDefinition> beanDefinitions = new ArrayList<BeanDefinition>();
 	
-	private Collection<Object> prebuildObjects; // the object that builded outside this factory.
+	//private Collection<Object> prebuildObjects; // the object that builded outside this factory.
 	
-	private Collection<BeanFactoryCloseEventListener> closeEventListeners = new ArrayList<BeanFactoryCloseEventListener>();
+	//private Collection<BeanFactoryCloseEventListener> closeEventListeners = new ArrayList<BeanFactoryCloseEventListener>();
+	private Collection<ApplicationListener> applicationListeners = new ArrayList<>();
+	
+	private ObjectMapper objectMapper = new ObjectMapper();
+	private TypeReference<List<Map<String, Object>>> typeReference = new TypeReference<List<Map<String, Object>>>() {};
 	
 	// keep the current initializing bean id
 	// to prevent infinite loop
 	private Stack<String> initializingBeanIds = new Stack<String>();
 	
-	private ObjectMapper objectMapper = new ObjectMapper();
 	
-	private TypeReference<List<Map<String, Object>>> typeReference = new TypeReference<List<Map<String, Object>>>() {};
+	private final Logger logger = LoggerFactory.getLogger(DefaultBeanFactory.class);
 	
 	/**
 	 * 
@@ -88,9 +102,9 @@ public class DefaultBeanFactory implements BeanFactory { //, BeanDefinitionBuild
 		this.beanDefineFileName = beanDefineFileName;
 		this.placeholderValueResolver = placeholderValueResolver;
 		this.requiredPlaceholderValue = requiredPlaceholderValue;
-		this.prebuildObjects = prebuildObjects;
-		this.resourceLoader = resourceLoader;
-		init();
+		//this.prebuildObjects = prebuildObjects;
+		//this.resourceLoader = resourceLoader;
+		init(resourceLoader, prebuildObjects);
 	}
 	
 	public DefaultBeanFactory(
@@ -109,10 +123,10 @@ public class DefaultBeanFactory implements BeanFactory { //, BeanDefinitionBuild
 				ApplicationSettingPlaceholderValueResolver.DEFAULT_REQUIRED_PLACEHOLDER_VALUE).toString());
 		
 		this.placeholderValueResolver = new ApplicationSettingPlaceholderValueResolver(applicationSetting);
-		this.prebuildObjects = Arrays.asList(resourceLoader, applicationSetting);
-		this.resourceLoader = resourceLoader;
+		Collection<Object> prebuildObjects = Arrays.asList(resourceLoader, applicationSetting);
+		//this.resourceLoader = resourceLoader;
 		
-		init();
+		init(resourceLoader, prebuildObjects);
 	}
 
 	public DefaultBeanFactory(String... applicationConfigFileName) throws Exception{
@@ -131,10 +145,10 @@ public class DefaultBeanFactory implements BeanFactory { //, BeanDefinitionBuild
 				ApplicationSettingPlaceholderValueResolver.DEFAULT_REQUIRED_PLACEHOLDER_VALUE).toString());
 		
 		this.placeholderValueResolver = new ApplicationSettingPlaceholderValueResolver(applicationSetting);
-		this.prebuildObjects = Arrays.asList(resLoader, applicationSetting);
-		this.resourceLoader = resLoader;
+		Collection<Object> prebuildObjects = Arrays.asList(resLoader, applicationSetting);
+		//this.resourceLoader = resLoader;
 		
-		init();
+		init(resLoader, prebuildObjects);
 	}
 
 	public void setBeanDefineFileName(String beanDefineFileName) {
@@ -149,22 +163,17 @@ public class DefaultBeanFactory implements BeanFactory { //, BeanDefinitionBuild
 		this.placeholderValueResolver = placeholderValueResolver;
 	}
 
-	public void setPrebuildObjects(Collection<Object> prebuildObjects) {
-		this.prebuildObjects = prebuildObjects;
-	}
+//	public void setPrebuildObjects(Collection<Object> prebuildObjects) {
+//		this.prebuildObjects = prebuildObjects;
+//	}
 	
-	@Override
-	public void addCloseEventListener(BeanFactoryCloseEventListener eventListener) {
-		closeEventListeners.add(eventListener);
-	}
-	
-	public void init() throws Exception {
+	private void init(ResourceLoader resourceLoader, Collection<Object> prebuildObjects) throws Exception {
 		loadPreBuildObject(this);
-		loadPreBuildObjects();
-		loadBeanDefine(resourceLoader);
+		loadPreBuildObjects(prebuildObjects);
+		loadBeanDefinition(resourceLoader);
 	}
 	
-	private void loadPreBuildObjects() {
+	private void loadPreBuildObjects(Collection<Object> prebuildObjects) {
 		if (prebuildObjects == null || prebuildObjects.isEmpty()) {
 			return;
 		}
@@ -206,7 +215,7 @@ public class DefaultBeanFactory implements BeanFactory { //, BeanDefinitionBuild
 		beanDefinitions.add(bean);
 	}
 	
-	private void loadBeanDefine(ResourceLoader resourceLoader) throws Exception {
+	private void loadBeanDefinition(ResourceLoader resourceLoader) throws Exception {
 		if (StringUtils.isEmpty(beanDefineFileName)) {
 			return;
 		}
@@ -216,12 +225,26 @@ public class DefaultBeanFactory implements BeanFactory { //, BeanDefinitionBuild
 			throw new FileNotFoundException(beanDefineFileName);
 		}
 		
-		Collection<Map<String, Object>> defineClassNames = getDefineClassNames(resource);
-		List<BeanDefinition> uninitBeans = buildUninitBeans(defineClassNames);
+		Collection<Map<String, Object>> defineClassNames = loadBeanDefinition(resource);
+		List<BeanDefinition> uninitBeans = buildBeans(defineClassNames);
 		beanDefinitions.addAll(uninitBeans);
 	}
 
-	private List<BeanDefinition> buildUninitBeans(Collection<Map<String, Object>> defineClassNames) throws 
+	private Collection<Map<String, Object>> loadBeanDefinition(Resource resource) throws IOException {
+		List<Map<String, Object>> defineClassNames = null;
+		InputStream in = null;
+		
+		try{
+			in = resource.getInputStream();
+			defineClassNames = objectMapper.readValue(in, typeReference);
+		}finally{
+			IOUtils.closeQuietly(in);
+		}
+		
+		return defineClassNames;
+	}
+	
+	private List<BeanDefinition> buildBeans(Collection<Map<String, Object>> defineClassNames) throws 
 			ClassNotFoundException, InstantiationException, IllegalAccessException {
 		
 		List<BeanDefinition> uninitBeans = new ArrayList<BeanDefinition>();
@@ -281,157 +304,7 @@ public class DefaultBeanFactory implements BeanFactory { //, BeanDefinitionBuild
 		
 		return uninitBeans;
 	}
-	
-	private Collection<Map<String, Object>> getDefineClassNames(Resource resource) throws IOException {
-		List<Map<String, Object>> defineClassNames = null;
-		InputStream in = null;
-		
-		try{
-			in = resource.getInputStream();
-			defineClassNames = objectMapper.readValue(in, typeReference);
-		}finally{
-			IOUtils.closeQuietly(in);
-		}
-		
-		return defineClassNames;
-	}
 
-	@Override
-	public Object get(String id) {
-		Assert.hasText(id);
-		
-		for(BeanDefinition bean : beanDefinitions){
-			if (id.equals(bean.getId())){
-				if (!bean.isInitialized()){
-					try{
-						initBean(bean);
-					}catch(ClassNotFoundException | 
-							IllegalAccessException | 
-							IllegalArgumentException |
-							NoSuchMethodException e){
-						throw new IllegalArgumentException(
-								String.format("Can not initialize bean [%s], message: %s", 
-										bean.getClazz().getName(), e.getMessage()),
-								e);
-					}catch(InvocationTargetException e){
-						Throwable te = ((InvocationTargetException)e).getTargetException();
-						throw new IllegalArgumentException(
-								String.format("Can not initialize bean [%s], message: %s", 
-										bean.getClazz().getName(), te.getMessage()),
-								te);
-					}
-				}
-				return bean.getObject();
-			}
-		}
-		
-		return null;
-	}
-
-	@Override
-	public <T> T get(Class<T> clazz) {
-		Assert.notNull(clazz);
-		
-		Collection<T> objects = list(clazz);
-		if (objects.isEmpty()) {
-			return null;
-		}
-		
-		if (objects.size() > 1) {
-			throw new IllegalArgumentException(
-					"More than one object are assign from this class: " + clazz.getName());
-		}
-		
-		return objects.iterator().next();
-	}
-
-	@Override
-	public <T> Collection<T> list(Class<T> clazz) {
-		Assert.notNull(clazz);
-		
-		Collection<BeanDefinition> matchBeans = new ArrayList<BeanDefinition>();
-		for(BeanDefinition bean : beanDefinitions) {
-			if (bean.getClazz().equals(clazz)){
-				matchBeans.add(bean);
-			}else{
-				for(Class<?> c : bean.getInterfaces()){
-					if (clazz.equals(c)) {
-						matchBeans.add(bean);
-					}
-				}
-			}
-		}
-		
-		Collection<T> objects = new ArrayList<T>();
-		
-		for(BeanDefinition bean : matchBeans) {
-			if (!bean.isInitialized()) {
-				try{
-					initBean(bean);
-				}catch(ClassNotFoundException | 
-						IllegalAccessException | 
-						IllegalArgumentException |
-						NoSuchMethodException e){
-					throw new IllegalArgumentException(
-							String.format("Can not initialize bean [%s], message: %s",
-									bean.getClazz().getName(), e.getMessage()), 
-							e);
-				}catch(InvocationTargetException e){
-					Throwable te = ((InvocationTargetException)e).getTargetException();
-					throw new IllegalArgumentException(
-							String.format("Can not initialize bean [%s], message: %s", 
-									bean.getClazz().getName(), te.getMessage()),
-							te);
-				}
-			}
-
-			objects.add((T)bean.getObject());
-		}
-		
-		return objects;
-	}
-
-	@Override
-	public Collection<Object> listByAnnotation(Class<? extends Annotation> clazz) {
-		Assert.notNull(clazz);
-		
-		Collection<BeanDefinition> matchBeans = new ArrayList<BeanDefinition>();
-		for(BeanDefinition bean : beanDefinitions) {
-			for(Annotation c : bean.getAnnotations()){
-				if (clazz.equals(c.annotationType())) {
-					matchBeans.add(bean);
-				}
-			}
-		}
-		
-		Collection<Object> objects = new ArrayList<Object>();
-		
-		for(BeanDefinition bean : matchBeans) {
-			if (!bean.isInitialized()) {
-				try{			
-					initBean(bean);
-				}catch(ClassNotFoundException | 
-							IllegalAccessException | 
-							IllegalArgumentException |
-							NoSuchMethodException e) {
-					throw new IllegalArgumentException(
-							String.format("Can not initialize bean [%s], message: %s",
-									clazz.getName(), e.getMessage()), 
-							e);
-				}catch(InvocationTargetException e){
-					Throwable te = ((InvocationTargetException)e).getTargetException();
-					throw new IllegalArgumentException(
-							String.format("Can not initialize bean [%s], message: %s", 
-									bean.getClazz().getName(), te.getMessage()),
-							te);
-				}
-			}
-			objects.add(bean.getObject());
-		}
-		
-		return objects;
-	}
-	
 	private void initBean(BeanDefinition bean) throws 
 			ClassNotFoundException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		
@@ -462,13 +335,17 @@ public class DefaultBeanFactory implements BeanFactory { //, BeanDefinitionBuild
 					// inject collection field.
 					ParameterizedType pType = (ParameterizedType)field.getGenericType();
 					dataType = (Class<?>)pType.getActualTypeArguments()[0];
-					Collection<?> targetObjects = list(dataType);
+					Map<String, ?> nameObjects = getBeansOfType(dataType);
+					
+					// convert to List
+					Collection<Object> targetObjects = new ArrayList<Object>(nameObjects.values());
 					
 					if (targetObjects.isEmpty()){
 						if (autowired == null || autowired.required()) {
-							throw new IllegalArgumentException(
-									String.format("There is no match type to inject field [%s#%s]",
-											clazz.getName(), field.getName()));
+//							throw new IllegalArgumentException(
+//									String.format("There is no match type to inject field [%s#%s]",
+//											clazz.getName(), field.getName()));
+							throw new NoSuchBeanDefinitionException(dataType);
 						}
 					}else{
 						field.set(obj, targetObjects);
@@ -479,16 +356,21 @@ public class DefaultBeanFactory implements BeanFactory { //, BeanDefinitionBuild
 					
 					Named named = field.getAnnotation(Named.class);
 					if (named != null) {
-						targetObject = get(named.value());
+						targetObject = getBean(named.value());
 					}else{
-						targetObject = get(dataType);
+						targetObject = getBean(dataType);
 					}
 					
 					if (targetObject == null) {
 						if (autowired == null || autowired.required()) {
-							throw new IllegalArgumentException(
-									String.format("There is no match type to inject field [%s#%s]",
-											clazz.getName(), field.getName()));
+//							throw new IllegalArgumentException(
+//									String.format("There is no match type to inject field [%s#%s]",
+//											clazz.getName(), field.getName()));
+							if (named != null) {
+								throw new NoSuchBeanDefinitionException(named.value());
+							}else{
+								throw new NoSuchBeanDefinitionException(dataType);
+							}
 						}
 					}else{
 						field.set(obj, targetObject);
@@ -547,7 +429,9 @@ public class DefaultBeanFactory implements BeanFactory { //, BeanDefinitionBuild
 					}else if (targetValue instanceof String) {
 						field.setBoolean(obj, Boolean.parseBoolean((String)targetValue));
 					}else{
-						throw new ClassCastException("Can not cast the value of placeholder " + placeholder + " to boolean." );
+						throw new IllegalArgumentException(
+								String.format("Can not resolve the placeholder [%s] for field [%s#%s], type cast error.",
+										placeholder, clazz.getName(), field.getName()));
 					}
 				}
 			}
@@ -568,27 +452,32 @@ public class DefaultBeanFactory implements BeanFactory { //, BeanDefinitionBuild
 				}
 
 				if (prop.containsKey("bean")){
+					// inject bean
 					Object defineValue = prop.get("bean");
 					if (defineValue instanceof Collection){
 						Collection<Object> os = new ArrayList<>();
 						for(String id : (Collection<String>)defineValue){
-							Object o = get(id);
+							Object o = getBean(id);
 							if (o == null) {
-								throw new IllegalArgumentException(
-										String.format("Can not found bean [%s].", id));
+//								throw new IllegalArgumentException(
+//										String.format("Can not found bean [%s].", id));
+								throw new NoSuchBeanDefinitionException(id);
 							}
 							os.add(o);
 						}
 						value = os;
 					}else{
-						Object o = get((String)defineValue);
+						Object o = getBean((String)defineValue);
 						if (o == null) {
-							throw new IllegalArgumentException(
-									String.format("Can not found bean [%s].", defineValue));
+//							throw new IllegalArgumentException(
+//									String.format("Can not found bean [%s].", defineValue));
+							throw new NoSuchBeanDefinitionException((String)defineValue);
 						}
 						value = o;
 					}
 				}else if (prop.containsKey("value")){
+					// inject value
+					
 					Object defineValue = prop.get("value");
 					if (defineValue instanceof Collection){
 						Collection<Object> os = new ArrayList<>();
@@ -620,25 +509,11 @@ public class DefaultBeanFactory implements BeanFactory { //, BeanDefinitionBuild
 			initMethod.invoke(obj);
 		}
 		
+		// set flag
 		bean.setInitialized(true);
 		
+		// prevent loop
 		initializingBeanIds.pop();
-	}
-
-	@Override
-	public void close() throws Exception {
-		for(BeanDefinition bean : beanDefinitions) {
-			String disposeMethodName = bean.getDisposeMethodName();
-			if (disposeMethodName != null) {
-				Method disposeMethod = getMethodByName(bean.getMethods(), disposeMethodName);
-				disposeMethod.invoke(bean.getObject());
-			}
-		}
-		
-		// notify event listeners
-		for(BeanFactoryCloseEventListener eventListener : closeEventListeners) {
-			eventListener.onClose();
-		}
 	}
 	
 	private Method getMethodByName(Method[] methods, String name) {
@@ -688,5 +563,263 @@ public class DefaultBeanFactory implements BeanFactory { //, BeanDefinitionBuild
 		}
 		
 		return targetValue;
+	}
+
+	@Override
+	public boolean containsBeanDefinition(String beanName) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public int getBeanDefinitionCount() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public String[] getBeanDefinitionNames() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public String[] getBeanNamesForType(Class<?> type) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public String[] getBeanNamesForType(Class<?> type, boolean includeNonSingletons, boolean allowEagerInit) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public <T> Map<String, T> getBeansOfType(Class<T> type) throws BeansException {
+		Assert.notNull(type);
+		
+		Collection<BeanDefinition> matchBeans = new ArrayList<BeanDefinition>();
+		for(BeanDefinition bean : beanDefinitions) {
+			if (bean.getClazz().equals(type)){
+				matchBeans.add(bean);
+			}else{
+				for(Class<?> c : bean.getInterfaces()){
+					if (type.equals(c)) {
+						matchBeans.add(bean);
+					}
+				}
+			}
+		}
+		
+		Map<String, T> objects = new HashMap<>();
+		
+		for(BeanDefinition bean : matchBeans) {
+			if (!bean.isInitialized()) {
+				try{
+					initBean(bean);
+				}catch(ClassNotFoundException | 
+						IllegalAccessException | 
+						IllegalArgumentException |
+						NoSuchMethodException e){
+					throw new IllegalArgumentException(
+							String.format("Can not initialize bean [%s], message: %s",
+									bean.getClazz().getName(), e.getMessage()), 
+							e);
+				}catch(InvocationTargetException e){
+					Throwable te = ((InvocationTargetException)e).getTargetException();
+					throw new IllegalArgumentException(
+							String.format("Can not initialize bean [%s], message: %s", 
+									bean.getClazz().getName(), te.getMessage()),
+							te);
+				}
+			}
+
+			objects.put(bean.getId(), (T)bean.getObject());
+		}
+		
+		return objects;
+	}
+
+	@Override
+	public <T> Map<String, T> getBeansOfType(Class<T> type, boolean includeNonSingletons, boolean allowEagerInit) throws BeansException {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public String[] getBeanNamesForAnnotation(Class<? extends Annotation> annotationType) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public Map<String, Object> getBeansWithAnnotation(Class<? extends Annotation> annotationType) throws BeansException {
+		Assert.notNull(annotationType);
+		
+		Collection<BeanDefinition> matchBeans = new ArrayList<BeanDefinition>();
+		for(BeanDefinition bean : beanDefinitions) {
+			for(Annotation c : bean.getAnnotations()){
+				if (annotationType.equals(c.annotationType())) {
+					matchBeans.add(bean);
+				}
+			}
+		}
+		
+		Map<String, Object> objects = new HashMap<>();
+		
+		for(BeanDefinition bean : matchBeans) {
+			if (!bean.isInitialized()) {
+				try{			
+					initBean(bean);
+				}catch(ClassNotFoundException | 
+							IllegalAccessException | 
+							IllegalArgumentException |
+							NoSuchMethodException e) {
+					throw new IllegalArgumentException(
+							String.format("Can not initialize bean [%s], message: %s",
+									annotationType.getName(), e.getMessage()), 
+							e);
+				}catch(InvocationTargetException e){
+					Throwable te = ((InvocationTargetException)e).getTargetException();
+					throw new IllegalArgumentException(
+							String.format("Can not initialize bean [%s], message: %s", 
+									bean.getClazz().getName(), te.getMessage()),
+							te);
+				}
+			}
+			objects.put(bean.getId(), bean.getObject());
+		}
+		
+		return objects;
+	}
+
+	@Override
+	public <A extends Annotation> A findAnnotationOnBean(String beanName, Class<A> annotationType) throws NoSuchBeanDefinitionException {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public Object getBean(String name) throws BeansException {
+		Assert.hasText(name);
+		
+		for(BeanDefinition bean : beanDefinitions){
+			if (name.equals(bean.getId())){
+				if (!bean.isInitialized()){
+					try{
+						initBean(bean);
+					}catch(ClassNotFoundException | 
+							IllegalAccessException | 
+							IllegalArgumentException |
+							NoSuchMethodException e){
+						throw new IllegalArgumentException(
+								String.format("Can not initialize bean [%s], message: %s", 
+										bean.getClazz().getName(), e.getMessage()),
+								e);
+					}catch(InvocationTargetException e){
+						Throwable te = ((InvocationTargetException)e).getTargetException();
+						throw new IllegalArgumentException(
+								String.format("Can not initialize bean [%s], message: %s", 
+										bean.getClazz().getName(), te.getMessage()),
+								te);
+					}
+				}
+				return bean.getObject();
+			}
+		}
+		
+		throw new NoSuchBeanDefinitionException(name);
+	}
+
+	@Override
+	public <T> T getBean(String name, Class<T> requiredType) throws BeansException {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public <T> T getBean(Class<T> requiredType) throws BeansException {
+		Assert.notNull(requiredType);
+		
+		Map<String, T> objects = getBeansOfType(requiredType);
+		if (objects.isEmpty()) {
+			throw new NoSuchBeanDefinitionException(requiredType);
+		}
+		
+		if (objects.size() > 1) {
+			throw new NoUniqueBeanDefinitionException(requiredType, objects.keySet());
+					//"More than one object are assign from this class: " + requiredType.getName());
+		}
+		
+		return objects.values().iterator().next();
+	}
+
+	@Override
+	public Object getBean(String name, Object... args) throws BeansException {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public <T> T getBean(Class<T> requiredType, Object... args) throws BeansException {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public boolean containsBean(String name) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public boolean isSingleton(String name) throws NoSuchBeanDefinitionException {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public boolean isPrototype(String name) throws NoSuchBeanDefinitionException {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public boolean isTypeMatch(String name, Class<?> targetType) throws NoSuchBeanDefinitionException {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public Class<?> getType(String name) throws NoSuchBeanDefinitionException {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public String[] getAliases(String name) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	public void addApplicationListener(ApplicationListener<?> listener) {
+		applicationListeners.add(listener);
+	}
+	
+	@Override
+	public void close() throws IOException {
+		for(BeanDefinition bean : beanDefinitions) {
+			String disposeMethodName = bean.getDisposeMethodName();
+			if (disposeMethodName != null) {
+				Method disposeMethod = getMethodByName(bean.getMethods(), disposeMethodName);
+				try {
+					disposeMethod.invoke(bean.getObject());
+				} catch (IllegalAccessException | 
+						IllegalArgumentException ex) {
+					logger.error(
+							String.format("Close bean [%s] error, message: %s.", bean.getId(), ex.getMessage()), 
+							ex);
+				} catch(InvocationTargetException ex){
+					Throwable t = ((InvocationTargetException)ex).getTargetException();
+					logger.error(
+							String.format("Close bean [%s] error, message: %s.", bean.getId(), t.getMessage()), 
+							t);
+				}
+			}
+		}
+		
+		// notify event listeners
+		publishEvent(new BeanFactoryClosedEvent(this));
+	}
+
+	@Override
+	public void publishEvent(ApplicationEvent event) {
+		for(ApplicationListener listener : applicationListeners) {
+			listener.onApplicationEvent(event);
+		}
 	}
 }

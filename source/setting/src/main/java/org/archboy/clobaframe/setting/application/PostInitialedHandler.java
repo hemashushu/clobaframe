@@ -10,7 +10,7 @@ import java.util.Map;
  * 
  * @author yang
  */
-public interface PostApplicationSetting {
+public interface PostInitialedHandler {
 	
 	
 	void execute(Map<String, Object> settings) throws Exception;

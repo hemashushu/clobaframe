@@ -61,12 +61,24 @@ public class NamedResourceSenderImpl implements NamedResourceSender{
 	private void send(NamedResourceInfo resourceInfo, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Map<String, Object> headers = new HashMap<String, Object>();
 		
-		if (resourceInfo instanceof CompressibleResourceInfo ||
-			(resourceInfo instanceof AbstractWrapperResourceInfo &&
-				((AbstractWrapperResourceInfo)resourceInfo).listTypes()
-					.contains(WrapperResourceInfo.TYPE_COMPRESS))){
-			// it's compressed resource already.
-			headers.put("Content-Encoding", "gzip");
+//		if (resourceInfo instanceof CompressibleResourceInfo) { // ||
+////			(resourceInfo instanceof AbstractWrapperResourceInfo &&
+////				((AbstractWrapperResourceInfo)resourceInfo).listTypes()
+////					.contains(WrapperResourceInfo.TYPE_COMPRESS))){
+//			// it's compressed resource already.
+//			headers.put("Content-Encoding", "gzip");
+//		}
+		
+		Object r = resourceInfo;
+		while(r != null) {
+			if (r instanceof CompressibleResourceInfo) {
+				headers.put("Content-Encoding", "gzip");
+				break;
+			}else if(r instanceof WrapperResourceInfo) {
+				r = ((WrapperResourceInfo)r).getInheritedObject();
+			}else{
+				break;
+			}
 		}
 		
 		clientCacheResourceSender.send(resourceInfo,

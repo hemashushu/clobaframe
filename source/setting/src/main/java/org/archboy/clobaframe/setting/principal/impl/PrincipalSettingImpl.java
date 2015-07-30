@@ -14,6 +14,7 @@ import org.archboy.clobaframe.setting.principal.PrincipalSettingProvider;
 import org.archboy.clobaframe.setting.principal.PrincipalSettingRepository;
 import org.archboy.clobaframe.setting.support.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.OrderComparator;
 import org.springframework.util.Assert;
 
 /**
@@ -47,12 +48,13 @@ public class PrincipalSettingImpl implements PrincipalSetting {
 		principalSettingProviders.add(settingProvider);
 		
 		// sort 0-9
-		principalSettingProviders.sort(new Comparator<PrincipalSettingProvider>() {
-			@Override
-			public int compare(PrincipalSettingProvider o1, PrincipalSettingProvider o2) {
-				return o1.getOrder() - o2.getOrder();
-			}
-		});
+		OrderComparator.sort(principalSettingProviders);
+//		principalSettingProviders.sort(new Comparator<PrincipalSettingProvider>() {
+//			@Override
+//			public int compare(PrincipalSettingProvider o1, PrincipalSettingProvider o2) {
+//				return o1.getOrder() - o2.getOrder();
+//			}
+//		});
 	}
 
 	@Override

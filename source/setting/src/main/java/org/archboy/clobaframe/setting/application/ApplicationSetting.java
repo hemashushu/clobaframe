@@ -78,6 +78,6 @@ public interface ApplicationSetting extends CacheableSetting {
 	 * @param postApplicationSettings 
 	 */
 	void setPostApplicationSettings(
-			Collection<PostApplicationSetting> postApplicationSettings);
+			Collection<PostInitialedHandler> postApplicationSettings);
 	
 }

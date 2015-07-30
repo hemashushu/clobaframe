@@ -15,6 +15,7 @@ import org.archboy.clobaframe.setting.global.GlobalSetting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.OrderComparator;
 import org.springframework.util.Assert;
 
 /**
@@ -58,12 +59,13 @@ public class GlobalSettingImpl implements GlobalSetting { //, InitializingBean {
 		globalSettingProviders.add((GlobalSettingProvider)settingProvider);
 		
 		// sort 0-9
-		globalSettingProviders.sort(new Comparator<GlobalSettingProvider>() {
-			@Override
-			public int compare(GlobalSettingProvider o1, GlobalSettingProvider o2) {
-				return o1.getOrder() - o2.getOrder();
-			}
-		});
+		OrderComparator.sort(globalSettingProviders);
+//		globalSettingProviders.sort(new Comparator<GlobalSettingProvider>() {
+//			@Override
+//			public int compare(GlobalSettingProvider o1, GlobalSettingProvider o2) {
+//				return o1.getOrder() - o2.getOrder();
+//			}
+//		});
 	}
 
 	@Override

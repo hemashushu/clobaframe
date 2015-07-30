@@ -2,6 +2,7 @@ package org.archboy.clobaframe.ioc;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 import org.archboy.clobaframe.ioc.bean.Animal;
 import org.archboy.clobaframe.ioc.bean.Cat;
 import org.archboy.clobaframe.ioc.bean.DefaultFood;
@@ -21,6 +22,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.context.ApplicationListener;
 import org.springframework.core.io.ResourceLoader;
 
 /**
@@ -29,7 +33,7 @@ import org.springframework.core.io.ResourceLoader;
  */
 public class BeanFactoryTest {
 
-	private BeanFactory beanFactory;
+	private ListableBeanFactory beanFactory;
 	private long start, span;
 	
 	private boolean factoryCloseEventFired = false;
@@ -59,62 +63,76 @@ public class BeanFactoryTest {
 	public void testGet() throws Exception {
 		
 		// get by interface
-		Food food = beanFactory.get(Food.class);
+		Food food = beanFactory.getBean(Food.class);
 		assertEquals(DefaultFood.class, food.getClass());
 		assertEquals("default", food.getType());
 		
 		// get by id
-		Food foodById = (Food)beanFactory.get("food");
+		Food foodById = (Food)beanFactory.getBean("food");
 		assertEquals(food, foodById);
 		
 		// get by id - class without id define.
-		Dog dog = (Dog)beanFactory.get("dog");
+		Dog dog = (Dog)beanFactory.getBean("dog");
 		assertEquals("dog", dog.getName());
 		assertEquals("black", dog.getColor());
 		assertEquals("color:black,food:default", dog.say());
 		
 		// get by id - class with @Named id specify
-		Duck duck = (Duck)beanFactory.get("newDuck");
+		Duck duck = (Duck)beanFactory.getBean("newDuck");
 		assertEquals("duck", duck.getName());
 		assertEquals("yellow", duck.getColor());
 
 		// get by class
-		Food foodByClass = beanFactory.get(DefaultFood.class);
+		Food foodByClass = beanFactory.getBean(DefaultFood.class);
 		assertEquals(food, foodByClass);
 		
-		Cat cat = beanFactory.get(Cat.class);
+		Cat cat = beanFactory.getBean(Cat.class);
 		assertEquals("cat", cat.getName());
 		assertEquals("white", cat.getColor());
 		
-		RubberDuck rubberDuck = beanFactory.get(RubberDuck.class);
+		RubberDuck rubberDuck = beanFactory.getBean(RubberDuck.class);
 		assertEquals("rubberDuck", rubberDuck.getName());
 		assertEquals("undefine", rubberDuck.getColor()); // does not support inhert @Value and @Inject
 		
 		// get by class that inject by define file
-		Fish fish = beanFactory.get(Fish.class);
+		Fish fish = beanFactory.getBean(Fish.class);
 		assertEquals("fish", fish.getName());
 		assertEquals("grey", fish.getColor());
 		
 		// get the prebuild bean
-		assertNotNull(beanFactory.get(ResourceLoader.class));
-		assertNotNull(beanFactory.get(ApplicationSetting.class));
+		assertNotNull(beanFactory.getBean(ResourceLoader.class));
+		assertNotNull(beanFactory.getBean(ApplicationSetting.class));
 		
 		// list by interface
-		Collection<Animal> animals = beanFactory.list(Animal.class);
-		assertEquals(4, animals.size());
+		Map<String, ?> nameAnimals = beanFactory.getBeansOfType(Animal.class);
+		assertEquals(4, nameAnimals.size());
+		
+		Collection<String> names1 = nameAnimals.keySet();
+		assertTrue(names1.contains("cat"));
+		assertTrue(names1.contains("dog"));
+		assertTrue(names1.contains("newDuck"));
+		assertTrue(names1.contains("fish"));
+		
+		Collection<Animal> animals = (Collection<Animal>)nameAnimals.values();
 		assertTrue(animals.contains(cat));
 		assertTrue(animals.contains(dog));
 		assertTrue(animals.contains(duck));
 		assertTrue(animals.contains(fish));
 		
 		// list by annotation
-		Collection<Object> specials = beanFactory.listByAnnotation(Special.class);
-		assertEquals(2, specials.size());
-		assertTrue(specials.contains(beanFactory.get(Dog.class)));
-		assertTrue(specials.contains(beanFactory.get(RubberDuck.class)));
+		Map<String, ?> nameSpecials = beanFactory.getBeansWithAnnotation(Special.class);
+		assertEquals(2, nameSpecials.size());
+		
+		Collection<String> names2 = nameSpecials.keySet();
+		assertTrue(names2.contains("dog"));
+		assertTrue(names2.contains("rubberDuck"));
+		
+		Collection<?> specials = nameSpecials.values();
+		assertTrue(specials.contains(dog));
+		assertTrue(specials.contains(rubberDuck));
 		
 		// collection inject
-		Zoo zoo = beanFactory.get(Zoo.class);
+		Zoo zoo = beanFactory.getBean(Zoo.class);
 		
 		Collection<Animal> animalsByZoo = zoo.getAnimals();
 		assertEquals(4, animalsByZoo.size());
@@ -140,19 +158,19 @@ public class BeanFactoryTest {
 		assertTrue(pets.contains(dog));
 		
 		// test life cycle maintain
-		beanFactory.addCloseEventListener(new BeanFactoryCloseEventListener() {
+		((DefaultBeanFactory)beanFactory).addApplicationListener(new ApplicationListener<BeanFactoryClosedEvent>() {
 			@Override
-			public void onClose() {
+			public void onApplicationEvent(BeanFactoryClosedEvent event) {
 				factoryCloseEventFired = true;
 			}
 		});
 				
-		Status status = beanFactory.get(Status.class);
+		Status status = beanFactory.getBean(Status.class);
 		assertEquals(Status.class, status.getClass());
 		
 		assertEquals("active", status.getType());
 
-		beanFactory.close();
+		((DefaultBeanFactory)beanFactory).close();
 		
 		// test life cycle maintain
 		assertEquals("sleep", status.getType());

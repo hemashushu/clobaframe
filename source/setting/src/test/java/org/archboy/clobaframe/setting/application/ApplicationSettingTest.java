@@ -1,6 +1,7 @@
 package org.archboy.clobaframe.setting.application;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -31,32 +32,34 @@ public class ApplicationSettingTest {
 	public void setUp() throws Exception {
 		start = System.currentTimeMillis();
 		
-		// build the application instance
-		DefaultApplicationSetting appSetting = new DefaultApplicationSetting();
-		
 		// base properties
-		appSetting.setApplicationName("clobaframe");
-		appSetting.setRootConfigFileName("classpath:root.properties");
+		String applicationName = "clobaframe";
+		String rootConfigFileName = "classpath:root.properties";
+		//appSetting.setApplicationName("clobaframe");
+		//appSetting.setRootConfigFileName("classpath:root.properties");
 		
 		// set properties
 		Properties properties = new Properties();
 		properties.put("clobaframe.setting.test.root.prop", "rootPropOk");
-		appSetting.setProperties(properties);
+		//appSetting.setProperties(properties);
 		
 		// set locations
 		String[] locations = new String[]{"classpath:application-layer2.properties"};
-		appSetting.setLocations(locations);
+		//appSetting.setLocations(locations);
 		
 		// set post application setting
-		PostApplicationSetting postApplicationSetting = new TestingPostApplicationSetting();
-		appSetting.setPostApplicationSettings(Arrays.asList(postApplicationSetting));
+		PostInitialedHandler postApplicationSetting = new TestingPostApplicationSetting();
+		//appSetting.setPostApplicationSettings(Arrays.asList(postApplicationSetting));
+		Collection<PostInitialedHandler> postApplicationSettings = Arrays.asList(postApplicationSetting);
 		
 		// set resource loader
 		ResourceLoader resourceLoader = new DefaultResourceLoader();
-		appSetting.setResourceLoader(resourceLoader);
+		//appSetting.setResourceLoader(resourceLoader);
 		
-		// init
-		appSetting.afterPropertiesSet();
+		// build the application instance
+		DefaultApplicationSetting appSetting = new DefaultApplicationSetting(
+				resourceLoader, applicationName, properties, rootConfigFileName, 
+				postApplicationSettings, locations);
 		
 		this.applicationSetting = appSetting;
 	}
@@ -160,7 +163,7 @@ public class ApplicationSettingTest {
 		}
 	}
 	
-	public static class TestingPostApplicationSetting implements PostApplicationSetting {
+	public static class TestingPostApplicationSetting implements PostInitialedHandler {
 
 		@Override
 		public void execute(Map<String, Object> settings) throws Exception {

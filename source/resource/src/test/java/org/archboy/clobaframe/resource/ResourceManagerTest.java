@@ -68,7 +68,6 @@ public class ResourceManagerTest {
 		};
 		
 		for (String name : names) {
-			System.out.println(name);
 			NamedResourceInfo webResourceInfo = resourceManager.getServedResource(name);
 			assertTrue(webResourceInfo.getContentLength() > 0);
 		}

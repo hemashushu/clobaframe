@@ -34,7 +34,7 @@ public class DefaultLocationTransformResourceInfo extends AbstractWrapperResourc
 	private final Logger logger = LoggerFactory.getLogger(DefaultLocationTransformResourceInfo.class);
 
 	private ResourceManager resourceManager;
-	private NamedResourceInfo resourceInfo;
+	//private NamedResourceInfo resourceInfo;
 	
 	//private String lastContentHash; // the underlay content hash
 	
@@ -51,22 +51,23 @@ public class DefaultLocationTransformResourceInfo extends AbstractWrapperResourc
 	public DefaultLocationTransformResourceInfo(
 			ResourceManager resourceManager,
 			NamedResourceInfo resourceInfo) {
-
+		super(resourceInfo);
+		
 		Assert.notNull(resourceManager);
 		Assert.notNull(resourceInfo);
 		
 		this.resourceManager = resourceManager;
-		this.resourceInfo = resourceInfo;
+		//this.resourceInfo = resourceInfo;
 		
-		appendType(getType(), resourceInfo);
+		//appendType(getType(), resourceInfo);
 		
 		rebuild();
 	}
 
-	@Override
-	public int getType() {
-		return TYPE_LOCATION_TRANSFORM;
-	}
+//	@Override
+//	public int getType() {
+//		return TYPE_LOCATION_TRANSFORM;
+//	}
 	
 	@Override
 	public String getContentHash() {
@@ -82,17 +83,18 @@ public class DefaultLocationTransformResourceInfo extends AbstractWrapperResourc
 
 	@Override
 	public String getMimeType() {
-		return resourceInfo.getMimeType();
+		return ((NamedResourceInfo)inheritedObject).getMimeType();
+		
 	}
 
 	@Override
 	public String getName() {
-		return resourceInfo.getName();
+		return ((NamedResourceInfo)inheritedObject).getName();
 	}
 
 	@Override
 	public Date getLastModified() {
-		return resourceInfo.getLastModified();
+		return ((NamedResourceInfo)inheritedObject).getLastModified();
 	}
 
 	@Override
@@ -129,7 +131,7 @@ public class DefaultLocationTransformResourceInfo extends AbstractWrapperResourc
 		InputStream in = null;
 
 		try{
-			in = resourceInfo.getContent();
+			in = ((NamedResourceInfo)inheritedObject).getContent();
 
 			InputStreamReader reader = new InputStreamReader(in, "utf-8");
 			text = IOUtils.toString(reader);
@@ -253,7 +255,7 @@ public class DefaultLocationTransformResourceInfo extends AbstractWrapperResourc
 			pathName = pathName.substring(2);
 		}
 
-		String currentName = resourceInfo.getName();
+		String currentName = ((NamedResourceInfo)inheritedObject).getName();
 		int pathIdx = currentName.lastIndexOf('/');
 		String currentPath = pathIdx < 0 ? "":currentName.substring(0, pathIdx);
 

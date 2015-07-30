@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.archboy.clobaframe.io.NamedResourceInfo;
-import org.archboy.clobaframe.ioc.BeanFactory;
 import org.archboy.clobaframe.ioc.impl.DefaultBeanFactory;
 import org.junit.After;
 import org.junit.Before;
@@ -13,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import static org.junit.Assert.*;
 import org.junit.Test;
+import org.springframework.beans.factory.BeanFactory;
 
 /**
  *
@@ -30,12 +30,12 @@ public class ResourceManagerWithIoCTest {
 		this.beanFactory = new DefaultBeanFactory(
 				"classpath:application.properties", 
 				"classpath:clobaframe.properties");
-		this.resourceManager = beanFactory.get(ResourceManager.class);
+		this.resourceManager = beanFactory.getBean(ResourceManager.class);
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		beanFactory.close();
+		((DefaultBeanFactory)beanFactory).close();
 	}
 
 	@Test
@@ -50,7 +50,6 @@ public class ResourceManagerWithIoCTest {
 		};
 		
 		for (String name : names) {
-			System.out.println(name);
 			NamedResourceInfo webResourceInfo = resourceManager.getServedResource(name);
 			assertTrue(webResourceInfo.getContentLength() > 0);
 		}

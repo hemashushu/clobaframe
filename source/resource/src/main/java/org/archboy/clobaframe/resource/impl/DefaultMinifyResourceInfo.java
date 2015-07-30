@@ -30,7 +30,7 @@ import org.springframework.util.Assert;
  */
 public class DefaultMinifyResourceInfo extends AbstractWrapperResourceInfo {
 
-	private NamedResourceInfo resourceInfo;
+	//private NamedResourceInfo resourceInfo;
 	private String lastContentHash;
 	private byte[] content;
 
@@ -40,24 +40,25 @@ public class DefaultMinifyResourceInfo extends AbstractWrapperResourceInfo {
 	private final Logger logger = LoggerFactory.getLogger(DefaultMinifyResourceInfo.class);
 	
 	public DefaultMinifyResourceInfo(NamedResourceInfo resourceInfo) {
+		super(resourceInfo);
 		Assert.notNull(resourceInfo);
 		Assert.isInstanceOf(ContentHashResourceInfo.class, resourceInfo);
 		
-		this.resourceInfo = resourceInfo;
+		//this.resourceInfo = resourceInfo;
 		
-		appendType(getType(), resourceInfo);
+		//appendType(getType(), resourceInfo);
 		rebuild();
 	}
 
-	@Override
-	public int getType() {
-		return TYPE_MINIFY;
-	}
+//	@Override
+//	public int getType() {
+//		return TYPE_MINIFY;
+//	}
 	
 	@Override
 	public String getContentHash() {
 		// return the upstream content hash, because the actually content does not changed.
-		return ((ContentHashResourceInfo)resourceInfo).getContentHash();
+		return ((ContentHashResourceInfo)inheritedObject).getContentHash();
 	}
 
 	@Override
@@ -68,17 +69,17 @@ public class DefaultMinifyResourceInfo extends AbstractWrapperResourceInfo {
 
 	@Override
 	public String getMimeType() {
-		return resourceInfo.getMimeType();
+		return ((NamedResourceInfo)inheritedObject).getMimeType();
 	}
 
 	@Override
 	public String getName() {
-		return resourceInfo.getName();
+		return ((NamedResourceInfo)inheritedObject).getName();
 	}
 
 	@Override
 	public Date getLastModified() {
-		return resourceInfo.getLastModified();
+		return ((NamedResourceInfo)inheritedObject).getLastModified();
 	}
 
 	@Override
@@ -111,7 +112,7 @@ public class DefaultMinifyResourceInfo extends AbstractWrapperResourceInfo {
 
 		InputStream in = null;
 		ByteArrayOutputStream out = null;
-
+		NamedResourceInfo resourceInfo = (NamedResourceInfo)inheritedObject;
 		try{
 			in = resourceInfo.getContent();
 			out = new ByteArrayOutputStream();

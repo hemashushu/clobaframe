@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.commons.io.IOUtils;
@@ -25,7 +26,7 @@ import org.springframework.core.io.ResourceLoader;
  * @author yang
  */
 @Named
-public class DefaultGlobalSettingProvider implements GlobalSettingProvider, InitializingBean {
+public class DefaultGlobalSettingProvider implements GlobalSettingProvider { //, InitializingBean {
 	//, ResourceLoaderAware {
 
 	public static final String NAME = "defaultGlobalSetting";
@@ -69,8 +70,8 @@ public class DefaultGlobalSettingProvider implements GlobalSettingProvider, Init
 		return SettingProvider.PRIORITY_LOWER;
 	}
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	public void init() throws Exception {
 		if (StringUtils.isEmpty(defaultGlobalSettingFileName)) {
 			if (applicationSetting != null) {
 				defaultGlobalSettingFileName = (String)applicationSetting.getValue(

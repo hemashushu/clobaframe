@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -19,38 +20,43 @@ import org.springframework.util.Assert;
  */
 public class DefaultConcatenateResourceInfo extends AbstractWrapperResourceInfo {
 
-	private List<NamedResourceInfo> resourceInfos;
+	//private List<NamedResourceInfo> resourceInfos;
 	private String name;
 	private String mimeType;
 
 	public DefaultConcatenateResourceInfo(
 			List<NamedResourceInfo> resourceInfos, String name) {
+		super(resourceInfos);
+		
 		Assert.notNull(resourceInfos);
 		Assert.hasText(name);
+		
 		for(NamedResourceInfo resourceInfo : resourceInfos){
 			Assert.isInstanceOf(ContentHashResourceInfo.class, resourceInfo);
 		}
 		
-		this.resourceInfos = resourceInfos;
+		//this.resourceInfos = resourceInfos;
 		this.name = name;
 		
 		// get the first resource mime type as the composite resource mime type.
 		this.mimeType = resourceInfos.get(0).getMimeType();
 		
-		for(NamedResourceInfo info : resourceInfos) {
-			appendType(getType(), info);
-		}
+//		for(NamedResourceInfo info : resourceInfos) {
+//			appendType(getType(), info);
+//		}
 	}
 
-	@Override
-	public int getType() {
-		return TYPE_CONCATENATE;
-	}
+//	@Override
+//	public int getType() {
+//		return TYPE_CONCATENATE;
+//	}
 	
 	@Override
 	public String getContentHash() {
 		// only hash all source hash values, not hash the source content itself, to increase the compute performance.
+		List<NamedResourceInfo> resourceInfos = (List<NamedResourceInfo>)inheritedObject;
 		StringBuilder builder = new StringBuilder(resourceInfos.size());
+		
 		for (NamedResourceInfo resourceInfo : resourceInfos) {
 			builder.append(((ContentHashResourceInfo)resourceInfo).getContentHash());
 		}
@@ -61,6 +67,8 @@ public class DefaultConcatenateResourceInfo extends AbstractWrapperResourceInfo 
 	@Override
 	public long getContentLength() {
 		long length = 0;
+		
+		List<NamedResourceInfo> resourceInfos = (List<NamedResourceInfo>)inheritedObject;
 		for(NamedResourceInfo resourceInfo : resourceInfos){
 			length += resourceInfo.getContentLength();
 		}
@@ -101,6 +109,7 @@ public class DefaultConcatenateResourceInfo extends AbstractWrapperResourceInfo 
 		// get the last modified time of all resources.
 		long lastModified = 0;
 		
+		List<NamedResourceInfo> resourceInfos = (List<NamedResourceInfo>)inheritedObject;
 		for(NamedResourceInfo resourceInfo : resourceInfos){
 			Date date = resourceInfo.getLastModified();
 			long time = date.getTime();
@@ -115,6 +124,7 @@ public class DefaultConcatenateResourceInfo extends AbstractWrapperResourceInfo 
 		
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		
+		List<NamedResourceInfo> resourceInfos = (List<NamedResourceInfo>)inheritedObject;
 		for(int idx=0; idx<resourceInfos.size(); idx++){
 			NamedResourceInfo resourceInfo = resourceInfos.get(idx);
 			InputStream in = resourceInfo.getContent();

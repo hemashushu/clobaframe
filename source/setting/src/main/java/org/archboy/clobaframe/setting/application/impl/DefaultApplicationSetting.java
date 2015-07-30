@@ -21,11 +21,12 @@ import org.archboy.clobaframe.setting.support.Utils;
 import org.archboy.clobaframe.setting.application.ApplicationSetting;
 import org.archboy.clobaframe.setting.application.ApplicationSettingProvider;
 import org.archboy.clobaframe.setting.application.ApplicationSettingRepository;
-import org.archboy.clobaframe.setting.application.PostApplicationSetting;
+import org.archboy.clobaframe.setting.application.PostInitialedHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ResourceLoaderAware;
+import org.springframework.core.OrderComparator;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -36,6 +37,11 @@ import org.springframework.util.Assert;
  *
  * Consider using (Apache Commons Configuration)[http://commons.apache.org/proper/commons-configuration/] 
  * to read/write the properties file.
+ * 
+ * Note:
+ * The {@link PropertyPlaceholderConfigurer} will prevent the @Inject and @PostConstruct,
+ * so use ResourceLoaderAware and InitializingBean instead of annotation.
+ * 
  * @author yang
  */
 public class DefaultApplicationSetting implements ApplicationSetting, ResourceLoaderAware, InitializingBean {
@@ -78,7 +84,7 @@ public class DefaultApplicationSetting implements ApplicationSetting, ResourceLo
 	
 	private List<ApplicationSettingProvider> applicationSettingProviders;
 	private ApplicationSettingRepository applicationSettingRepository;
-	private Collection<PostApplicationSetting> postApplicationSettings;
+	private Collection<PostInitialedHandler> postApplicationSettings;
 	
 	private final Logger logger = LoggerFactory.getLogger(DefaultApplicationSetting.class);
 	
@@ -98,7 +104,7 @@ public class DefaultApplicationSetting implements ApplicationSetting, ResourceLo
 	}
 
 	@Override
-	public void setPostApplicationSettings(Collection<PostApplicationSetting> postApplicationSettings) {
+	public void setPostApplicationSettings(Collection<PostInitialedHandler> postApplicationSettings) {
 		this.postApplicationSettings = postApplicationSettings;
 	}
 
@@ -125,7 +131,7 @@ public class DefaultApplicationSetting implements ApplicationSetting, ResourceLo
 			String applicationName,
 			Properties properties, 
 			String rootConfigFileName, 
-			Collection<PostApplicationSetting> postApplicationSettings,
+			Collection<PostInitialedHandler> postApplicationSettings,
 			String... locations) throws Exception {
 		this.resourceLoader = resourceLoader;
 		this.applicationName = applicationName;
@@ -133,7 +139,7 @@ public class DefaultApplicationSetting implements ApplicationSetting, ResourceLo
 		this.rootConfigFileName = rootConfigFileName;
 		this.postApplicationSettings = postApplicationSettings;
 		this.locations = locations;
-		afterPropertiesSet();
+		init();
 	}
 	
 	public DefaultApplicationSetting(ResourceLoader resourceLoader, 
@@ -142,17 +148,22 @@ public class DefaultApplicationSetting implements ApplicationSetting, ResourceLo
 		this.resourceLoader = resourceLoader;
 		this.properties = properties;
 		this.locations = locations;
-		afterPropertiesSet();
+		init();
 	}
 	
 	public DefaultApplicationSetting(String... locations) throws Exception {
 		this.resourceLoader = new DefaultResourceLoader();
 		this.locations = locations;
-		afterPropertiesSet();
+		init();
 	}
 	
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		init();
+	}
+	
+	//@PostConstruct
+	private void init() throws Exception {
 		loadRootConfigFromBeanDefine();
 		loadRootConfigFromFile();
 		loadProviders();
@@ -168,13 +179,15 @@ public class DefaultApplicationSetting implements ApplicationSetting, ResourceLo
 		}
 		
 		applicationSettingProviders.add((ApplicationSettingProvider)settingProvider);
-		applicationSettingProviders.sort(new Comparator<ApplicationSettingProvider>() {
-
-			@Override
-			public int compare(ApplicationSettingProvider o1, ApplicationSettingProvider o2) {
-				return o1.getOrder() - o2.getOrder();
-			}
-		});
+		
+//		OrderComparator.sort(applicationSettingProviders);
+//		applicationSettingProviders.sort(new Comparator<ApplicationSettingProvider>() {
+//
+//			@Override
+//			public int compare(ApplicationSettingProvider o1, ApplicationSettingProvider o2) {
+//				return o1.getOrder() - o2.getOrder();
+//			}
+//		});
 	}
 
 	@Override
@@ -328,11 +341,11 @@ public class DefaultApplicationSetting implements ApplicationSetting, ResourceLo
 			return;
 		}
 		
-		for(PostApplicationSetting postApplicationSetting : postApplicationSettings) {
+		for(PostInitialedHandler postApplicationSetting : postApplicationSettings) {
 			try{
 				postApplicationSetting.execute(setting);
 			}catch(Exception e){
-				logger.error("Fail to execute PostApplicationSetting [{}].", PostApplicationSetting.class.getSimpleName());
+				logger.error("Fail to execute PostApplicationSetting [{}].", PostInitialedHandler.class.getSimpleName());
 			}
 		}
 	}

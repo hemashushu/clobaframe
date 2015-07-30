@@ -18,7 +18,7 @@ public class DefaultCacheableResourceInfo extends AbstractWrapperResourceInfo im
 
 	private long cacheMilliSeconds;
 	private long lastCheckingTime;
-	private NamedResourceInfo resourceInfo;
+	//private NamedResourceInfo resourceInfo;
 
 	private String lastContentHash;
 	private Date lastModified;
@@ -37,24 +37,26 @@ public class DefaultCacheableResourceInfo extends AbstractWrapperResourceInfo im
 	 * @param cacheSeconds -1 = cache always, 0 = no cache, >0 cache seconds.
 	 */
 	public DefaultCacheableResourceInfo(NamedResourceInfo resourceInfo, int cacheSeconds) {
+		super(resourceInfo);
+		
 		Assert.notNull(resourceInfo);
 		Assert.isInstanceOf(ContentHashResourceInfo.class, resourceInfo);
 		
-		this.resourceInfo = resourceInfo;
+		//this.resourceInfo = resourceInfo;
 		this.cacheMilliSeconds = (cacheSeconds == -1 ? -1 : cacheSeconds * 1000);
 		this.resourceUpdateListeners = new HashSet<ResourceUpdateListener>();
 		
-		appendType(getType(), resourceInfo);
+		//appendType(getType(), resourceInfo);
 		
 		// first time rebuild
 		rebuild();
 		this.lastCheckingTime = System.currentTimeMillis();
 	}
 
-	@Override
-	public int getType() {
-		return TYPE_CACHE;
-	}
+//	@Override
+//	public int getType() {
+//		return TYPE_CACHE;
+//	}
 
 	@Override
 	public InputStream getContent() throws IOException{
@@ -76,7 +78,7 @@ public class DefaultCacheableResourceInfo extends AbstractWrapperResourceInfo im
 
 	@Override
 	public String getName() {
-		return resourceInfo.getName();
+		return ((NamedResourceInfo)inheritedObject).getName();
 	}
 
 	@Override
@@ -99,7 +101,7 @@ public class DefaultCacheableResourceInfo extends AbstractWrapperResourceInfo im
 
 	@Override
 	public String getMimeType() {
-		return resourceInfo.getMimeType();
+		return ((NamedResourceInfo)inheritedObject).getMimeType();
 	}
 
 	private void recheck() {
@@ -121,7 +123,7 @@ public class DefaultCacheableResourceInfo extends AbstractWrapperResourceInfo im
 	private void rebuild() {
 		
 		// get the upstream content hash
-		String currentContentHash = ((ContentHashResourceInfo)resourceInfo).getContentHash();
+		String currentContentHash = ((ContentHashResourceInfo)inheritedObject).getContentHash();
 		
 		if (rebuilding || 
 				(!forceRefresh && currentContentHash.equals(lastContentHash))){
@@ -129,6 +131,8 @@ public class DefaultCacheableResourceInfo extends AbstractWrapperResourceInfo im
 			return;
 		}
 
+		NamedResourceInfo resourceInfo = (NamedResourceInfo)inheritedObject;
+		
 		this.forceRefresh = false;
 		this.rebuilding = true;
 		this.lastContentHash = currentContentHash;

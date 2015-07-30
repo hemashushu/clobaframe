@@ -88,7 +88,23 @@
 			<groupId>org.archboy.clobaframe</groupId>
 			<artifactId>clobaframe-setting</artifactId>
 			<version>${project.version}</version>
+			<!--
+			<exclusions>
+				<exclusion>
+					<groupId>org.archboy.clobaframe</groupId>
+					<artifactId>clobaframe-common</artifactId>
+				</exclusion>
+			</exclusions>
+			-->
 		</dependency>
+		
+		<!--	
+		<dependency>
+			<groupId>org.archboy.clobaframe</groupId>
+			<artifactId>clobaframe-common-spring-repackage</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		-->
 
 	</dependencies>
 </project>

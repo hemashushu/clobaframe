@@ -6,12 +6,14 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.archboy.clobaframe.io.NamedResourceInfo;
 import org.archboy.clobaframe.resource.ResourceProviderSet;
 import org.archboy.clobaframe.resource.ResourceProvider;
 import org.archboy.clobaframe.resource.ContentHashResourceInfo;
+import org.springframework.core.OrderComparator;
 import org.springframework.util.Assert;
 
 /**
@@ -26,6 +28,13 @@ public class ResourceProviderSetImpl implements ResourceProviderSet {
 
 	public void setResourceProviders(List<ResourceProvider> resourceProviders) {
 		this.resourceProviders = resourceProviders;
+	}
+	
+	@PostConstruct
+	public void init() throws Exception {
+		if (resourceProviders != null && !resourceProviders.isEmpty()) {
+			OrderComparator.sort(resourceProviders);
+		}
 	}
 	
 	@Override
@@ -64,13 +73,14 @@ public class ResourceProviderSetImpl implements ResourceProviderSet {
 		resourceProviders.add(webResourceProvider);
 		
 		// sort 0-9
-		resourceProviders.sort(new Comparator<ResourceProvider>() {
-
-			@Override
-			public int compare(ResourceProvider o1, ResourceProvider o2) {
-				return o1.getOrder() - o2.getOrder();
-			}
-		});
+		OrderComparator.sort(resourceProviders);
+//		resourceProviders.sort(new Comparator<ResourceProvider>() {
+//
+//			@Override
+//			public int compare(ResourceProvider o1, ResourceProvider o2) {
+//				return o1.getOrder() - o2.getOrder();
+//			}
+//		});
 	}
 
 	@Override

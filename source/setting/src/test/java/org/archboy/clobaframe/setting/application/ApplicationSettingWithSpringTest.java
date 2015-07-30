@@ -128,7 +128,7 @@ public class ApplicationSettingWithSpringTest {
 		}
 	}
 	
-	public static class TestingPostApplicationSetting implements PostApplicationSetting {
+	public static class TestingPostApplicationSetting implements PostInitialedHandler {
 
 		@Override
 		public void execute(Map<String, Object> settings) throws Exception {
