@@ -15,8 +15,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,6 +35,7 @@ import org.archboy.clobaframe.setting.application.impl.DefaultApplicationSetting
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanNotOfRequiredTypeException;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -54,7 +57,8 @@ import org.springframework.util.Assert;
  */
 public class DefaultBeanFactory implements ListableBeanFactory, Closeable, ApplicationEventPublisher  { //, BeanDefinitionBuilder {
 
-	private static final String placeholderRegex = "^\\$\\{([\\w\\.-]+)(\\:([\\w\\.\\:\\/-]*))?\\}$";
+	//private static final String placeholderRegex = "^\\$\\{([\\w\\.-]+)(\\:([\\w\\.\\:\\/-]*))?\\}$";
+	private static final String placeholderRegex = "^\\$\\{([\\w\\.-]+)(\\:(.*))?\\}$";
 	private static final Pattern placeholderPattern = Pattern.compile(placeholderRegex);
 	
 	//private ResourceLoader resourceLoader;
@@ -185,29 +189,32 @@ public class DefaultBeanFactory implements ListableBeanFactory, Closeable, Appli
 	
 	private void loadPreBuildObject(Object object) {
 		Class<?> clazz = object.getClass();
-		Class<?>[] interfaces = clazz.getInterfaces();
+		//Class<?>[] interfaces = clazz.getInterfaces();
 		Annotation[] annotations = clazz.getDeclaredAnnotations();
 		Field[] fields = clazz.getDeclaredFields();
-		Method[] methods = clazz.getDeclaredMethods();
+		Method[] methods = clazz.getMethods();
 		
 		// build bean id
 		String id = null;
 		
-		if (clazz.isAnnotationPresent(Named.class)){
+		//if (clazz.isAnnotationPresent(Named.class)){
 			// get id from @Named
 			Named named = getAnnotationByType(annotations, Named.class);
-			String nid = named.value();
-			if (StringUtils.isNotEmpty(nid)){
-				id = nid;
+			if (named != null) {
+				String nid = named.value();
+				if (StringUtils.isNotEmpty(nid)){
+					id = nid;
+				}
 			}
-		}
+		//}
 		
 		if (StringUtils.isEmpty(id)) {
 			StringUtils.uncapitalize(clazz.getSimpleName());
 		}
 		
 		BeanDefinition bean = new BeanDefinition(id, clazz, object, 
-				interfaces, annotations, fields, methods, 
+				//interfaces, 
+				annotations, fields, methods, 
 				null, null, 
 				null,
 				true);
@@ -252,10 +259,10 @@ public class DefaultBeanFactory implements ListableBeanFactory, Closeable, Appli
 		for (Map<String, Object> defineClassName : defineClassNames) {
 			
 			Class<?> clazz = Class.forName((String)defineClassName.get("class"));
-			Class<?>[] interfaces = clazz.getInterfaces();
+			//Class<?>[] interfaces = clazz.getInterfaces();
 			Annotation[] annotations = clazz.getDeclaredAnnotations();
 			Field[] fields = clazz.getDeclaredFields();
-			Method[] methods = clazz.getDeclaredMethods();
+			Method[] methods = clazz.getMethods();
 			
 			// create instance
 			Object object = clazz.newInstance();
@@ -264,14 +271,16 @@ public class DefaultBeanFactory implements ListableBeanFactory, Closeable, Appli
 			String id = (String)defineClassName.get("id");
 			
 			if (StringUtils.isEmpty(id)) {
-				if (clazz.isAnnotationPresent(Named.class)){
+				//if (clazz.isAnnotationPresent(Named.class)){
 					// get id from @Named
 					Named named = getAnnotationByType(annotations, Named.class);
-					String nid = named.value();
-					if (StringUtils.isNotEmpty(nid)){
-						id = nid;
+					if (named != null) {
+						String nid = named.value();
+						if (StringUtils.isNotEmpty(nid)){
+							id = nid;
+						}
 					}
-				}
+				//}
 			}
 			
 			if (StringUtils.isEmpty(id)) {
@@ -286,7 +295,9 @@ public class DefaultBeanFactory implements ListableBeanFactory, Closeable, Appli
 			String initMethodName = null;
 			String disposeMethodName = null;
 			
-			for(Method method : methods) {
+			// check declare methods only!
+			Method[] declaredMethods = clazz.getDeclaredMethods();
+			for(Method method : declaredMethods) {
 				if (method.getAnnotation(PostConstruct.class) != null){
 					initMethodName = method.getName();
 				}else if (method.getAnnotation(PreDestroy.class) != null){
@@ -295,7 +306,8 @@ public class DefaultBeanFactory implements ListableBeanFactory, Closeable, Appli
 			}
 			
 			BeanDefinition bean = new BeanDefinition(id, clazz, object, 
-					interfaces, annotations, fields, methods, 
+					//interfaces, 
+					annotations, fields, methods, 
 					initMethodName, disposeMethodName, 
 					props,
 					false);
@@ -319,8 +331,83 @@ public class DefaultBeanFactory implements ListableBeanFactory, Closeable, Appli
 		Class<?> clazz = bean.getClazz();
 		Object obj = bean.getObject();
 		
+		logger.info("Initializing bean {}.", clazz.getName());
+		
+		// handle define set
+		Set<String> settledProps = new HashSet<>(); // remember all settled field/propertie names.
+		Collection<Map<String, Object>> props = bean.getProps();
+		if (props != null && !props.isEmpty()) {
+			for (Map<String, Object> prop : bean.getProps()){
+				String name = (String)prop.get("name");
+				Object value = null;
+
+				String methodName = "set" + StringUtils.capitalize(name);
+				Method method = getMethodByName(bean.getMethods(), methodName);
+				if (method == null) {
+					throw new NoSuchMethodException(
+							String.format("Can not found method [%s#%s].", clazz.getName(), methodName));
+				}
+
+				if (prop.containsKey("bean")){
+					// inject bean
+					Object defineValue = prop.get("bean");
+					if (defineValue instanceof Collection){
+						Collection<Object> os = new ArrayList<>();
+						for(String id : (Collection<String>)defineValue){
+							Object o = getBean(id);
+//							if (o == null) {
+//								throw new IllegalArgumentException(
+//										String.format("Can not found bean [%s].", id));
+//								throw new NoSuchBeanDefinitionException(id);
+//							}
+							os.add(o);
+						}
+						value = os;
+					}else{
+						Object o = getBean((String)defineValue);
+//						if (o == null) {
+//							throw new IllegalArgumentException(
+//									String.format("Can not found bean [%s].", defineValue));
+//							throw new NoSuchBeanDefinitionException((String)defineValue);
+//						}
+						value = o;
+					}
+				}else if (prop.containsKey("value")){
+					// inject value
+					
+					Object defineValue = prop.get("value");
+					if (defineValue instanceof Collection){
+						Collection<Object> os = new ArrayList<>();
+						for(Object o : (Collection)defineValue){
+							if (o instanceof String){
+								o = resolveValue((String)o);
+							}
+							os.add(o);
+						}
+						value = os;
+					}else{
+						Object o = defineValue;
+						if (o instanceof String){
+							o = resolveValue((String)o);
+						}
+						value = o;
+					}
+				}
+
+				// set value
+				method.invoke(obj, value);
+				
+				// remember
+				settledProps.add(name);
+			}
+		}
+		
 		// process field inject
-		for(Field field : bean.getFields()){
+		for(Field field : bean.getDeclaredFields()){
+			
+			if (settledProps.contains(field.getName())){
+				continue; // skip field that already settled.
+			}
 			
 			// inject by @Inject and @Autowired annotation
 			Inject inject = field.getAnnotation(Inject.class);
@@ -337,7 +424,7 @@ public class DefaultBeanFactory implements ListableBeanFactory, Closeable, Appli
 					dataType = (Class<?>)pType.getActualTypeArguments()[0];
 					Map<String, ?> nameObjects = getBeansOfType(dataType);
 					
-					// convert to List
+					// convert Map.Value into List
 					Collection<Object> targetObjects = new ArrayList<Object>(nameObjects.values());
 					
 					if (targetObjects.isEmpty()){
@@ -345,6 +432,9 @@ public class DefaultBeanFactory implements ListableBeanFactory, Closeable, Appli
 //							throw new IllegalArgumentException(
 //									String.format("There is no match type to inject field [%s#%s]",
 //											clazz.getName(), field.getName()));
+							logger.error("There is no match type [{}] to inject field [{}#{}]",
+									dataType.getName(), clazz.getName(), field.getName());
+							
 							throw new NoSuchBeanDefinitionException(dataType);
 						}
 					}else{
@@ -355,10 +445,15 @@ public class DefaultBeanFactory implements ListableBeanFactory, Closeable, Appli
 					Object targetObject = null;
 					
 					Named named = field.getAnnotation(Named.class);
-					if (named != null) {
-						targetObject = getBean(named.value());
-					}else{
-						targetObject = getBean(dataType);
+					
+					try{
+						if (named != null) {
+							targetObject = getBean(named.value());
+						}else{
+							targetObject = getBean(dataType);
+						}
+					}catch(NoSuchBeanDefinitionException e){
+						// check @Autowired and required later.
 					}
 					
 					if (targetObject == null) {
@@ -367,8 +462,14 @@ public class DefaultBeanFactory implements ListableBeanFactory, Closeable, Appli
 //									String.format("There is no match type to inject field [%s#%s]",
 //											clazz.getName(), field.getName()));
 							if (named != null) {
+								logger.error("There is no match id [{}] to inject field [{}#{}]",
+										named.value(), clazz.getName(), field.getName());
+								
 								throw new NoSuchBeanDefinitionException(named.value());
 							}else{
+								logger.error("There is no match type [{}] to inject field [{}#{}]",
+										dataType.getName(), clazz.getName(), field.getName());
+								
 								throw new NoSuchBeanDefinitionException(dataType);
 							}
 						}
@@ -388,9 +489,10 @@ public class DefaultBeanFactory implements ListableBeanFactory, Closeable, Appli
 				String placeholder = value.value();
 				Object targetValue = resolveValue(placeholder);
 				
-				if (targetValue == null || 
-						(targetValue instanceof String && 
-						targetValue.equals(StringUtils.EMPTY))) {
+//				if (targetValue == null || 
+//						(targetValue instanceof String && 
+//						targetValue.equals(StringUtils.EMPTY))) {
+				if (targetValue == null) {
 					if (requiredPlaceholderValue) {
 						throw new IllegalArgumentException(
 								String.format("Can not resolve the placeholder [%s] for field [%s#%s]",
@@ -398,6 +500,14 @@ public class DefaultBeanFactory implements ListableBeanFactory, Closeable, Appli
 					}else{
 						continue;
 					}
+				}
+				
+				if (targetValue instanceof String && 
+						targetValue.equals(StringUtils.EMPTY)) {
+					// convert EMPTY string to null.
+					// because the Java annotation can not express NULL value.
+					//targetValue = null; 
+					continue;
 				}
 				
 				Class<?> dataType = field.getType();
@@ -434,71 +544,6 @@ public class DefaultBeanFactory implements ListableBeanFactory, Closeable, Appli
 										placeholder, clazz.getName(), field.getName()));
 					}
 				}
-			}
-		}
-		
-		// handle define set
-		Collection<Map<String, Object>> props = bean.getProps();
-		if (props != null && !props.isEmpty()) {
-			for (Map<String, Object> prop : bean.getProps()){
-				String name = (String)prop.get("name");
-				Object value = null;
-
-				String methodName = "set" + StringUtils.capitalize(name);
-				Method method = getMethodByName(bean.getMethods(), methodName);
-				if (method == null) {
-					throw new NoSuchMethodException(
-							String.format("Can not found method [%s#%s].", clazz.getName(), methodName));
-				}
-
-				if (prop.containsKey("bean")){
-					// inject bean
-					Object defineValue = prop.get("bean");
-					if (defineValue instanceof Collection){
-						Collection<Object> os = new ArrayList<>();
-						for(String id : (Collection<String>)defineValue){
-							Object o = getBean(id);
-							if (o == null) {
-//								throw new IllegalArgumentException(
-//										String.format("Can not found bean [%s].", id));
-								throw new NoSuchBeanDefinitionException(id);
-							}
-							os.add(o);
-						}
-						value = os;
-					}else{
-						Object o = getBean((String)defineValue);
-						if (o == null) {
-//							throw new IllegalArgumentException(
-//									String.format("Can not found bean [%s].", defineValue));
-							throw new NoSuchBeanDefinitionException((String)defineValue);
-						}
-						value = o;
-					}
-				}else if (prop.containsKey("value")){
-					// inject value
-					
-					Object defineValue = prop.get("value");
-					if (defineValue instanceof Collection){
-						Collection<Object> os = new ArrayList<>();
-						for(Object o : (Collection)defineValue){
-							if (o instanceof String){
-								o = resolveValue((String)o);
-							}
-							os.add(o);
-						}
-						value = os;
-					}else{
-						Object o = defineValue;
-						if (o instanceof String){
-							o = resolveValue((String)o);
-						}
-						value = o;
-					}
-				}
-
-				// set value
-				method.invoke(obj, value);
 			}
 		}
 		
@@ -596,14 +641,17 @@ public class DefaultBeanFactory implements ListableBeanFactory, Closeable, Appli
 		
 		Collection<BeanDefinition> matchBeans = new ArrayList<BeanDefinition>();
 		for(BeanDefinition bean : beanDefinitions) {
-			if (bean.getClazz().equals(type)){
+//			if (bean.getClazz().equals(type)){
+//				matchBeans.add(bean);
+//			}else{
+//				for(Class<?> c : bean.getInterfaces()){
+//					if (type.equals(c)) {
+//						matchBeans.add(bean);
+//					}
+//				}
+//			}
+			if (type.isAssignableFrom(bean.getClazz())) {
 				matchBeans.add(bean);
-			}else{
-				for(Class<?> c : bean.getInterfaces()){
-					if (type.equals(c)) {
-						matchBeans.add(bean);
-					}
-				}
 			}
 		}
 		
@@ -652,7 +700,7 @@ public class DefaultBeanFactory implements ListableBeanFactory, Closeable, Appli
 		
 		Collection<BeanDefinition> matchBeans = new ArrayList<BeanDefinition>();
 		for(BeanDefinition bean : beanDefinitions) {
-			for(Annotation c : bean.getAnnotations()){
+			for(Annotation c : bean.getDeclaredAnnotations()){
 				if (annotationType.equals(c.annotationType())) {
 					matchBeans.add(bean);
 				}

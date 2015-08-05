@@ -18,9 +18,9 @@ public class BeanDefinition {
 	private String id;
 	private Class<?> clazz;
 	private Object object;
-	private Class<?>[] interfaces;
-	private Annotation[] annotations;
-	private Field[] fields;
+	//private Class<?>[] interfaces;
+	private Annotation[] declaredAnnotations;
+	private Field[] declaredFields;
 	private Method[] methods; // declared methods
 	private String initMethodName;
 	private String disposeMethodName;
@@ -28,16 +28,17 @@ public class BeanDefinition {
 	private boolean initialized;
 	
 	public BeanDefinition(String id, Class<?> clazz, Object object, 
-			Class<?>[] interfaces, Annotation[] annotations, Field[] fields, Method[] methods, 
+			//Class<?>[] interfaces, 
+			Annotation[] declaredAnnotations, Field[] declaredFields, Method[] methods, 
 			String initMethodName, String disposeMethodName, 
 			Collection<Map<String, Object>> props,
 			boolean initialized) {
 		this.id = id;
 		this.clazz = clazz;
 		this.object = object;
-		this.interfaces = interfaces;
-		this.annotations = annotations;
-		this.fields = fields;
+		//this.interfaces = interfaces;
+		this.declaredAnnotations = declaredAnnotations;
+		this.declaredFields = declaredFields;
 		this.methods = methods;
 		this.initMethodName = initMethodName;
 		this.disposeMethodName = disposeMethodName;
@@ -57,18 +58,26 @@ public class BeanDefinition {
 		return object;
 	}
 
-	public Class<?>[] getInterfaces() {
-		return interfaces;
+//	public Class<?>[] getInterfaces() {
+//		return interfaces;
+//	}
+//
+//	public Annotation[] getAnnotations() {
+//		return annotations;
+//	}
+//
+//	public Field[] getFields() {
+//		return fields;
+//	}
+
+	public Annotation[] getDeclaredAnnotations() {
+		return declaredAnnotations;
 	}
 
-	public Annotation[] getAnnotations() {
-		return annotations;
+	public Field[] getDeclaredFields() {
+		return declaredFields;
 	}
-
-	public Field[] getFields() {
-		return fields;
-	}
-
+	
 	public Method[] getMethods() {
 		return methods;
 	}

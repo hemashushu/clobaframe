@@ -105,19 +105,21 @@ public class BeanFactoryTest {
 		
 		// list by interface
 		Map<String, ?> nameAnimals = beanFactory.getBeansOfType(Animal.class);
-		assertEquals(4, nameAnimals.size());
+		assertEquals(5, nameAnimals.size());
 		
 		Collection<String> names1 = nameAnimals.keySet();
 		assertTrue(names1.contains("cat"));
 		assertTrue(names1.contains("dog"));
 		assertTrue(names1.contains("newDuck"));
 		assertTrue(names1.contains("fish"));
+		assertTrue(names1.contains("rubberDuck"));
 		
 		Collection<Animal> animals = (Collection<Animal>)nameAnimals.values();
 		assertTrue(animals.contains(cat));
 		assertTrue(animals.contains(dog));
 		assertTrue(animals.contains(duck));
 		assertTrue(animals.contains(fish));
+		assertTrue(animals.contains(rubberDuck));
 		
 		// list by annotation
 		Map<String, ?> nameSpecials = beanFactory.getBeansWithAnnotation(Special.class);
@@ -135,11 +137,12 @@ public class BeanFactoryTest {
 		Zoo zoo = beanFactory.getBean(Zoo.class);
 		
 		Collection<Animal> animalsByZoo = zoo.getAnimals();
-		assertEquals(4, animalsByZoo.size());
+		assertEquals(5, animalsByZoo.size());
 		assertTrue(animals.contains(cat));
 		assertTrue(animals.contains(dog));
 		assertTrue(animals.contains(duck));
 		assertTrue(animals.contains(fish));
+		assertTrue(animals.contains(rubberDuck));
 		
 		// inject with @Named specified
 		Animal seaAnimal = zoo.getSeaAnimal();

@@ -90,6 +90,8 @@ public class ConcatenateWebResourceProvider implements ResourceProvider {
 			return;
 		}
 
+		logger.info("Load concatenate config file [{}].", concatenateConfig);
+		
 		//Properties properties = new Properties();
 		InputStream in = null;
 		
