@@ -23,6 +23,8 @@
 		"class":"org.archboy.clobaframe.ioc.bean.Zoo",
 		"props":[
 			{"name":"owners", "value":["foo", "${os.name}"]},
+			{"name":"amount", "value":123},
+			{"name":"amounts", "value":[1,2,3]},
 			{"name":"pets", "bean":["cat", "dog"]}
 		]}
 ]

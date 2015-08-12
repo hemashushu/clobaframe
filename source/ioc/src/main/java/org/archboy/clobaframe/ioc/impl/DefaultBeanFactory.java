@@ -10,6 +10,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -374,22 +375,62 @@ public class DefaultBeanFactory implements ListableBeanFactory, Closeable, Appli
 					}
 				}else if (prop.containsKey("value")){
 					// inject value
-					
 					Object defineValue = prop.get("value");
+					
+					// check date type.
+					Parameter[] parameters = method.getParameters();
+					if (parameters.length != 1) {
+						throw new IllegalArgumentException(
+								String.format("The setter [%s#%s] parameter error.",
+										clazz.getName(), method.getName()));
+					}
+					
+					Parameter parameter = parameters[0];
+					
 					if (defineValue instanceof Collection){
+						ParameterizedType pType = (ParameterizedType)parameter.getParameterizedType();
+						Class<?> dataType = (Class<?>)pType.getActualTypeArguments()[0];
+						
 						Collection<Object> os = new ArrayList<>();
 						for(Object o : (Collection)defineValue){
 							if (o instanceof String){
 								o = resolveValue((String)o);
 							}
+							
+							// convert datetype
+							if(dataType.equals(Integer.class)){
+								if (o instanceof String) {
+									o = Integer.parseInt((String)o);
+								}
+							}else if(dataType.equals(Boolean.class)){
+								if (o instanceof String) {
+									o = Boolean.parseBoolean((String)o);
+								}
+							}
+							
 							os.add(o);
 						}
 						value = os;
 					}else{
 						Object o = defineValue;
+						
 						if (o instanceof String){
 							o = resolveValue((String)o);
 						}
+						
+						Class<?> dataType = parameter.getType();
+						
+						// convert datetype
+						if(dataType.equals(Integer.class) || dataType.equals(Integer.TYPE)){
+							if (o instanceof String) {
+								o = Integer.parseInt((String)o);
+							}
+						}else if(dataType.equals(Boolean.class) || dataType.equals(Boolean.TYPE)){
+							if (o instanceof String) {
+								o = Boolean.parseBoolean((String)o);
+							}
+						}
+						
 						value = o;
 					}
 				}
@@ -523,16 +564,16 @@ public class DefaultBeanFactory implements ListableBeanFactory, Closeable, Appli
 								String.format("Can not resolve the placeholder [%s] for field [%s#%s], type cast error.",
 										placeholder, clazz.getName(), field.getName()));
 					}
-				}else if(dataType.equals(Long.class)){
-					if (targetValue instanceof Long){
-						field.setLong(obj, (Long)targetValue);
-					}else if (targetValue instanceof String) {
-						field.setLong(obj, Long.parseLong((String)targetValue));
-					}else {
-						throw new IllegalArgumentException(
-								String.format("Can not resolve the placeholder [%s] for field [%s#%s], type cast error.",
-										placeholder, clazz.getName(), field.getName()));
-					}
+//				}else if(dataType.equals(Long.class)){
+//					if (targetValue instanceof Long){
+//						field.setLong(obj, (Long)targetValue);
+//					}else if (targetValue instanceof String) {
+//						field.setLong(obj, Long.parseLong((String)targetValue));
+//					}else {
+//						throw new IllegalArgumentException(
+//								String.format("Can not resolve the placeholder [%s] for field [%s#%s], type cast error.",
+//										placeholder, clazz.getName(), field.getName()));
+//					}
 				}else if(dataType.equals(Boolean.class)){
 					if (targetValue instanceof Boolean){
 						field.setBoolean(obj, (Boolean)targetValue);
@@ -544,6 +585,9 @@ public class DefaultBeanFactory implements ListableBeanFactory, Closeable, Appli
 										placeholder, clazz.getName(), field.getName()));
 					}
 				}
+//					else{
+//					
+//				}
 			}
 		}
 		

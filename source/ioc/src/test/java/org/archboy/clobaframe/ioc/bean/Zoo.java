@@ -22,6 +22,8 @@ public class Zoo {
 	private String size;
 	
 	private Collection<String> owners; // inject by bean define file.
+	private Collection<Integer> amounts;
+	private int amount;
 	private Collection<Animal> pets; // inject by bean define file.
 	
 	public Collection<Animal> getAnimals() {
@@ -58,6 +60,22 @@ public class Zoo {
 
 	public Animal getSeaAnimal() {
 		return seaAnimal;
+	}
+
+	public int getAmount() {
+		return amount;
+	}
+
+	public void setAmount(int amount) {
+		this.amount = amount;
+	}
+
+	public Collection<Integer> getAmounts() {
+		return amounts;
+	}
+
+	public void setAmounts(Collection<Integer> amounts) {
+		this.amounts = amounts;
 	}
 	
 }

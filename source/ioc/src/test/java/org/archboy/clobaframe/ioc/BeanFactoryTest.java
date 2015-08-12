@@ -159,6 +159,14 @@ public class BeanFactoryTest {
 		Collection<Animal> pets = zoo.getPets();
 		assertTrue(pets.contains(cat));
 		assertTrue(pets.contains(dog));
+
+		assertEquals(123, zoo.getAmount());
+		
+		Collection<Integer> amounts = zoo.getAmounts();
+		assertEquals(3, amounts.size());
+		assertTrue(amounts.contains(1));
+		assertTrue(amounts.contains(2));
+		assertTrue(amounts.contains(3));
 		
 		// test life cycle maintain
 		((DefaultBeanFactory)beanFactory).addApplicationListener(new ApplicationListener<BeanFactoryClosedEvent>() {
