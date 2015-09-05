@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -398,17 +399,24 @@ public class DefaultBeanFactory implements ListableBeanFactory, Closeable, Appli
 							}
 							
 							// convert datetype
-							if(dataType.equals(Integer.class)){
-								if (o instanceof String) {
+							if (dataType.equals(String.class)){
+								os.add(o);
+							}else if(dataType.equals(Integer.class) || dataType.equals(Integer.TYPE)){
+								if (o instanceof Integer){
+									//
+								}else if (o instanceof String) {
 									o = Integer.parseInt((String)o);
+								}else {
+									throw new IllegalArgumentException(
+											String.format("Can not inject value for [%s#%s], type cast error.",
+											clazz.getName(), method.getName()));
 								}
-							}else if(dataType.equals(Boolean.class)){
-								if (o instanceof String) {
-									o = Boolean.parseBoolean((String)o);
-								}
+								os.add(o);
+							}else {
+								throw new IllegalArgumentException(
+										String.format("Can not inject value for [%s#%s], unsupported data type.",
+										clazz.getName(), method.getName()));
 							}
-							
-							os.add(o);
 						}
 						value = os;
 					}else{
@@ -421,17 +429,39 @@ public class DefaultBeanFactory implements ListableBeanFactory, Closeable, Appli
 						Class<?> dataType = parameter.getType();
 						
 						// convert datetype
-						if(dataType.equals(Integer.class) || dataType.equals(Integer.TYPE)){
-							if (o instanceof String) {
+						if (dataType.equals(String.class)){
+							value = o;
+						}else if(dataType.equals(Integer.class) || dataType.equals(Integer.TYPE)){
+							if (o instanceof Integer){
+								//
+							}else if (o instanceof String) {
 								o = Integer.parseInt((String)o);
+							}else{
+								throw new IllegalArgumentException(
+											String.format("Can not inject value for [%s#%s], type cast error.",
+											clazz.getName(), method.getName()));
 							}
+							value = o;
 						}else if(dataType.equals(Boolean.class) || dataType.equals(Boolean.TYPE)){
-							if (o instanceof String) {
+							if (o instanceof Boolean) {
+								//
+							}else if (o instanceof String) {
 								o = Boolean.parseBoolean((String)o);
+							}else{
+								throw new IllegalArgumentException(
+											String.format("Can not inject value for [%s#%s], type cast error.",
+											clazz.getName(), method.getName()));
 							}
+							value = o;
+						}else if (dataType.equals(Locale.class)) {
+							value = Locale.forLanguageTag((String)o);
+						}else {
+							throw new IllegalArgumentException(
+									String.format("Can not inject value for [%s#%s], unsupported data type.",
+									clazz.getName(), method.getName()));
 						}
 						
-						value = o;
+						
 					}
 				}
 
@@ -552,9 +582,10 @@ public class DefaultBeanFactory implements ListableBeanFactory, Closeable, Appli
 				}
 				
 				Class<?> dataType = field.getType();
+				
 				if (dataType.equals(String.class)) {
 					field.set(obj, targetValue.toString());
-				}else if(dataType.equals(Integer.class)){
+				}else if(dataType.equals(Integer.class) || dataType.equals(Integer.TYPE)){
 					if (targetValue instanceof Integer){
 						field.setInt(obj, (Integer)targetValue);
 					}else if (targetValue instanceof String) {
@@ -574,7 +605,7 @@ public class DefaultBeanFactory implements ListableBeanFactory, Closeable, Appli
 //								String.format("Can not resolve the placeholder [%s] for field [%s#%s], type cast error.",
 //										placeholder, clazz.getName(), field.getName()));
 //					}
-				}else if(dataType.equals(Boolean.class)){
+				}else if(dataType.equals(Boolean.class) || dataType.equals(Boolean.TYPE)){
 					if (targetValue instanceof Boolean){
 						field.setBoolean(obj, (Boolean)targetValue);
 					}else if (targetValue instanceof String) {
@@ -584,10 +615,13 @@ public class DefaultBeanFactory implements ListableBeanFactory, Closeable, Appli
 								String.format("Can not resolve the placeholder [%s] for field [%s#%s], type cast error.",
 										placeholder, clazz.getName(), field.getName()));
 					}
+				}else if (dataType.equals(Locale.class)) {
+					field.set(obj, Locale.forLanguageTag((String)targetValue));
+				}else{
+					throw new IllegalArgumentException(
+								String.format("Can not resolve the placeholder [%s] for field [%s#%s], unsupported field data type.",
+										placeholder, clazz.getName(), field.getName()));
 				}
-//					else{
-//					
-//				}
 			}
 		}
 		
