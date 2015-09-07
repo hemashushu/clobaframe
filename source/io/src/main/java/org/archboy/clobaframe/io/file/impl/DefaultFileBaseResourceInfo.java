@@ -51,21 +51,7 @@ public class DefaultFileBaseResourceInfo implements FileBaseResourceInfo {
 	@Override
 	public Date getLastModified() {
 		// get the last modified time just in time.
-		System.out.println("FILE:" + file.getName());
-		System.out.println("	last mod:" + file.lastModified());
 		Date date = new Date(file.lastModified());
-		System.out.println("	last mod(date):" + date);
-		
-		try{
-			Path path = Paths.get(file.toURI());
-			FileTime ft = Files.getLastModifiedTime(path);
-			long m = ft.toMillis();
-			System.out.println(" --" + m);
-			System.out.println(" --(date)" + new Date(m));
-		}catch(IOException e){
-			//
-		}
-		
 		return date;
 	}
 
