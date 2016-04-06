@@ -6,7 +6,7 @@ that an application need, it also abstracts the underlay service that runs on cl
 such as VPS, Google Cloud Platform, Amazon Web Service, make it possible to migrate
 application between these cloud platforms.
 
-__Features:__
+*Features:*
 
 * common: common functions.
 * setting: application settings, writable.
