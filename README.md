@@ -22,6 +22,9 @@ application between these cloud platforms.
 * mail: abstract the mail sender.
 * search: full text index.
 
+
+![family](https://github.com/ivarptr/clobaframe/raw/master/doc/figure-family.jpg)
+
 Unit test
 ---------
 1. Install Git, JDK, Apache Maven.
@@ -39,3 +42,11 @@ Install clobaframe into Apache Maven local repository:
 ```
     $ mvn clean javadoc:jar source:jar install
 ```
+
+Release
+-------
+
+[v2.6 release notes](https://github.com/ivarptr/clobaframe/tree/master/doc/release-2.6_zh-CN.md)
+
+
+
