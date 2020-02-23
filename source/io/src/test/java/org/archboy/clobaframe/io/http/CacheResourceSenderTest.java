@@ -47,7 +47,7 @@ public class CacheResourceSenderTest {
 	private String sampleFileDirectory = DEFAULT_SAMPLE_FILE_DIRECTORY;
 	
 	private String sampleFileName1 = sampleFileDirectory + "/test.jpg";
-	private String sampleFileUrl1 = "http://localhost:18080/resource?name=test.jpg";
+	private String sampleFileUrl1 = "http://localhost:8088/resource?name=test.jpg";
 	
 	private Server server;
 	
@@ -63,7 +63,7 @@ public class CacheResourceSenderTest {
 	@Before
 	public void setUp() throws Exception {
 		// start jetty http server
-		server = new Server(18080);
+		server = new Server(8088);
 		
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 		context.setContextPath("/");

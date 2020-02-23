@@ -55,10 +55,10 @@ public class ResourceSenderTest {
 	private String sampleFileDirectory = DEFAULT_SAMPLE_FILE_DIRECTORY;
 	
 	private String sampleFileName1 = sampleFileDirectory + "/test.jpg";
-	private String sampleFileUrl1 = "http://localhost:18080/resource?name=test.jpg";
+	private String sampleFileUrl1 = "http://localhost:8088/resource?name=test.jpg";
 	
 	private String sampleFileName2 = sampleFileDirectory + "/test.css";
-	private String sampleFileUrl2 = "http://localhost:18080/resource?name=test.css";
+	private String sampleFileUrl2 = "http://localhost:8088/resource?name=test.css";
 
 	private Server server;
 	//private Tomcat tomcat;
@@ -75,7 +75,7 @@ public class ResourceSenderTest {
 	@Before
 	public void setUp() throws Exception {
 		// start jetty http server
-		server = new Server(18080);
+		server = new Server(8088);
 		
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 		context.setContextPath("/");
@@ -88,7 +88,7 @@ public class ResourceSenderTest {
 		
 		// start tomcat http server
 //		tomcat = new Tomcat();
-//		tomcat.setPort(18080);
+//		tomcat.setPort(8088);
 //		
 //		File base = new File(System.getProperty("java.io.tmpdir"));
 //		Context context = tomcat.addContext("", base.getAbsolutePath());

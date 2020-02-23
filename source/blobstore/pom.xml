@@ -60,7 +60,12 @@
 			<groupId>javax.inject</groupId>
 			<artifactId>javax.inject</artifactId>
 		</dependency>
-			
+                
+                <dependency>
+                    <groupId>javax.annotation</groupId>
+                    <artifactId>javax.annotation-api</artifactId>
+                </dependency>
+                			
 		<!-- Spring Core -->
 <!--		<dependency>
 			<groupId>org.springframework</groupId>

@@ -48,7 +48,7 @@ public class NamedResourceSenderTest {
 	@Before
 	public void setUp() throws Exception {
 		// start http server
-		server = new Server(18080);
+		server = new Server(8088);
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 		context.setContextPath("/");
 		server.setHandler(context);
@@ -74,7 +74,7 @@ public class NamedResourceSenderTest {
 		CloseableHttpClient client = HttpClients.createDefault();
 
 		// test get by resource name
-		HttpGet method1 = new HttpGet("http://localhost:18080/resource/test.png");
+		HttpGet method1 = new HttpGet("http://localhost:8088/resource/test.png");
 
 		try {
 			assertResponseContentEquals(client, method1, webResource1);
@@ -83,7 +83,7 @@ public class NamedResourceSenderTest {
 		}
 
 		// test none exists resource
-		HttpGet method3 = new HttpGet("http://localhost:18080/resource/none-exists");
+		HttpGet method3 = new HttpGet("http://localhost:8088/resource/none-exists");
 		try {
 			assertStatusCodeEquals(client, method3, HttpStatus.SC_NOT_FOUND);
 		} catch (IOException e) {
@@ -92,7 +92,7 @@ public class NamedResourceSenderTest {
 		
 		// test get by resource name with version number
 		String location1 = resourceManager.getLocation(webResource1);
-		HttpGet method4 = new HttpGet("http://localhost:18080" + location1);
+		HttpGet method4 = new HttpGet("http://localhost:8088" + location1);
 		try {
 			assertResponseContentEquals(client, method4, webResource1);
 		} catch (IOException e) {

@@ -56,7 +56,7 @@ public class MultipartFormResourceReceiverTest {
 
 	private String sampleFile1 = "sample/data/test.jpg";
 	private String sampleFile2 = "sample/data/test.png";
-	private String postUrl = "http://localhost:18080/post";
+	private String postUrl = "http://localhost:8088/post";
 
 	private Server server;
 	private final ObjectMapper objectMapper = new ObjectMapper();
@@ -73,7 +73,7 @@ public class MultipartFormResourceReceiverTest {
 	@Before
 	public void setUp() throws Exception {
 		// start http server
-		server = new Server(18080);
+		server = new Server(8088);
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 		context.setContextPath("/");
 		server.setHandler(context);

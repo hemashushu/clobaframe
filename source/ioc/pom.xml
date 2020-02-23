@@ -54,6 +54,11 @@
 			<artifactId>junit</artifactId>
 		</dependency>
 
+                <dependency>
+                    <groupId>javax.annotation</groupId>
+                    <artifactId>javax.annotation-api</artifactId>
+                </dependency>
+                
 		<!-- Apache Commons -->
 		<!-- need by clobaframe-ioc -->
 <!--		<dependency>

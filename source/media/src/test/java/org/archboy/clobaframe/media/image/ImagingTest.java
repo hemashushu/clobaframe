@@ -312,7 +312,8 @@ public class ImagingTest {
 		Composite composite4 = imaging.text("Watermark", font1, Color.blue, 200, 260, 0.6F);
 
 		List<Composite> compositeList = Arrays.asList(composite1, composite2, composite3, composite4);
-		Composite[] composites = (Composite[])compositeList.toArray();
+//		Composite[] composites = (Composite[])compositeList.toArray();
+                Composite[] composites = compositeList.toArray(new Composite[0]);
 
 		File file3 = getFileByName("test.jpg");
 		Image image3 = (Image)mediaFactory.make(file3, temporaryResources);

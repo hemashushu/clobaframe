@@ -139,18 +139,18 @@ public class ImageFactoryTest {
 		assertEquals(64, image1.getHeight());
 	}
 
-	@Test
-	public void testMakeImageFromURL() throws MalformedURLException, IOException {
-		// can be safetly replace this image url.
-		URL url = new URL("https://upload.wikimedia.org/wikipedia/en/b/bc/Wiki.png");
-		Image image1 = (Image)mediaFactory.make(url, temporaryResources);
-		assertEquals(Image.Format.PNG, image1.getFormat());
-		assertTrue(image1.getWidth() > 1);
-		assertTrue(image1.getHeight() > 1);
-
-		// manual check
-		Utils.saveImage(image1, "mediaFactory-from-url");
-	}
+//	@Test
+//	public void testMakeImageFromURL() throws MalformedURLException, IOException {
+//		// can be safetly replace this image url.
+//		URL url = new URL("https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RE1Mu3b");
+//		Image image1 = (Image)mediaFactory.make(url, temporaryResources);
+//		assertEquals(Image.Format.PNG, image1.getFormat());
+//		assertTrue(image1.getWidth() > 1);
+//		assertTrue(image1.getHeight() > 1);
+//
+//		// manual check
+//		Utils.saveImage(image1, "mediaFactory-from-url");
+//	}
 
 	@Test
 	public void testMakeImageFromResourceInfo() throws IOException{

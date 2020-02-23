@@ -8,3 +8,5 @@ target/
 *.log
 catalog.xml
 nb-configuration.xml
+.idea/
+source/**/*.iml
