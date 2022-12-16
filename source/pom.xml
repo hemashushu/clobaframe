@@ -49,7 +49,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- dependencies version -->
-		<org.springframework-version>4.1.6.RELEASE</org.springframework-version>
+		<org.springframework-version>5.2.20.RELEASE</org.springframework-version>
 		<com.fasterxml.jackson.core-version>2.5.4</com.fasterxml.jackson.core-version>
 		<org.slf4j-version>1.7.5</org.slf4j-version>
 		<log4j-version>1.2.17</log4j-version>
